@@ -1,0 +1,33 @@
+diff --git a/src/flatc.cpp b/src/flatc.cpp
+index 9c59232..dae494e 100644
+--- a/src/flatc.cpp
++++ b/src/flatc.cpp
+@@ -278,7 +278,6 @@ int FlatCompiler::Compile(int argc, const char **argv) {
+         opts.object_suffix = argv[argi];
+       } else if (arg == "--gen-all") {
+         opts.generate_all = true;
+-        opts.include_dependence_headers = false;
+       } else if (arg == "--gen-includes") {
+         // Deprecated, remove this option some time in the future.
+         printf("warning: --gen-includes is deprecated (it is now default)\n");
+@@ -464,6 +463,12 @@ int FlatCompiler::Compile(int argc, const char **argv) {
+ 
+     for (size_t i = 0; i < params_.num_generators; ++i) {
+       parser->opts.lang = params_.generators[i].lang;
++      auto include_dependence_headers_temp = parser->opts.include_dependence_headers;
++      if (parser->opts.generate_all) {
++          parser->opts.include_dependence_headers =
++              parser->opts.lang == IDLOptions::kPython && parser->opts.include_dependence_headers;
++      }
++
+       if (generator_enabled[i]) {
+         if (!print_make_rules) {
+           flatbuffers::EnsureDirExists(output_path);
+@@ -499,6 +504,7 @@ int FlatCompiler::Compile(int argc, const char **argv) {
+           }
+         }
+       }
++      parser->opts.include_dependence_headers = include_dependence_headers_temp;
+     }
+ 
+     if (!opts.root_type.empty()) {

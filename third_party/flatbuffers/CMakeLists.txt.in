@@ -1,0 +1,18 @@
+cmake_minimum_required(VERSION 3.6)
+project(flatbuffers-download NONE)
+include(ExternalProject)
+
+message(${CMAKE_CURRENT_SOURCE_DIR})
+
+ExternalProject_Add(flatbuffers
+    GIT_REPOSITORY    https://github.com/google/flatbuffers.git
+    GIT_TAG           eddebec1b6136a3248c99aff1bcb4c3012a766be
+    SOURCE_DIR        ${CMAKE_CURRENT_BINARY_DIR}/flatbuffers-src
+    BINARY_DIR        ${CMAKE_CURRENT_BINARY_DIR}/flatbuffers-build
+    PATCH_COMMAND     patch -p1 -N -i ${CMAKE_CURRENT_SOURCE_DIR}/fix_include.patch
+    COMMAND           patch -p1 -N -i ${CMAKE_CURRENT_SOURCE_DIR}/fix_instance_name.patch
+    CONFIGURE_COMMAND ""
+    BUILD_COMMAND     ""
+    INSTALL_COMMAND   ""
+    TEST_COMMAND      ""
+)
