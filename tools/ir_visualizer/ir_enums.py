@@ -1,0 +1,216 @@
+from enum import Enum
+
+
+class DefaultEnum(Enum):
+    @classmethod
+    def get_name(cls, val):
+        try:
+            return cls(val).name
+        except ValueError:
+            return 'UNKNOWN'
+
+
+# Enum Define
+# 'IR' Enums
+class NodeType(DefaultEnum):
+    NNNode = 0
+    OpNode = 1
+
+
+class EdgeType(DefaultEnum):
+    DataEdge = 0
+    ControlEdge = 1
+
+
+class NNNodeType(DefaultEnum):
+    NONE = 0
+    InputNode = 1
+    ConvNode = 2
+    PoolNode = 3
+    ActivationNode = 4
+    FullyConnectedNode = 5
+    ConcatNode = 6
+    SoftmaxNode = 7
+    EltwiseNode = 8
+    BatchNormNode = 9
+    ScaleNode = 10
+    PriorBoxNode = 11
+    PermuteNode = 12
+    ReshapeNode = 13
+    Pad = 14
+
+
+# 'NNNode' Enums
+class InputType(DefaultEnum):
+    Data = 0
+    Image = 1
+    Speech = 2
+    Text = 3
+
+
+class PoolType(DefaultEnum):
+    Average = 0
+    Max = 1
+    Stochastic = 2
+
+
+class ActivationType(DefaultEnum):
+    None_ = 0
+    Relu = 1
+    Relu6 = 2
+    Sigmoid = 3
+    Tanh = 4
+    LeakyRelu = 5
+    PRelu = 6,
+    PiecewiseLinear = 7,
+    Relu1 = 8,
+    Clip = 9
+
+
+class PadCalculation(DefaultEnum):
+    Ignore = 0
+    Include = 1
+
+
+class EltwiseType(DefaultEnum):
+    Prod = 0
+    Sum = 1
+    Max = 2
+
+
+# 'Type' Enums
+class DataType(DefaultEnum):
+    FP_32 = 0
+    FIXED_16 = 1
+    FIXED_8 = 2
+    FIXED_8U = 3
+    FIXED_64 = 4
+    FIXED_16U = 5
+    FIXED_32 = 6
+    FIXED_32U = 7
+    FP_16 = 8
+    FIXED_4 = 9
+    FIXED_4U = 10
+
+
+class ShapeType(DefaultEnum):
+    UNDEFINED = 0
+    CELL = 1
+    NCHW = 2
+    NHWC = 3
+
+
+class QuantType(DefaultEnum):
+    SAIT = 0
+    Google = 1
+
+
+class NodeExecutionType(DefaultEnum):
+    NODE_DATA_LOAD_START = 0
+    NODE_DATA_LOAD_SYNC = 1
+    EXEC_START = 2
+    EXEC_SYNC = 3
+
+
+class EdgeExecutionType(DefaultEnum):
+    LOAD_START = 0
+    LOAD_SYNC = 1
+    STORE_START = 2
+    STORE_SYNC = 3
+
+
+# memory_instr
+class DirectionType(DefaultEnum):
+    DRAM2SRAM = 0
+    SRAM2DRAM = 1
+    DRAM2FIFO = 2
+
+
+class MemoryType(DefaultEnum):
+    DRAM = 0
+    SRAM = 1
+    FIFO = 2
+
+
+class MemoryDataType(DefaultEnum):
+    PSUM = 0
+    IFM = 1
+    KERNEL = 2
+    OFM = 3
+    INSTR = 4
+    MISC = 5
+    INTERMEDIATE_FM = 6
+    SHARED_IM = 7
+    CONSTANT = 8
+    LUT = 9
+
+
+class NodeOperationType(DefaultEnum):
+    NORMAL = 0
+    DEDICATED = 1
+
+
+class TilingSchemeType(DefaultEnum):
+    WEIGHT = 0
+    IFM = 1
+    IFM_WEIGHT = 2
+
+
+class TilingDirectionType(DefaultEnum):
+    OUTCHWISE = 0
+    INCHWISE = 1
+    HEIGHTWISE = 2
+    WIDTHWISE = 3
+
+
+class SyncType(DefaultEnum):
+    NONE = 0
+    LOCAL = 1
+    REMOTE = 2
+
+
+class SigType(DefaultEnum):
+    NONE = 0
+    Sig_wait = 1
+    Sig_bar = 2
+    Sig_send = 3
+
+
+class PartitionMode(DefaultEnum):
+    NONE = 0
+    Branch = 1
+    IFM_H = 2
+    OFM_C = 3
+
+
+class GlobalConcatType(DefaultEnum):
+    Intra = 0
+    Inter = 1
+
+
+class GlobalConcatAxis(DefaultEnum):
+    C_axis = 0
+    H_axis = 1
+
+
+class CompressionType(DefaultEnum):
+    NONE = 0
+    FLC = 1
+
+
+class DataFormatConversion(DefaultEnum):
+    RASTER2CELL = 0
+    CELL2RASTER = 1
+
+
+class PriorboxType(DefaultEnum):
+    NONE = 0
+    TF = 1
+
+
+class PadType(DefaultEnum):
+    ZERO = 0
+    MIRROR = 1
+    REPLICATE = 2
+    CONSTANT = 3
+    SYMMETRIC = 4
