@@ -22,6 +22,8 @@ class EdgeType(DefaultEnum):
     ControlEdge = 1
 
 
+_TORCH_ATEN_OP_START = 100
+
 class NNNodeType(DefaultEnum):
     NONE = 0
     InputNode = 1
@@ -38,6 +40,60 @@ class NNNodeType(DefaultEnum):
     PermuteNode = 12
     ReshapeNode = 13
     Pad = 14
+
+    # Torch Aten Ops
+    # for extension, Torch Aten Ops starts from "_TORCH_ATEN_OP_START"
+    AtenZerosLikeNode = _TORCH_ATEN_OP_START + 0
+    AtenZerosNode = _TORCH_ATEN_OP_START + 1
+    AtenUnsqueezeNode = _TORCH_ATEN_OP_START + 2
+    AtenToNode = _TORCH_ATEN_OP_START + 3
+    AtenTensorNode = _TORCH_ATEN_OP_START + 4 
+    AtenSliceNode = _TORCH_ATEN_OP_START + 5
+    AtenSizeNode = _TORCH_ATEN_OP_START + 6
+    AtenSelectNode = _TORCH_ATEN_OP_START + 7
+    AtenNegNode = _TORCH_ATEN_OP_START + 8
+    AtenNeNode = _TORCH_ATEN_OP_START + 9
+    AtenItNode = _TORCH_ATEN_OP_START + 10 
+    AtenLSTMNode = _TORCH_ATEN_OP_START + 11
+    AtenListNode = _TORCH_ATEN_OP_START + 12
+    AtenLenNode = _TORCH_ATEN_OP_START + 13 
+    AtenItemNode = _TORCH_ATEN_OP_START + 14
+    AtenGtNode = _TORCH_ATEN_OP_START + 15
+    AtenFormatNode = _TORCH_ATEN_OP_START + 16
+    AtenExpandNode = _TORCH_ATEN_OP_START + 17
+    AtenEqNode = _TORCH_ATEN_OP_START + 18
+    AtenEmbeddingNode = _TORCH_ATEN_OP_START + 19
+    AtenDropoutNode = _TORCH_ATEN_OP_START + 20
+    AtenDivNode = _TORCH_ATEN_OP_START + 21 
+    AtenDimNode = _TORCH_ATEN_OP_START + 22
+    AtenCopyNode = _TORCH_ATEN_OP_START + 23
+    AtenCeilNode = _TORCH_ATEN_OP_START + 24
+    AtenCatNode = _TORCH_ATEN_OP_START + 25
+    AtenAppendNode = _TORCH_ATEN_OP_START + 26
+    AtenAdmmNode = _TORCH_ATEN_OP_START + 27
+    AtenAddNode = _TORCH_ATEN_OP_START + 28
+    AtenIsNode = _TORCH_ATEN_OP_START + 29
+    AtenGetItemNode = _TORCH_ATEN_OP_START + 30
+    AtenDeriveIndexNode = _TORCH_ATEN_OP_START + 31
+    AtenIntNode = _TORCH_ATEN_OP_START + 32
+
+
+class ControlNodeType(DefaultEnum):
+    NONE = 0
+    PrimConstantNode = 1
+    PrimGetAttrNode = 2
+    PrimIf = 3
+    PrimListUnpackNode = 4
+    PrimLoopNode = 5
+    PrimRaiseExceptionNode = 6
+    PrimTupleConstructNode = 7
+    PrimTupleIndexNode = 8
+    PrimTupleUnpackNode = 9
+    PrimUninitializedNode = 10
+    PrimDataNode = 11
+    PrimDeviceNode = 12
+    PrimDtypeNode = 13
+    primUncheckedCastNode = 14
 
 
 # 'NNNode' Enums

@@ -25,3 +25,9 @@
 
 #swap files
 *.swp
+
+# python cache files
+*.pyc
+
+# vscode
+.vscode
