@@ -350,6 +350,230 @@ def shift_node_label(shift_node: IR.OPNode.ShiftNode.ShiftNode) -> str:
 
     return list_table([retval])
 
+# Torch Aten Ops
+def aten_slice_node_label(aten_slice_node: IR.NNNode.AtenSliceNode.AtenSliceNode) -> str:
+    dim = aten_slice_node.Dim()
+    start = aten_slice_node.Start()
+    end = aten_slice_node.End()
+    step = aten_slice_node.Step()
+
+    retval = 'AtenSlice Node<br/>'
+    if dim is not None:
+        retval += 'Dim: {}<br/>'.format(dim)
+    if start is not None:
+        retval += 'Start: {}<br/>'.format(start)
+    if end is not None:
+        retval += 'End: {}<br/>'.format(end)
+    if step is not None:
+        retval += 'Step: {}<br/>'.format(step)
+    return list_table([retval])
+
+
+def aten_unsqueeze_node_label(aten_unsqueeze_node: IR.NNNode.AtenUnsqueezeNode.AtenUnsqueezeNode) -> str:
+    retval = 'AtenUnsqueeze Node<br/>'
+    dim = aten_unsqueeze_node.Dim()
+    if dim is not None:
+        retval += 'Dim: {}<br/>'.format(dim)
+    return list_table([retval])
+
+
+def aten_to_node_label(aten_to_node: IR.NNNode.AtenToNode.AtenToNode) -> str:
+    retval = 'AtenTo Node<br/>'
+    dtype = aten_to_node.Dtype()
+    non_blocking = aten_to_node.NonBlocking()
+    copy = aten_to_node.Copy()
+
+    if dtype is not None:
+        retval += 'Dtype: {}<br/>'.format(dtype)
+    if non_blocking is not None:
+        retval += 'NonBlocking: {}<br/>'.format(non_blocking)
+    if copy is not None:
+        retval += 'Copy: {}<br/>'.format(copy)
+    return list_table([retval])
+
+
+def aten_size_node_label(aten_size_node: IR.NNNode.AtenSizeNode.AtenSizeNode) -> str:
+    retval = 'AtenSizeNode Node<br/>'
+    dim = aten_size_node.Dim()
+    if dim is not None:
+        retval += 'Dim: {}<br/>'.format(dim)
+    return list_table([retval])
+
+
+def aten_select_node_label(aten_select_node: IR.NNNode.AtenSelectNode.AtenSelectNode) -> str:
+    retval = 'AtenSelect Node Node<br/>'
+    dim = aten_select_node.Dim()
+    index = aten_select_node.Index()
+    if dim is not None:
+        retval += 'Dim: {}<br/>'.format(dim)
+    if index is not None:
+        retval += 'Index: {}<br/>'.format(index)
+    return list_table([retval])
+
+
+def aten_expand_node_label(aten_expand_node: IR.NNNode.AtenExpandNode.AtenExpandNode) -> str:
+    retval = 'AtenExpandNode Node<br/>'
+    implicit = aten_expand_node.Implicit()
+    if implicit is not None:
+        retval += 'Implicit: {}<br/>'.format(implicit)
+    return list_table([retval])
+
+
+def aten_dropout_node_label(aten_dropout_node: IR.NNNode.AtenDropoutNode.AtenDropoutNode) -> str:
+    retval = 'AtenDropout Node Node<br/>'
+    proportion = aten_dropout_node.Proportion()
+    train = aten_dropout_node.Train()
+
+    if proportion is not None:
+        retval += 'Proportion: {}<br/>'.format(proportion)
+    if train is not None:
+        retval += 'Train: {}<br/>'.format(train)
+    return list_table([retval])
+
+
+def aten_transpose_node_label(aten_transpose_node: IR.NNNode.AtenTransposeNode.AtenTransposeNode) -> str:
+    retval = 'AtenTranspose Node<br/>'
+    dim0 = aten_transpose_node.Dim0()
+    dim1 = aten_transpose_node.Dim1()
+
+    if dim0 is not None:
+        retval += 'Dim0: {}<br/>'.format(dim0)
+    if dim1 is not None:
+        retval += 'Dim1: {}<br/>'.format(dim1)
+    return list_table([retval])
+
+
+def aten_cat_node_label(aten_cat_node: IR.NNNode.AtenCatNode.AtenCatNode) -> str:
+    retval = 'AtenCat Node<br/>'
+    dim = aten_cat_node.Dim()
+    if dim is not None:
+        retval += 'Dim: {}<br/>'.format(dim)
+    return list_table([retval])
+
+
+def aten_not_node_label(aten_not_node: IR.NNNode.AtenNotNode.AtenNotNode) -> str:
+    retval = 'AtenNot Node<br/>'
+    input_ = aten_not_node.Input()
+    if input_ is not None:
+        retval += 'Input: {}<br/>'.format(input_)
+    return list_table([retval])
+
+
+def aten_lstm_node_label(aten_lstm_node: IR.NNNode.AtenLSTMNode.AtenLSTMNode) -> str:
+    retval = 'AtenLSTMNode Node<br/>'
+    has_biases = aten_lstm_node.HashBiases()
+    num_layers = aten_lstm_node.NumLayers()
+    dropout = aten_lstm_node.Dropout()
+    train = aten_lstm_node.Train()
+    bidirectional = aten_lstm_node.Bidirectional()
+    batch_first = aten_lstm_node.BatchFirst()
+
+    if has_biases is not None:
+        retval += 'HashBiases: {}<br/>'.format(has_biases)
+    if num_layers' is not None:
+        retval += 'NumLayers: {}<br/>'.format(num_layers)
+    if dropout is not None:
+        retval += 'Dropout: {}<br/>'.format(dropout)
+    if train is not None:
+        retval += 'Train: {}<br/>'.format(train)
+    if bidirectional is not None:
+        retval += 'Bidirectional: {}<br/>'.format(bidirectional)
+    if batch_first is not None:
+        retval += 'BatchFirst: {}<br/>'.format(batch_first)
+    return list_table([retval])
+
+
+def _aten_op_node_label(aten_op_name: str) -> str:
+    retval = '{} Node<br/>'.format(aten_op_name[:-4])
+    return list_table([retval])
+
+def aten_zeros_like_node_label(aten_node) -> str:
+    return _aten_op_node_label('AtenZerosLike')
+
+def aten_zeros_node_label(aten_node) -> str:
+    return _aten_op_node_label('AtenZerosNode')
+
+def aten_tensor_node_label(aten_node) -> str:
+    return _aten_op_node_label('AtenTensorNode')
+
+def aten_neg_node_label(aten_node) -> str:
+    return _aten_op_node_label('AtenNegNode')
+
+def aten_ne_node_label(aten_node) -> str:
+    return _aten_op_node_label('AtenNeNode')
+
+def aten_lt_node_label(aten_node) -> str:
+    return _aten_op_node_label('AtenLtNode')
+
+def aten_list_node_label(aten_node) -> str:
+    return _aten_op_node_label('AtenListNode')
+
+def aten_len_node_label(aten_node) -> str:
+    return _aten_op_node_label('AtenLenNode')
+
+def aten_item_node_label(aten_node) -> str:
+    return _aten_op_node_label('AtenItemNode')
+
+def aten_len_gt_label(aten_node) -> str:
+    return _aten_op_node_label('AtenGtNode')
+
+def aten_format_node_label(aten_node) -> str:
+    return _aten_op_node_label('AtenFormatNode')
+
+def aten_eq_node_label(aten_node) -> str:
+    return _aten_op_node_label('AtenEqNode')
+
+def aten_embedding_node_label(aten_node) -> str:
+    return _aten_op_node_label('AtenEmbeddingNode')
+
+def aten_div_node_label(aten_node) -> str:
+    return _aten_op_node_label('AtenDivNode')
+
+def aten_dim_node_label(aten_node) -> str:
+    return _aten_op_node_label('AtenDimNode')
+
+def aten_copy_node_label(aten_node) -> str:
+    return _aten_op_node_label('AtenCopyNode')
+
+def aten_ceil_node_label(aten_node) -> str:
+    return _aten_op_node_label('AtenCeilNode')
+
+def aten_append_node_label(aten_node) -> str:
+    return _aten_op_node_label('AtenAppendNode')
+
+def aten_admm_node_label(aten_node) -> str:
+    return _aten_op_node_label('AtenAdmmNode')
+
+def aten_add_node_label(aten_node) -> str:
+    return _aten_op_node_label('AtenAddNode')
+
+def aten_is_node_label(aten_node) -> str:
+    return _aten_op_node_label('AtenIsNode')
+
+def aten_get_item_node_label(aten_node) -> str:
+    return _aten_op_node_label('AtenGetItemNode')
+
+def aten_derive_index_node_label(aten_node) -> str:
+    return _aten_op_node_label('AtenDeriveIndexNode')
+
+def aten_int_node_label(aten_node) -> str:
+    return _aten_op_node_label('AtenIntNode')
+
+def aten_matmul_node_label(aten_node) -> str:
+    return _aten_op_node_label('AtenMatmulNode')
+
+def aten_max_node_label(aten_node) -> str:
+    return _aten_op_node_label('AtenMaxNode')
+
+def aten_relu_node_label(aten_node) -> str:
+    return _aten_op_node_label('AtenReluNode')
+
+def aten_sub_node_label(aten_node) -> str:
+    return _aten_op_node_label('AtenSubNode')
+
+def aten_not_node_label(aten_node) -> str:
+    return _aten_op_node_label('AtenNotNode')
+
 
 # Labels for Blob
 def data_edge_label(ir_data_edge: ir_enums.EdgeType.DataEdge) -> str:
