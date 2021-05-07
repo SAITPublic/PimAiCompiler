@@ -18,7 +18,7 @@ $ pip install numpy
 
 
 ## Usage
-Run ir_visualizer.sh which is located in NNCompiler/scripts/tools/.
+Run ir_visualizer.sh which is located in NNCompiler/scripts/tools/, make sure that you have build the project before running.
 
 ```bash
 $ ./ir_visualizer.sh
@@ -30,6 +30,15 @@ $ ./ir_visualizer.sh
         --ir(-i)            input ir file name
 
 ```
+
+## Test
+There is a frontend IR file of Inception-v3 model placed in test/ folder. To visualize it, one can run the following command at the base directory of NNCompiler:
+
+```
+$ ./scripts/tools/ir_visualizer.sh -i tools/ir_visualizer/test/iv3_frontend.ir
+```
+
+Then the visualization result will be saved in gv.svg format (a html file) at: tools/ir_visualizer/test/.
 
 ## Visualizer Configuration
 
