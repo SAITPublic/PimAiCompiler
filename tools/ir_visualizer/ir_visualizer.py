@@ -38,7 +38,6 @@ class Visualizer():
         self.input_file = input_file
         self.ir_root = IR.Root.Root.GetRootAsRoot(self.read_flattbuffer_bin(input_file), 0)
 
-    def new_graph(self):
         self.p_graph = Digraph(format=self.__file_format,
                                engine=self.__engine,
                                node_attr={'fontsize': self.__node_config['font_size'],
@@ -98,25 +97,26 @@ class Visualizer():
             print('{} Does Not Exist'.format(filename))
             exit()
 
-    def draw(self, graph_num: int):
-        ir_graph = self.ir_root.Graphs(graph_num)
-        nw_cluster = Digraph(name='cluster_{}_nw'.format(graph_num),
-                             graph_attr={'label': ir_graph.Name().decode('utf-8')})
+    def draw(self):
+        for graph_num in range(self.ir_root.GraphsLength()):
+            ir_graph = self.ir_root.Graphs(graph_num)
+            nw_cluster = Digraph(name='cluster_{}_nw'.format(graph_num),
+                                 graph_attr={'label': ir_graph.Name().decode('utf-8')})
+            self.__node_mem_infos = []
 
-        self.__node_mem_infos = []
+            self.__blob_dict = dict()
+            # node iteration
+            self.__draw_nodes(ir_graph=ir_graph, cluster=nw_cluster)
 
-        self.__blob_dict = dict()
-        # node iteration
-        self.__draw_nodes(ir_graph=ir_graph, cluster=nw_cluster)
+            # edge iteration
+            self.__draw_edges(ir_graph=ir_graph, cluster=nw_cluster)
 
-        # edge iteration
-        self.__draw_edges(ir_graph=ir_graph, cluster=nw_cluster)
+            # blob iteration
+            if not self.__hide_blobs:
+                self.__draw_blobs(ir_graph=ir_graph, cluster=nw_cluster)
 
-        # blob iteration
-        if not self.__hide_blobs:
-            self.__draw_blobs(ir_graph=ir_graph, cluster=nw_cluster)
+            self.p_graph.subgraph(nw_cluster)
 
-        self.p_graph.subgraph(nw_cluster)
 
     def __draw_nodes(self, ir_graph: IR.Graph.Graph, cluster: Digraph):
         for node_num in range(ir_graph.NodesLength()):
@@ -326,9 +326,9 @@ class Visualizer():
                 return idx[0][0] + 1
         return 0
 
-    def render(self, graph_num: int):
+    def render(self):
         # generate *.gv file and render graph
-        output_file = "{}.{}.gv".format(os.path.splitext(self.input_file)[0], graph_num)
+        output_file = os.path.splitext(self.input_file)[0] + '.gv'
         dt1 = datetime.datetime.now()
         print('Start at {}'.format(dt1))
         self.p_graph.render(output_file)
@@ -454,7 +454,5 @@ if __name__ == "__main__":
 
     ir_visualizer = Visualizer(input_file, args)
 
-    for graph_num in range(ir_visualizer.ir_root.GraphsLength()):
-        ir_visualizer.new_graph()
-        ir_visualizer.draw(graph_num)
-        ir_visualizer.render(graph_num)
+    ir_visualizer.draw()
+    ir_visualizer.render()
