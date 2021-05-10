@@ -28,6 +28,66 @@ import IR.NNNode.DataFormatNode
 import IR.NNNode.SliceNode
 import IR.NNNode.TileNode
 
+import IR.NNNode.AtenAddNode
+import IR.NNNode.AtenAddmmNode
+import IR.NNNode.AtenAppendNode
+import IR.NNNode.AtenCatNode
+import IR.NNNode.AtenCeilNode
+import IR.NNNode.AtenCopyNode
+import IR.NNNode.AtenDeriveIndexNode
+import IR.NNNode.AtenDimNode
+import IR.NNNode.AtenDivNode
+import IR.NNNode.AtenDropoutNode
+import IR.NNNode.AtenEmbeddingNode
+import IR.NNNode.AtenEqNode
+import IR.NNNode.AtenExpandNode
+import IR.NNNode.AtenFormatNode
+import IR.NNNode.AtenGetItemNode
+import IR.NNNode.AtenGtNode
+import IR.NNNode.AtenIntNode
+import IR.NNNode.AtenIsNode
+import IR.NNNode.AtenItemNode
+import IR.NNNode.AtenLSTMNode
+import IR.NNNode.AtenLenNode
+import IR.NNNode.AtenListNode
+import IR.NNNode.AtenLtNode
+import IR.NNNode.AtenMatmulNode
+import IR.NNNode.AtenMaxNode
+import IR.NNNode.AtenNeNode
+import IR.NNNode.AtenNegNode
+import IR.NNNode.AtenNotNode
+import IR.NNNode.AtenReluNode
+import IR.NNNode.AtenSelectNode
+import IR.NNNode.AtenSizeNode
+import IR.NNNode.AtenSliceNode
+import IR.NNNode.AtenSubNode
+import IR.NNNode.AtenTensorNode
+import IR.NNNode.AtenToNode
+import IR.NNNode.AtenTransposeNode
+import IR.NNNode.AtenUnsqueezeNode
+import IR.NNNode.AtenZerosLikeNode
+import IR.NNNode.AtenZerosNode
+
+import IR.ControlNode
+import IR.CONTROLNode.AnyType
+import IR.CONTROLNode.PrimCallMethodNode
+import IR.CONTROLNode.PrimConstantNode
+import IR.CONTROLNode.PrimDataNode
+import IR.CONTROLNode.PrimDeviceNode
+import IR.CONTROLNode.PrimDtypeNode
+import IR.CONTROLNode.PrimIfNode
+import IR.CONTROLNode.PrimListConstructNode
+import IR.CONTROLNode.PrimListUnpackNode
+import IR.CONTROLNode.PrimLoopNode
+import IR.CONTROLNode.PrimRaiseExceptionNode
+import IR.CONTROLNode.PrimTupleConstructNode
+import IR.CONTROLNode.PrimTupleIndexNode
+import IR.CONTROLNode.PrimTupleUnpackNode
+import IR.CONTROLNode.PrimUncheckedCastNode
+import IR.CONTROLNode.PrimUninitializedNode
+
+import torch_ops
+
 
 def node_name(graph_id: int, node_id: int) -> str:
     return str(graph_id) + '_node' + str(node_id)
@@ -131,9 +191,103 @@ def nn_node_label(nn_node: IR.NnNode.NnNode) -> (object, str):
         copy_node = IR.NNNode.CopyNode.CopyNode()
         copy_node.Init(nn_node.NnNode().Bytes, nn_node.NnNode().Pos)
         return copy_node, list_table(['Copy Node'])
+    
+    # torch AtenNode
+    # these AtenNode with attribute
+    elif node_type == IR.NNNode.AnyType.AnyType().AtenCatNode:
+        aten_cat_node = IR.NNNode.AtenCatNode.AtenCatNode()
+        aten_cat_node.Init(nn_node.NnNode().Bytes, nn_node.NnNode().Pos)
+        return aten_cat_node, aten_cat_node_label(aten_cat_node)
+
+    elif node_type == IR.NNNode.AnyType.AnyType().AtenDropoutNode:
+        aten_dropout_node = IR.NNNode.AtenDropoutNode.AtenDropoutNode()
+        aten_dropout_node.Init(nn_node.NnNode().Bytes, nn_node.NnNode().Pos)
+        return aten_dropout_node, aten_dropout_node_label(aten_dropout_node)
+    
+    elif node_type == IR.NNNode.AnyType.AnyType().AtenExpandNode:
+        aten_expand_node = IR.NNNode.AtenExpandNode.AtenExpandNode()
+        aten_expand_node.Init(nn_node.NnNode().Bytes, nn_node.NnNode().Pos)
+        return aten_expand_node, aten_expand_node_label(aten_expand_node)
+    
+    elif node_type == IR.NNNode.AnyType.AnyType().AtenLSTMNode:
+        aten_lstm_node = IR.NNNode.AtenLSTMNode.AtenLSTMNode()
+        aten_lstm_node.Init(nn_node.NnNode().Bytes, nn_node.NnNode().Pos)
+        return aten_lstm_node, aten_lstm_node_label(aten_lstm_node)
+    
+    elif node_type == IR.NNNode.AnyType.AnyType().AtenSelectNode:
+        aten_select_node = IR.NNNode.AtenSelectNode.AtenSelectNode()
+        aten_select_node.Init(nn_node.NnNode().Bytes, nn_node.NnNode().Pos)
+        return aten_select_node, aten_select_node_label(aten_select_node)
+
+    elif node_type == IR.NNNode.AnyType.AnyType().AtenSizeNode:
+        aten_size_node = IR.NNNode.AtenSizeNode.AtenSizeNode()
+        aten_size_node.Init(nn_node.NnNode().Bytes, nn_node.NnNode().Pos)
+        return aten_size_node, aten_size_node_label(aten_size_node)
+    
+    elif node_type == IR.NNNode.AnyType.AnyType().AtenSliceNode:
+        aten_slice_node = IR.NNNode.AtenSliceNode.AtenSliceNode()
+        aten_slice_node.Init(nn_node.NnNode().Bytes, nn_node.NnNode().Pos)
+        return aten_slice_node, aten_slice_node_label(aten_slice_node)
+    
+    elif node_type == IR.NNNode.AnyType.AnyType().AtenToNode:
+        aten_to_node = IR.NNNode.AtenToNode.AtenToNode()
+        aten_to_node.Init(nn_node.NnNode().Bytes, nn_node.NnNode().Pos)
+        return aten_to_node, aten_to_node_label(aten_to_node)
+    
+    elif node_type == IR.NNNode.AnyType.AnyType().AtenTransposeNode:
+        aten_transpose_node = IR.NNNode.AtenTransposeNode.AtenTransposeNode()
+        aten_transpose_node.Init(nn_node.NnNode().Bytes, nn_node.NnNode().Pos)
+        return aten_transpose_node, aten_transpose_node_label(aten_transpose_node)
+    
+    elif node_type == IR.NNNode.AnyType.AnyType().AtenUnsqueezeNode:
+        aten_unsqueeze_node = IR.NNNode.AtenUnsqueezeNode.AtenUnsqueezeNode()
+        aten_unsqueeze_node.Init(nn_node.NnNode().Bytes, nn_node.NnNode().Pos)
+        return aten_unsqueeze_node, aten_unsqueeze_node_label(aten_unsqueeze_node)
+    
+    # aten Ops without attribute, lookup table
+    op_name = torch_ops.aten_ops_dict[node_type]
+    if op_name in torch_ops.aten_ops_no_attr_dict:      # has key
+        aten_op_ = torch_ops.aten_ops_no_attr_dict[op_name]
+        aten_op_.Init(nn_node.NnNode().Bytes, nn_node.NnNode().Pos)
+        return aten_op_, list_table(['{} Node'.format(op_name[:-4])])
 
     else:
         return None, list_table(['Unknown NNNode Type'])
+
+
+def control_node_label(ctl_node: IR.ControlNode.ControlNode) -> (object, str):
+    node_type = ctl_node.ControlNodeType()
+    # torch prim ops with attrs
+    if node_type == IR.CONTROLNode.AnyType.AnyType().CallMethodNode:
+        prim_call_method_node = IR.CONTROLNode.PrimCallMethodNode.PrimCallMethodNode()
+        prim_call_method_node.Init(ctl_node.ControlNode().Bytes, ctl_node.ControlNode().Pos)
+        return prim_call_method_node, prim_call_method_node_label(prim_call_method_node)
+
+    elif node_type == IR.CONTROLNode.AnyType.AnyType().PrimConstantNode:
+        prim_constant_node = IR.CONTROLNode.PrimConstantNode.PrimConstantNode()
+        prim_constant_node.Init(ctl_node.ControlNode().Bytes, ctl_node.ControlNode().Pos)
+        return prim_constant_node, prim_constant_node_label(prim_constant_node)
+    
+    elif node_type == IR.CONTROLNode.AnyType.AnyType().PrimIfNode:
+        prim_if_node = IR.CONTROLNode.PrimIfNode.PrimIfNode()
+        prim_if_node.Init(ctl_node.ControlNode().Bytes, ctl_node.ControlNode().Pos)
+        return prim_if_node, prim_if_node_label(prim_if_node)
+    
+    elif node_type == IR.CONTROLNode.AnyType.AnyType().PrimLoopNode:
+        prim_loop_node = IR.CONTROLNode.PrimLoopNode.PrimLoopNode()
+        prim_loop_node.Init(ctl_node.ControlNode().Bytes, ctl_node.ControlNode().Pos)
+        return prim_loop_node, prim_loop_node_label(prim_loop_node)
+    
+    elif node_type == IR.CONTROLNode.AnyType.AnyType().PrimTupleIndexNode:
+        prim_tuple_index_node = IR.CONTROLNode.PrimTupleIndexNode.PrimTupleIndexNode()
+        prim_tuple_index_node.Init(ctl_node.ControlNode().Bytes, ctl_node.ControlNode().Pos)
+        return prim_tuple_index_node, prim_tuple_index_node_label(prim_tuple_index_node)
+    # torch prim OPs without attrs
+    op_name = torch_ops.prim_ops_dict[node_type]
+    if op_name in torch_ops.prim_ops_no_attr_dict:
+        prim_op_ = torch_ops.prim_ops_no_attr_dict[op_name]
+        prim_op_.Init(ctl_node.ControlNode().Bytes, ctl_node.ControlNode().Pos)
+        return prim_op_, list_table(['{} Node'.format(op_name[:-4])])
 
 
 def op_node_label(op_node: IR.OpNode.OpNode) -> (object, str):
@@ -463,96 +617,53 @@ def aten_lstm_node_label(aten_lstm_node: IR.NNNode.AtenLSTMNode.AtenLSTMNode) ->
     return list_table([retval])
 
 
-def _aten_op_node_label(aten_op_name: str) -> str:
-    retval = '{} Node<br/>'.format(aten_op_name[:-4])
+
+def prim_constant_node_label(prim_constant_node: IR.CONTROLNode.PrimConstantNode.PrimConstantNode) -> str:
+    retval = 'PrimConstant Node<br/>'
+    value = prim_constant_node.Value()
+    if value is not None:
+        retval += 'Value: {}<br/>'.format(value)
     return list_table([retval])
 
-def aten_zeros_like_node_label(aten_node) -> str:
-    return _aten_op_node_label('AtenZerosLike')
 
-def aten_zeros_node_label(aten_node) -> str:
-    return _aten_op_node_label('AtenZerosNode')
+def prim_loop_node_label(prim_loop_node: IR.CONTROLNode.PrimLoopNode.PrimLoopNode) -> str:
+    retval = 'PrimLoop Node<br/>'
+    trip_count = prim_loop_node.TripCount()
+    cond = prim_loop_node.Cond()
+    body_net = prim_loop_node.BodyNet()
+    if trip_count is not None:
+        retval += 'TripCount: {}<br/>'.format(trip_count)
+    if cond is not None:
+        retval += 'Cond: {}<br/>'.format(cond)
+    if body_net is not None:
+        retval += 'BodyNet: {}<br/>'.format(body_net)
+    return list_table([retval])
 
-def aten_tensor_node_label(aten_node) -> str:
-    return _aten_op_node_label('AtenTensorNode')
 
-def aten_neg_node_label(aten_node) -> str:
-    return _aten_op_node_label('AtenNegNode')
+def prim_tuple_index_node_label(prim_tuple_index_node: IR.CONTROLNode.PrimTupleIndexNode.PrimTupleIndexNode) -> str:
+    retval = 'PrimTupleIndex Node<br/>'
+    index = prim_tuple_index_node.Index()
+    if index is not None:
+        retval += 'Index: {}<br/>'.format(index)
+    return list_table([retval])
 
-def aten_ne_node_label(aten_node) -> str:
-    return _aten_op_node_label('AtenNeNode')
+def prim_if_node_label(prim_if_node: IR.CONTROLNode.PrimIfNode.PrimIfNode) -> str:
+    retval = 'PrimIf Node<br/>'
+    then_net = prim_if_node.ThenNet()
+    else_net = prim_if_node.ElseNet()
+    if then_net is not None:
+        retval += 'ThenNet: {}<br/>'.format(then_net)
+    if else_net is not None:
+        retval += 'ElseNet: {}<br/>'.format(else_net)
+    return list_table([retval])
 
-def aten_lt_node_label(aten_node) -> str:
-    return _aten_op_node_label('AtenLtNode')
 
-def aten_list_node_label(aten_node) -> str:
-    return _aten_op_node_label('AtenListNode')
-
-def aten_len_node_label(aten_node) -> str:
-    return _aten_op_node_label('AtenLenNode')
-
-def aten_item_node_label(aten_node) -> str:
-    return _aten_op_node_label('AtenItemNode')
-
-def aten_len_gt_label(aten_node) -> str:
-    return _aten_op_node_label('AtenGtNode')
-
-def aten_format_node_label(aten_node) -> str:
-    return _aten_op_node_label('AtenFormatNode')
-
-def aten_eq_node_label(aten_node) -> str:
-    return _aten_op_node_label('AtenEqNode')
-
-def aten_embedding_node_label(aten_node) -> str:
-    return _aten_op_node_label('AtenEmbeddingNode')
-
-def aten_div_node_label(aten_node) -> str:
-    return _aten_op_node_label('AtenDivNode')
-
-def aten_dim_node_label(aten_node) -> str:
-    return _aten_op_node_label('AtenDimNode')
-
-def aten_copy_node_label(aten_node) -> str:
-    return _aten_op_node_label('AtenCopyNode')
-
-def aten_ceil_node_label(aten_node) -> str:
-    return _aten_op_node_label('AtenCeilNode')
-
-def aten_append_node_label(aten_node) -> str:
-    return _aten_op_node_label('AtenAppendNode')
-
-def aten_admm_node_label(aten_node) -> str:
-    return _aten_op_node_label('AtenAdmmNode')
-
-def aten_add_node_label(aten_node) -> str:
-    return _aten_op_node_label('AtenAddNode')
-
-def aten_is_node_label(aten_node) -> str:
-    return _aten_op_node_label('AtenIsNode')
-
-def aten_get_item_node_label(aten_node) -> str:
-    return _aten_op_node_label('AtenGetItemNode')
-
-def aten_derive_index_node_label(aten_node) -> str:
-    return _aten_op_node_label('AtenDeriveIndexNode')
-
-def aten_int_node_label(aten_node) -> str:
-    return _aten_op_node_label('AtenIntNode')
-
-def aten_matmul_node_label(aten_node) -> str:
-    return _aten_op_node_label('AtenMatmulNode')
-
-def aten_max_node_label(aten_node) -> str:
-    return _aten_op_node_label('AtenMaxNode')
-
-def aten_relu_node_label(aten_node) -> str:
-    return _aten_op_node_label('AtenReluNode')
-
-def aten_sub_node_label(aten_node) -> str:
-    return _aten_op_node_label('AtenSubNode')
-
-def aten_not_node_label(aten_node) -> str:
-    return _aten_op_node_label('AtenNotNode')
+def prim_call_method_node_label(prim_call_method_node: IR.CONTROLNode.PrimCallMethodNode.PrimCallMethodNode) -> str:
+    retval = 'PrimCallMethod Node<br/>'
+    target_network_name = prim_call_method_node.TargetNetworkName()
+    if target_network_name is not None:
+        retval += 'TargetNetworkName: {}<br/>'.format(target_network_name)
+    return list_table([retval])
 
 
 # Labels for Blob

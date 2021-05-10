@@ -56,6 +56,7 @@ import IR.NNNode.AtenUnsqueezeNode
 import IR.NNNode.AtenZerosLikeNode
 import IR.NNNode.AtenZerosNode
 
+import IR.ControlNode
 import ir_labeler as labeler
 
 from distutils.util import strtobool
@@ -192,6 +193,15 @@ class Visualizer():
                 # Create Object for each OPNode.Type
                 typed_node, op_node_label = labeler.op_node_label(ir_op_node)
                 node_label = labeler.list_table([ir_node_title, op_node_label])
+            
+            # torch::prim Ops
+            elif ir_node.NodeType() == IR.AnyNode.AnyNode().ControlNode:
+                # create prim node
+                ir_control_node = IR.ControlNode.ControlNode()
+                ir_control_node.Init(ir_node.Node().Bytes, ir_node.Node().Pos)
+
+                typed_node, control_node_label = labeler.control_node_label(ir_control_node)
+                node_label = labeler.list_table([ir_node_title, control_node_label])
 
             else:
                 # Handle Unknown Node

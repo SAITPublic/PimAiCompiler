@@ -53,7 +53,7 @@ class NNNodeType(DefaultEnum):
     AtenSelectNode = _TORCH_ATEN_OP_START + 7
     AtenNegNode = _TORCH_ATEN_OP_START + 8
     AtenNeNode = _TORCH_ATEN_OP_START + 9
-    AtenItNode = _TORCH_ATEN_OP_START + 10 
+    AtenLtNode = _TORCH_ATEN_OP_START + 10 
     AtenLSTMNode = _TORCH_ATEN_OP_START + 11
     AtenListNode = _TORCH_ATEN_OP_START + 12
     AtenLenNode = _TORCH_ATEN_OP_START + 13 
