@@ -24,6 +24,38 @@ import IR.Type.TypedArray
 import IR.Type.TypedValue
 import IR.Type.EdgeType
 
+import IR.NNNode.AtenAddNode
+import IR.NNNode.AtenAppendNode
+import IR.NNNode.AtenCatNode
+import IR.NNNode.AtenCeilNode
+import IR.NNNode.AtenCopyNode
+import IR.NNNode.AtenDeriveIndexNode
+import IR.NNNode.AtenDimNode
+import IR.NNNode.AtenDivNode
+import IR.NNNode.AtenDropoutNode
+import IR.NNNode.AtenEmbeddingNode
+import IR.NNNode.AtenEqNode
+import IR.NNNode.AtenExpandNode
+import IR.NNNode.AtenFormatNode
+import IR.NNNode.AtenGetItemNode
+import IR.NNNode.AtenGtNode
+import IR.NNNode.AtenIntNode
+import IR.NNNode.AtenIsNode
+import IR.NNNode.AtenItemNode
+import IR.NNNode.AtenLSTMNode
+import IR.NNNode.AtenLenNode
+import IR.NNNode.AtenListNode
+import IR.NNNode.AtenNeNode
+import IR.NNNode.AtenNegNode
+import IR.NNNode.AtenSelectNode
+import IR.NNNode.AtenSizeNode
+import IR.NNNode.AtenSliceNode
+import IR.NNNode.AtenTensorNode
+import IR.NNNode.AtenToNode
+import IR.NNNode.AtenUnsqueezeNode
+import IR.NNNode.AtenZerosLikeNode
+import IR.NNNode.AtenZerosNode
+
 import ir_labeler as labeler
 
 from distutils.util import strtobool

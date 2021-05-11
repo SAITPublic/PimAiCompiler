@@ -431,31 +431,11 @@ def aten_dropout_node_label(aten_dropout_node: IR.NNNode.AtenDropoutNode.AtenDro
     return list_table([retval])
 
 
-def aten_transpose_node_label(aten_transpose_node: IR.NNNode.AtenTransposeNode.AtenTransposeNode) -> str:
-    retval = 'AtenTranspose Node<br/>'
-    dim0 = aten_transpose_node.Dim0()
-    dim1 = aten_transpose_node.Dim1()
-
-    if dim0 is not None:
-        retval += 'Dim0: {}<br/>'.format(dim0)
-    if dim1 is not None:
-        retval += 'Dim1: {}<br/>'.format(dim1)
-    return list_table([retval])
-
-
 def aten_cat_node_label(aten_cat_node: IR.NNNode.AtenCatNode.AtenCatNode) -> str:
     retval = 'AtenCat Node<br/>'
     dim = aten_cat_node.Dim()
     if dim is not None:
         retval += 'Dim: {}<br/>'.format(dim)
-    return list_table([retval])
-
-
-def aten_not_node_label(aten_not_node: IR.NNNode.AtenNotNode.AtenNotNode) -> str:
-    retval = 'AtenNot Node<br/>'
-    input_ = aten_not_node.Input()
-    if input_ is not None:
-        retval += 'Input: {}<br/>'.format(input_)
     return list_table([retval])
 
 
@@ -470,7 +450,7 @@ def aten_lstm_node_label(aten_lstm_node: IR.NNNode.AtenLSTMNode.AtenLSTMNode) ->
 
     if has_biases is not None:
         retval += 'HashBiases: {}<br/>'.format(has_biases)
-    if num_layers' is not None:
+    if num_layers is not None:
         retval += 'NumLayers: {}<br/>'.format(num_layers)
     if dropout is not None:
         retval += 'Dropout: {}<br/>'.format(dropout)
