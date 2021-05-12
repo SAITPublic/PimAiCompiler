@@ -245,8 +245,6 @@ def nn_node_label(nn_node: IR.NnNode.NnNode) -> (object, str):
         return aten_unsqueeze_node, aten_unsqueeze_node_label(aten_unsqueeze_node)
     
     # aten Ops without attribute, lookup table
-    # print(type(node_type))
-    # print(node_type)
     op_name = torch_ops.aten_ops_dict[node_type]
     if op_name in torch_ops.aten_ops_no_attr_dict:      # has key
         aten_op_ = torch_ops.aten_ops_no_attr_dict[op_name]
@@ -608,8 +606,8 @@ def aten_cat_node_label(aten_cat_node: IR.NNNode.AtenCatNode.AtenCatNode) -> str
 
 
 def aten_lstm_node_label(aten_lstm_node: IR.NNNode.AtenLSTMNode.AtenLSTMNode) -> str:
-    retval = 'AtenLSTMNode Node<br/>'
-    has_biases = aten_lstm_node.HashBiases()
+    retval = 'AtenLSTM Node<br/>'
+    has_biases = aten_lstm_node.HasBiases()
     num_layers = aten_lstm_node.NumLayers()
     dropout = aten_lstm_node.Dropout()
     train = aten_lstm_node.Train()
@@ -617,7 +615,7 @@ def aten_lstm_node_label(aten_lstm_node: IR.NNNode.AtenLSTMNode.AtenLSTMNode) ->
     batch_first = aten_lstm_node.BatchFirst()
 
     if has_biases is not None:
-        retval += 'HashBiases: {}<br/>'.format(has_biases)
+        retval += 'HasBiases: {}<br/>'.format(has_biases)
     if num_layers is not None:
         retval += 'NumLayers: {}<br/>'.format(num_layers)
     if dropout is not None:
@@ -633,11 +631,21 @@ def aten_lstm_node_label(aten_lstm_node: IR.NNNode.AtenLSTMNode.AtenLSTMNode) ->
 
 
 def prim_constant_node_label(prim_constant_node: IR.CONTROLNode.PrimConstantNode.PrimConstantNode) -> str:
+    # GDataType list comes from the defination of DTensor of GraphGen:
+    # URL: https://github.sec.samsung.net/FIM/GraphGen/blob/amdgpu_pim/core/graphgen_network/graphgen_types.h
+    GDataType = ['UNDEFINED','INT8','UINT8','INT16','UINT16','INT32','INT64','FLOAT16',
+                'FLOAT32','FLOAT64','BOOL','STRING','DEVICE','TENSOR']
+    named_datatype = {idx : symbol for idx, symbol in enumerate(GDataType)}
     retval = 'PrimConstant Node<br/>'
-    # value = prim_constant_node.Value()
-    value = None
-    if value is not None:
-        retval += 'Value: {}<br/>'.format(value)
+    tensor_shape = prim_constant_node.TensorShape()
+    data_type = prim_constant_node.DataType()
+    bit_width = prim_constant_node.BitWidth()
+    if tensor_shape is not None:
+        retval += 'TensorShape: {}<br/>'.format(dim4_label(tensor_shape))
+    if data_type is not None:
+        retval += 'DataType: {}<br/>'.format(named_datatype[data_type])
+    if bit_width is not None:
+        retval += 'BitWidth: {}<br/>'.format(bit_width)
     return list_table([retval])
 
 
@@ -698,9 +706,17 @@ def weight_blob_edge_label(fc_node: IR.NNNode.FullyConnectedNode.FullyConnectedN
     return list_table(['Weight Blob'])
 
 
+def lstm_weight_blob_edge_label(aten_lstm_node: IR.NNNode.AtenLSTMNode.AtenLSTMNode) -> str:
+    return list_table(['Weight Blob'])
+
+
+def lstm_bias_blob_edge_label(aten_lstm_node: IR.NNNode.AtenLSTMNode.AtenLSTMNode) -> str:
+    return list_table(['Bias Blob'])
+
+
 def blob_node_label(blob: IR.Blob.Blob) -> str:
     retval = ''
-    retval += 'QuantType: {}<br/>'.format(ir_enums.QuantType.get_name(blob.QuantType()))
+    # retval += 'QuantType: {}<br/>'.format(ir_enums.QuantType.get_name(blob.QuantType()))
     retval += 'ShapeType: {}<br/>'.format(ir_enums.ShapeType.get_name(blob.Shape()))
     retval += 'Dim: {}<br/>'.format(dim4_label(blob.Dim()))
     retval += 'DataType: {}<br/>'.format(ir_enums.DataType.get_name(blob.DataType()))
@@ -710,18 +726,18 @@ def blob_node_label(blob: IR.Blob.Blob) -> str:
         retval += 'LivenessNode: {} - {}<br/>'.format(hwinfo.LivenessStartNode(),
                                                       hwinfo.LivenessEndNode())
         retval += 'Alignment: {}<br/>'.format(dim4_label(hwinfo.AlignmentUnit()))
-    retval += 'ZeroPoint: {}<br/>'.format(blob.ZeroPoint())
+    # retval += 'ZeroPoint: {}<br/>'.format(blob.ZeroPoint())
     # FIXME: frac_len and quant_leval should be handled later
-    frac_len = []
-    if blob.FracLenLength() <= 5:
-        for idx in range(0, blob.FracLenLength()):
-            frac_len.append(blob.FracLen(idx))
-    else:
-        for idx in range(0, 3):
-            frac_len.append(blob.FracLen(idx))
-        frac_len.append('...')
-        frac_len.append(blob.FracLen(blob.FracLenLength() - 1))
-    retval += 'FracLen: {} size: {}<br/>'.format(frac_len, blob.FracLenLength())
+    # frac_len = []
+    # if blob.FracLenLength() <= 5:
+    #     for idx in range(0, blob.FracLenLength()):
+    #         frac_len.append(blob.FracLen(idx))
+    # else:
+    #     for idx in range(0, 3):
+    #         frac_len.append(blob.FracLen(idx))
+    #     frac_len.append('...')
+    #     frac_len.append(blob.FracLen(blob.FracLenLength() - 1))
+    # retval += 'FracLen: {} size: {}<br/>'.format(frac_len, blob.FracLenLength())
     return list_table([blob_title(blob), retval])
 
 

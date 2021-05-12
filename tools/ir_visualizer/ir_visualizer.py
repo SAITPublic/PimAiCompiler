@@ -77,21 +77,32 @@ class Visualizer():
                                           'fontcolor': self.__node_config['font_color']},
                                edge_attr={'fontsize': self.__edge_blob_config['font_size']},
                                graph_attr={'rankdir': self.__rank_dir})
-
+        self.__named_ir_graphs = {}
+        self.__named_viz_graphs = {}
+        self.__main_ir_graph_name = None
+        self.__main_viz_graph_name = None
     
     def show_ir_graph_info(self):
         total_nodes = 0
+        total_blobs = 0
+        total_edges = 0
         graphs_length = self.ir_root.GraphsLength()
         for graph_num in range(graphs_length):
             ir_graph = self.ir_root.Graphs(graph_num)
             graph_name = ir_graph.Name().decode('utf-8')
             num_nodes = ir_graph.NodesLength()
+            num_blobs = ir_graph.BlobsLength()
+            num_edges = ir_graph.EdgesLength()
             total_nodes += num_nodes
-            print('Idx:{} GraphName:{} NumOfNodes:{}'.format(graph_num, graph_name, num_nodes))
+            total_blobs += num_blobs
+            total_edges += num_edges
+            print('Idx:{} GraphName:{} NumOfNodes:{} NumOfBlobs:{} NumOfEdges:{}'.format(graph_num, graph_name, num_nodes, num_blobs, num_edges))
         print('\nSummary')
         print('*'*50)
         print('Total Graphs:{}'.format(graphs_length))
         print('Total Nodes(Ops):{}'.format(total_nodes))
+        print('Total Blobs:{}'.format(total_blobs))
+        print('Total Edges:{}'.format(total_edges))
         print('*'*50)
         print()
 
@@ -146,7 +157,7 @@ class Visualizer():
         else:
             print('{} Does Not Exist'.format(filename))
             exit()
-
+    
     def draw(self):
         for graph_num in range(self.ir_root.GraphsLength()):
             ir_graph = self.ir_root.Graphs(graph_num)
@@ -166,6 +177,7 @@ class Visualizer():
                 self.__draw_blobs(ir_graph=ir_graph, cluster=nw_cluster)
 
             self.p_graph.subgraph(nw_cluster)
+            # break
 
 
     def __draw_nodes(self, ir_graph: IR.Graph.Graph, cluster: Digraph):
@@ -181,6 +193,22 @@ class Visualizer():
                 # Create Object for each NNNode.Type
                 typed_node, nn_node_label = labeler.nn_node_label(ir_nn_node)
                 node_label = labeler.list_table([ir_node_title, nn_node_label])
+
+                # Support LSTM weight Blob, attribute of WeightBlobId is defined in AtenLSTMNOde
+                if isinstance(typed_node,IR.NNNode.AtenLSTMNode.AtenLSTMNode):
+                    if 'WeightBlobIds' in dir(typed_node):
+                        # LSTM have >= 8 Weight, it is a list
+                        weight_blob_id_list = [typed_node.WeightBlobIds(k) for k in range(typed_node.WeightBlobIdsLength())]
+                        edge_label = labeler.html_str(labeler.lstm_weight_blob_edge_label(typed_node))
+                        if weight_blob_id_list:
+                            for blob_id in weight_blob_id_list:
+                                self.__append_blob_dict(blob_id, blob_type='weight', dst=node_name, label=edge_label)
+                    if 'BiasBlobIds' in dir(typed_node):
+                        bias_blob_id_list = bias_blob_id_list = [typed_node.BiasBlobIds(k) for k in range(typed_node.BiasBlobIdsLength())]
+                        edge_label = labeler.html_str(labeler.lstm_bias_blob_edge_label(typed_node))
+                        if bias_blob_id_list:
+                            for blob_id in bias_blob_id_list:
+                                self.__append_blob_dict(blob_id, blob_type='bias', dst=node_name, label=edge_label)
 
                 # Save edge's blob info
                 if 'KernelBlobId' in dir(typed_node):
@@ -333,6 +361,8 @@ class Visualizer():
         bias_blobs = []
         edge_blobs = []
         lut_blobs = []
+        weight_blobs = []       # For LSTM
+        
         for blob_num in range(ir_graph.BlobsLength()):
             blob = ir_graph.Blobs(blob_num)
             # check if blob is unused
@@ -349,6 +379,8 @@ class Visualizer():
                     bias_blobs.append({'blob': blob, 'val': val})
                 elif val['blob_type'] == 'lut':
                     lut_blobs.append({'blob': blob, 'val': val})
+                elif val['blob_type'] == 'weight':                      # For LSTM
+                    weight_blobs.append({'blob': blob, 'val': val})
 
         cluster.attr('node', fontsize=self.__kernel_blob_config['font_size'])
         cluster.attr('node', fontcolor=self.__kernel_blob_config['font_color'])
@@ -369,6 +401,12 @@ class Visualizer():
         cluster.attr('node', fontcolor=self.__lut_blob_config['font_color'])
         cluster.attr('node', fillcolor=self.__lut_blob_config['color'])
         blob_iter(ir_graph, cluster, lut_blobs, 'none', 'none')
+
+        # For LSTM's weight
+        cluster.attr('node', fontsize=self.__kernel_blob_config['font_size'])
+        cluster.attr('node', fontcolor=self.__kernel_blob_config['font_color'])
+        cluster.attr('node', fillcolor=self.__kernel_blob_config['color'])
+        blob_iter(ir_graph, cluster, weight_blobs, 'dashed', 'none')
 
     def __append_blob_dict(self, blob_id: int, blob_type: str, dst: str, label: str):
         if blob_id not in self.__blob_dict:
