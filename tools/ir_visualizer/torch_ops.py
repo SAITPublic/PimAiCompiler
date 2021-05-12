@@ -43,6 +43,7 @@ import IR.NNNode.AtenZerosNode
 
 # Torch Prim Ops
 import  IR.CONTROLNode
+import  IR.CONTROLNode.AnyType
 import IR.CONTROLNode.PrimCallMethodNode
 import IR.CONTROLNode.PrimConstantNode
 import IR.CONTROLNode.PrimDataNode
@@ -173,6 +174,7 @@ def create_prim_op_map():
         IR.CONTROLNode.AnyType.AnyType().PrimUncheckedCastNode : 'PrimUncheckedCastNode',
         IR.CONTROLNode.AnyType.AnyType().PrimUninitializedNode : 'PrimUninitializedNode'
     }
+    return op_dict
 
 prim_ops_dict = create_prim_op_map()
 
@@ -191,3 +193,8 @@ prim_ops_no_attr_dict = {
     'PrimUncheckedCastNode' : IR.CONTROLNode.PrimUncheckedCastNode.PrimUncheckedCastNode(),
     'PrimUninitializedNode' : IR.CONTROLNode.PrimUninitializedNode.PrimUninitializedNode()
 }
+
+if __name__ =='__main__':
+    print(prim_ops_dict)
+    prim_list_construct = prim_ops_dict[IR.CONTROLNode.AnyType.AnyType().PrimListConstructNode]
+    print(prim_list_construct)

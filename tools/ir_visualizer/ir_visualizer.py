@@ -78,6 +78,23 @@ class Visualizer():
                                edge_attr={'fontsize': self.__edge_blob_config['font_size']},
                                graph_attr={'rankdir': self.__rank_dir})
 
+    
+    def show_ir_graph_info(self):
+        total_nodes = 0
+        graphs_length = self.ir_root.GraphsLength()
+        for graph_num in range(graphs_length):
+            ir_graph = self.ir_root.Graphs(graph_num)
+            graph_name = ir_graph.Name().decode('utf-8')
+            num_nodes = ir_graph.NodesLength()
+            total_nodes += num_nodes
+            print('Idx:{} GraphName:{} NumOfNodes:{}'.format(graph_num, graph_name, num_nodes))
+        print('\nSummary')
+        print('*'*50)
+        print('Total Graphs:{}'.format(graphs_length))
+        print('Total Nodes(Ops):{}'.format(total_nodes))
+        print('*'*50)
+        print()
+
     def __set_config(self, args: str):
 
         self.__engine = str(args.engine)
@@ -134,7 +151,7 @@ class Visualizer():
         for graph_num in range(self.ir_root.GraphsLength()):
             ir_graph = self.ir_root.Graphs(graph_num)
             nw_cluster = Digraph(name='cluster_{}_nw'.format(graph_num),
-                                 graph_attr={'label': ir_graph.Name().decode('utf-8')})
+                                graph_attr={'label': ir_graph.Name().decode('utf-8')})
             self.__node_mem_infos = []
 
             self.__blob_dict = dict()
@@ -154,10 +171,8 @@ class Visualizer():
     def __draw_nodes(self, ir_graph: IR.Graph.Graph, cluster: Digraph):
         for node_num in range(ir_graph.NodesLength()):
             ir_node = ir_graph.Nodes(node_num)
-
             ir_node_title = labeler.ir_node_title(ir_node)
             node_name = labeler.node_name(ir_graph.Id(), ir_node.Id())
-
             # handle IR.Node by Type
             if ir_node.NodeType() == IR.AnyNode.AnyNode().NnNode:
                 ir_nn_node = IR.NnNode.NnNode()
@@ -209,6 +224,7 @@ class Visualizer():
 
             # Draw
             cluster.node(node_name, labeler.html_str(node_label), shape='rectangle')
+
 
     def __draw_edges(self, ir_graph: IR.Graph.Graph, cluster: Digraph):
         # set attr
@@ -495,6 +511,7 @@ if __name__ == "__main__":
     input_file = args.ir
 
     ir_visualizer = Visualizer(input_file, args)
+    ir_visualizer.show_ir_graph_info()
 
     ir_visualizer.draw()
     ir_visualizer.render()

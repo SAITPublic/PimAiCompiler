@@ -245,6 +245,8 @@ def nn_node_label(nn_node: IR.NnNode.NnNode) -> (object, str):
         return aten_unsqueeze_node, aten_unsqueeze_node_label(aten_unsqueeze_node)
     
     # aten Ops without attribute, lookup table
+    # print(type(node_type))
+    # print(node_type)
     op_name = torch_ops.aten_ops_dict[node_type]
     if op_name in torch_ops.aten_ops_no_attr_dict:      # has key
         aten_op_ = torch_ops.aten_ops_no_attr_dict[op_name]
@@ -258,7 +260,7 @@ def nn_node_label(nn_node: IR.NnNode.NnNode) -> (object, str):
 def control_node_label(ctl_node: IR.ControlNode.ControlNode) -> (object, str):
     node_type = ctl_node.ControlNodeType()
     # torch prim ops with attrs
-    if node_type == IR.CONTROLNode.AnyType.AnyType().CallMethodNode:
+    if node_type == IR.CONTROLNode.AnyType.AnyType().PrimCallMethodNode:
         prim_call_method_node = IR.CONTROLNode.PrimCallMethodNode.PrimCallMethodNode()
         prim_call_method_node.Init(ctl_node.ControlNode().Bytes, ctl_node.ControlNode().Pos)
         return prim_call_method_node, prim_call_method_node_label(prim_call_method_node)
@@ -545,6 +547,18 @@ def aten_to_node_label(aten_to_node: IR.NNNode.AtenToNode.AtenToNode) -> str:
         retval += 'Copy: {}<br/>'.format(copy)
     return list_table([retval])
 
+def aten_transpose_node_label(aten_transpose_node: IR.NNNode.AtenTransposeNode.AtenTransposeNode) -> str:
+    retval = 'AtenTranspose Node<br/>'
+    dim_0 = aten_transpose_node.Dim0()
+    dim_1 = aten_transpose_node.Dim1()
+
+    if dim_0 is not None:
+        retval += 'Dim0: {}<br/>'.format(dim_0)
+    if dim_1 is not None:
+        retval += 'Dim1: {}<br/>'.format(dim_1)
+
+    return list_table([retval])
+
 
 def aten_size_node_label(aten_size_node: IR.NNNode.AtenSizeNode.AtenSizeNode) -> str:
     retval = 'AtenSizeNode Node<br/>'
@@ -620,7 +634,8 @@ def aten_lstm_node_label(aten_lstm_node: IR.NNNode.AtenLSTMNode.AtenLSTMNode) ->
 
 def prim_constant_node_label(prim_constant_node: IR.CONTROLNode.PrimConstantNode.PrimConstantNode) -> str:
     retval = 'PrimConstant Node<br/>'
-    value = prim_constant_node.Value()
+    # value = prim_constant_node.Value()
+    value = None
     if value is not None:
         retval += 'Value: {}<br/>'.format(value)
     return list_table([retval])
