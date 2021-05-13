@@ -31,3 +31,6 @@
 
 # vscode
 .vscode
+
+# Generated files
+ir_generated.h
