@@ -9,8 +9,8 @@ set(EXEC_PREFIX "${PREFIX}/bin")
 set(ROCM_PATH $ENV{ROCM_PATH})
 
 # Set CMake Flags
-set(CMAKE_CXX_FLAGS "-std=c++11 -Wall -Wno-unused-command-line-argument")
-set(CMAKE_C_FLAGS "-std=c11")
+set(CMAKE_CXX_FLAGS "-std=c++17 -Wall -Wno-unused-command-line-argument")
+set(CMAKE_C_FLAGS "-std=c17")
 
 #Define minimum version for GCC
 set(GCC_EXPECTED_VERSION 4.9.0)
@@ -27,7 +27,7 @@ link_directories("${ROCM_PATH}/hsa/lib" "${ROCM_PATH}/libhsakmt/lib" "${ROCM_PAT
 add_definitions(-DROCM_PATH="${ROCM_PATH}")
 
 add_subdirectory(runtime)
-#add_subdirectory(compiler)
+add_subdirectory(compiler)
 #add_subdirectory(python_libs)
 #add_subdirectory(examples)
 #add_subdirectory(external_libs)

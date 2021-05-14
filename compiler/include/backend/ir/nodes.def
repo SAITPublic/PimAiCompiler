@@ -1,0 +1,65 @@
+#if !defined(PROCESS_NODE) && !defined(PROCESS_BASE_NODE)
+#  error "PROCESS_NODE(NODE_TYPE, NODE_CLASS, BASE_NODE_CLASS) or "
+         "PROCESS_BASE_NODE(NODE_TYPE, NODE_CLASS, BASE_NODE_CLASS) macro must be defined before including this file"
+#endif
+
+#ifndef PROCESS_NODE
+#  define PROCESS_NODE(NODE_TYPE, NODE_CLASS, BASE_NODE_CLASS)
+#endif
+
+#ifndef PROCESS_BASE_NODE
+#  define PROCESS_BASE_NODE(NODE_TYPE, NODE_CLASS, BASE_NODE_CLASS) PROCESS_NODE(NODE_TYPE, NODE_CLASS, BASE_NODE_CLASS)
+#endif
+
+// NN nodes
+PROCESS_BASE_NODE(NNNode, NNNode, Node)
+PROCESS_NODE(ACTIVATION, ActivationNode, NNNode)
+PROCESS_NODE(BATCHNORM, BatchNormNode, NNNode)
+PROCESS_NODE(CONCAT, ConcatNode, NNNode)
+PROCESS_NODE(CONVOLUTION, ConvolutionNode, NNNode)
+PROCESS_NODE(DATAFORMAT, DataFormatNode, NNNode)
+PROCESS_NODE(DECONVOLUTION, DeconvolutionNode, NNNode)
+PROCESS_NODE(DEPTHTOSPACE, DepthToSpaceNode, NNNode)
+PROCESS_NODE(DUMMY, DummyNode, NNNode)
+PROCESS_NODE(ELTWISE, EltwiseNode, NNNode)
+PROCESS_NODE(FULLYCONNECTED, FullyConnectedNode, NNNode)
+PROCESS_NODE(INPUT, InputNode, NNNode)
+PROCESS_NODE(MATMUL, MatMulNode, NNNode)
+PROCESS_NODE(PERMUTE, PermuteNode, NNNode)
+PROCESS_NODE(POOL, PoolNode, NNNode)
+PROCESS_NODE(PRIORBOX, PriorBoxNode, NNNode)
+PROCESS_NODE(RESHAPE, ReshapeNode, NNNode)
+PROCESS_NODE(SCALE, ScaleNode, NNNode)
+PROCESS_NODE(SLICE, SliceNode, NNNode)
+PROCESS_NODE(SOFTMAX, SoftmaxNode, NNNode)
+PROCESS_NODE(SPACETODEPTH, SpaceToDepthNode, NNNode)
+PROCESS_NODE(TILE, TileNode, NNNode)
+PROCESS_NODE(COPY, CopyNode, NNNode)
+
+// HW nodes
+PROCESS_NODE(HWNode, HWNode, Node)
+
+PROCESS_NODE(MAAELTWISE, MAAEltwiseNode, HWNode)
+
+// Op nodes
+PROCESS_BASE_NODE(OPNode, OPNode, Node)
+PROCESS_NODE(SHIFT, ShiftNode, OPNode)
+
+// QNodes
+PROCESS_BASE_NODE(QNode, QNode, Node)
+PROCESS_NODE(QUANT, QuantNode, QNode)
+PROCESS_NODE(DEQUANT, DequantNode, QNode)
+
+// Global nodes
+PROCESS_BASE_NODE(GlobalNode, GlobalNode, Node)
+PROCESS_NODE(GSPLIT, GlobalSplitNode, GlobalNode)
+PROCESS_NODE(GCONCAT, GlobalConcatNode, GlobalNode)
+PROCESS_NODE(GSYNC, GlobalSyncNode, GlobalNode)
+
+// Virtual nodes
+PROCESS_BASE_NODE(VNode, VNode, Node)
+PROCESS_NODE(VCONCAT, VConcatNode, VNode)
+PROCESS_NODE(VSPLIT, VSplitNode, VNode)
+
+#undef PROCESS_BASE_NODE
+#undef PROCESS_NODE
