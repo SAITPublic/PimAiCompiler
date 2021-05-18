@@ -244,6 +244,26 @@ def nn_node_label(nn_node: IR.NnNode.NnNode) -> (object, str):
         aten_unsqueeze_node.Init(nn_node.NnNode().Bytes, nn_node.NnNode().Pos)
         return aten_unsqueeze_node, aten_unsqueeze_node_label(aten_unsqueeze_node)
     
+    elif node_type == IR.NNNode.AnyType.AnyType().AtenCopyNode:
+        aten_copy_node = IR.NNNode.AtenCopyNode.AtenCopyNode()
+        aten_copy_node.Init(nn_node.NnNode().Bytes, nn_node.NnNode().Pos)
+        return aten_copy_node, aten_copy_node_label(aten_copy_node)
+    
+    elif node_type == IR.NNNode.AnyType.AnyType().AtenDeriveIndexNode:
+        aten_derive_index_node = IR.NNNode.AtenDeriveIndexNode.AtenDeriveIndexNode()
+        aten_derive_index_node.Init(nn_node.NnNode().Bytes, nn_node.NnNode().Pos)
+        return aten_derive_index_node, aten_derive_index_node_label(aten_derive_index_node)
+    
+    elif node_type == IR.NNNode.AnyType.AnyType().AtenEmbeddingNode:
+        aten_embedding_node = IR.NNNode.AtenEmbeddingNode.AtenEmbeddingNode()
+        aten_embedding_node.Init(nn_node.NnNode().Bytes, nn_node.NnNode().Pos)
+        return aten_embedding_node, aten_embedding_node_label(aten_embedding_node)
+    
+    elif node_type == IR.NNNode.AnyType.AnyType().AtenFormatNode:
+        aten_format_node = IR.NNNode.AtenFormatNode.AtenFormatNode()
+        aten_format_node.Init(nn_node.NnNode().Bytes, nn_node.NnNode().Pos)
+        return aten_format_node, aten_format_node_label(aten_format_node)
+
     # aten Ops without attribute, lookup table
     op_name = torch_ops.aten_ops_dict[node_type]
     if op_name in torch_ops.aten_ops_no_attr_dict:      # has key
@@ -537,13 +557,62 @@ def aten_to_node_label(aten_to_node: IR.NNNode.AtenToNode.AtenToNode) -> str:
     non_blocking = aten_to_node.NonBlocking()
     copy = aten_to_node.Copy()
 
+    optional_memory_format = aten_to_node.OptionalMemoryFormat()
     if dtype is not None:
         retval += 'Dtype: {}<br/>'.format(dtype)
     if non_blocking is not None:
         retval += 'NonBlocking: {}<br/>'.format(non_blocking)
     if copy is not None:
         retval += 'Copy: {}<br/>'.format(copy)
+    if optional_memory_format is not None:
+        retval += 'OptionalMemoryFormat: {}<br/>'.format(optional_memory_format)
     return list_table([retval])
+
+
+def aten_embedding_node_label(aten_embedding_node: IR.NNNode.AtenEmbeddingNode.AtenEmbeddingNode) -> str:
+    retval = 'AtenEmbedding Node<br/>'
+    padding_idx = aten_embedding_node.PaddingIdx()
+    scale_grad_by_freq = aten_embedding_node.ScaleGradByFreq()
+    sparse = aten_embedding_node.Sparse()
+
+    if padding_idx is not None:
+        retval += 'PaddingIdx: {}<br/>'.format(padding_idx)
+    if scale_grad_by_freq is not None:
+        retval += 'ScaleGradByFreq: {}<br/>'.format(scale_grad_by_freq)
+    if sparse is not None:
+        retval += 'Sparse: {}<br/>'.format(sparse)
+    return list_table([retval])
+
+
+def aten_copy_node_label(aten_copy_node: IR.NNNode.AtenCopyNode.AtenCopyNode) -> str:
+    retval = 'AtenCopy Node<br/>'
+    non_blocking = aten_copy_node.NonBlocking()
+    
+    if non_blocking is not None:
+        retval += 'NonBlocking: {}<br/>'.format(non_blocking)
+    return list_table([retval])
+
+
+def aten_derive_index_node_label(aten_derive_index_node: IR.NNNode.AtenDeriveIndexNode.AtenDeriveIndexNode) -> str:
+    retval = 'AtenDeriveIndex Node<br/>'
+    start = aten_derive_index_node.Start()
+    step = aten_derive_index_node.Step()
+    
+    if start is not None:
+        retval += 'Start: {}<br/>'.format(start)
+    if step is not None:
+        retval += 'Step: {}<br/>'.format(step)
+    return list_table([retval])
+
+
+def aten_format_node_label(aten_format_node: IR.NNNode.AtenFormatNode.AtenFormatNode) -> str:
+    retval = 'AtenFormat Node<br/>'
+    assembly_format = aten_format_node.AssemblyFormat()
+    
+    if assembly_format is not None:
+        retval += 'AssemblyFormat: {}<br/>'.format(assembly_format)
+    return list_table([retval])
+
 
 def aten_transpose_node_label(aten_transpose_node: IR.NNNode.AtenTransposeNode.AtenTransposeNode) -> str:
     retval = 'AtenTranspose Node<br/>'
