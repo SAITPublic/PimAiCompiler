@@ -80,20 +80,24 @@ class NNNodeType(DefaultEnum):
 
 class ControlNodeType(DefaultEnum):
     NONE = 0
-    PrimConstantNode = 1
-    PrimGetAttrNode = 2
-    PrimIf = 3
-    PrimListUnpackNode = 4
-    PrimLoopNode = 5
-    PrimRaiseExceptionNode = 6
-    PrimTupleConstructNode = 7
-    PrimTupleIndexNode = 8
-    PrimTupleUnpackNode = 9
-    PrimUninitializedNode = 10
-    PrimDataNode = 11
-    PrimDeviceNode = 12
-    PrimDtypeNode = 13
-    primUncheckedCastNode = 14
+    PrimBlockNode = 1
+    PrimConstantNode = 2
+    PrimEndIfNode = 3
+    PrimEndLoopNode = 4
+    PrimGetAttrNode = 5
+    PrimIf = 6
+    PrimListUnpackNode = 7
+    PrimLoopIndexNode = 8
+    PrimLoopNode = 9
+    PrimRaiseExceptionNode = 10
+    PrimTupleConstructNode = 11
+    PrimTupleIndexNode = 12
+    PrimTupleUnpackNode = 13
+    PrimUninitializedNode = 14
+    PrimDataNode = 15
+    PrimDeviceNode = 16
+    PrimDtypeNode = 17
+    primUncheckedCastNode = 18
 
 
 # 'NNNode' Enums

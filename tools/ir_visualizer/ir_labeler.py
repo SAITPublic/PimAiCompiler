@@ -70,14 +70,18 @@ import IR.NNNode.AtenZerosNode
 
 import IR.ControlNode
 import IR.CONTROLNode.AnyType
+import IR.CONTROLNode.PrimBlockNode
 import IR.CONTROLNode.PrimCallMethodNode
 import IR.CONTROLNode.PrimConstantNode
 import IR.CONTROLNode.PrimDataNode
 import IR.CONTROLNode.PrimDeviceNode
 import IR.CONTROLNode.PrimDtypeNode
+import IR.CONTROLNode.PrimEndIfNode
+import IR.CONTROLNode.PrimEndLoopNode
 import IR.CONTROLNode.PrimIfNode
 import IR.CONTROLNode.PrimListConstructNode
 import IR.CONTROLNode.PrimListUnpackNode
+import IR.CONTROLNode.PrimLoopIndexNode
 import IR.CONTROLNode.PrimLoopNode
 import IR.CONTROLNode.PrimRaiseExceptionNode
 import IR.CONTROLNode.PrimTupleConstructNode
@@ -293,6 +297,11 @@ def control_node_label(ctl_node: IR.ControlNode.ControlNode) -> (object, str):
         prim_if_node.Init(ctl_node.ControlNode().Bytes, ctl_node.ControlNode().Pos)
         return prim_if_node, prim_if_node_label(prim_if_node)
     
+    elif node_type == IR.CONTROLNode.AnyType.AnyType().PrimLoopIndexNode:
+        prim_loop_index_node = IR.CONTROLNode.PrimLoopIndexNode.PrimLoopIndexNode()
+        prim_loop_index_node.Init(ctl_node.ControlNode().Bytes, ctl_node.ControlNode().Pos)
+        return prim_loop_index_node, prim_loop_index_node_label(prim_loop_index_node)
+    
     elif node_type == IR.CONTROLNode.AnyType.AnyType().PrimLoopNode:
         prim_loop_node = IR.CONTROLNode.PrimLoopNode.PrimLoopNode()
         prim_loop_node.Init(ctl_node.ControlNode().Bytes, ctl_node.ControlNode().Pos)
@@ -302,6 +311,7 @@ def control_node_label(ctl_node: IR.ControlNode.ControlNode) -> (object, str):
         prim_tuple_index_node = IR.CONTROLNode.PrimTupleIndexNode.PrimTupleIndexNode()
         prim_tuple_index_node.Init(ctl_node.ControlNode().Bytes, ctl_node.ControlNode().Pos)
         return prim_tuple_index_node, prim_tuple_index_node_label(prim_tuple_index_node)
+
     # torch prim OPs without attrs
     op_name = torch_ops.prim_ops_dict[node_type]
     if op_name in torch_ops.prim_ops_no_attr_dict:
@@ -715,6 +725,14 @@ def prim_constant_node_label(prim_constant_node: IR.CONTROLNode.PrimConstantNode
         retval += 'DataType: {}<br/>'.format(named_datatype[data_type])
     if bit_width is not None:
         retval += 'BitWidth: {}<br/>'.format(bit_width)
+    return list_table([retval])
+
+
+def prim_loop_index_node_label(prim_loop_index_node: IR.CONTROLNode.PrimLoopIndexNode.PrimLoopIndexNode) -> str:
+    retval = 'PrimLoopIndex Node<br/>'
+    index = prim_loop_index_node.Index()
+    if index is not None:
+        retval += 'LoopIndex: {}<br/>'.format(index)
     return list_table([retval])
 
 

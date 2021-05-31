@@ -44,14 +44,18 @@ import IR.NNNode.AtenZerosNode
 # Torch Prim Ops
 import  IR.CONTROLNode
 import  IR.CONTROLNode.AnyType
+import IR.CONTROLNode.PrimBlockNode
 import IR.CONTROLNode.PrimCallMethodNode
 import IR.CONTROLNode.PrimConstantNode
 import IR.CONTROLNode.PrimDataNode
 import IR.CONTROLNode.PrimDeviceNode
 import IR.CONTROLNode.PrimDtypeNode
+import IR.CONTROLNode.PrimEndIfNode
+import IR.CONTROLNode.PrimEndLoopNode
 import IR.CONTROLNode.PrimIfNode
 import IR.CONTROLNode.PrimListConstructNode
 import IR.CONTROLNode.PrimListUnpackNode
+import IR.CONTROLNode.PrimLoopIndexNode
 import IR.CONTROLNode.PrimLoopNode
 import IR.CONTROLNode.PrimRaiseExceptionNode
 import IR.CONTROLNode.PrimTupleConstructNode
@@ -154,14 +158,18 @@ def create_prim_op_map():
     create a dict that contains all torch::prim Ops of RNNT
     '''
     op_dict = {
+        IR.CONTROLNode.AnyType.AnyType().PrimBlockNode : 'PrimBlockNode',
         IR.CONTROLNode.AnyType.AnyType().PrimCallMethodNode : 'PrimCallMethodNode',
         IR.CONTROLNode.AnyType.AnyType().PrimConstantNode : 'PrimConstantNode',
         IR.CONTROLNode.AnyType.AnyType().PrimDataNode : 'PrimDataNode',
         IR.CONTROLNode.AnyType.AnyType().PrimDeviceNode : 'PrimDeviceNode',
         IR.CONTROLNode.AnyType.AnyType().PrimDtypeNode : 'PrimDtypeNode',
+        IR.CONTROLNode.AnyType.AnyType().PrimEndIfNode : 'PrimEndIfNode',
+        IR.CONTROLNode.AnyType.AnyType().PrimEndLoopNode : 'PrimEndLoopNode',
         IR.CONTROLNode.AnyType.AnyType().PrimIfNode : 'PrimIfNode',
         IR.CONTROLNode.AnyType.AnyType().PrimListConstructNode : 'PrimListConstructNode',
         IR.CONTROLNode.AnyType.AnyType().PrimListUnpackNode : 'PrimListUnpackNode',
+        IR.CONTROLNode.AnyType.AnyType().PrimLoopIndexNode : 'PrimLoopIndexNode',
         IR.CONTROLNode.AnyType.AnyType().PrimLoopNode : 'PrimLoopNode',
         IR.CONTROLNode.AnyType.AnyType().PrimRaiseExceptionNode : 'PrimRaiseExceptionNode',
         IR.CONTROLNode.AnyType.AnyType().PrimTupleConstructNode : 'PrimTupleConstructNode',
@@ -178,9 +186,12 @@ prim_ops_dict = create_prim_op_map()
 these torch::prim Ops have no attribute
 '''
 prim_ops_no_attr_dict = {
+    'PrimBlockNode' : IR.CONTROLNode.PrimBlockNode.PrimBlockNode(),
     'PrimDataNode' : IR.CONTROLNode.PrimDataNode.PrimDataNode(),
     'PrimDeviceNode' : IR.CONTROLNode.PrimDeviceNode.PrimDeviceNode(),
     'PrimDtypeNode' : IR.CONTROLNode.PrimDtypeNode.PrimDtypeNode(),
+    'PrimEndIfNode' : IR.CONTROLNode.PrimEndIfNode.PrimEndIfNode(),
+    'PrimEndLoopNode' : IR.CONTROLNode.PrimEndLoopNode.PrimEndLoopNode(),
     'PrimListConstructNode' : IR.CONTROLNode.PrimListConstructNode.PrimListConstructNode(),
     'PrimListUnpackNode' : IR.CONTROLNode.PrimListUnpackNode.PrimListUnpackNode(),
     'PrimRaiseExceptionNode' : IR.CONTROLNode.PrimRaiseExceptionNode.PrimRaiseExceptionNode(),
