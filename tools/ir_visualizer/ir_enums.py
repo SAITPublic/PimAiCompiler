@@ -76,6 +76,32 @@ class NNNodeType(DefaultEnum):
     AtenGetItemNode = _TORCH_ATEN_OP_START + 30
     AtenDeriveIndexNode = _TORCH_ATEN_OP_START + 31
     AtenIntNode = _TORCH_ATEN_OP_START + 32
+    AtenAndNode = _TORCH_ATEN_OP_START + 33
+    AtenPackPaddedSequenceNode = _TORCH_ATEN_OP_START + 34
+    AtenPadPackedSequenceNode = _TORCH_ATEN_OP_START + 35
+    AtenSetItemNode = _TORCH_ATEN_OP_START + 35
+    AtenAnyNode = _TORCH_ATEN_OP_START + 36
+    AtenArangeNode = _TORCH_ATEN_OP_START + 37
+    AtenAsTensorNode = _TORCH_ATEN_OP_START + 38
+    AtenBitwiseNotNode = _TORCH_ATEN_OP_START + 39
+    AtenBmmNode = _TORCH_ATEN_OP_START + 39
+    AtenBoolNode = _TORCH_ATEN_OP_START + 40
+    AtenChunkNode = _TORCH_ATEN_OP_START + 41
+    AtenClampNode = _TORCH_ATEN_OP_START + 42
+    AtenClearNode = _TORCH_ATEN_OP_START + 43
+    AtenContiguousNode = _TORCH_ATEN_OP_START + 44
+    AtenCpuNode = _TORCH_ATEN_OP_START + 45
+    AtenCudaNode = _TORCH_ATEN_OP_START + 46
+    AtenEqualNode = _TORCH_ATEN_OP_START + 47
+    AtenFloorDivideNode = _TORCH_ATEN_OP_START + 48
+    AtenGeNode = _TORCH_ATEN_OP_START + 49
+    AtenIndexNode = _TORCH_ATEN_OP_START + 50
+    AtenFillNode = _TORCH_ATEN_OP_START + 51
+    AtenLogNode = _TORCH_ATEN_OP_START + 52
+    AtenTanhNode = _TORCH_ATEN_OP_START + 53
+    AtenViewNode =  _TORCH_ATEN_OP_START + 54
+    AtenMaskedSelectNode =  _TORCH_ATEN_OP_START + 55
+    AtenPowNode =  _TORCH_ATEN_OP_START + 56
 
 
 class ControlNodeType(DefaultEnum):
@@ -98,7 +124,7 @@ class ControlNodeType(DefaultEnum):
     PrimDeviceNode = 16
     PrimDtypeNode = 17
     primUncheckedCastNode = 18
-
+    PrimSetAttrNode = 19
 
 # 'NNNode' Enums
 class InputType(DefaultEnum):

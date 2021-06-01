@@ -30,41 +30,67 @@ import IR.NNNode.TileNode
 
 import IR.NNNode.AtenAddNode
 import IR.NNNode.AtenAddmmNode
+import IR.NNNode.AtenAndNode
+import IR.NNNode.AtenAnyNode
 import IR.NNNode.AtenAppendNode
+import IR.NNNode.AtenArangeNode
+import IR.NNNode.AtenAsTensorNode
+import IR.NNNode.AtenBitwiseNotNode
+import IR.NNNode.AtenBmmNode
+import IR.NNNode.AtenBoolNode
 import IR.NNNode.AtenCatNode
 import IR.NNNode.AtenCeilNode
+import IR.NNNode.AtenChunkNode
+import IR.NNNode.AtenClampNode
+import IR.NNNode.AtenClearNode
+import IR.NNNode.AtenContiguousNode
 import IR.NNNode.AtenCopyNode
+import IR.NNNode.AtenCpuNode
+import IR.NNNode.AtenCudaNode
 import IR.NNNode.AtenDeriveIndexNode
 import IR.NNNode.AtenDimNode
 import IR.NNNode.AtenDivNode
 import IR.NNNode.AtenDropoutNode
 import IR.NNNode.AtenEmbeddingNode
 import IR.NNNode.AtenEqNode
+import IR.NNNode.AtenEqualNode
 import IR.NNNode.AtenExpandNode
+import IR.NNNode.AtenFillNode
+import IR.NNNode.AtenFloorDivideNode
 import IR.NNNode.AtenFormatNode
+import IR.NNNode.AtenGeNode
 import IR.NNNode.AtenGetItemNode
 import IR.NNNode.AtenGtNode
+import IR.NNNode.AtenIndexNode
 import IR.NNNode.AtenIntNode
 import IR.NNNode.AtenIsNode
 import IR.NNNode.AtenItemNode
 import IR.NNNode.AtenLSTMNode
 import IR.NNNode.AtenLenNode
 import IR.NNNode.AtenListNode
+import IR.NNNode.AtenLogNode
 import IR.NNNode.AtenLtNode
+import IR.NNNode.AtenMaskedSelectNode
 import IR.NNNode.AtenMatmulNode
 import IR.NNNode.AtenMaxNode
 import IR.NNNode.AtenNeNode
 import IR.NNNode.AtenNegNode
 import IR.NNNode.AtenNotNode
+import IR.NNNode.AtenPackPaddedSequenceNode
+import IR.NNNode.AtenPadPackedSequenceNode
 import IR.NNNode.AtenReluNode
+import IR.NNNode.AtenPowNode
 import IR.NNNode.AtenSelectNode
+import IR.NNNode.AtenSetItemNode
 import IR.NNNode.AtenSizeNode
 import IR.NNNode.AtenSliceNode
 import IR.NNNode.AtenSubNode
+import IR.NNNode.AtenTanhNode
 import IR.NNNode.AtenTensorNode
 import IR.NNNode.AtenToNode
 import IR.NNNode.AtenTransposeNode
 import IR.NNNode.AtenUnsqueezeNode
+import IR.NNNode.AtenViewNode
 import IR.NNNode.AtenZerosLikeNode
 import IR.NNNode.AtenZerosNode
 
@@ -89,6 +115,8 @@ import IR.CONTROLNode.PrimTupleIndexNode
 import IR.CONTROLNode.PrimTupleUnpackNode
 import IR.CONTROLNode.PrimUncheckedCastNode
 import IR.CONTROLNode.PrimUninitializedNode
+import IR.CONTROLNode.PrimGetAttrNode
+import IR.CONTROLNode.PrimSetAttrNode
 
 import torch_ops
 
@@ -268,6 +296,47 @@ def nn_node_label(nn_node: IR.NnNode.NnNode) -> (object, str):
         aten_format_node.Init(nn_node.NnNode().Bytes, nn_node.NnNode().Pos)
         return aten_format_node, aten_format_node_label(aten_format_node)
 
+    elif node_type == IR.NNNode.AnyType.AnyType().AtenPackPaddedSequenceNode:
+        aten_pack_padded_sequence_node = IR.NNNode.AtenPackPaddedSequenceNode.AtenPackPaddedSequenceNode()
+        aten_pack_padded_sequence_node.Init(nn_node.NnNode().Bytes, nn_node.NnNode().Pos)
+        return aten_pack_padded_sequence_node, aten_pack_padded_sequence_node_label(aten_pack_padded_sequence_node)
+
+    elif node_type == IR.NNNode.AnyType.AnyType().AtenPadPackedSequenceNode:
+        aten_pad_packed_sequence_node = IR.NNNode.AtenPadPackedSequenceNode.AtenPadPackedSequenceNode()
+        aten_pad_packed_sequence_node.Init(nn_node.NnNode().Bytes, nn_node.NnNode().Pos)
+        return aten_pad_packed_sequence_node, aten_pad_packed_sequence_node_label(aten_pad_packed_sequence_node)
+
+    elif node_type == IR.NNNode.AnyType.AnyType().AtenSetItemNode:
+        aten_set_item_node = IR.NNNode.AtenSetItemNode.AtenSetItemNode()
+        aten_set_item_node.Init(nn_node.NnNode().Bytes, nn_node.NnNode().Pos)
+        return aten_set_item_node, aten_set_item_node_label(aten_set_item_node)
+
+    elif node_type == IR.NNNode.AnyType.AnyType().AtenArangeNode:
+        aten_arange_node = IR.NNNode.AtenArangeNode.AtenArangeNode()
+        aten_arange_node.Init(nn_node.NnNode().Bytes, nn_node.NnNode().Pos)
+        return aten_arange_node, aten_arange_node_label(aten_arange_node)
+
+    elif node_type == IR.NNNode.AnyType.AnyType().AtenAsTensorNode:
+        aten_as_tensor_node = IR.NNNode.AtenAsTensorNode.AtenAsTensorNode()
+        aten_as_tensor_node.Init(nn_node.NnNode().Bytes, nn_node.NnNode().Pos)
+        return aten_as_tensor_node, aten_as_tensor_node_label(aten_as_tensor_node)
+    
+    elif node_type == IR.NNNode.AnyType.AnyType().AtenChunkNode:
+        aten_chunk_node = IR.NNNode.AtenChunkNode.AtenChunkNode()
+        aten_chunk_node.Init(nn_node.NnNode().Bytes, nn_node.NnNode().Pos)
+        return aten_chunk_node, aten_chunk_node_label(aten_chunk_node)
+    
+    elif node_type == IR.NNNode.AnyType.AnyType().AtenClampNode:
+        aten_clamp_node = IR.NNNode.AtenClampNode.AtenClampNode()
+        aten_clamp_node.Init(nn_node.NnNode().Bytes, nn_node.NnNode().Pos)
+        return aten_clamp_node, aten_clamp_node_label(aten_clamp_node)
+
+    elif node_type == IR.NNNode.AnyType.AnyType().AtenContiguousNode:
+        aten_contiguous_node = IR.NNNode.AtenContiguousNode.AtenContiguousNode()
+        aten_contiguous_node.Init(nn_node.NnNode().Bytes, nn_node.NnNode().Pos)
+        return aten_contiguous_node, aten_contiguous_node_label(aten_contiguous_node)
+        
+
     # aten Ops without attribute, lookup table
     op_name = torch_ops.aten_ops_dict[node_type]
     if op_name in torch_ops.aten_ops_no_attr_dict:      # has key
@@ -281,6 +350,9 @@ def nn_node_label(nn_node: IR.NnNode.NnNode) -> (object, str):
 
 def control_node_label(ctl_node: IR.ControlNode.ControlNode) -> (object, str):
     node_type = ctl_node.ControlNodeType()
+    print(" node type  {}".format(node_type))
+    op_name = torch_ops.prim_ops_dict[node_type]
+    print(" node name  {}".format(op_name))
     # torch prim ops with attrs
     if node_type == IR.CONTROLNode.AnyType.AnyType().PrimCallMethodNode:
         prim_call_method_node = IR.CONTROLNode.PrimCallMethodNode.PrimCallMethodNode()
@@ -313,7 +385,7 @@ def control_node_label(ctl_node: IR.ControlNode.ControlNode) -> (object, str):
         return prim_tuple_index_node, prim_tuple_index_node_label(prim_tuple_index_node)
 
     # torch prim OPs without attrs
-    op_name = torch_ops.prim_ops_dict[node_type]
+    #op_name = torch_ops.prim_ops_dict[node_type]
     if op_name in torch_ops.prim_ops_no_attr_dict:
         prim_op_ = torch_ops.prim_ops_no_attr_dict[op_name]
         prim_op_.Init(ctl_node.ControlNode().Bytes, ctl_node.ControlNode().Pos)
@@ -705,6 +777,96 @@ def aten_lstm_node_label(aten_lstm_node: IR.NNNode.AtenLSTMNode.AtenLSTMNode) ->
         retval += 'Bidirectional: {}<br/>'.format(bidirectional)
     if batch_first is not None:
         retval += 'BatchFirst: {}<br/>'.format(batch_first)
+    return list_table([retval])
+
+
+def aten_pack_padded_sequence_node_label(aten_pack_padded_sequence_node: IR.NNNode.AtenPackPaddedSequenceNode.AtenPackPaddedSequenceNode) -> str:
+    retval = 'AtenPackPaddedSequence Node<br/>'
+    batch_first = aten_pack_padded_sequence_node.BatchFirst()
+    if batch_first is not None:
+        retval += 'BatchFirst: {}<br/>'.format(batch_first)
+    return list_table([retval])
+
+
+def aten_pad_packed_sequence_node_label(aten_pad_packed_sequence_node: IR.NNNode.AtenPadPackedSequenceNode.AtenPadPackedSequenceNode) -> str:
+    retval = 'AtenPadPackedSequence Node<br/>'
+    batch_first = aten_pad_packed_sequence_node.BatchFirst()
+    padding_value = aten_pad_packed_sequence_node.PaddingValue()
+    if batch_first is not None:
+        retval += 'BatchFirst: {}<br/>'.format(batch_first)
+    if padding_value is not None:
+        retval += 'PaddingValue: {}<br/>'.format(padding_value)
+    return list_table([retval])
+
+
+def aten_set_item_node_label(aten_set_item_node: IR.NNNode.AtenSetItemNode.AtenSetItemNode) -> str:
+    retval = 'AtenSetItem Node<br/>'
+    indices = aten_set_item_node.Indices()
+    if indices is not None:
+        retval += 'Indices: {}<br/>'.format(indices)
+    return list_table([retval])
+
+
+def aten_arange_node_label(aten_arange_node: IR.NNNode.AtenArangeNode.AtenArangeNode) -> str:
+    retval = 'AtenArange Node<br/>'
+    start = aten_arange_node.Start()
+    step = aten_arange_node.Step()
+    dtype = aten_arange_node.Dtype()
+    layout = aten_arange_node.Layout()
+    pin_memory = aten_arange_node.PinMemory()
+
+    if start is not None:
+        retval += 'Start: {}<br/>'.format(start)
+    if step is not None:
+        retval += 'Step: {}<br/>'.format(step)
+    if dtype is not None:
+        retval += 'Dtype: {}<br/>'.format(dtype)
+    if layout is not None:
+        retval += 'Layout: {}<br/>'.format(layout)
+    if pin_memory is not None:
+        retval += 'PinMemory: {}<br/>'.format(pin_memory)
+
+    return list_table([retval])
+    
+
+def aten_as_tensor_node_label(aten_as_tensor_node: IR.NNNode.AtenAsTensorNode.AtenAsTensorNode) -> str:
+    retval = 'AtenAsTensor Node<br/>'
+    dtype = aten_as_tensor_node.Dtype()
+    device = aten_as_tensor_node.Device()
+    if dtype is not None:
+        retval += 'Dtype: {}<br/>'.format(dtype)
+    if device is not None:
+        retval += 'Device: {}<br/>'.format(device)
+    return list_table([retval])
+
+
+def aten_clamp_node_label(aaten_clamp_node: IR.NNNode.AtenClampNode.AtenClampNode) -> str:
+    retval = 'AtenClamp Node<br/>'
+    min = aaten_clamp_node.Min()
+    max = aaten_clamp_node.Max()
+    if min is not None:
+        retval += 'Min: {}<br/>'.format(min)
+    if max is not None:
+        retval += 'Max: {}<br/>'.format(max)
+    return list_table([retval])
+
+
+def aaten_chunk_node_label(aten_chunk_node: IR.NNNode.AtenChunkNode.AtenChunkNode) -> str:
+    retval = 'AtenChunk Node<br/>'
+    chunks = aten_chunk_node.Chunks()
+    dim = aten_chunk_node.Dim()
+    if chunks is not None:
+        retval += 'Chunks: {}<br/>'.format(chunks)
+    if dim is not None:
+        retval += 'Dim: {}<br/>'.format(dim)
+    return list_table([retval])
+
+
+def aten_contiguous_node_label(aten_contiguous_node: IR.NNNode.AtenContiguousNode.AtenContiguousNode) -> str:
+    retval = 'AtenContiguous Node<br/>'
+    memory_format = aten_contiguous_node.MemoryFormat()
+    if memory_format is not None:
+        retval += 'MemoryFormat: {}<br/>'.format(memory_format)
     return list_table([retval])
 
 
