@@ -99,9 +99,20 @@ class NNNodeType(DefaultEnum):
     AtenFillNode = _TORCH_ATEN_OP_START + 51
     AtenLogNode = _TORCH_ATEN_OP_START + 52
     AtenTanhNode = _TORCH_ATEN_OP_START + 53
-    AtenViewNode =  _TORCH_ATEN_OP_START + 54
-    AtenMaskedSelectNode =  _TORCH_ATEN_OP_START + 55
-    AtenPowNode =  _TORCH_ATEN_OP_START + 56
+    AtenViewNode = _TORCH_ATEN_OP_START + 54
+    AtenMaskedSelectNode = _TORCH_ATEN_OP_START + 55
+    AtenPowNode = _TORCH_ATEN_OP_START + 56
+    AtenGatherNode = _TORCH_ATEN_OP_START + 57
+    AtenIndexPutNode = _TORCH_ATEN_OP_START + 58
+    AtenIndexSelectNode = _TORCH_ATEN_OP_START + 59
+    AtenLeakyReluNode = _TORCH_ATEN_OP_START + 60
+    AtenLogSoftmaxNode = _TORCH_ATEN_OP_START + 61
+    AtenMaskedFillNode = _TORCH_ATEN_OP_START + 62
+    AtenMinNode = _TORCH_ATEN_OP_START + 63
+    AtenMulNode = _TORCH_ATEN_OP_START + 64
+    AtenOnesNode = _TORCH_ATEN_OP_START + 65
+    AtenSoftmaxNode = _TORCH_ATEN_OP_START + 66
+    AtenSqueezeNode = _TORCH_ATEN_OP_START + 67
 
 
 class ControlNodeType(DefaultEnum):

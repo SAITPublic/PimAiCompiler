@@ -93,6 +93,16 @@ import IR.NNNode.AtenUnsqueezeNode
 import IR.NNNode.AtenViewNode
 import IR.NNNode.AtenZerosLikeNode
 import IR.NNNode.AtenZerosNode
+import IR.NNNode.AtenGatherNode
+import IR.NNNode.AtenIndexPutNode
+import IR.NNNode.AtenLeakyReluNode
+import IR.NNNode.AtenLogSoftmaxNode
+import IR.NNNode.AtenMaskedFillNode
+import IR.NNNode.AtenMinNode
+import IR.NNNode.AtenMulNode
+import IR.NNNode.AtenOnesNode
+import IR.NNNode.AtenSoftmaxNode
+import IR.NNNode.AtenSqueezeNode
 
 import IR.ControlNode
 import IR.CONTROLNode.AnyType
@@ -335,8 +345,57 @@ def nn_node_label(nn_node: IR.NnNode.NnNode) -> (object, str):
         aten_contiguous_node = IR.NNNode.AtenContiguousNode.AtenContiguousNode()
         aten_contiguous_node.Init(nn_node.NnNode().Bytes, nn_node.NnNode().Pos)
         return aten_contiguous_node, aten_contiguous_node_label(aten_contiguous_node)
-        
 
+    elif node_type == IR.NNNode.AnyType.AnyType().AtenGatherNode:
+        aten_gather_node = IR.NNNode.AtenGatherNode.AtenGatherNode()
+        aten_gather_node.Init(nn_node.NnNode().Bytes, nn_node.NnNode().Pos)
+        return aten_gather_node, aten_gather_node_label(aten_gather_node)
+
+    elif node_type == IR.NNNode.AnyType.AnyType().AtenIndexPutNode:
+        aten_index_put_node = IR.NNNode.AtenIndexPutNode.AtenIndexPutNode()
+        aten_index_put_node.Init(nn_node.NnNode().Bytes, nn_node.NnNode().Pos)
+        return aten_index_put_node, aten_index_put_node_label(aten_index_put_node)
+
+    elif node_type == IR.NNNode.AnyType.AnyType().AtenLeakyReluNode:
+        aten_leaky_relu_node = IR.NNNode.AtenLeakyReluNode.AtenLeakyReluNode()
+        aten_leaky_relu_node.Init(nn_node.NnNode().Bytes, nn_node.NnNode().Pos)
+        return aten_leaky_relu_node, aten_leaky_relu_node_label(aten_leaky_relu_node)
+    
+    elif node_type == IR.NNNode.AnyType.AnyType().AtenLogSoftmaxNode:
+        aten_log_softmax_node = IR.NNNode.AtenLogSoftmaxNode.AtenLogSoftmaxNode()
+        aten_log_softmax_node.Init(nn_node.NnNode().Bytes, nn_node.NnNode().Pos)
+        return aten_log_softmax_node, aten_log_softmax_node_label(aten_log_softmax_node)
+     
+    elif node_type == IR.NNNode.AnyType.AnyType().AtenMaskedFillNode:
+        aten_masked_fill_node = IR.NNNode.AtenMaskedFillNode.AtenMaskedFillNode()
+        aten_masked_fill_node.Init(nn_node.NnNode().Bytes, nn_node.NnNode().Pos)
+        return aten_masked_fill_node, aten_masked_fill_node_label(aten_masked_fill_node)
+    
+    elif node_type == IR.NNNode.AnyType.AnyType().AtenMinNode:
+        aten_min_node = IR.NNNode.AtenMinNode.AtenMinNode()
+        aten_min_node.Init(nn_node.NnNode().Bytes, nn_node.NnNode().Pos)
+        return aten_min_node, aten_min_node_label(aten_min_node)
+
+    elif node_type == IR.NNNode.AnyType.AnyType().AtenMulNode:
+        aten_mul_node = IR.NNNode.AtenMulNode.AtenMulNode()
+        aten_mul_node.Init(nn_node.NnNode().Bytes, nn_node.NnNode().Pos)
+        return aten_mul_node, aten_mul_node_label(aten_mul_node)
+    
+    elif node_type == IR.NNNode.AnyType.AnyType().AtenOnesNode:
+        aten_ones_node = IR.NNNode.AtenOnesNode.AtenOnesNode()
+        aten_ones_node.Init(nn_node.NnNode().Bytes, nn_node.NnNode().Pos)
+        return aten_ones_node, aten_ones_node_label(aten_ones_node)   
+    
+    elif node_type == IR.NNNode.AnyType.AnyType().AtenSoftmaxNode:
+        aten_softmax_node = IR.NNNode.AtenSoftmaxNode.AtenSoftmaxNode()
+        aten_softmax_node.Init(nn_node.NnNode().Bytes, nn_node.NnNode().Pos)
+        return aten_softmax_node, aten_softmax_node_label(aten_softmax_node) 
+
+    elif node_type == IR.NNNode.AnyType.AnyType().AtenSqueezeNode:
+        aten_squeeze_node = IR.NNNode.AtenSqueezeNode.AtenSqueezeNode()
+        aten_squeeze_node.Init(nn_node.NnNode().Bytes, nn_node.NnNode().Pos)
+        return aten_squeeze_node, aten_squeeze_node_label(aten_squeeze_node) 
+    
     # aten Ops without attribute, lookup table
     op_name = torch_ops.aten_ops_dict[node_type]
     if op_name in torch_ops.aten_ops_no_attr_dict:      # has key
@@ -870,6 +929,107 @@ def aten_contiguous_node_label(aten_contiguous_node: IR.NNNode.AtenContiguousNod
     return list_table([retval])
 
 
+def aten_gather_node_label(aten_gather_node: IR.NNNode.AtenGatherNode.AtenGatherNode) -> str:
+    retval = 'AtenGather Node<br/>'
+    dim = aten_gather_node.Dim()
+    sparse_grad = aten_gather_node.SparseGrad()
+    if dim is not None:
+        retval += 'Dim: {}<br/>'.format(dim)
+    if sparse_grad is not None:
+        retval += 'SparseGrad: {}<br/>'.format(sparse_grad)
+    return list_table([retval])
+
+
+def aten_index_put_node_label(aten_index_put_node: IR.NNNode.AtenIndexPutNode.AtenIndexPutNode) -> str:
+    retval = 'AtenIndexPut Node<br/>'
+    accumulate = aten_index_put_node.Accumulate()
+    if accumulate is not None:
+        retval += 'Accumulate: {}<br/>'.format(accumulate)
+    return list_table([retval])
+
+
+def aten_leaky_relu_node_label(aten_leaky_relu_node: IR.NNNode.AtenLeakyReluNode.AtenLeakyReluNode) -> str:
+    retval = 'AtenLeakyRelu Node<br/>'
+    scalar = aten_leaky_relu_node.Scalar()
+    if scalar is not None:
+        retval += 'Scalar: {}<br/>'.format(scalar)
+    return list_table([retval])
+
+
+def aten_log_softmax_node_label(aten_log_softmax_node: IR.NNNode.AtenLogSoftmaxNode.AtenLogSoftmaxNode) -> str:
+    retval = 'AtenLogSoftmax Node<br/>'
+    dim = aten_log_softmax_node.Dim()
+    dtype = aten_log_softmax_node.Dtype()
+    if dim is not None:
+        retval += 'Dim: {}<br/>'.format(dim)
+    if dtype is not None:
+        retval += 'Dtype: {}<br/>'.format(dtype)
+    return list_table([retval])
+
+
+def aten_masked_fill_node_label(aten_masked_fill_node: IR.NNNode.AtenMaskedFillNode.AtenMaskedFillNode) -> str:
+    retval = 'AtenMaskedFill Node<br/>'
+    value = aten_masked_fill_node.Value()
+    if value is not None:
+        retval += 'Value: {}<br/>'.format(value)
+    return list_table([retval])
+
+
+def aten_min_node_label(aten_min_node: IR.NNNode.AtenMinNode.AtenMinNode) -> str:
+    retval = 'AtenMin Node<br/>'
+    dim_or_y = aten_min_node.DimOrY()
+    keep_dim = aten_min_node.KeepDim()
+    if dim_or_y is not None:
+        retval += 'Dim_or_y: {}<br/>'.format(dim_or_y)
+    if keep_dim is not None:
+        retval += 'KeepDim: {}<br/>'.format(keep_dim)
+    
+    return list_table([retval])
+
+
+def aten_mul_node_label(aten_mul_node: IR.NNNode.AtenMulNode.AtenMulNode) -> str:
+    retval = 'AtenMul Node<br/>'
+    other = aten_mul_node.Other()
+    if other is not None:
+        retval += 'Other: {}<br/>'.format(other)
+    return list_table([retval])
+
+
+def aten_ones_node_label(aten_ones_node: IR.NNNode.AtenOnesNode.AtenOnesNode) -> str:
+    retval = 'AtenOnes Node<br/>'
+    size = aten_ones_node.Size()
+    dtype = aten_ones_node.Dtype()
+    layout = aten_ones_node.Layout()
+    device = aten_ones_node.Device()
+
+    if size is not None:
+        retval += 'Size: {}<br/>'.format(size)
+    if dtype is not None:
+        retval += 'Dtype: {}<br/>'.format(dtype)
+    if layout is not None:
+        retval += 'Layout: {}<br/>'.format(layout)
+    if device is not None:
+        retval += 'Device: {}<br/>'.format(device)
+    return list_table([retval])
+
+
+def aten_softmax_node_label(aten_softmax_node: IR.NNNode.AtenSoftmaxNode.AtenSoftmaxNode) -> str:
+    retval = 'AtenSoftmax Node<br/>'
+    dim = aten_softmax_node.Dim()
+    other = aten_softmax_node.Other()
+    if dim is not None:
+        retval += 'Dim: {}<br/>'.format(dim)
+    if other is not None:
+        retval += 'Other: {}<br/>'.format(other)
+    return list_table([retval])
+
+
+def aten_squeeze_node_label(aten_squeeze_node: IR.NNNode.AtenSqueezeNode.AtenSqueezeNode) -> str:
+    retval = 'AtenSqueeze Node<br/>'
+    dim = aten_squeeze_node.Dim()
+    if dim is not None:
+        retval += 'Dim: {}<br/>'.format(dim)
+    return list_table([retval])
 
 def prim_constant_node_label(prim_constant_node: IR.CONTROLNode.PrimConstantNode.PrimConstantNode) -> str:
     # GDataType list comes from the defination of DTensor of GraphGen:

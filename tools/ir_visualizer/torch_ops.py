@@ -67,6 +67,17 @@ import IR.NNNode.AtenUnsqueezeNode
 import IR.NNNode.AtenViewNode
 import IR.NNNode.AtenZerosLikeNode
 import IR.NNNode.AtenZerosNode
+import IR.NNNode.AtenGatherNode
+import IR.NNNode.AtenIndexPutNode
+import IR.NNNode.AtenIndexSelectNode
+import IR.NNNode.AtenLeakyReluNode
+import IR.NNNode.AtenLogSoftmaxNode
+import IR.NNNode.AtenMaskedFillNode
+import IR.NNNode.AtenMinNode
+import IR.NNNode.AtenMulNode
+import IR.NNNode.AtenOnesNode
+import IR.NNNode.AtenSoftmaxNode
+import IR.NNNode.AtenSqueezeNode
 
 # Torch Prim Ops
 import  IR.CONTROLNode
@@ -135,24 +146,32 @@ def create_aten_ops_map():
         IR.NNNode.AnyType.AnyType().AtenFillNode : 'AtenFillNode',
         IR.NNNode.AnyType.AnyType().AtenFloorDivideNode : 'AtenFloorDivideNode',
         IR.NNNode.AnyType.AnyType().AtenFormatNode : 'AtenFormatNode',
+        IR.NNNode.AnyType.AnyType().AtenGatherNode : 'AtenGatherNode',
         IR.NNNode.AnyType.AnyType().AtenGeNode : 'AtenGeNode',
         IR.NNNode.AnyType.AnyType().AtenGetItemNode : 'AtenGetItemNode',
         IR.NNNode.AnyType.AnyType().AtenGtNode : 'AtenGtNode',
         IR.NNNode.AnyType.AnyType().AtenIndexNode : 'AtenIndexNode',
+        IR.NNNode.AnyType.AnyType().AtenIndexPutNode : 'AtenIndexPutNode',
         IR.NNNode.AnyType.AnyType().AtenIntNode : 'AtenIntNode',
         IR.NNNode.AnyType.AnyType().AtenIsNode : 'AtenIsNode',
         IR.NNNode.AnyType.AnyType().AtenItemNode : 'AtenItemNode',
         IR.NNNode.AnyType.AnyType().AtenLSTMNode : 'AtenLSTMNode',
+        IR.NNNode.AnyType.AnyType().AtenLeakyReluNode : 'AtenLeakyReluNode',
         IR.NNNode.AnyType.AnyType().AtenLenNode : 'AtenLenNode',
         IR.NNNode.AnyType.AnyType().AtenListNode : 'AtenListNode',
         IR.NNNode.AnyType.AnyType().AtenLogNode : 'AtenLogNode',
+        IR.NNNode.AnyType.AnyType().AtenLogSoftmaxNode : 'AtenLogSoftmaxNode',
         IR.NNNode.AnyType.AnyType().AtenLtNode : 'AtenLtNode',
+        IR.NNNode.AnyType.AnyType().AtenMaskedFillNode : 'AtenMaskedFillNode',
         IR.NNNode.AnyType.AnyType().AtenMaskedSelectNode : 'AtenMaskedSelectNode',
         IR.NNNode.AnyType.AnyType().AtenMatmulNode : 'AtenMatmulNode',
         IR.NNNode.AnyType.AnyType().AtenMaxNode : 'AtenMaxNode',
+        IR.NNNode.AnyType.AnyType().AtenMinNode : 'AtenMinNode',
+        IR.NNNode.AnyType.AnyType().AtenMulNode : 'AtenMulNode',
         IR.NNNode.AnyType.AnyType().AtenNeNode : 'AtenNeNode',
         IR.NNNode.AnyType.AnyType().AtenNegNode : 'AtenNegNode',
         IR.NNNode.AnyType.AnyType().AtenNotNode : 'AtenNotNode',
+        IR.NNNode.AnyType.AnyType().AtenOnesNode : 'AtenOnesNode',
         IR.NNNode.AnyType.AnyType().AtenPackPaddedSequenceNode : 'AtenPackPaddedSequenceNode',
         IR.NNNode.AnyType.AnyType().AtenPadPackedSequenceNode : 'AtenPadPackedSequenceNode',
         IR.NNNode.AnyType.AnyType().AtenPowNode : 'AtenPowNode',
@@ -161,6 +180,8 @@ def create_aten_ops_map():
         IR.NNNode.AnyType.AnyType().AtenSetItemNode : 'AtenSetItemNode',
         IR.NNNode.AnyType.AnyType().AtenSizeNode : 'AtenSizeNode',
         IR.NNNode.AnyType.AnyType().AtenSliceNode : 'AtenSliceNode',
+        IR.NNNode.AnyType.AnyType().AtenSoftmaxNode : 'AtenSoftmaxNode',
+        IR.NNNode.AnyType.AnyType().AtenSqueezeNode : 'AtenSqueezeNode',
         IR.NNNode.AnyType.AnyType().AtenSubNode : 'AtenSubNode',
         IR.NNNode.AnyType.AnyType().AtenTanhNode : 'AtenTanhNode',
         IR.NNNode.AnyType.AnyType().AtenTensorNode : 'AtenTensorNode',
