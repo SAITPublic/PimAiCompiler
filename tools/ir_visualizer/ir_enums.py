@@ -113,6 +113,12 @@ class NNNodeType(DefaultEnum):
     AtenOnesNode = _TORCH_ATEN_OP_START + 65
     AtenSoftmaxNode = _TORCH_ATEN_OP_START + 66
     AtenSqueezeNode = _TORCH_ATEN_OP_START + 67
+    AtenSumNode = _TORCH_ATEN_OP_START + 68
+    AtenTopkNode = _TORCH_ATEN_OP_START + 69
+    AtenWarnNode = _TORCH_ATEN_OP_START + 70
+    AtenConv2dNode = _TORCH_ATEN_OP_START + 71
+    AtenLinearNode = _TORCH_ATEN_OP_START + 72
+    AtenMaxPool2dNode = _TORCH_ATEN_OP_START + 73
 
 
 class ControlNodeType(DefaultEnum):
@@ -136,6 +142,8 @@ class ControlNodeType(DefaultEnum):
     PrimDtypeNode = 17
     primUncheckedCastNode = 18
     PrimSetAttrNode = 19
+    PrimVariableNode = 20
+    PrimTypeNode = 21
 
 # 'NNNode' Enums
 class InputType(DefaultEnum):

@@ -78,6 +78,12 @@ import IR.NNNode.AtenMulNode
 import IR.NNNode.AtenOnesNode
 import IR.NNNode.AtenSoftmaxNode
 import IR.NNNode.AtenSqueezeNode
+import IR.NNNode.AtenSumNode
+import IR.NNNode.AtenTopkNode
+import IR.NNNode.AtenWarnNode
+import IR.NNNode.AtenConv2dNode
+import IR.NNNode.AtenLinearNode
+import IR.NNNode.AtenMaxPool2dNode
 
 # Torch Prim Ops
 import  IR.CONTROLNode
@@ -95,6 +101,7 @@ import IR.CONTROLNode.PrimListConstructNode
 import IR.CONTROLNode.PrimListUnpackNode
 import IR.CONTROLNode.PrimLoopIndexNode
 import IR.CONTROLNode.PrimLoopNode
+import IR.CONTROLNode.PrimTypeNode
 import IR.CONTROLNode.PrimRaiseExceptionNode
 import IR.CONTROLNode.PrimTupleConstructNode
 import IR.CONTROLNode.PrimTupleIndexNode
@@ -103,6 +110,7 @@ import IR.CONTROLNode.PrimUncheckedCastNode
 import IR.CONTROLNode.PrimUninitializedNode
 import IR.CONTROLNode.PrimGetAttrNode
 import IR.CONTROLNode.PrimSetAttrNode
+import IR.CONTROLNode.PrimVariableNode
 
 
 '''
@@ -132,6 +140,7 @@ def create_aten_ops_map():
         IR.NNNode.AnyType.AnyType().AtenClampNode : 'AtenClampNode',
         IR.NNNode.AnyType.AnyType().AtenClearNode : 'AtenClearNode',
         IR.NNNode.AnyType.AnyType().AtenContiguousNode : 'AtenContiguousNode',
+        IR.NNNode.AnyType.AnyType().AtenConv2dNode : 'AtenConv2dNode',
         IR.NNNode.AnyType.AnyType().AtenCopyNode : 'AtenCopyNode',
         IR.NNNode.AnyType.AnyType().AtenCpuNode : 'AtenCpuNode',
         IR.NNNode.AnyType.AnyType().AtenCudaNode : 'AtenCudaNode',
@@ -152,12 +161,14 @@ def create_aten_ops_map():
         IR.NNNode.AnyType.AnyType().AtenGtNode : 'AtenGtNode',
         IR.NNNode.AnyType.AnyType().AtenIndexNode : 'AtenIndexNode',
         IR.NNNode.AnyType.AnyType().AtenIndexPutNode : 'AtenIndexPutNode',
+        IR.NNNode.AnyType.AnyType().AtenIndexSelectNode : 'AtenIndexSelectNode',
         IR.NNNode.AnyType.AnyType().AtenIntNode : 'AtenIntNode',
         IR.NNNode.AnyType.AnyType().AtenIsNode : 'AtenIsNode',
         IR.NNNode.AnyType.AnyType().AtenItemNode : 'AtenItemNode',
         IR.NNNode.AnyType.AnyType().AtenLSTMNode : 'AtenLSTMNode',
         IR.NNNode.AnyType.AnyType().AtenLeakyReluNode : 'AtenLeakyReluNode',
         IR.NNNode.AnyType.AnyType().AtenLenNode : 'AtenLenNode',
+        IR.NNNode.AnyType.AnyType().AtenLinearNode : 'AtenLinearNode',
         IR.NNNode.AnyType.AnyType().AtenListNode : 'AtenListNode',
         IR.NNNode.AnyType.AnyType().AtenLogNode : 'AtenLogNode',
         IR.NNNode.AnyType.AnyType().AtenLogSoftmaxNode : 'AtenLogSoftmaxNode',
@@ -166,6 +177,7 @@ def create_aten_ops_map():
         IR.NNNode.AnyType.AnyType().AtenMaskedSelectNode : 'AtenMaskedSelectNode',
         IR.NNNode.AnyType.AnyType().AtenMatmulNode : 'AtenMatmulNode',
         IR.NNNode.AnyType.AnyType().AtenMaxNode : 'AtenMaxNode',
+        IR.NNNode.AnyType.AnyType().AtenMaxPool2dNode : 'AtenMaxPool2dNode',
         IR.NNNode.AnyType.AnyType().AtenMinNode : 'AtenMinNode',
         IR.NNNode.AnyType.AnyType().AtenMulNode : 'AtenMulNode',
         IR.NNNode.AnyType.AnyType().AtenNeNode : 'AtenNeNode',
@@ -183,12 +195,15 @@ def create_aten_ops_map():
         IR.NNNode.AnyType.AnyType().AtenSoftmaxNode : 'AtenSoftmaxNode',
         IR.NNNode.AnyType.AnyType().AtenSqueezeNode : 'AtenSqueezeNode',
         IR.NNNode.AnyType.AnyType().AtenSubNode : 'AtenSubNode',
+        IR.NNNode.AnyType.AnyType().AtenSumNode : 'AtenSumNode',
         IR.NNNode.AnyType.AnyType().AtenTanhNode : 'AtenTanhNode',
         IR.NNNode.AnyType.AnyType().AtenTensorNode : 'AtenTensorNode',
         IR.NNNode.AnyType.AnyType().AtenToNode : 'AtenToNode',
+        IR.NNNode.AnyType.AnyType().AtenTopkNode : 'AtenTopkNode',
         IR.NNNode.AnyType.AnyType().AtenTransposeNode : 'AtenTransposeNode',
         IR.NNNode.AnyType.AnyType().AtenUnsqueezeNode : 'AtenUnsqueezeNode',
         IR.NNNode.AnyType.AnyType().AtenViewNode : 'AtenViewNode',
+        IR.NNNode.AnyType.AnyType().AtenWarnNode : 'AtenWarnNode',
         IR.NNNode.AnyType.AnyType().AtenZerosLikeNode : 'AtenZerosLikeNode',
         IR.NNNode.AnyType.AnyType().AtenZerosNode : 'AtenZerosNode'
     }
@@ -228,6 +243,7 @@ aten_ops_no_attr_dict = {
     'AtenIsNode' : IR.NNNode.AtenIsNode.AtenIsNode(),
     'AtenItemNode' : IR.NNNode.AtenItemNode.AtenItemNode(),
     'AtenLenNode' : IR.NNNode.AtenLenNode.AtenLenNode(),
+    'AtenLinearNode' : IR.NNNode.AtenLinearNode.AtenLinearNode(),
     'AtenListNode' : IR.NNNode.AtenListNode.AtenListNode(),
     'AtenLogNode' : IR.NNNode.AtenLogNode.AtenLogNode(),
     'AtenLtNode' : IR.NNNode.AtenLtNode.AtenLtNode(),
@@ -266,6 +282,7 @@ def create_prim_op_map():
         IR.CONTROLNode.AnyType.AnyType().PrimListUnpackNode : 'PrimListUnpackNode',
         IR.CONTROLNode.AnyType.AnyType().PrimLoopIndexNode : 'PrimLoopIndexNode',
         IR.CONTROLNode.AnyType.AnyType().PrimLoopNode : 'PrimLoopNode',
+        IR.CONTROLNode.AnyType.AnyType().PrimTypeNode : 'PrimTypeNode',
         IR.CONTROLNode.AnyType.AnyType().PrimRaiseExceptionNode : 'PrimRaiseExceptionNode',
         IR.CONTROLNode.AnyType.AnyType().PrimTupleConstructNode : 'PrimTupleConstructNode',
         IR.CONTROLNode.AnyType.AnyType().PrimTupleIndexNode : 'PrimTupleIndexNode',
@@ -274,6 +291,7 @@ def create_prim_op_map():
         IR.CONTROLNode.AnyType.AnyType().PrimUninitializedNode : 'PrimUninitializedNode',
         IR.CONTROLNode.AnyType.AnyType().PrimGetAttrNode : 'PrimGetAttrNode',
         IR.CONTROLNode.AnyType.AnyType().PrimSetAttrNode : 'PrimSetAttrNode',
+        IR.CONTROLNode.AnyType.AnyType().PrimVariableNode  : 'PrimVariableNode'
     }
     return op_dict
 
@@ -291,6 +309,7 @@ prim_ops_no_attr_dict = {
     'PrimEndLoopNode' : IR.CONTROLNode.PrimEndLoopNode.PrimEndLoopNode(),
     'PrimListConstructNode' : IR.CONTROLNode.PrimListConstructNode.PrimListConstructNode(),
     'PrimListUnpackNode' : IR.CONTROLNode.PrimListUnpackNode.PrimListUnpackNode(),
+    'PrimTypeNode' : IR.CONTROLNode.PrimTypeNode.PrimTypeNode(),
     'PrimRaiseExceptionNode' : IR.CONTROLNode.PrimRaiseExceptionNode.PrimRaiseExceptionNode(),
     'PrimTupleConstructNode' : IR.CONTROLNode.PrimTupleConstructNode.PrimTupleConstructNode(),
     'PrimTupleUnpackNode' : IR.CONTROLNode.PrimTupleUnpackNode.PrimTupleUnpackNode(),

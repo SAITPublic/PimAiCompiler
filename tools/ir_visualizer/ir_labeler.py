@@ -95,6 +95,7 @@ import IR.NNNode.AtenZerosLikeNode
 import IR.NNNode.AtenZerosNode
 import IR.NNNode.AtenGatherNode
 import IR.NNNode.AtenIndexPutNode
+import IR.NNNode.AtenIndexSelectNode
 import IR.NNNode.AtenLeakyReluNode
 import IR.NNNode.AtenLogSoftmaxNode
 import IR.NNNode.AtenMaskedFillNode
@@ -103,6 +104,12 @@ import IR.NNNode.AtenMulNode
 import IR.NNNode.AtenOnesNode
 import IR.NNNode.AtenSoftmaxNode
 import IR.NNNode.AtenSqueezeNode
+import IR.NNNode.AtenSumNode
+import IR.NNNode.AtenTopkNode
+import IR.NNNode.AtenWarnNode
+import IR.NNNode.AtenConv2dNode
+import IR.NNNode.AtenLinearNode
+import IR.NNNode.AtenMaxPool2dNode
 
 import IR.ControlNode
 import IR.CONTROLNode.AnyType
@@ -119,6 +126,7 @@ import IR.CONTROLNode.PrimListConstructNode
 import IR.CONTROLNode.PrimListUnpackNode
 import IR.CONTROLNode.PrimLoopIndexNode
 import IR.CONTROLNode.PrimLoopNode
+import IR.CONTROLNode.PrimTypeNode
 import IR.CONTROLNode.PrimRaiseExceptionNode
 import IR.CONTROLNode.PrimTupleConstructNode
 import IR.CONTROLNode.PrimTupleIndexNode
@@ -127,6 +135,7 @@ import IR.CONTROLNode.PrimUncheckedCastNode
 import IR.CONTROLNode.PrimUninitializedNode
 import IR.CONTROLNode.PrimGetAttrNode
 import IR.CONTROLNode.PrimSetAttrNode
+import IR.CONTROLNode.PrimVariableNode 
 
 import torch_ops
 
@@ -395,7 +404,37 @@ def nn_node_label(nn_node: IR.NnNode.NnNode) -> (object, str):
         aten_squeeze_node = IR.NNNode.AtenSqueezeNode.AtenSqueezeNode()
         aten_squeeze_node.Init(nn_node.NnNode().Bytes, nn_node.NnNode().Pos)
         return aten_squeeze_node, aten_squeeze_node_label(aten_squeeze_node) 
+
+    elif node_type == IR.NNNode.AnyType.AnyType().AtenSumNode:
+        aten_sum_node = IR.NNNode.AtenSumNode.AtenSumNode()
+        aten_sum_node.Init(nn_node.NnNode().Bytes, nn_node.NnNode().Pos)
+        return aten_sum_node, aten_sum_node_label(aten_sum_node) 
     
+    elif node_type == IR.NNNode.AnyType.AnyType().AtenTopkNode:
+        aten_topk_node = IR.NNNode.AtenTopkNode.AtenTopkNode()
+        aten_topk_node.Init(nn_node.NnNode().Bytes, nn_node.NnNode().Pos)
+        return aten_topk_node, aten_topk_node_label(aten_topk_node) 
+    
+    elif node_type == IR.NNNode.AnyType.AnyType().AtenWarnNode:
+        aten_warn_node = IR.NNNode.AtenWarnNode.AtenWarnNode()
+        aten_warn_node.Init(nn_node.NnNode().Bytes, nn_node.NnNode().Pos)
+        return aten_warn_node, aten_warn_node_label(aten_warn_node) 
+    
+    elif node_type == IR.NNNode.AnyType.AnyType().AtenConv2dNode:
+        aten_conv2d_node = IR.NNNode.AtenConv2dNode.AtenConv2dNode()
+        aten_conv2d_node.Init(nn_node.NnNode().Bytes, nn_node.NnNode().Pos)
+        return aten_conv2d_node, aten_conv2d_node_label(aten_conv2d_node) 
+    
+    elif node_type == IR.NNNode.AnyType.AnyType().AtenMaxPool2dNode:
+        aten_maxpool2d_node = IR.NNNode.AtenMaxPool2dNode.AtenMaxPool2dNode()
+        aten_maxpool2d_node.Init(nn_node.NnNode().Bytes, nn_node.NnNode().Pos)
+        return aten_maxpool2d_node, aten_maxpool2d_node_label(aten_maxpool2d_node) 
+
+    elif node_type == IR.NNNode.AnyType.AnyType().AtenIndexSelectNode:
+        aten_index_select_node = IR.NNNode.AtenIndexSelectNode.AtenIndexSelectNode()
+        aten_index_select_node.Init(nn_node.NnNode().Bytes, nn_node.NnNode().Pos)
+        return aten_index_select_node, aten_index_select_node_label(aten_index_select_node) 
+
     # aten Ops without attribute, lookup table
     op_name = torch_ops.aten_ops_dict[node_type]
     if op_name in torch_ops.aten_ops_no_attr_dict:      # has key
@@ -409,9 +448,7 @@ def nn_node_label(nn_node: IR.NnNode.NnNode) -> (object, str):
 
 def control_node_label(ctl_node: IR.ControlNode.ControlNode) -> (object, str):
     node_type = ctl_node.ControlNodeType()
-    print(" node type  {}".format(node_type))
-    op_name = torch_ops.prim_ops_dict[node_type]
-    print(" node name  {}".format(op_name))
+
     # torch prim ops with attrs
     if node_type == IR.CONTROLNode.AnyType.AnyType().PrimCallMethodNode:
         prim_call_method_node = IR.CONTROLNode.PrimCallMethodNode.PrimCallMethodNode()
@@ -442,9 +479,14 @@ def control_node_label(ctl_node: IR.ControlNode.ControlNode) -> (object, str):
         prim_tuple_index_node = IR.CONTROLNode.PrimTupleIndexNode.PrimTupleIndexNode()
         prim_tuple_index_node.Init(ctl_node.ControlNode().Bytes, ctl_node.ControlNode().Pos)
         return prim_tuple_index_node, prim_tuple_index_node_label(prim_tuple_index_node)
+    
+    elif node_type == IR.CONTROLNode.AnyType.AnyType().PrimVariableNode :
+        prim_variable_node = IR.CONTROLNode.PrimVariableNode .PrimVariableNode ()
+        prim_variable_node.Init(ctl_node.ControlNode().Bytes, ctl_node.ControlNode().Pos)
+        return prim_variable_node, prim_variable_node_label(prim_variable_node)
 
     # torch prim OPs without attrs
-    #op_name = torch_ops.prim_ops_dict[node_type]
+    op_name = torch_ops.prim_ops_dict[node_type]
     if op_name in torch_ops.prim_ops_no_attr_dict:
         prim_op_ = torch_ops.prim_ops_no_attr_dict[op_name]
         prim_op_.Init(ctl_node.ControlNode().Bytes, ctl_node.ControlNode().Pos)
@@ -910,7 +952,7 @@ def aten_clamp_node_label(aaten_clamp_node: IR.NNNode.AtenClampNode.AtenClampNod
     return list_table([retval])
 
 
-def aaten_chunk_node_label(aten_chunk_node: IR.NNNode.AtenChunkNode.AtenChunkNode) -> str:
+def aten_chunk_node_label(aten_chunk_node: IR.NNNode.AtenChunkNode.AtenChunkNode) -> str:
     retval = 'AtenChunk Node<br/>'
     chunks = aten_chunk_node.Chunks()
     dim = aten_chunk_node.Dim()
@@ -1016,11 +1058,11 @@ def aten_ones_node_label(aten_ones_node: IR.NNNode.AtenOnesNode.AtenOnesNode) ->
 def aten_softmax_node_label(aten_softmax_node: IR.NNNode.AtenSoftmaxNode.AtenSoftmaxNode) -> str:
     retval = 'AtenSoftmax Node<br/>'
     dim = aten_softmax_node.Dim()
-    other = aten_softmax_node.Other()
+    dtype = aten_softmax_node.Dtype()
     if dim is not None:
         retval += 'Dim: {}<br/>'.format(dim)
-    if other is not None:
-        retval += 'Other: {}<br/>'.format(other)
+    if dtype is not None:
+        retval += 'Dtype: {}<br/>'.format(dtype)
     return list_table([retval])
 
 
@@ -1030,6 +1072,91 @@ def aten_squeeze_node_label(aten_squeeze_node: IR.NNNode.AtenSqueezeNode.AtenSqu
     if dim is not None:
         retval += 'Dim: {}<br/>'.format(dim)
     return list_table([retval])
+
+
+def aten_sum_node_label(aten_sum_node: IR.NNNode.AtenSumNode.AtenSumNode) -> str:
+    retval = 'AtenSum Node<br/>'
+    dim = aten_sum_node.Dim()
+    keepdim = aten_sum_node.KeepDim()
+    dtype = aten_sum_node.KeepDim()
+    if dim is not None:
+        retval += 'Dim: {}<br/>'.format(dim)
+    if keepdim is not None:
+        retval += 'KeepDim: {}<br/>'.format(keepdim)
+    if dtype is not None:
+        retval += 'Dtype: {}<br/>'.format(dtype)
+    return list_table([retval])
+    
+
+def aten_topk_node_label(aten_topk_node: IR.NNNode.AtenTopkNode.AtenTopkNode) -> str:
+    retval = 'AtenTopk Node<br/>'
+    k = aten_topk_node.K()
+    dim = aten_topk_node.Dim()
+    largest = aten_topk_node.Largest()
+    sorted = aten_topk_node.Sorted()
+    if k is not None:
+        retval += 'K: {}<br/>'.format(k)
+    if dim is not None:
+        retval += 'Dim: {}<br/>'.format(dim)
+    if largest is not None:
+        retval += 'Largest: {}<br/>'.format(largest)
+    if sorted is not None:
+        retval += 'Sorted: {}<br/>'.format(sorted)
+    return list_table([retval])
+
+
+def aten_warn_node_label(aten_warn_node: IR.NNNode.AtenWarnNode.AtenWarnNode) -> str:
+    retval = 'AtenWarn Node<br/>'
+    value = aten_warn_node.Value()
+    if value is not None:
+        retval += 'Value: {}<br/>'.format(value)
+    return list_table([retval])
+
+
+def aten_index_select_node_label(aten_index_select_node: IR.NNNode.AtenIndexSelectNode.AtenIndexSelectNode) -> str:
+    retval = 'AtenIndexSelect Node<br/>'
+    dim = aten_index_select_node.Dim()
+    if dim is not None:
+        retval += 'Dim: {}<br/>'.format(dim)
+    return list_table([retval])
+
+
+def aten_conv2d_node_label(aten_conv2d_node: IR.NNNode.AtenConv2dNode.AtenConv2dNode) -> str:
+    retval = 'AtenConv2d Node<br/>'
+    #stride = aten_conv2d_node.Stride()
+    # padding = aten_conv2d_node.Padding()
+    # dialation = aten_conv2d_node.Dialation()
+    groups = aten_conv2d_node.Groups()
+    #if stride is not None:
+    #    retval += 'Stride: {}<br/>'.format(stride)
+    # if padding is not None:
+    #     retval += 'Padding: {}<br/>'.format(padding)
+    # if dialation is not None:
+    #     retval += 'Dialation: {}<br/>'.format(dialation)
+    if groups is not None:
+        retval += 'Groups: {}<br/>'.format(groups)
+    return list_table([retval])
+
+
+def aten_maxpool2d_node_label(aten_maxpool2d_node: IR.NNNode.AtenMaxPool2dNode.AtenMaxPool2dNode) -> str:
+    retval = 'AtenMaxPool2d Node<br/>'
+    # kernel_size = aten_maxpool2d_node.KernelSize()
+    # pad = aten_maxpool2d_node.Pad()
+    # stride = aten_maxpool2d_node.Stride()
+    # dialation = aten_maxpool2d_node.Dialation()
+    return_indices = aten_maxpool2d_node.ReturnIndices()
+    # if kernel_size is not None:
+    #     retval += 'KernelSize: {}<br/>'.format(kernel_size)
+    # if pad is not None:
+    #     retval += 'Pad: {}<br/>'.format(pad)
+    # if stride is not None:
+    #     retval += 'Stride: {}<br/>'.format(stride)
+    # if dialation is not None:
+    #     retval += 'Dialation: {}<br/>'.format(dialation)
+    if return_indices is not None:
+        retval += 'ReturnIndices: {}<br/>'.format(return_indices)
+    return list_table([retval])
+
 
 def prim_constant_node_label(prim_constant_node: IR.CONTROLNode.PrimConstantNode.PrimConstantNode) -> str:
     # GDataType list comes from the defination of DTensor of GraphGen:
@@ -1095,6 +1222,13 @@ def prim_call_method_node_label(prim_call_method_node: IR.CONTROLNode.PrimCallMe
     target_network_name = prim_call_method_node.TargetNetworkName()
     if target_network_name is not None:
         retval += 'TargetNetworkName: {}<br/>'.format(target_network_name)
+    return list_table([retval])
+
+def prim_variable_node_label(prim_variable_node: IR.CONTROLNode.PrimVariableNode.PrimVariableNode) -> str:
+    retval = 'PrimVariable Node<br/>'
+    data_type  = prim_variable_node.DataType()
+    if data_type  is not None:
+        retval += 'DataType : {}<br/>'.format(data_type )
     return list_table([retval])
 
 
