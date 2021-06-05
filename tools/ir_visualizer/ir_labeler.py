@@ -28,8 +28,8 @@ import IR.NNNode.DataFormatNode
 import IR.NNNode.SliceNode
 import IR.NNNode.TileNode
 
-import IR.NNNode.AtenAddNode
 import IR.NNNode.AtenAddmmNode
+import IR.NNNode.AtenAddNode
 import IR.NNNode.AtenAndNode
 import IR.NNNode.AtenAnyNode
 import IR.NNNode.AtenAppendNode
@@ -44,6 +44,7 @@ import IR.NNNode.AtenChunkNode
 import IR.NNNode.AtenClampNode
 import IR.NNNode.AtenClearNode
 import IR.NNNode.AtenContiguousNode
+import IR.NNNode.AtenConv2dNode
 import IR.NNNode.AtenCopyNode
 import IR.NNNode.AtenCpuNode
 import IR.NNNode.AtenCudaNode
@@ -58,58 +59,57 @@ import IR.NNNode.AtenExpandNode
 import IR.NNNode.AtenFillNode
 import IR.NNNode.AtenFloorDivideNode
 import IR.NNNode.AtenFormatNode
+import IR.NNNode.AtenGatherNode
 import IR.NNNode.AtenGeNode
 import IR.NNNode.AtenGetItemNode
 import IR.NNNode.AtenGtNode
 import IR.NNNode.AtenIndexNode
+import IR.NNNode.AtenIndexPutNode
+import IR.NNNode.AtenIndexSelectNode
 import IR.NNNode.AtenIntNode
 import IR.NNNode.AtenIsNode
 import IR.NNNode.AtenItemNode
-import IR.NNNode.AtenLSTMNode
+import IR.NNNode.AtenLeakyReluNode
 import IR.NNNode.AtenLenNode
+import IR.NNNode.AtenLinearNode
 import IR.NNNode.AtenListNode
 import IR.NNNode.AtenLogNode
+import IR.NNNode.AtenLogSoftmaxNode
+import IR.NNNode.AtenLSTMNode
 import IR.NNNode.AtenLtNode
+import IR.NNNode.AtenMaskedFillNode
 import IR.NNNode.AtenMaskedSelectNode
 import IR.NNNode.AtenMatmulNode
 import IR.NNNode.AtenMaxNode
-import IR.NNNode.AtenNeNode
+import IR.NNNode.AtenMaxPool2dNode
+import IR.NNNode.AtenMinNode
+import IR.NNNode.AtenMulNode
 import IR.NNNode.AtenNegNode
+import IR.NNNode.AtenNeNode
 import IR.NNNode.AtenNotNode
+import IR.NNNode.AtenOnesNode
 import IR.NNNode.AtenPackPaddedSequenceNode
 import IR.NNNode.AtenPadPackedSequenceNode
-import IR.NNNode.AtenReluNode
 import IR.NNNode.AtenPowNode
+import IR.NNNode.AtenReluNode
 import IR.NNNode.AtenSelectNode
 import IR.NNNode.AtenSetItemNode
 import IR.NNNode.AtenSizeNode
 import IR.NNNode.AtenSliceNode
+import IR.NNNode.AtenSoftmaxNode
+import IR.NNNode.AtenSqueezeNode
 import IR.NNNode.AtenSubNode
+import IR.NNNode.AtenSumNode
 import IR.NNNode.AtenTanhNode
 import IR.NNNode.AtenTensorNode
 import IR.NNNode.AtenToNode
+import IR.NNNode.AtenTopkNode
 import IR.NNNode.AtenTransposeNode
 import IR.NNNode.AtenUnsqueezeNode
 import IR.NNNode.AtenViewNode
+import IR.NNNode.AtenWarnNode
 import IR.NNNode.AtenZerosLikeNode
 import IR.NNNode.AtenZerosNode
-import IR.NNNode.AtenGatherNode
-import IR.NNNode.AtenIndexPutNode
-import IR.NNNode.AtenIndexSelectNode
-import IR.NNNode.AtenLeakyReluNode
-import IR.NNNode.AtenLogSoftmaxNode
-import IR.NNNode.AtenMaskedFillNode
-import IR.NNNode.AtenMinNode
-import IR.NNNode.AtenMulNode
-import IR.NNNode.AtenOnesNode
-import IR.NNNode.AtenSoftmaxNode
-import IR.NNNode.AtenSqueezeNode
-import IR.NNNode.AtenSumNode
-import IR.NNNode.AtenTopkNode
-import IR.NNNode.AtenWarnNode
-import IR.NNNode.AtenConv2dNode
-import IR.NNNode.AtenLinearNode
-import IR.NNNode.AtenMaxPool2dNode
 
 import IR.ControlNode
 import IR.CONTROLNode.AnyType
@@ -121,21 +121,21 @@ import IR.CONTROLNode.PrimDeviceNode
 import IR.CONTROLNode.PrimDtypeNode
 import IR.CONTROLNode.PrimEndIfNode
 import IR.CONTROLNode.PrimEndLoopNode
+import IR.CONTROLNode.PrimGetAttrNode
 import IR.CONTROLNode.PrimIfNode
 import IR.CONTROLNode.PrimListConstructNode
 import IR.CONTROLNode.PrimListUnpackNode
 import IR.CONTROLNode.PrimLoopIndexNode
 import IR.CONTROLNode.PrimLoopNode
-import IR.CONTROLNode.PrimTypeNode
 import IR.CONTROLNode.PrimRaiseExceptionNode
+import IR.CONTROLNode.PrimSetAttrNode
 import IR.CONTROLNode.PrimTupleConstructNode
 import IR.CONTROLNode.PrimTupleIndexNode
 import IR.CONTROLNode.PrimTupleUnpackNode
+import IR.CONTROLNode.PrimTypeNode
 import IR.CONTROLNode.PrimUncheckedCastNode
 import IR.CONTROLNode.PrimUninitializedNode
-import IR.CONTROLNode.PrimGetAttrNode
-import IR.CONTROLNode.PrimSetAttrNode
-import IR.CONTROLNode.PrimVariableNode 
+import IR.CONTROLNode.PrimVariableNode
 
 import torch_ops
 
@@ -1123,16 +1123,16 @@ def aten_index_select_node_label(aten_index_select_node: IR.NNNode.AtenIndexSele
 
 def aten_conv2d_node_label(aten_conv2d_node: IR.NNNode.AtenConv2dNode.AtenConv2dNode) -> str:
     retval = 'AtenConv2d Node<br/>'
-    #stride = aten_conv2d_node.Stride()
-    # padding = aten_conv2d_node.Padding()
-    # dialation = aten_conv2d_node.Dialation()
+    stride = aten_conv2d_node.Stride()
+    padding = aten_conv2d_node.Padding()
+    dilation = aten_conv2d_node.Dilation()
     groups = aten_conv2d_node.Groups()
-    #if stride is not None:
-    #    retval += 'Stride: {}<br/>'.format(stride)
-    # if padding is not None:
-    #     retval += 'Padding: {}<br/>'.format(padding)
-    # if dialation is not None:
-    #     retval += 'Dialation: {}<br/>'.format(dialation)
+    if stride is not None:
+       retval += 'Stride: {}<br/>'.format(dim2_label(stride))
+    if padding is not None:
+        retval += 'Padding: {}<br/>'.format(pad4_label(padding))
+    if dilation is not None:
+        retval += 'Dilation: {}<br/>'.format(dim2_label(dilation))
     if groups is not None:
         retval += 'Groups: {}<br/>'.format(groups)
     return list_table([retval])
@@ -1140,19 +1140,19 @@ def aten_conv2d_node_label(aten_conv2d_node: IR.NNNode.AtenConv2dNode.AtenConv2d
 
 def aten_maxpool2d_node_label(aten_maxpool2d_node: IR.NNNode.AtenMaxPool2dNode.AtenMaxPool2dNode) -> str:
     retval = 'AtenMaxPool2d Node<br/>'
-    # kernel_size = aten_maxpool2d_node.KernelSize()
-    # pad = aten_maxpool2d_node.Pad()
-    # stride = aten_maxpool2d_node.Stride()
-    # dialation = aten_maxpool2d_node.Dialation()
+    kernel_size = aten_maxpool2d_node.KernelSize()
+    pad = aten_maxpool2d_node.Pad()
+    stride = aten_maxpool2d_node.Stride()
+    dilation = aten_maxpool2d_node.Dilation()
     return_indices = aten_maxpool2d_node.ReturnIndices()
-    # if kernel_size is not None:
-    #     retval += 'KernelSize: {}<br/>'.format(kernel_size)
-    # if pad is not None:
-    #     retval += 'Pad: {}<br/>'.format(pad)
-    # if stride is not None:
-    #     retval += 'Stride: {}<br/>'.format(stride)
-    # if dialation is not None:
-    #     retval += 'Dialation: {}<br/>'.format(dialation)
+    if kernel_size is not None:
+        retval += 'KernelSize: {}<br/>'.format(dim2_label(kernel_size))
+    if pad is not None:
+        retval += 'Pad: {}<br/>'.format(pad4_label(pad))
+    if stride is not None:
+        retval += 'Stride: {}<br/>'.format(dim2_label(stride))
+    if dilation is not None:
+        retval += 'Dialation: {}<br/>'.format(dim2_label(dilation))
     if return_indices is not None:
         retval += 'ReturnIndices: {}<br/>'.format(return_indices)
     return list_table([retval])
@@ -1249,12 +1249,12 @@ def weight_blob_edge_label(fc_node: IR.NNNode.FullyConnectedNode.FullyConnectedN
     return list_table(['Weight Blob'])
 
 
-def lstm_weight_blob_edge_label(aten_lstm_node: IR.NNNode.AtenLSTMNode.AtenLSTMNode) -> str:
-    return list_table(['Weight Blob'])
-
-
-def lstm_bias_blob_edge_label(aten_lstm_node: IR.NNNode.AtenLSTMNode.AtenLSTMNode) -> str:
+def aten_bias_blob_edge_label() -> str:
     return list_table(['Bias Blob'])
+
+
+def aten_weight_blob_edge_label() -> str:
+    return list_table(['Weight Blob'])
 
 
 def blob_node_label(blob: IR.Blob.Blob) -> str:

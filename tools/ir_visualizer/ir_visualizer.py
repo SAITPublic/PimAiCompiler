@@ -194,23 +194,22 @@ class Visualizer():
                 typed_node, nn_node_label = labeler.nn_node_label(ir_nn_node)
                 node_label = labeler.list_table([ir_node_title, nn_node_label])
 
-                # Support LSTM weight Blob, attribute of WeightBlobId is defined in AtenLSTMNOde
-                if isinstance(typed_node,IR.NNNode.AtenLSTMNode.AtenLSTMNode):
-                    if 'WeightBlobIds' in dir(typed_node):
-                        # LSTM have >= 8 Weight, it is a list
-                        weight_blob_id_list = [typed_node.WeightBlobIds(k) for k in range(typed_node.WeightBlobIdsLength())]
-                        edge_label = labeler.html_str(labeler.lstm_weight_blob_edge_label(typed_node))
-                        if weight_blob_id_list:
-                            for blob_id in weight_blob_id_list:
-                                self.__append_blob_dict(blob_id, blob_type='weight', dst=node_name, label=edge_label)
-                    if 'BiasBlobIds' in dir(typed_node):
-                        bias_blob_id_list = bias_blob_id_list = [typed_node.BiasBlobIds(k) for k in range(typed_node.BiasBlobIdsLength())]
-                        edge_label = labeler.html_str(labeler.lstm_bias_blob_edge_label(typed_node))
-                        if bias_blob_id_list:
-                            for blob_id in bias_blob_id_list:
-                                self.__append_blob_dict(blob_id, blob_type='bias', dst=node_name, label=edge_label)
-
+ 
                 # Save edge's blob info
+                if 'WeightBlobIds' in dir(typed_node):
+                    # LSTM have >= 8 Weight, it is a list
+                    weight_blob_id_list = [typed_node.WeightBlobIds(k) for k in range(typed_node.WeightBlobIdsLength())]
+                    edge_label = labeler.html_str(labeler.aten_weight_blob_edge_label())
+                    if weight_blob_id_list:
+                        for blob_id in weight_blob_id_list:
+                            self.__append_blob_dict(blob_id, blob_type='weight', dst=node_name, label=edge_label)
+                if 'BiasBlobIds' in dir(typed_node):
+                    bias_blob_id_list = bias_blob_id_list = [typed_node.BiasBlobIds(k) for k in range(typed_node.BiasBlobIdsLength())]
+                    edge_label = labeler.html_str(labeler.aten_bias_blob_edge_label())
+                    if bias_blob_id_list:
+                        for blob_id in bias_blob_id_list:
+                            self.__append_blob_dict(blob_id, blob_type='bias', dst=node_name, label=edge_label)
+
                 if 'KernelBlobId' in dir(typed_node):
                     blob_id = typed_node.KernelBlobId()
                     edge_label = labeler.html_str(labeler.kernel_blob_edge_label(typed_node))
