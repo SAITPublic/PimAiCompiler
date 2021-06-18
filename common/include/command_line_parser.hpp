@@ -10,8 +10,8 @@
 
 #pragma once
 
-#include "common/log.hpp"
-#include "common/types.hpp"
+#include "common/include/log.hpp"
+#include "common/include/types.hpp"
 
 #include <algorithm>
 #include <cassert>

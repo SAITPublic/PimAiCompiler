@@ -17,7 +17,7 @@
 
 #pragma once
 
-#include "common/common.hpp"
+#include "common/include/common.hpp"
 
 enum class RetVal {
     SUCCESS = 0,

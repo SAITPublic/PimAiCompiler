@@ -14,8 +14,8 @@
 #include <cstring>
 #include <string>
 
-#include "common/iterator_ext.hpp"
-#include "common/log.hpp"
+#include "common/include/iterator_ext.hpp"
+#include "common/include/log.hpp"
 
 /// @brief function that returns typename FuncT in string representation
 template <typename FuncT>

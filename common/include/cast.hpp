@@ -12,8 +12,8 @@
 
 #include <type_traits>
 
-#include "common/attributes.h"
-#include "common/log.hpp"
+#include "common/include/attributes.h"
+#include "common/include/log.hpp"
 
 /// these function implement type casting support for IR classes.
 /// The contract for classes that will be used in down-casting has to be the following:
