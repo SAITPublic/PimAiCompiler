@@ -18,9 +18,9 @@
 
 #include <climits>
 
-#include "common/arithmetics.hpp"
-#include "common/wrapper_types.hpp"
-#include "ir/blob.hpp"
+#include "common/include/arithmetics.hpp"
+#include "common/include/wrapper_types.hpp"
+#include "ir/include/blob.hpp"
 
 namespace nn_compiler {
 namespace nn_ir {

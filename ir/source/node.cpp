@@ -8,21 +8,21 @@
  * to third parties without the express written permission of Samsung Electronics.
  */
 
-#include "ir/node.hpp"
-#include "common/arithmetics.hpp"
-#include "ir/blob.hpp"
-#include "ir/common/log.hpp"
-#include "ir/data_edge.hpp"
-#include "ir/nn_node_type_traits.hpp"
+#include "ir/include/node.hpp"
+#include "common/include/arithmetics.hpp"
+#include "ir/include/blob.hpp"
+#include "ir/include/common/log.hpp"
+#include "ir/include/data_edge.hpp"
+#include "ir/include/nn_node_type_traits.hpp"
 
-#include "ir/nn_ir.hpp"
+#include "ir/include/nn_ir.hpp"
 
 namespace nn_compiler {
 namespace nn_ir {
 
 #define PROCESS_NODE(NODE_TYPE, NODE_CLASS, BASE_NODE_CLASS) \
     static_assert(std::is_base_of_v<BASE_NODE_CLASS, NODE_CLASS>, "invalid base node class");
-#include "ir/nodes.def"
+#include "ir/include/nodes.def"
 
 Node::Node(const NodeInfo& node_info, NodeType type) : Node(node_info.graph, type) {
     id_           = node_info.id;

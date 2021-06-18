@@ -17,7 +17,7 @@
 
 #pragma once
 
-#include "common/common.hpp"
-#include "common/log.hpp"
+#include "common/include/common.hpp"
+#include "common/include/log.hpp"
 
 DEFINE_LOGGER(IR, "[IR]")

@@ -8,11 +8,11 @@
  * to third parties without the express written permission of Samsung Electronics.
  */
 
-#include "ir/ir_exporter.hpp"
-#include "ir/common/log.hpp"
-#include "ir/ir_includes.hpp"
-#include "ir/ir_types.hpp"
-#include "ir/op_nodes/shift_node.hpp"
+#include "ir/include/ir_exporter.hpp"
+#include "ir/include/common/log.hpp"
+#include "ir/include/ir_includes.hpp"
+#include "ir/include/ir_types.hpp"
+#include "ir/include/op_nodes/shift_node.hpp"
 
 namespace nn_compiler {
 

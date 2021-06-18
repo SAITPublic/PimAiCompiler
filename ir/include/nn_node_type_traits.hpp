@@ -10,9 +10,9 @@
 
 #pragma once
 
-#include "ir/ir_includes.hpp"
-#include "ir/kernel_node_parameters.hpp"
-#include "ir/nn_ir.hpp"
+#include "ir/include/ir_includes.hpp"
+#include "ir/include/kernel_node_parameters.hpp"
+#include "ir/include/nn_ir.hpp"
 
 namespace nn_compiler::nn_ir {
 

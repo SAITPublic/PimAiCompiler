@@ -17,14 +17,14 @@
 
 #pragma once
 
-#include "ir/blob.hpp"
-#include "ir/edge.hpp"
-#include "ir/execution_step.hpp"
-#include "ir/ir_intrusive_list_traits.hpp"
-#include "ir/node.hpp"
+#include "ir/include/blob.hpp"
+#include "ir/include/edge.hpp"
+#include "ir/include/execution_step.hpp"
+#include "ir/include/ir_intrusive_list_traits.hpp"
+#include "ir/include/node.hpp"
 
-#include "common/algorithm_ext.hpp"
-#include "common/types.hpp"
+#include "common/include/algorithm_ext.hpp"
+#include "common/include/types.hpp"
 
 #include <type_traits>
 #include <unordered_map>

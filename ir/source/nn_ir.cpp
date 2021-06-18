@@ -16,17 +16,17 @@
  *              Supported functions are as follow:
  */
 
-#include "ir/nn_ir.hpp"
-#include "ir/common/log.hpp"
-#include "ir/nn_node_type_traits.hpp"
-#include "ir/nn_nodes/concat_node.hpp"
-#include "ir/v_nodes/vconcat_node.hpp"
-#include "ir/v_nodes/vsplit_node.hpp"
+#include "ir/include/nn_ir.hpp"
+#include "ir/include/common/log.hpp"
+#include "ir/include/nn_node_type_traits.hpp"
+#include "ir/include/nn_nodes/concat_node.hpp"
+#include "ir/include/v_nodes/vconcat_node.hpp"
+#include "ir/include/v_nodes/vsplit_node.hpp"
 
-#include "ir/global_nodes/global_concat_node.hpp"
-#include "ir/global_nodes/global_split_node.hpp"
+#include "ir/include/global_nodes/global_concat_node.hpp"
+#include "ir/include/global_nodes/global_split_node.hpp"
 
-#include "common/algorithm_ext.hpp"
+#include "common/include/algorithm_ext.hpp"
 
 namespace nn_compiler {
 namespace nn_ir {

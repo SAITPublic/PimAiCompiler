@@ -17,12 +17,12 @@
 
 #pragma once
 
-#include "common/common.hpp"
-#include "common/types.hpp"
+#include "common/include/common.hpp"
+#include "common/include/types.hpp"
 
-#include "ir/common/log.hpp"
-#include "ir/execution_step.hpp"
-#include "ir/ir_types.hpp"
+#include "ir/include/common/log.hpp"
+#include "ir/include/execution_step.hpp"
+#include "ir/include/ir_types.hpp"
 
 namespace nn_compiler {
 namespace nn_ir {

@@ -15,8 +15,8 @@
  * @version 0.1 ... (version comment)
  *              Supported functions are as follow:
  */
-#include "ir/edge.hpp"
-#include "ir/nn_ir.hpp"
+#include "ir/include/edge.hpp"
+#include "ir/include/nn_ir.hpp"
 
 namespace nn_compiler {
 namespace nn_ir {

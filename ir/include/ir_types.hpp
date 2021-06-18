@@ -17,13 +17,13 @@
 
 #pragma once
 
-#include "ir/common/log.hpp"
-#include <ir/generated/ir_generated.h>
+#include "ir/include/common/log.hpp"
+#include <ir/include/generated/ir_generated.h>
 
-#include "common/arithmetics.hpp"
-#include "common/attributes.h"
-#include "common/cast.hpp"
-#include "common/pretty_print.hpp"
+#include "common/include/arithmetics.hpp"
+#include "common/include/attributes.h"
+#include "common/include/cast.hpp"
+#include "common/include/pretty_print.hpp"
 
 #include "half.hpp"
 

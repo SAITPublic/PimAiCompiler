@@ -16,8 +16,8 @@
  *              Supported functions are as follow:
  */
 
-#include "ir/data_blob.hpp"
-#include "ir/common/log.hpp"
+#include "ir/include/data_blob.hpp"
+#include "ir/include/common/log.hpp"
 
 namespace nn_compiler {
 namespace nn_ir {} // namespace nn_ir

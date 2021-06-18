@@ -8,8 +8,8 @@
  * to third parties without the express written permission of Samsung Electronics.
  */
 
-#include "ir/data_edge.hpp"
-#include "ir/nn_ir.hpp"
+#include "ir/include/data_edge.hpp"
+#include "ir/include/nn_ir.hpp"
 
 namespace nn_compiler {
 namespace nn_ir {

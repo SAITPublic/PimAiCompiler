@@ -17,8 +17,8 @@
 
 #pragma once
 
-#include "common/types.hpp"
-#include "ir/nn_ir.hpp"
+#include "common/include/types.hpp"
+#include "ir/include/nn_ir.hpp"
 
 namespace nn_compiler {
 

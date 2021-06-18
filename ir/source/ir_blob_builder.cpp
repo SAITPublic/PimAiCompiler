@@ -8,11 +8,11 @@
  * to third parties without the express written permission of Samsung Electronics.
  */
 
-#include "ir/ir_blob_builder.hpp"
+#include "ir/include/ir_blob_builder.hpp"
 #include "flatbuffers/flatbuffers.h"
-#include "ir/common/log.hpp"
-#include "ir/ir_includes.hpp"
-#include "ir/ir_tools.hpp"
+#include "ir/include/common/log.hpp"
+#include "ir/include/ir_includes.hpp"
+#include "ir/include/ir_tools.hpp"
 
 namespace nn_compiler {
 

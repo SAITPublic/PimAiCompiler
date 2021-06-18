@@ -10,11 +10,11 @@
 
 #pragma once
 
-#include "ir/ir_types.hpp"
-#include "ir/node.hpp"
+#include "ir/include/ir_types.hpp"
+#include "ir/include/node.hpp"
 
-#include "common/common.hpp"
-#include "common/types.hpp"
+#include "common/include/common.hpp"
+#include "common/include/types.hpp"
 
 namespace nn_compiler::nn_ir {
 

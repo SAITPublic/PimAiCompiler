@@ -16,8 +16,8 @@
  *              Supported functions are as follow:
  */
 
-#include "ir/instructions/signal_wait_instr.hpp"
-#include "ir/common/log.hpp"
+#include "ir/include/instructions/signal_wait_instr.hpp"
+#include "ir/include/common/log.hpp"
 
 namespace nn_compiler {
 namespace nn_ir {} // namespace nn_ir

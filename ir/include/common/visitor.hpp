@@ -10,10 +10,10 @@
 
 #pragma once
 
-#include "common/common.hpp"
-#include "common/types.hpp"
+#include "common/include/common.hpp"
+#include "common/include/types.hpp"
 
-#include "ir/all_nodes.hpp"
+#include "ir/include/all_nodes.hpp"
 
 namespace nn_compiler::nn_ir {
 
@@ -44,7 +44,7 @@ class Visitor {
 
 #define PROCESS_NODE(NODE_TYPE, NODE_CLASS, BASE_NODE_CLASS) \
     using NODE_CLASS##Type = std::conditional_t<is_const, const NODE_CLASS, NODE_CLASS>;
-#include "ir/nodes.def"
+#include "ir/include/nodes.def"
 
  public:
     /// @brief this function invokes specific visit* function depends on real type of node
@@ -57,7 +57,7 @@ class Visitor {
 #define PROCESS_NODE(NODE_TYPE, NODE_CLASS, BASE_NODE_CLASS) \
     case nn_ir::NodeType::NODE_TYPE:                         \
         return static_cast<DerivedT*>(this)->visit##NODE_CLASS(static_cast<NODE_CLASS##Type&>(node));
-#include "ir/nodes.def"
+#include "ir/include/nodes.def"
         }
     }
 
@@ -67,7 +67,7 @@ class Visitor {
     RetT visit##NODE_CLASS(NODE_CLASS##Type& node) {                       \
         return static_cast<DerivedT*>(this)->visit##BASE_NODE_CLASS(node); \
     }
-#include "ir/nodes.def"
+#include "ir/include/nodes.def"
 
     /// @brief the top level visit function that will be invoked by all visit*
     /// functions if they were not hidden in derived class

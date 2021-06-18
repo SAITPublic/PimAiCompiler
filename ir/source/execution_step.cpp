@@ -15,9 +15,9 @@
  * @version 0.1 ... (version comment)
  *              Supported functions are as follow:
  */
-#include "ir/execution_step.hpp"
-#include "ir/common/log.hpp"
-#include "ir/nn_ir.hpp"
+#include "ir/include/execution_step.hpp"
+#include "ir/include/common/log.hpp"
+#include "ir/include/nn_ir.hpp"
 
 namespace nn_compiler {
 namespace nn_ir {

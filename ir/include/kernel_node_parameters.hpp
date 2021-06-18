@@ -10,8 +10,8 @@
 
 #pragma once
 
-#include "ir/ir_includes.hpp"
-#include "ir/nn_ir.hpp"
+#include "ir/include/ir_includes.hpp"
+#include "ir/include/nn_ir.hpp"
 
 namespace nn_compiler {
 namespace nn_ir {

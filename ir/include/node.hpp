@@ -10,18 +10,18 @@
 
 #pragma once
 
-#include "common/common.hpp"
-#include "common/iterators.hpp"
-#include "common/types.hpp"
+#include "common/include/common.hpp"
+#include "common/include/iterators.hpp"
+#include "common/include/types.hpp"
 
-#include "ir/common/log.hpp"
-#include "ir/instruction.hpp"
-#include "ir/ir_types.hpp"
-#include "ir/node_execution_step.hpp"
-#include "ir/node_mixin.hpp"
+#include "ir/include/common/log.hpp"
+#include "ir/include/instruction.hpp"
+#include "ir/include/ir_types.hpp"
+#include "ir/include/node_execution_step.hpp"
+#include "ir/include/node_mixin.hpp"
 
-#include "common/algorithm_ext.hpp"
-#include "common/intrusive_list.hpp"
+#include "common/include/algorithm_ext.hpp"
+#include "common/include/intrusive_list.hpp"
 #include <unordered_map>
 
 namespace nn_compiler {

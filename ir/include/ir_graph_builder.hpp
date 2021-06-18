@@ -17,10 +17,10 @@
 
 #pragma once
 
-#include "ir/edge.hpp"
-#include "ir/generated/ir_generated.h"
-#include "ir/ir_types.hpp"
-#include "ir/nn_ir.hpp"
+#include "ir/include/edge.hpp"
+#include "ir/include/generated/ir_generated.h"
+#include "ir/include/ir_types.hpp"
+#include "ir/include/nn_ir.hpp"
 
 namespace nn_compiler {
 

@@ -10,10 +10,10 @@
 
 #pragma once
 
-#include "ir/nn_ir.hpp"
-#include "ir/node.hpp"
+#include "ir/include/nn_ir.hpp"
+#include "ir/include/node.hpp"
 
-#include "common/cast.hpp"
+#include "common/include/cast.hpp"
 
 namespace nn_compiler {
 

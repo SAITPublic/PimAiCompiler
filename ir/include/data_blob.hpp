@@ -17,15 +17,15 @@
 
 #pragma once
 
-#include "common/common.hpp"
-#include "common/types.hpp"
-#include "ir/common/log.hpp"
+#include "common/include/common.hpp"
+#include "common/include/types.hpp"
+#include "ir/include/common/log.hpp"
 
-#include "ir/blob.hpp"
-#include "ir/ir_types.hpp"
+#include "ir/include/blob.hpp"
+#include "ir/include/ir_types.hpp"
 #include <variant>
 
-#include "common/cow_ptr.hpp"
+#include "common/include/cow_ptr.hpp"
 
 namespace nn_compiler {
 namespace nn_ir {

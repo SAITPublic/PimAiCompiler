@@ -1,5 +1,4 @@
-include_directories(${PROJECT_SOURCE_DIR}/compiler/include/backend)
-include_directories(${PROJECT_SOURCE_DIR}/compiler/source/backend)
+include_directories(${PROJECT_SOURCE_DIR})
 include_directories(${PROJECT_BINARY_DIR}/third_party/flatbuffers/flatbuffers-src/include)
 
 file(GLOB_RECURSE ir_src *.cpp)

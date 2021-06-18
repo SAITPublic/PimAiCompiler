@@ -17,12 +17,12 @@
 
 #pragma once
 
-#include "ir/instruction.hpp"
-#include "ir/ir_types.hpp"
+#include "ir/include/instruction.hpp"
+#include "ir/include/ir_types.hpp"
 
-#include "common/attributes.h"
-#include "common/common.hpp"
-#include "common/types.hpp"
+#include "common/include/attributes.h"
+#include "common/include/common.hpp"
+#include "common/include/types.hpp"
 
 #include <vector>
 

@@ -8,7 +8,7 @@
  * to third parties without the express written permission of Samsung Electronics.
  */
 
-#include "ir/nn_node_type_traits.hpp"
+#include "ir/include/nn_node_type_traits.hpp"
 
 #include <optional>
 
@@ -20,7 +20,7 @@ static ShiftNode* getShiftNodeImpl(Node& node) {
 #define SHIFTABLE_NODE(ENUM_TYPE, C_TYPE) \
     case ENUM_TYPE:                       \
         return static_cast<C_TYPE&>(node).getShiftNode();
-#include "ir/private/shiftable_nodes.inc"
+#include "ir/source/private/shiftable_nodes.inc"
         default:
             return nullptr;
     }
@@ -32,7 +32,7 @@ static void setShiftNodeImpl(Node& node, std::unique_ptr<ShiftNode> shift_node) 
     case ENUM_TYPE:                                                     \
         static_cast<C_TYPE&>(node).setShiftNode(std::move(shift_node)); \
         break;
-#include "ir/private/shiftable_nodes.inc"
+#include "ir/source/private/shiftable_nodes.inc"
         default:
             Log::IR::I() << "setShiftNode() => unsupported node type!";
             return;
@@ -44,7 +44,7 @@ static const ActivationNode* getActivationNodeImpl(const Node& node) {
 #define ACTIVATABLE_NODE(ENUM_TYPE, C_TYPE) \
     case ENUM_TYPE:                         \
         return static_cast<const C_TYPE&>(node).getActivationNode();
-#include "ir/private/activatable_nodes.inc"
+#include "ir/source/private/activatable_nodes.inc"
         default:
             return nullptr;
     }
@@ -56,7 +56,7 @@ static void setActivationNodeImpl(Node& node, std::unique_ptr<ActivationNode> ac
     case ENUM_TYPE:                                                        \
         static_cast<C_TYPE&>(node).setActivationNode(std::move(act_node)); \
         break;
-#include "ir/private/activatable_nodes.inc"
+#include "ir/source/private/activatable_nodes.inc"
         default:
             Log::IR::I() << "setActivationNode() => unsupported node type!";
             return;
@@ -68,7 +68,7 @@ static BLOB_ID_T getKernelBlobIdImpl(const Node& node) {
 #define NODE_WITH_KERNEL_DATA(ENUM_TYPE, C_TYPE) \
     case ENUM_TYPE:                              \
         return static_cast<const C_TYPE&>(node).getKernelBlobId();
-#include "ir/private/nodes_with_kernel_data.inc"
+#include "ir/source/private/nodes_with_kernel_data.inc"
         default:
             return INVALID_ID;
     }
@@ -80,7 +80,7 @@ static void setKernelBlobIdImpl(Node& node, BLOB_ID_T blob_id) {
     case ENUM_TYPE:                                          \
         static_cast<C_TYPE&>(node).setKernelBlobId(blob_id); \
         break;
-#include "ir/private/nodes_with_kernel_data.inc"
+#include "ir/source/private/nodes_with_kernel_data.inc"
         default:
             Log::IR::I() << "setKernelBlobId() => unsupported node type!";
             return;
@@ -92,7 +92,7 @@ static BLOB_ID_T getBiasBlobIdImpl(const Node& node) {
 #define NODE_WITH_KERNEL_DATA(ENUM_TYPE, C_TYPE) \
     case ENUM_TYPE:                              \
         return static_cast<const C_TYPE&>(node).getBiasBlobId();
-#include "ir/private/nodes_with_kernel_data.inc"
+#include "ir/source/private/nodes_with_kernel_data.inc"
         default:
             return INVALID_ID;
     }
@@ -104,7 +104,7 @@ static void setBiasBlobIdImpl(Node& node, BLOB_ID_T blob_id) {
     case ENUM_TYPE:                                        \
         static_cast<C_TYPE&>(node).setBiasBlobId(blob_id); \
         break;
-#include "ir/private/nodes_with_kernel_data.inc"
+#include "ir/source/private/nodes_with_kernel_data.inc"
         default:
             Log::IR::I() << "setBiasBlobId() => unsupported node type!";
             return;
@@ -116,7 +116,7 @@ static std::optional<KernelNodeParameters> getKernelNodeParametersImpl(const Nod
 #define KERNEL_NODE(ENUM_TYPE, C_TYPE) \
     case ENUM_TYPE:                    \
         return static_cast<const C_TYPE&>(node).getKernelNodeParameters();
-#include "ir/private/kernel_nodes.inc"
+#include "ir/source/private/kernel_nodes.inc"
         default:
             return std::nullopt;
     }
@@ -128,7 +128,7 @@ static void setKernelNodeParametersImpl(Node& node, const KernelNodeParameters& 
     case ENUM_TYPE:                                                                 \
         static_cast<C_TYPE&>(node).setKernelNodeParameters(kernel_node_parameters); \
         break;
-#include "ir/private/kernel_nodes.inc"
+#include "ir/source/private/kernel_nodes.inc"
         default:
             Log::IR::I() << "setKernelNodeParameters() => unsupported node type!";
             return;
@@ -140,7 +140,7 @@ static bool isChannelwiseImpl(const Node& node) {
 #define DEPTHWISE_BY_DEFAULT_NODE(ENUM_TYPE, C_TYPE) \
     case ENUM_TYPE:                                  \
         return true;
-#include "ir/private/channelwise_by_default_nodes.inc"
+#include "ir/source/private/channelwise_by_default_nodes.inc"
         default:
             if (auto* kernel_blob = nn_ir::getKernelBlob(node)) {
                 auto  kernel_blob_dim = kernel_blob->getShape();
@@ -283,7 +283,7 @@ static bool hasRasterIfmBlob(const Node& node, bool reverse) {
         (void)N;                         \
         return (COND);                   \
     }
-#include "ir/private/raster_ifm_nodes.inc"
+#include "ir/source/private/raster_ifm_nodes.inc"
     return false;
 }
 
@@ -311,7 +311,7 @@ static bool hasRasterOfmBlob(const Node& node, bool reverse) {
         (void)N;                         \
         return (COND);                   \
     }
-#include "ir/private/raster_ofm_nodes.inc"
+#include "ir/source/private/raster_ofm_nodes.inc"
     return false;
 }
 

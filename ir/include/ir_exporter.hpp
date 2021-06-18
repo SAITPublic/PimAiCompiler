@@ -19,20 +19,20 @@
 
 #include "flatbuffers/flatbuffers.h"
 
-#include "common/common.hpp"
-#include "common/types.hpp"
+#include "common/include/common.hpp"
+#include "common/include/types.hpp"
 
-#include "ir/generated/ir_generated.h"
-#include "ir/nn_ir.hpp"
+#include "ir/include/generated/ir_generated.h"
+#include "ir/include/nn_ir.hpp"
 
-#include "ir/blob.hpp"
-#include "ir/edge.hpp"
+#include "ir/include/blob.hpp"
+#include "ir/include/edge.hpp"
 
-#include "ir/ir_types.hpp"
+#include "ir/include/ir_types.hpp"
 
-#include "ir/nn_node.hpp"
-#include "ir/op_node.hpp"
-#include "ir/q_node.hpp"
+#include "ir/include/nn_node.hpp"
+#include "ir/include/op_node.hpp"
+#include "ir/include/q_node.hpp"
 
 namespace nn_compiler {
 

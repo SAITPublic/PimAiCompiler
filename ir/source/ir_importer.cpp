@@ -8,11 +8,11 @@
  * to third parties without the express written permission of Samsung Electronics.
  */
 
-#include "ir/ir_importer.hpp"
-#include "ir/common/log.hpp"
-#include "ir/ir_blob_builder.hpp"
-#include "ir/ir_graph_builder.hpp"
-#include "ir/ir_includes.hpp"
+#include "ir/include/ir_importer.hpp"
+#include "ir/include/common/log.hpp"
+#include "ir/include/ir_blob_builder.hpp"
+#include "ir/include/ir_graph_builder.hpp"
+#include "ir/include/ir_includes.hpp"
 
 namespace nn_compiler {
 

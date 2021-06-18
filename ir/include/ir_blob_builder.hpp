@@ -17,9 +17,9 @@
 
 #pragma once
 
-#include "ir/blob.hpp"
-#include "ir/generated/ir_generated.h"
-#include "ir/nn_ir.hpp"
+#include "ir/include/blob.hpp"
+#include "ir/include/generated/ir_generated.h"
+#include "ir/include/nn_ir.hpp"
 
 namespace nn_compiler {
 

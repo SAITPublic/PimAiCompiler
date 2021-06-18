@@ -27,6 +27,7 @@ link_directories("${ROCM_PATH}/hsa/lib" "${ROCM_PATH}/libhsakmt/lib" "${ROCM_PAT
 add_definitions(-DROCM_PATH="${ROCM_PATH}")
 
 add_subdirectory(common)
+add_subdirectory(ir)
 add_subdirectory(runtime)
 #add_subdirectory(compiler)
 #add_subdirectory(python_libs)

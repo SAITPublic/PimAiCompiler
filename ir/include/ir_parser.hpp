@@ -17,10 +17,10 @@
 
 #pragma once
 
-#include "ir/generated/ir_generated.h"
-#include "ir/ir_hwnode_parser.hpp"
-#include "ir/ir_nnnode_parser.hpp"
-#include "ir/nn_ir.hpp"
+#include "ir/include/generated/ir_generated.h"
+#include "ir/include/ir_hwnode_parser.hpp"
+#include "ir/include/ir_nnnode_parser.hpp"
+#include "ir/include/nn_ir.hpp"
 
 namespace nn_compiler {
 

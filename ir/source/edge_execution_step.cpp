@@ -16,9 +16,9 @@
  *              Supported functions are as follow:
  */
 
-#include "ir/edge_execution_step.hpp"
-#include "ir/common/log.hpp"
-#include "ir/nn_ir.hpp"
+#include "ir/include/edge_execution_step.hpp"
+#include "ir/include/common/log.hpp"
+#include "ir/include/nn_ir.hpp"
 
 namespace nn_compiler {
 namespace nn_ir {

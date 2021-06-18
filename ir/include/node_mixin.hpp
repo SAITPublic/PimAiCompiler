@@ -70,7 +70,7 @@ bool AbstractNodeMixin<DerivedNodeT, BaseNodeT>::classof(const AbstractNodeMixin
         auto node_type = static_cast<const DerivedNodeT*>(node)->getNodeType();                          \
         return node_type >= nn_ir::NodeType::NODE_TYPE && node_type <= nn_ir::NodeType::Last##NODE_TYPE; \
     }
-#include "ir/nodes.def"
+#include "ir/include/nodes.def"
     Log::IR::E() << "Unreachable code!";
 }
 
@@ -94,7 +94,7 @@ class NodeMixin : public BaseNodeT {
     if constexpr (std::is_same_v<DerivedNodeT, NODE_CLASS>) {                                       \
         return static_cast<const DerivedNodeT*>(node)->getNodeType() == nn_ir::NodeType::NODE_TYPE; \
     }
-#include "ir/nodes.def"
+#include "ir/include/nodes.def"
         Log::IR::E() << "Unreachable code!";
     }
 

@@ -16,8 +16,8 @@
  *              Supported functions are as follow:
  */
 
-#include "ir/instruction.hpp"
-#include "ir/common/log.hpp"
+#include "ir/include/instruction.hpp"
+#include "ir/include/common/log.hpp"
 
 namespace nn_compiler {
 namespace nn_ir {

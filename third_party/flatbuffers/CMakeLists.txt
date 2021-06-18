@@ -29,10 +29,10 @@ set(FLATBUFFERS_INCLUDE_DIR ${CMAKE_CURRENT_BINARY_DIR}/flatbuffers-src/include 
 set(FLATC_GENERATOR_DEPENDENCY flatc)
 
 add_custom_target(flatc_cpp_generator
-                  COMMAND flatc -o ${COMPILER_ROOT_DIR}/compiler/include/backend/ir/generated -I ${SCHEMA_DIR}/npu_schema -c ${SCHEMA_DIR}/ir.fbs --gen-all
+                  COMMAND flatc -o ${COMPILER_ROOT_DIR}/ir/include/generated -I ${SCHEMA_DIR}/npu_schema -c ${SCHEMA_DIR}/ir.fbs --gen-all
                   DEPENDS ${FLATC_GENERATOR_DEPENDENCY})
 set_target_properties(flatc_cpp_generator
-    PROPERTIES ADDITIONAL_CLEAN_FILES ${COMPILER_ROOT_DIR}/compiler/include/backend/ir/generated)
+    PROPERTIES ADDITIONAL_CLEAN_FILES ${COMPILER_ROOT_DIR}/ir/include/generated)
 
 add_custom_target(flatc_python_generator ALL
                   COMMAND flatc -o ${PROJECT_BINARY_DIR}/python -p -I ${SCHEMA_DIR}/npu_schema --gen-all --gen-object-api ${SCHEMA_DIR}/ir.fbs

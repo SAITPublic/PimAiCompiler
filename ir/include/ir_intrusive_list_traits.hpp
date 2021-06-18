@@ -8,8 +8,8 @@
  * to third parties without the express written permission of Samsung Electronics.
  */
 
-#include "ir/ir_types.hpp"
-#include "ir/node.hpp"
+#include "ir/include/ir_types.hpp"
+#include "ir/include/node.hpp"
 
 #pragma once
 
