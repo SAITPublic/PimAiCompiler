@@ -8,10 +8,10 @@
  * to third parties without the express written permission of Samsung Electronics.
  */
 
-#include "ir/nn_nodes/convolution_node.hpp"
-#include "ir/common/log.hpp"
+#include "ir/include/nn_nodes/convolution_node.hpp"
+#include "ir/include/common/log.hpp"
 
-#include "common/arithmetics.hpp"
+#include "common/include/arithmetics.hpp"
 
 namespace nn_compiler {
 namespace nn_ir {

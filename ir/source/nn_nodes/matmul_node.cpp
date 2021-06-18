@@ -8,7 +8,7 @@
  * to third parties without the express written permission of Samsung Electronics.
  */
 
-#include "ir/nn_nodes/matmul_node.hpp"
+#include "ir/include/nn_nodes/matmul_node.hpp"
 
 namespace nn_compiler {
 namespace nn_ir {

@@ -16,8 +16,8 @@
  *              Supported functions are as follow:
  */
 
-#include "ir/op_nodes/shift_node.hpp"
-#include "ir/common/log.hpp"
+#include "ir/include/op_nodes/shift_node.hpp"
+#include "ir/include/common/log.hpp"
 
 namespace nn_compiler {
 namespace nn_ir {

@@ -17,13 +17,13 @@
 
 #pragma once
 
-#include "common/common.hpp"
-#include "common/types.hpp"
+#include "common/include/common.hpp"
+#include "common/include/types.hpp"
 
-#include "ir/blob.hpp"
-#include "ir/data_edge.hpp"
-#include "ir/global_node.hpp"
-#include "ir/ir_types.hpp"
+#include "ir/include/blob.hpp"
+#include "ir/include/data_edge.hpp"
+#include "ir/include/global_node.hpp"
+#include "ir/include/ir_types.hpp"
 
 namespace nn_compiler {
 namespace nn_ir {

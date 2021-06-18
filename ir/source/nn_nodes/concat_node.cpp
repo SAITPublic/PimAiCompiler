@@ -16,11 +16,11 @@
  *              Supported functions are as follow:
  */
 
-#include "ir/nn_nodes/concat_node.hpp"
+#include "ir/include/nn_nodes/concat_node.hpp"
 
-#include "common/algorithm_ext.hpp"
-#include "ir/common/log.hpp"
-#include "ir/nn_node_type_traits.hpp"
+#include "common/include/algorithm_ext.hpp"
+#include "ir/include/common/log.hpp"
+#include "ir/include/nn_node_type_traits.hpp"
 
 namespace nn_compiler {
 namespace nn_ir {

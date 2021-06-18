@@ -15,9 +15,9 @@
  * @version 0.1 ... (version comment)
  *              Supported functions are as follow:
  */
-#include "common/common.hpp"
+#include "common/include/common.hpp"
 
-#include "ir/nn_nodes/dummy_node.hpp"
+#include "ir/include/nn_nodes/dummy_node.hpp"
 
 namespace nn_compiler {
 namespace nn_ir {} // namespace nn_ir

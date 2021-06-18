@@ -16,8 +16,8 @@
  *              Supported functions are as follow:
  */
 
-#include "ir/nn_nodes/data_format_node.hpp"
-#include "ir/common/log.hpp"
+#include "ir/include/nn_nodes/data_format_node.hpp"
+#include "ir/include/common/log.hpp"
 
 namespace nn_compiler {
 namespace nn_ir {

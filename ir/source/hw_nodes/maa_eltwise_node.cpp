@@ -8,8 +8,8 @@
  * to third parties without the express written permission of Samsung Electronics.
  */
 
-#include "ir/hw_nodes/maa_eltwise_node.hpp"
-#include "ir/common/log.hpp"
+#include "ir/include/hw_nodes/maa_eltwise_node.hpp"
+#include "ir/include/common/log.hpp"
 
 namespace nn_compiler::nn_ir {
 

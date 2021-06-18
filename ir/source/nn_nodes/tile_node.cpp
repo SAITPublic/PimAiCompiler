@@ -8,8 +8,8 @@
  * to third parties without the express written permission of Samsung Electronics.
  */
 
-#include "ir/nn_nodes/tile_node.hpp"
-#include "ir/common/log.hpp"
+#include "ir/include/nn_nodes/tile_node.hpp"
+#include "ir/include/common/log.hpp"
 
 namespace nn_compiler {
 namespace nn_ir {} // namespace nn_ir

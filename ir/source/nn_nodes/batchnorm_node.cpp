@@ -16,9 +16,9 @@
  *              Supported functions are as follow:
  */
 
-#include "common/common.hpp"
+#include "common/include/common.hpp"
 
-#include "ir/nn_nodes/batchnorm_node.hpp"
+#include "ir/include/nn_nodes/batchnorm_node.hpp"
 
 namespace nn_compiler {
 namespace nn_ir {} // namespace nn_ir
