@@ -21,7 +21,12 @@ launch-container.sh <image name> [directory to be mapped]
 
 [clean build & install]
 
-./script/build.sh all -o .
+./scripts/build.sh all -o .
+
+# How to run
+
+## Middlend
+./build/compiler/middlend/middlend -i frontend.ir
 
 # How to test
 

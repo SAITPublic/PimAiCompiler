@@ -26,6 +26,9 @@ link_directories("${ROCM_PATH}/hsa/lib" "${ROCM_PATH}/libhsakmt/lib" "${ROCM_PAT
 #for test vectors default data path
 add_definitions(-DROCM_PATH="${ROCM_PATH}")
 
+add_subdirectory(third_party/flatbuffers)
+include_directories(${FLATBUFFERS_INCLUDE_DIR})
+
 add_subdirectory(common)
 add_subdirectory(ir)
 add_subdirectory(runtime)
@@ -33,5 +36,4 @@ add_subdirectory(runtime)
 #add_subdirectory(python_libs)
 #add_subdirectory(examples)
 #add_subdirectory(external_libs)
-add_subdirectory(third_party/flatbuffers)
 add_dependencies(nn_runtime flatc_cpp_generator)
