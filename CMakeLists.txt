@@ -28,7 +28,7 @@ add_definitions(-DROCM_PATH="${ROCM_PATH}")
 
 add_subdirectory(common)
 add_subdirectory(runtime)
-add_subdirectory(compiler)
+#add_subdirectory(compiler)
 #add_subdirectory(python_libs)
 #add_subdirectory(examples)
 #add_subdirectory(external_libs)
