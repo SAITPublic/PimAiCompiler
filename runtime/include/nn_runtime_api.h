@@ -13,6 +13,7 @@
 
 #define __NNR_API__
 
+__NNR_API__ int NnrTest(void);
 __NNR_API__ int NnrInitialize(void);
 __NNR_API__ int NnrDeinitialize(void);
 __NNR_API__ int NnrCompileModel(void);

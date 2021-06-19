@@ -7,10 +7,17 @@
  * electronic, mechanical, manual or otherwise, or disclosed
  * to third parties without the express written permission of Samsung Electronics.
  */
+#include<cstdio>
 
 #include "nn_runtime_api.h"
 
 // using namespace nn::runtime;
+
+int NnrTest(void)
+{
+    printf("hello NNRuntime!\n");
+    return 0;
+}
 
 int NnrInitialize(void)
 {
