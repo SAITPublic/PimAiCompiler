@@ -290,8 +290,10 @@ IRParser::IRParser() {
         {IR::NNNode::AnyType_MatMulNode, &IRNNNodeParser::parseNNNode<IR::NNNode::AnyType_MatMulNode>},
         {IR::NNNode::AnyType_DummyNode, &IRNNNodeParser::parseNNNode<IR::NNNode::AnyType_DummyNode>},
         {IR::NNNode::AnyType_CopyNode, &IRNNNodeParser::parseNNNode<IR::NNNode::AnyType_CopyNode>},
+
+        {IR::NNNode::AnyType_AtenDimNode, &IRNNNodeParser::parseNNNode<IR::NNNode::AnyType_AtenDimNode>},
         {IR::NNNode::AnyType_AtenSizeNode, &IRNNNodeParser::parseNNNode<IR::NNNode::AnyType_AtenSizeNode>},
-        {IR::NNNode::AnyType_AtenZerosNode, &IRNNNodeParser::parseNNNode<IR::NNNode::AnyType_AtenZerosNode>},
+        {IR::NNNode::AnyType_AtenZerosNode, &IRNNNodeParser::parseNNNode<IR::NNNode::AnyType_AtenZerosNode>}
     };
 
     op_node_parse_func_map_ = {

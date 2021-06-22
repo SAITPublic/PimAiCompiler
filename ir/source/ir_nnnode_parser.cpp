@@ -441,6 +441,16 @@ IRNNNodeParser::parseNNNode<IR::NNNode::AnyType_CopyNode>(const IR::NnNode* ir_n
 
 template <>
 std::unique_ptr<nn_ir::NNNode>
+IRNNNodeParser::parseNNNode<IR::NNNode::AnyType_AtenDimNode>(const IR::NnNode*      ir_node,
+                                                             const nn_ir::NodeInfo& node_info) {
+    auto aten_dim_node = ir_node->nn_node_as_AtenDimNode();
+    Log::IR::E_IF(aten_dim_node == nullptr) << "IRNNNodeParser::parseNNNode<NN::AtenDimNode>() => wrong node type!";
+
+    return std::make_unique<nn_ir::AtenDimNode>(node_info);
+}
+
+template <>
+std::unique_ptr<nn_ir::NNNode>
 IRNNNodeParser::parseNNNode<IR::NNNode::AnyType_AtenSizeNode>(const IR::NnNode* ir_node,
                                                               const nn_ir::NodeInfo& node_info) {
     auto aten_size_node = ir_node->nn_node_as_AtenSizeNode();
