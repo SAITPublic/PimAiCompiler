@@ -79,9 +79,9 @@ enum class DataType {
     LastIntDataType, // start describing int datatype
 
     BOOL,
-    STRING,
     DEVICE,
     LIST,
+    STRING,
     TENSOR,
     NONE,
 };
@@ -106,9 +106,9 @@ inline std::ostream& operator<<(std::ostream& s, DataType type) {
         ENUM_STR(UINT4)
        
         ENUM_STR(BOOL)
-        ENUM_STR(STRING)
         ENUM_STR(DEVICE)
         ENUM_STR(LIST)
+        ENUM_STR(STRING)
         ENUM_STR(TENSOR)
         ENUM_STR(NONE)
 #undef ENUM_STR
@@ -159,6 +159,7 @@ class Blob;
 class Instruction;
 class ExecutionStep;
 
+class CONTROLNode;
 class NNNode;
 class HWNode;
 class OPNode;
@@ -226,6 +227,11 @@ class EdgeExecutionStep;
 class MAAEltwiseNode;
 
 enum class NodeType {
+    CONTROLNode, // start describing control nodes
+    PRIMCONSTANT,
+
+    LastCONTROLNode, // start describing control nodes
+
     NNNode, // start describing nn nodes
     INPUT,
     CONVOLUTION,
@@ -313,6 +319,8 @@ inline std::ostream& operator<<(std::ostream& s, nn_ir::NodeType type) {
         ENUM_STR(DEQUANT)
         ENUM_STR(MATMUL)
         ENUM_STR(MAAELTWISE)
+
+        ENUM_STR(PRIMCONSTANT)
 #undef ENUM_STR
         default:
             Log::IR::E() << "Invalid opcode " << static_cast<int>(type);

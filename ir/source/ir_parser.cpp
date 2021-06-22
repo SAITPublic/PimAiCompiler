@@ -10,6 +10,7 @@
 
 #include "ir/include/ir_parser.hpp"
 #include "ir/include/common/log.hpp"
+#include "ir/include/ir_control_node_parser.hpp"
 #include "ir/include/ir_hwnode_parser.hpp"
 #include "ir/include/ir_includes.hpp"
 #include "ir/include/ir_nnnode_parser.hpp"
@@ -48,6 +49,15 @@ std::unique_ptr<nn_ir::Node> IRParser::parseNode(const IR::Node* node, const nn_
     }
 
     switch (node->node_type()) {
+        case IR::AnyNode_ControlNode: {
+            auto typed_node = node->node_as_ControlNode();
+            Log::IR::E_IF(!control_node_parse_func_map_.count(typed_node->control_node_type()))
+                << "IRParser::parseNode => unknown node type!";
+            const auto&    parser = control_node_parse_func_map_[typed_node->control_node_type()];
+            IRCONTROLNodeParser obj;
+            g_node = (obj.*parser)(typed_node, node_info);
+            break;
+        }
         // NODE(IR::AnyNode_NnNode, nn_node_parse_func_map_, node_as_NnNode, nn_node_type)
         case IR::AnyNode_NnNode: {
             auto typed_node = node->node_as_NnNode();
@@ -244,6 +254,10 @@ std::unique_ptr<nn_ir::QNode> IRParser::parseQNode<IR::QNode::AnyType_DequantNod
  * @returns.
  */
 IRParser::IRParser() {
+    control_node_parse_func_map_ = {
+        {IR::CONTROLNode::AnyType_PrimConstantNode, &IRCONTROLNodeParser::parseControlNode<IR::CONTROLNode::AnyType_PrimConstantNode>},
+        //{IR::CONTROLNode::AnyType_PrimBlockNode, &IRCONTROLNodeParser::parseNNNode<IR::CONTROLNode::AnyType_PrimBlockNode>},
+    };
     nn_node_parse_func_map_ = {
         {IR::NNNode::AnyType_InputNode, &IRNNNodeParser::parseNNNode<IR::NNNode::AnyType_InputNode>},
         {IR::NNNode::AnyType_ConvNode, &IRNNNodeParser::parseNNNode<IR::NNNode::AnyType_ConvNode>},

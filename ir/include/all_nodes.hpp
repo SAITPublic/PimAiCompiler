@@ -55,3 +55,5 @@
 
 #include "ir/include/v_nodes/vconcat_node.hpp"
 #include "ir/include/v_nodes/vsplit_node.hpp"
+
+#include "ir/include/control_nodes/prim_constant_node.hpp"

@@ -18,6 +18,7 @@
 #pragma once
 
 #include "ir/include/generated/ir_generated.h"
+#include "ir/include/ir_control_node_parser.hpp"
 #include "ir/include/ir_hwnode_parser.hpp"
 #include "ir/include/ir_nnnode_parser.hpp"
 #include "ir/include/nn_ir.hpp"
@@ -39,6 +40,9 @@ class IRParser {
     IRParser(IRParser&&)      = delete;
     IRParser& operator=(const IRParser&) = delete;
     IRParser& operator=(IRParser&&) = delete;
+
+    using controlParseFunction = std::unique_ptr<nn_ir::CONTROLNode>(IRCONTROLNodeParser::*)(const IR::ControlNode*      ir_node,
+                                                                                             const nn_ir::NodeInfo& node_info);
 
     using nnParseFunction = std::unique_ptr<nn_ir::NNNode> (IRNNNodeParser::*)(const IR::NnNode*      ir_node,
                                                                                const nn_ir::NodeInfo& node_info);
@@ -73,6 +77,7 @@ class IRParser {
     template <IR::QNode::AnyType>
     std::unique_ptr<nn_ir::QNode> parseQNode(const IR::qNode* ir_node, const nn_ir::NodeInfo& node_info);
 
+    std::map<IR::CONTROLNode::AnyType, controlParseFunction>    control_node_parse_func_map_;
     std::map<IR::NNNode::AnyType, nnParseFunction>         nn_node_parse_func_map_;
     std::map<IR::HWNode::AnyType, hwParseFunction>         hw_node_parse_func_map_;
     std::map<IR::OPNode::AnyType, opParseFunction>         op_node_parse_func_map_;
