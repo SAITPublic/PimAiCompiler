@@ -21,6 +21,7 @@
 
 #include "ir/include/nn_nodes/activation_node.hpp"
 #include "ir/include/nn_nodes/aten_dim_node.hpp"
+#include "ir/include/nn_nodes/aten_ne_node.hpp"
 #include "ir/include/nn_nodes/aten_size_node.hpp"
 #include "ir/include/nn_nodes/aten_zeros_node.hpp"
 #include "ir/include/nn_nodes/batchnorm_node.hpp"

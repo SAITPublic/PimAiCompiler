@@ -292,6 +292,7 @@ IRParser::IRParser() {
         {IR::NNNode::AnyType_CopyNode, &IRNNNodeParser::parseNNNode<IR::NNNode::AnyType_CopyNode>},
 
         {IR::NNNode::AnyType_AtenDimNode, &IRNNNodeParser::parseNNNode<IR::NNNode::AnyType_AtenDimNode>},
+        {IR::NNNode::AnyType_AtenNeNode, &IRNNNodeParser::parseNNNode<IR::NNNode::AnyType_AtenNeNode>},
         {IR::NNNode::AnyType_AtenSizeNode, &IRNNNodeParser::parseNNNode<IR::NNNode::AnyType_AtenSizeNode>},
         {IR::NNNode::AnyType_AtenZerosNode, &IRNNNodeParser::parseNNNode<IR::NNNode::AnyType_AtenZerosNode>}
     };
