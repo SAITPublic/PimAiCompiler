@@ -255,8 +255,17 @@ std::unique_ptr<nn_ir::QNode> IRParser::parseQNode<IR::QNode::AnyType_DequantNod
  */
 IRParser::IRParser() {
     control_node_parse_func_map_ = {
-        {IR::CONTROLNode::AnyType_PrimConstantNode, &IRCONTROLNodeParser::parseControlNode<IR::CONTROLNode::AnyType_PrimConstantNode>},
-        //{IR::CONTROLNode::AnyType_PrimBlockNode, &IRCONTROLNodeParser::parseNNNode<IR::CONTROLNode::AnyType_PrimBlockNode>},
+        {IR::CONTROLNode::AnyType_PrimConstantNode,
+        &IRCONTROLNodeParser::parseControlNode<IR::CONTROLNode::AnyType_PrimConstantNode>},
+
+        {IR::CONTROLNode::AnyType_PrimDeviceNode,
+        &IRCONTROLNodeParser::parseControlNode<IR::CONTROLNode::AnyType_PrimDeviceNode>},
+
+        {IR::CONTROLNode::AnyType_PrimDtypeNode,
+        &IRCONTROLNodeParser::parseControlNode<IR::CONTROLNode::AnyType_PrimDtypeNode>},
+
+        {IR::CONTROLNode::AnyType_PrimListConstructNode,
+        &IRCONTROLNodeParser::parseControlNode<IR::CONTROLNode::AnyType_PrimListConstructNode>},
     };
     nn_node_parse_func_map_ = {
         {IR::NNNode::AnyType_InputNode, &IRNNNodeParser::parseNNNode<IR::NNNode::AnyType_InputNode>},
@@ -281,6 +290,8 @@ IRParser::IRParser() {
         {IR::NNNode::AnyType_MatMulNode, &IRNNNodeParser::parseNNNode<IR::NNNode::AnyType_MatMulNode>},
         {IR::NNNode::AnyType_DummyNode, &IRNNNodeParser::parseNNNode<IR::NNNode::AnyType_DummyNode>},
         {IR::NNNode::AnyType_CopyNode, &IRNNNodeParser::parseNNNode<IR::NNNode::AnyType_CopyNode>},
+        {IR::NNNode::AnyType_AtenSizeNode, &IRNNNodeParser::parseNNNode<IR::NNNode::AnyType_AtenSizeNode>},
+        {IR::NNNode::AnyType_AtenZerosNode, &IRNNNodeParser::parseNNNode<IR::NNNode::AnyType_AtenZerosNode>},
     };
 
     op_node_parse_func_map_ = {

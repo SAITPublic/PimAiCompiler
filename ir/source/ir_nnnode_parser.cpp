@@ -439,6 +439,27 @@ IRNNNodeParser::parseNNNode<IR::NNNode::AnyType_CopyNode>(const IR::NnNode* ir_n
     return std::make_unique<nn_ir::CopyNode>(node_info);
 }
 
+template <>
+std::unique_ptr<nn_ir::NNNode>
+IRNNNodeParser::parseNNNode<IR::NNNode::AnyType_AtenSizeNode>(const IR::NnNode* ir_node,
+                                                              const nn_ir::NodeInfo& node_info) {
+    auto aten_size_node = ir_node->nn_node_as_AtenSizeNode();
+    Log::IR::E_IF(aten_size_node == nullptr) << "IRNNNodeParser::parseNNNode<NN::AtenSizeNode>() => wrong node type!";
+
+    int64_t dim = aten_size_node->dim();
+    return std::make_unique<nn_ir::AtenSizeNode>(node_info, dim);
+}
+
+template <>
+std::unique_ptr<nn_ir::NNNode>
+IRNNNodeParser::parseNNNode<IR::NNNode::AnyType_AtenZerosNode>(const IR::NnNode* ir_node,
+                                                               const nn_ir::NodeInfo& node_info) {
+    auto aten_zeros_node = ir_node->nn_node_as_AtenZerosNode();
+    Log::IR::E_IF(aten_zeros_node == nullptr) << "IRNNNodeParser::parseNNNode<NN::AtenZerosNode>() => wrong node type!";
+
+    return std::make_unique<nn_ir::AtenZerosNode>(node_info);
+}
+
 std::unique_ptr<nn_ir::ActivationNode> IRNNNodeParser::getActNode(const nn_ir::NodeInfo&            node_info,
                                                                   const IR::NNNode::ActivationNode* ir_act_node) {
     if (ir_act_node == nullptr) {

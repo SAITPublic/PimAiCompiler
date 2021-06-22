@@ -20,6 +20,8 @@
 #include "ir/include/v_node.hpp"
 
 #include "ir/include/nn_nodes/activation_node.hpp"
+#include "ir/include/nn_nodes/aten_size_node.hpp"
+#include "ir/include/nn_nodes/aten_zeros_node.hpp"
 #include "ir/include/nn_nodes/batchnorm_node.hpp"
 #include "ir/include/nn_nodes/concat_node.hpp"
 #include "ir/include/nn_nodes/convolution_node.hpp"
@@ -57,3 +59,6 @@
 #include "ir/include/v_nodes/vsplit_node.hpp"
 
 #include "ir/include/control_nodes/prim_constant_node.hpp"
+#include "ir/include/control_nodes/prim_device_node.hpp"
+#include "ir/include/control_nodes/prim_dtype_node.hpp"
+#include "ir/include/control_nodes/prim_list_construct_node.hpp"

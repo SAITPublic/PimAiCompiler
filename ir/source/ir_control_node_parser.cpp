@@ -26,8 +26,41 @@ IRCONTROLNodeParser::parseControlNode<IR::CONTROLNode::AnyType_PrimConstantNode>
     } else {
         shape = std::get<nn_ir::Shape4D>(nn_ir::parseParam(ir_shape));
     }
-    
+
     return std::make_unique<nn_ir::PrimConstantNode>(node_info, data, bit_width, data_type, shape);
+}
+
+template <>
+std::unique_ptr<nn_ir::CONTROLNode>
+IRCONTROLNodeParser::parseControlNode<IR::CONTROLNode::AnyType_PrimDeviceNode>(const IR::ControlNode*    ir_node,
+                                                           const nn_ir::NodeInfo& node_info) {
+    auto constant_node = ir_node->control_node_as_PrimDeviceNode();
+    Log::IR::E_IF(constant_node == nullptr)
+    << "IRCONTROLNodeParser::parseNNNode<Control::CONTROLNode>() => wrong node type!";
+
+    return std::make_unique<nn_ir::PrimDeviceNode>(node_info);
+}
+
+template <>
+std::unique_ptr<nn_ir::CONTROLNode>
+IRCONTROLNodeParser::parseControlNode<IR::CONTROLNode::AnyType_PrimDtypeNode>(const IR::ControlNode*    ir_node,
+                                                           const nn_ir::NodeInfo& node_info) {
+    auto constant_node = ir_node->control_node_as_PrimDtypeNode();
+    Log::IR::E_IF(constant_node == nullptr)
+    << "IRCONTROLNodeParser::parseNNNode<Control::CONTROLNode>() => wrong node type!";
+
+    return std::make_unique<nn_ir::PrimDtypeNode>(node_info);
+}
+
+template <>
+std::unique_ptr<nn_ir::CONTROLNode>
+IRCONTROLNodeParser::parseControlNode<IR::CONTROLNode::AnyType_PrimListConstructNode>(const IR::ControlNode*    ir_node,
+                                                           const nn_ir::NodeInfo& node_info) {
+    auto constant_node = ir_node->control_node_as_PrimListConstructNode();
+    Log::IR::E_IF(constant_node == nullptr)
+    << "IRCONTROLNodeParser::parseNNNode<Control::CONTROLNode>() => wrong node type!";
+
+    return std::make_unique<nn_ir::PrimListConstructNode>(node_info);
 }
 
 } // namespace nn_compiler

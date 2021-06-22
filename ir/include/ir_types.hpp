@@ -104,7 +104,7 @@ inline std::ostream& operator<<(std::ostream& s, DataType type) {
         ENUM_STR(UINT8)
         ENUM_STR(INT4)
         ENUM_STR(UINT4)
-       
+
         ENUM_STR(BOOL)
         ENUM_STR(DEVICE)
         ENUM_STR(LIST)
@@ -193,6 +193,9 @@ class MatMulNode;
 class DummyNode;
 class CopyNode;
 
+class AtenSizeNode;
+class AtenZerosNode;
+
 class ShiftNode;
 
 class QuantNode;
@@ -229,7 +232,9 @@ class MAAEltwiseNode;
 enum class NodeType {
     CONTROLNode, // start describing control nodes
     PRIMCONSTANT,
-
+    PRIMDEVICE,
+    PRIMDTYPE,
+    PRIMLISTCONSTRUCT,
     LastCONTROLNode, // start describing control nodes
 
     NNNode, // start describing nn nodes
@@ -255,6 +260,9 @@ enum class NodeType {
     MATMUL,
     DUMMY,
     COPY,
+
+    ATENSIZE,
+    ATENZEROS,
     LastNNNode, // end describing nn nodes
 
     OPNode, // start describing op nodes
@@ -320,7 +328,13 @@ inline std::ostream& operator<<(std::ostream& s, nn_ir::NodeType type) {
         ENUM_STR(MATMUL)
         ENUM_STR(MAAELTWISE)
 
+        ENUM_STR(ATENSIZE)
+        ENUM_STR(ATENZEROS)
+
         ENUM_STR(PRIMCONSTANT)
+        ENUM_STR(PRIMDEVICE)
+        ENUM_STR(PRIMDTYPE)
+        ENUM_STR(PRIMLISTCONSTRUCT)
 #undef ENUM_STR
         default:
             Log::IR::E() << "Invalid opcode " << static_cast<int>(type);
