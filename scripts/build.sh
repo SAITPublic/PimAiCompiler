@@ -89,7 +89,7 @@ cmake_fn()
 
 
     cd ${build}
-    cmake ${cmake_build_options} ${proj_cmake_dir}
+    cmake ${cmake_build_options} ${proj_cmake_dir} -DLIBTORCH_DIR=${LIBTORCH_DIR}
 }
 
 make_clean()

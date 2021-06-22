@@ -10,12 +10,15 @@
 #include<cstdio>
 
 #include "nn_runtime_api.h"
+#include "torch/script.h"
+
 
 // using namespace nn::runtime;
 
 int NnrTest(void)
 {
-    printf("hello NNRuntime!\n");
+    torch::jit::Node* node;
+    printf("hello NNRuntime with torch!\n");
     return 0;
 }
 

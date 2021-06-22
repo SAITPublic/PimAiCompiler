@@ -18,10 +18,11 @@ if(GCC_EXPECTED_VERSION VERSION_GREATER CMAKE_CXX_COMPILER_VERSION)
     message(FATAL_ERROR "GCC: NNCompiler-c++ requires atleast version ${GCC_EXPECTED_VERSION}")
 endif()
 
+include(Torch.cmake)
 include_directories("${PROJECT_SOURCE_DIR}/runtime/include"
                     "${PROJECT_SOURCE_DIR}/external_libs/include"
-                    "${ROCM_PATH}/include")
-link_directories("${ROCM_PATH}/hsa/lib" "${ROCM_PATH}/libhsakmt/lib" "${ROCM_PATH}/lib" "${PROJECT_SOURCE_DIR}/external_libs")
+                    "${ROCM_PATH}/include" "${TORCH_INCLUDE_DIRS}")
+link_directories("${ROCM_PATH}/hsa/lib" "${ROCM_PATH}/libhsakmt/lib" "${ROCM_PATH}/lib" "${PROJECT_SOURCE_DIR}/external_libs" "${TORCH_LIBRARIES}")
 
 #for test vectors default data path
 add_definitions(-DROCM_PATH="${ROCM_PATH}")
