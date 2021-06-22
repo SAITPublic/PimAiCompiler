@@ -78,6 +78,11 @@ enum class DataType {
     UINT4,
     LastIntDataType, // start describing int datatype
 
+    BOOL,
+    STRING,
+    DEVICE,
+    LIST,
+    TENSOR,
     NONE,
 };
 
@@ -99,6 +104,12 @@ inline std::ostream& operator<<(std::ostream& s, DataType type) {
         ENUM_STR(UINT8)
         ENUM_STR(INT4)
         ENUM_STR(UINT4)
+       
+        ENUM_STR(BOOL)
+        ENUM_STR(STRING)
+        ENUM_STR(DEVICE)
+        ENUM_STR(LIST)
+        ENUM_STR(TENSOR)
         ENUM_STR(NONE)
 #undef ENUM_STR
         default:

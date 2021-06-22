@@ -207,6 +207,11 @@ NNIR_Node_Config_Type_ parseConfigType(IR_Node_Config_Type_& type) {
                     {IR::Type::DataType_FIXED_8U, nn_ir::DataType::UINT8},
                     {IR::Type::DataType_FIXED_4, nn_ir::DataType::INT4},
                     {IR::Type::DataType_FIXED_4U, nn_ir::DataType::UINT4},
+                    {IR::Type::DataType_TENSOR, nn_ir::DataType::TENSOR},
+                    {IR::Type::DataType_BOOL, nn_ir::DataType::BOOL},
+                    {IR::Type::DataType_STRING, nn_ir::DataType::STRING},
+                    {IR::Type::DataType_DEVICE, nn_ir::DataType::DEVICE},
+                    {IR::Type::DataType_LIST, nn_ir::DataType::LIST},
                 };
                 nnir_type = data_type_map[args];
             } else if constexpr (std::is_same_v<T, IR::TargetHardware::Type::NodeExecutionType>) {
@@ -278,6 +283,11 @@ IR_Node_Config_Type_ parseConfigType(NNIR_Node_Config_Type_& type) {
                     {nn_ir::DataType::UINT16, IR::Type::DataType_FIXED_16U},
                     {nn_ir::DataType::INT8, IR::Type::DataType_FIXED_8},
                     {nn_ir::DataType::UINT8, IR::Type::DataType_FIXED_8U},
+                    {nn_ir::DataType::TENSOR, IR::Type::DataType_TENSOR},
+                    {nn_ir::DataType::BOOL, IR::Type::DataType_BOOL},
+                    {nn_ir::DataType::STRING, IR::Type::DataType_STRING},
+                    {nn_ir::DataType::DEVICE, IR::Type::DataType_DEVICE},
+                    {nn_ir::DataType::LIST, IR::Type::DataType_LIST},
                 };
                 ir_type = data_type_map[args];
             } else if constexpr (std::is_same_v<T, nn_ir::NodeExecutionStepType>) {
