@@ -1,5 +1,4 @@
 #include "common/include/command_line_parser.hpp"
-#include "common/include/file_parser.hpp"
 
 #include "compiler/include/middlend/common/log.hpp"
 #include "ir/include/ir_importer.hpp"
@@ -14,23 +13,45 @@ static cl_opt::Option<std::string>
 namespace nn_compiler {
 namespace middlend {
 
-void MiddlendDriver::initialize() {
+RetVal MiddlendDriver::initialize() {
+    return RetVal::SUCCESS;
+}
+
+RetVal MiddlendDriver::build() {
+    Log::ME::I() << "NNCompiler MiddlendDriver::build() is called";
+    importIR();
+
+    buildPasses();
+
+    return RetVal::SUCCESS;
+}
+
+RetVal MiddlendDriver::run() {
+    Log::ME::I() << "NNCompiler MiddlendDriver::run() is called";
+
+    return RetVal::SUCCESS;
+}
+
+RetVal MiddlendDriver::wrapup() {
+    Log::ME::I() << "NNCompiler MiddlendDriver::wrapup() is called";
+    exportIR();
+
+    return RetVal::SUCCESS;
+}
+
+RetVal MiddlendDriver::finalize() {
+    return RetVal::SUCCESS;
 }
 
 void MiddlendDriver::importIR() {
-    Log::ME::I() << "[importer] NNCompiler MiddlendDriver::importIR() is called";
-
     IRImporter ir_importer;
     ir_importer.getNNIRFromFile(in_ir_file_path, graphs_);
 }
 
-void MiddlendDriver::runPasses() {
+void MiddlendDriver::buildPasses() {
 }
 
 void MiddlendDriver::exportIR() {
-}
-
-void MiddlendDriver::finalize() {
 }
 
 } // namespace middlend

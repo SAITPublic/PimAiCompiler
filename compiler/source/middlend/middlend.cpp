@@ -21,14 +21,14 @@ int main(int argc, char* argv[]) {
     // initialize
     driver.initialize();
 
-    // import
-    driver.importIR();
+    // build
+    driver.build();
 
-    // run passes
-    driver.runPasses();
+    // run
+    driver.run();
 
-    // export
-    driver.exportIR();
+    // wrapup
+    driver.wrapup();
 
     // finalize
     driver.finalize();
