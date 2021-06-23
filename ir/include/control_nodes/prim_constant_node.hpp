@@ -11,8 +11,10 @@ namespace nn_ir {
 
 class PrimConstantNode : public NodeMixin<PrimConstantNode, CONTROLNode> {
  public:
-    explicit PrimConstantNode(const NodeInfo &node_info, std::vector<uint8_t> data, int32_t bit_width, uint8_t data_type, Shape4D shape)
-            : NodeMixin(node_info, NodeType::PRIMCONSTANT), data_(data), bit_width_(bit_width), data_type_(data_type), shape_(shape)  {}
+    explicit PrimConstantNode(const NodeInfo &node_info, std::vector<uint8_t> data, 
+    int32_t bit_width, uint8_t data_type, Shape4D shape)
+            : NodeMixin(node_info, NodeType::PRIMCONSTANT), data_(data),
+             bit_width_(bit_width), data_type_(data_type), shape_(shape)  {}
 
     std::string getNodeTypeAsString(void) const override { return "PrimConstant"; }
     void setData(std::vector<uint8_t> data) { data_ = data; }

@@ -517,4 +517,12 @@ IRNNNodeParser::parseNNNode<IR::NNNode::AnyType_AtenFormatNode>(const IR::NnNode
     auto assembly_format = atenformat_node->assembly_format()->c_str();
     return std::make_unique<nn_ir::AtenFormatNode>(node_info, assembly_format);
 }
+
+template <>
+std::unique_ptr<nn_ir::NNNode>
+IRNNNodeParser::parseNNNode<IR::NNNode::AnyType_AtenListNode>(const IR::NnNode* ir_node, const nn_ir::NodeInfo& node_info) {
+    auto atenlist_node = ir_node->nn_node_as_AtenListNode();
+    Log::IR::E_IF(atenlist_node == nullptr) << "IRNNNodeParser::parseNNNode<NN::AtenListNode>() => wrong node type!";
+    return std::make_unique<nn_ir::AtenListNode>(node_info);
+}
 } // namespace nn_compiler

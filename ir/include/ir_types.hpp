@@ -171,6 +171,7 @@ class DataEdge;
 class ControlEdge;
 
 class AtenFormatNode;
+class AtenListNode;
 class ActivationNode;
 class BatchNormNode;
 class ConvolutionNode;
@@ -248,7 +249,6 @@ enum class NodeType {
     LastCONTROLNode, // start describing control nodes
 
     NNNode, // start describing nn nodes
-    ATENFORMAT,
     INPUT,
     CONVOLUTION,
     ACTIVATION,
@@ -273,6 +273,8 @@ enum class NodeType {
     COPY,
 
     ATENDIM,
+    ATENFORMAT,
+    ATENLIST,
     ATENNE,
     ATENSIZE,
     ATENZEROS,
@@ -343,10 +345,10 @@ inline std::ostream& operator<<(std::ostream& s, nn_ir::NodeType type) {
 
         ENUM_STR(ATENDIM)
         ENUM_STR(ATENFORMAT)
+        ENUM_STR(ATENLIST)
         ENUM_STR(ATENNE)
         ENUM_STR(ATENSIZE)
         ENUM_STR(ATENZEROS)
-
        
         ENUM_STR(PRIMCONSTANT)
         ENUM_STR(PRIMDEVICE)
