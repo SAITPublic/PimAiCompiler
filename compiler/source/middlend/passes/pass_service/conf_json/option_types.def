@@ -1,0 +1,7 @@
+#ifndef OPT
+#error Need to define OPT(ENUM, NAME, TYPE) macro
+#endif
+OPT(bool_opt, "bool", bool)
+OPT(string_opt, "string", std::string)
+OPT(null_opt, "null", std::monostate)
+#undef OPT
