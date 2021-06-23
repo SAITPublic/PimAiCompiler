@@ -1,7 +1,5 @@
 #include "compiler/include/middlend/context/compilation_context_builder.hpp"
 
-#include "compiler/include/middlend/context/compilation_context.hpp"
-
 // Add new CompilationContext file here
 
 namespace nn_compiler {

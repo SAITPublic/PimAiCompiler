@@ -4,6 +4,15 @@
 
 #include "ir/include/nn_ir.hpp"
 
+#include "compiler/include/middlend/context/compilation_context.hpp"
+#include "compiler/include/middlend/context/compilation_context_builder.hpp"
+#include "compiler/include/middlend/passes/pass_manager.hpp"
+#include "compiler/include/middlend/trait/trait_manager.hpp"
+#include "compiler/include/middlend/utils/util_builder.hpp"
+#include "compiler/include/middlend/utils/util_manager.hpp"
+
+#include "compiler/include/middlend/passes/pass_service/conf_json/conf_json.hpp"
+
 namespace nn_compiler {
 namespace middlend {
 
@@ -59,7 +68,18 @@ class MiddlendDriver {
 
     void exportIR();
 
+    // number of registered passes
+    uint32_t pass_counter_ = 0;
+
+    void bumpPassCounter() { pass_counter_++; }
+
     std::vector<std::unique_ptr<nn_compiler::nn_ir::NNIR>> graphs_;
+
+    // manager of compiler passes and utils
+    PassManager<>      base_pass_manager_;
+    UtilManager        base_util_manager_;
+    CompilationContext base_context_;
+    TraitManager       base_trait_manager_;
 
 }; // class MiddlendDriver
 

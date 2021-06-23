@@ -10,6 +10,19 @@
 static cl_opt::Option<std::string>
     in_ir_file_path(std::vector<std::string>{"-i", "--input"}, "<file>", "IR file path", cl_opt::Required::YES);
 
+static cl_opt::Option<int> verify_level("-v",
+                                        "<level>",
+                                        "verification level. Possible values: 0, 1, 2 (default: 0)",
+                                        cl_opt::Required::NO,
+                                        cl_opt::Hidden::NO,
+                                        static_cast<int>(nn_compiler::PassManager<>::VerificationLevelType::NONE),
+                                        std::vector<std::string>{"0", "1", "2"});
+
+static cl_opt::Option<std::string> pass_config_file_path(std::vector<std::string>{"-c", "--configuration"},
+                                                         "<file>",
+                                                         "passes configuration file path",
+                                                         cl_opt::Required::YES);
+
 namespace nn_compiler {
 namespace middlend {
 
@@ -28,6 +41,21 @@ RetVal MiddlendDriver::build() {
 
 RetVal MiddlendDriver::run() {
     Log::ME::I() << "NNCompiler MiddlendDriver::run() is called";
+
+    // #1. Call the passes pipeline
+    base_pass_manager_.initialize(base_util_manager_, base_trait_manager_);
+
+    for (const auto& graph : graphs_) {
+        base_pass_manager_.capability_check(*graph);
+    }
+
+    for (const auto& graph : graphs_) {
+        base_context_.resetLocalData();
+
+        base_pass_manager_.run(*graph, base_context_, verify_level);
+    }
+
+    base_pass_manager_.finalize();
 
     return RetVal::SUCCESS;
 }
