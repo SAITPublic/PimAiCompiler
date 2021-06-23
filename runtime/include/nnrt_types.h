@@ -2,7 +2,7 @@
 
 #include "osal_types.h"
 
-#define __NNR_API__
+#define __NNRT_API__
 
 typedef struct __NnrtBuffer {
   void* addr;                         /*!< buffer address */
