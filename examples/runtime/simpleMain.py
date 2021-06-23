@@ -2,5 +2,6 @@
 
 import Nnr
 
-Nnr.test()
-#Nnr.inference()
+n = Nnr.NNRuntime("/home/rnnt.torchscript")
+n.test()
+#n.inference()

@@ -1,15 +1,17 @@
-#include "nn_runtime_api.h"
-
 #include<pybind11/pybind11.h>
+#include "nn_runtime.h"
 
 namespace py = pybind11;
+using namespace nnr;
 
 PYBIND11_MODULE(Nnr, m) {
 
-    m.doc() = "NNRuntime module";
+    py::class_<NNRuntime>(m, "NNRuntime")
+    .def(py::init<const std::string>())
+    .def("test", &NNRuntime::test);
 
     // Add bindings here
-    m.def("test", &NnrTest, "A test funtion");
+    // m.def("test", &NnrTest, "A test funtion");
     // m.def("inference", &NnrInference, "inference once");
 
 }
