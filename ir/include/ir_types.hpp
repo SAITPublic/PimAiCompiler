@@ -236,6 +236,7 @@ enum class NodeType {
     PRIMCONSTANT,
     PRIMDEVICE,
     PRIMDTYPE,
+    PRIMIF,
     PRIMLISTCONSTRUCT,
     LastCONTROLNode, // start describing control nodes
 
@@ -340,6 +341,7 @@ inline std::ostream& operator<<(std::ostream& s, nn_ir::NodeType type) {
         ENUM_STR(PRIMCONSTANT)
         ENUM_STR(PRIMDEVICE)
         ENUM_STR(PRIMDTYPE)
+        ENUM_STR(PRIMIF)
         ENUM_STR(PRIMLISTCONSTRUCT)
 #undef ENUM_STR
         default:
