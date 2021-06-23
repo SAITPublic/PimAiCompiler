@@ -271,6 +271,7 @@ IRParser::IRParser() {
         &IRCONTROLNodeParser::parseControlNode<IR::CONTROLNode::AnyType_PrimListConstructNode>}
     };
     nn_node_parse_func_map_ = {
+        {IR::NNNode::AnyType_AtenFormatNode, &IRNNNodeParser::parseNNNode<IR::NNNode::AnyType_AtenFormatNode>},
         {IR::NNNode::AnyType_InputNode, &IRNNNodeParser::parseNNNode<IR::NNNode::AnyType_InputNode>},
         {IR::NNNode::AnyType_ConvNode, &IRNNNodeParser::parseNNNode<IR::NNNode::AnyType_ConvNode>},
         {IR::NNNode::AnyType_PoolNode, &IRNNNodeParser::parseNNNode<IR::NNNode::AnyType_PoolNode>},

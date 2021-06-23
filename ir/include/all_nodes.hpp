@@ -33,6 +33,7 @@
 #include "ir/include/nn_nodes/depth_to_space_node.hpp"
 #include "ir/include/nn_nodes/dummy_node.hpp"
 #include "ir/include/nn_nodes/eltwise_node.hpp"
+#include "ir/include/nn_nodes/aten_format_node.hpp"
 #include "ir/include/nn_nodes/fullyconnected_node.hpp"
 #include "ir/include/nn_nodes/input_node.hpp"
 #include "ir/include/nn_nodes/matmul_node.hpp"
