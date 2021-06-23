@@ -1,0 +1,13 @@
+#ifndef UTIL
+#define UTIL(UTIL_TYPE)
+#endif
+// add UTIL like: UTIL(BlobTransformUtil)
+
+#undef UTIL
+
+#ifndef BASE_UTIL
+#define BASE_UTIL(UTIL_TYPE, BASE_UTIL_TYPE)
+#endif
+// add BASE_UTIL like: BASE_UTIL(DramVRegionBuilderUtil, VRegionBuilderUtil)
+
+#undef BASE_UTIL
