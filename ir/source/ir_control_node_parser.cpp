@@ -10,9 +10,9 @@ namespace nn_compiler {
 template <>
 std::unique_ptr<nn_ir::CONTROLNode>
 IRCONTROLNodeParser::parseControlNode<IR::CONTROLNode::AnyType_PrimConstantNode>(const IR::ControlNode*      ir_node,
-                                                           const nn_ir::NodeInfo& node_info) {
+                                                                                 const nn_ir::NodeInfo& node_info) {
     auto constant_node = ir_node->control_node_as_PrimConstantNode();
-    Log::IR::E_IF(constant_node == nullptr) << "IRCONTROLNodeParser::parseControlNode<Control::CONTROLNode>() => wrong node type!";
+    Log::IR::E_IF(constant_node == nullptr) << "IRCONTROLNodeParser::parseControlNode<Control::PrimConstantNode>() => wrong node type!";
 
     auto data_arr = constant_node->data();
     auto data = makeDataArrFromVector<uint8_t>(data_arr);
@@ -72,6 +72,17 @@ IRCONTROLNodeParser::parseControlNode<IR::CONTROLNode::AnyType_PrimListConstruct
     << "IRCONTROLNodeParser::parseNNNode<Control::CONTROLNode>() => wrong node type!";
 
     return std::make_unique<nn_ir::PrimListConstructNode>(node_info);
+}
+
+template <>
+std::unique_ptr<nn_ir::CONTROLNode>
+IRCONTROLNodeParser::parseControlNode<IR::CONTROLNode::AnyType_PrimTupleConstructNode>(const IR::ControlNode*      ir_node,
+                                                                                       const nn_ir::NodeInfo& node_info) {
+    auto tuple_construct_node = ir_node->control_node_as_PrimTupleConstructNode();
+    Log::IR::E_IF(tuple_construct_node == nullptr) 
+    << "IRCONTROLNodeParser::parseControlNode<Control::PrimTupleConstructNode>() => wrong node type!";
+
+    return std::make_unique<nn_ir::PrimTupleConstructNode>(node_info);
 }
 
 } // namespace nn_compiler

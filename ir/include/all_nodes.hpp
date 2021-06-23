@@ -66,3 +66,4 @@
 #include "ir/include/control_nodes/prim_dtype_node.hpp"
 #include "ir/include/control_nodes/prim_if_node.hpp"
 #include "ir/include/control_nodes/prim_list_construct_node.hpp"
+#include "ir/include/control_nodes/prim_tuple_construct_node.hpp"

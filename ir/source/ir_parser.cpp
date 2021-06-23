@@ -269,6 +269,9 @@ IRParser::IRParser() {
 
         {IR::CONTROLNode::AnyType_PrimListConstructNode,
         &IRCONTROLNodeParser::parseControlNode<IR::CONTROLNode::AnyType_PrimListConstructNode>}
+
+        {IR::CONTROLNode::AnyType_PrimTupleConstructNode, 
+        &IRCONTROLNodeParser::parseControlNode<IR::CONTROLNode::AnyType_PrimTupleConstructNode>},
     };
     nn_node_parse_func_map_ = {
         {IR::NNNode::AnyType_AtenFormatNode, &IRNNNodeParser::parseNNNode<IR::NNNode::AnyType_AtenFormatNode>},

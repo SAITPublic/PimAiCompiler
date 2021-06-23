@@ -232,6 +232,10 @@ class EdgeExecutionStep;
 
 class MAAEltwiseNode;
 
+class PrimConstantNode;
+class PrimTupleConstructNode;
+
+
 enum class NodeType {
     CONTROLNode, // start describing control nodes
     PRIMCONSTANT,
@@ -239,6 +243,8 @@ enum class NodeType {
     PRIMDTYPE,
     PRIMIF,
     PRIMLISTCONSTRUCT,
+    PRIMTUPLECONSTRUCT,
+
     LastCONTROLNode, // start describing control nodes
 
     NNNode, // start describing nn nodes
@@ -341,11 +347,13 @@ inline std::ostream& operator<<(std::ostream& s, nn_ir::NodeType type) {
         ENUM_STR(ATENSIZE)
         ENUM_STR(ATENZEROS)
 
+       
         ENUM_STR(PRIMCONSTANT)
         ENUM_STR(PRIMDEVICE)
         ENUM_STR(PRIMDTYPE)
         ENUM_STR(PRIMIF)
         ENUM_STR(PRIMLISTCONSTRUCT)
+        ENUM_STR(PRIMTUPLECONSTRUCT)
 #undef ENUM_STR
         default:
             Log::IR::E() << "Invalid opcode " << static_cast<int>(type);
