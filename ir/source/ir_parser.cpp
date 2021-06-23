@@ -261,6 +261,9 @@ IRParser::IRParser() {
         {IR::CONTROLNode::AnyType_PrimConstantNode,
         &IRCONTROLNodeParser::parseControlNode<IR::CONTROLNode::AnyType_PrimConstantNode>},
 
+        {IR::CONTROLNode::AnyType_PrimDataNode,
+         &IRCONTROLNodeParser::parseControlNode<IR::CONTROLNode::AnyType_PrimDataNode>},
+
         {IR::CONTROLNode::AnyType_PrimDeviceNode,
         &IRCONTROLNodeParser::parseControlNode<IR::CONTROLNode::AnyType_PrimDeviceNode>},
 
@@ -279,9 +282,13 @@ IRParser::IRParser() {
         {IR::CONTROLNode::AnyType_PrimListConstructNode,
         &IRCONTROLNodeParser::parseControlNode<IR::CONTROLNode::AnyType_PrimListConstructNode>},
 
+        {IR::CONTROLNode::AnyType_PrimRaiseExceptionNode,
+        &IRCONTROLNodeParser::parseControlNode<IR::CONTROLNode::AnyType_PrimRaiseExceptionNode>},
+
         {IR::CONTROLNode::AnyType_PrimTupleConstructNode,
-        &IRCONTROLNodeParser::parseControlNode<IR::CONTROLNode::AnyType_PrimTupleConstructNode>}
+        &IRCONTROLNodeParser::parseControlNode<IR::CONTROLNode::AnyType_PrimTupleConstructNode>},
     };
+
     nn_node_parse_func_map_ = {
         {IR::NNNode::AnyType_InputNode, &IRNNNodeParser::parseNNNode<IR::NNNode::AnyType_InputNode>},
         {IR::NNNode::AnyType_ConvNode, &IRNNNodeParser::parseNNNode<IR::NNNode::AnyType_ConvNode>},
@@ -309,8 +316,10 @@ IRParser::IRParser() {
         {IR::NNNode::AnyType_AtenAppendNode, &IRNNNodeParser::parseNNNode<IR::NNNode::AnyType_AtenAppendNode>},
         {IR::NNNode::AnyType_AtenCopyNode, &IRNNNodeParser::parseNNNode<IR::NNNode::AnyType_AtenCopyNode>},
         {IR::NNNode::AnyType_AtenDimNode, &IRNNNodeParser::parseNNNode<IR::NNNode::AnyType_AtenDimNode>},
+        {IR::NNNode::AnyType_AtenDropoutNode, &IRNNNodeParser::parseNNNode<IR::NNNode::AnyType_AtenDropoutNode>},
         {IR::NNNode::AnyType_AtenFormatNode, &IRNNNodeParser::parseNNNode<IR::NNNode::AnyType_AtenFormatNode>},
         {IR::NNNode::AnyType_AtenListNode, &IRNNNodeParser::parseNNNode<IR::NNNode::AnyType_AtenListNode>},
+        {IR::NNNode::AnyType_AtenLSTMNode, &IRNNNodeParser::parseNNNode<IR::NNNode::AnyType_AtenLSTMNode>},
         {IR::NNNode::AnyType_AtenNeNode, &IRNNNodeParser::parseNNNode<IR::NNNode::AnyType_AtenNeNode>},
         {IR::NNNode::AnyType_AtenNegNode, &IRNNNodeParser::parseNNNode<IR::NNNode::AnyType_AtenNegNode>},
         {IR::NNNode::AnyType_AtenSizeNode, &IRNNNodeParser::parseNNNode<IR::NNNode::AnyType_AtenSizeNode>},

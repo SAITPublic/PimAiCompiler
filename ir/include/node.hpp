@@ -244,6 +244,9 @@ class Node : public estd::IntrusiveListNode<Node>, public AbstractNodeMixin<Node
     virtual Shape4D getPreprocessedKernelBlobDim() const { return {{.n = 0, .c = 0, .h = 0, .w = 0}}; }
     virtual Shape4D getPreprocessedKernelBlobDim() { return {{.n = 0, .c = 0, .h = 0, .w = 0}}; }
 
+    virtual std::vector<Shape4D> getPreprocessedWeightBlobDim() const { return {{{.n = 0, .c = 0, .h = 0, .w = 0}}}; }
+    virtual std::vector<Shape4D> getPreprocessedWeightBlobDim() { return {{{.n = 0, .c = 0, .h = 0, .w = 0}}}; }
+
     MEMORY_OFFSET_T addInstrSize(MemoryType mem_type, MemoryDataType data_type, MEMORY_OFFSET_T offset);
     MEMORY_OFFSET_T addKernelMemSize(MEMORY_OFFSET_T offset);
     MEMORY_OFFSET_T addPsumMemSize(MEMORY_OFFSET_T offset);

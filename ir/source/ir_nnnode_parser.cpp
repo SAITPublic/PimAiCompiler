@@ -439,6 +439,41 @@ IRNNNodeParser::parseNNNode<IR::NNNode::AnyType_CopyNode>(const IR::NnNode* ir_n
     return std::make_unique<nn_ir::CopyNode>(node_info);
 }
 
+
+template <>
+std::unique_ptr<nn_ir::NNNode>
+IRNNNodeParser::parseNNNode<IR::NNNode::AnyType_AtenDropoutNode>(const IR::NnNode*      ir_node,
+                                                                 const nn_ir::NodeInfo& node_info) {
+    auto aten_dropout_node = ir_node->nn_node_as_AtenDropoutNode();
+    Log::IR::E_IF(aten_dropout_node == nullptr)
+    << "IRNNNodeParser::parseNNNode<NN::AtenDropoutNode>() => wrong node type!";
+
+    float proportion = aten_dropout_node->proportion();
+    bool  train      = aten_dropout_node->train();
+    return std::make_unique<nn_ir::AtenDropoutNode>(node_info, proportion, train);
+}
+
+template <>
+std::unique_ptr<nn_ir::NNNode>
+IRNNNodeParser::parseNNNode<IR::NNNode::AnyType_AtenLSTMNode>(const IR::NnNode*      ir_node,
+                                                              const nn_ir::NodeInfo& node_info) {
+    auto aten_lstm_node = ir_node->nn_node_as_AtenLSTMNode();
+    Log::IR::E_IF(aten_lstm_node == nullptr) << "IRNNNodeParser::parseNNNode<NN::AtenLSTMNode>() => wrong node type!";
+
+    float   has_biases     = aten_lstm_node->has_biases();
+    int64_t num_layer      = aten_lstm_node->num_layers();
+    double  dropout        = aten_lstm_node->dropout();
+    bool    train          = aten_lstm_node->train();
+    bool    bidirectional  = aten_lstm_node->bidirectional();
+    bool    batch_first    = aten_lstm_node->batch_first();
+
+    auto weight_blob_id = makeDataArrFromVector<int64_t>(aten_lstm_node->weight_blob_ids());
+    auto bias_blob_id   = makeDataArrFromVector<int64_t>(aten_lstm_node->bias_blob_ids());
+
+    return std::make_unique<nn_ir::AtenLSTMNode>(node_info, has_biases, num_layer, dropout, train,
+                                              bidirectional, batch_first, weight_blob_id, bias_blob_id);
+}
+
 template <>
 std::unique_ptr<nn_ir::NNNode>
 IRNNNodeParser::parseNNNode<IR::NNNode::AnyType_AtenAppendNode>(const IR::NnNode* ir_node,

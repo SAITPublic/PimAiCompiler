@@ -197,7 +197,9 @@ class AtenAppendNode;
 class AtenCopyNode;
 class AtenDimNode;
 class AtenFormatNode;
+class AtenDropoutNode;
 class AtenListNode;
+class AtenLSTMNode;
 class AtenNeNode;
 class AtenNegNode;
 class AtenSizeNode;
@@ -251,12 +253,14 @@ enum class NodeType {
     CONTROLNode, // start describing control nodes
     PRIMBLOCK,
     PRIMCONSTANT,
+    PRIMDATA,
     PRIMDEVICE,
     PRIMDTYPE,
     PRIMIF,
     PRIMLISTCONSTRUCT,
     PRIMLOOPINDEX,
     PRIMLOOP,
+    PRIMRAISEEXCEPTION,
     PRIMTUPLECONSTRUCT,
     LastCONTROLNode, // start describing control nodes
 
@@ -287,12 +291,15 @@ enum class NodeType {
     ATENAPPEND,
     ATENCOPY,
     ATENDIM,
+    ATENDROPOUT,
     ATENFORMAT,
     ATENLIST,
+    ATENLSTM,
     ATENNE,
     ATENNEG,
     ATENSIZE,
     ATENZEROS,
+
     LastNNNode, // end describing nn nodes
 
     OPNode, // start describing op nodes
@@ -361,8 +368,10 @@ inline std::ostream& operator<<(std::ostream& s, nn_ir::NodeType type) {
         ENUM_STR(ATENAPPEND)
         ENUM_STR(ATENCOPY)
         ENUM_STR(ATENDIM)
+        ENUM_STR(ATENDROPOUT)
         ENUM_STR(ATENFORMAT)
         ENUM_STR(ATENLIST)
+        ENUM_STR(ATENLSTM)
         ENUM_STR(ATENNE)
         ENUM_STR(ATENNEG)
         ENUM_STR(ATENSIZE)
@@ -370,12 +379,14 @@ inline std::ostream& operator<<(std::ostream& s, nn_ir::NodeType type) {
 
         ENUM_STR(PRIMBLOCK)
         ENUM_STR(PRIMCONSTANT)
+        ENUM_STR(PRIMDATA)
         ENUM_STR(PRIMDEVICE)
         ENUM_STR(PRIMDTYPE)
         ENUM_STR(PRIMIF)
         ENUM_STR(PRIMLOOPINDEX)
         ENUM_STR(PRIMLOOP)
         ENUM_STR(PRIMLISTCONSTRUCT)
+        ENUM_STR(PRIMRAISEEXCEPTION)
         ENUM_STR(PRIMTUPLECONSTRUCT)
 
 #undef ENUM_STR
