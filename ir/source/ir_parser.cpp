@@ -343,6 +343,7 @@ IRParser::IRParser() {
         &IRNNNodeParser::parseNNNode<IR::NNNode::AnyType_AtenDeriveIndexNode>},
         {IR::NNNode::AnyType_AtenCatNode, &IRNNNodeParser::parseNNNode<IR::NNNode::AnyType_AtenCatNode>},
         {IR::NNNode::AnyType_AtenDimNode, &IRNNNodeParser::parseNNNode<IR::NNNode::AnyType_AtenDimNode>},
+        {IR::NNNode::AnyType_AtenDivNode, &IRNNNodeParser::parseNNNode<IR::NNNode::AnyType_AtenDivNode>},
         {IR::NNNode::AnyType_AtenDropoutNode, &IRNNNodeParser::parseNNNode<IR::NNNode::AnyType_AtenDropoutNode>},
         {IR::NNNode::AnyType_AtenEmbeddingNode, &IRNNNodeParser::parseNNNode<IR::NNNode::AnyType_AtenEmbeddingNode>},
         {IR::NNNode::AnyType_AtenEqNode, &IRNNNodeParser::parseNNNode<IR::NNNode::AnyType_AtenEqNode>},

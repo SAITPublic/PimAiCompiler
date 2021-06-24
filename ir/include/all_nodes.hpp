@@ -27,6 +27,7 @@
 #include "ir/include/nn_nodes/aten_copy_node.hpp"
 #include "ir/include/nn_nodes/aten_derive_index_node.hpp"
 #include "ir/include/nn_nodes/aten_dim_node.hpp"
+#include "ir/include/nn_nodes/aten_div_node.hpp"
 #include "ir/include/nn_nodes/aten_dropout_node.hpp"
 #include "ir/include/nn_nodes/aten_embedding_node.hpp"
 #include "ir/include/nn_nodes/aten_eq_node.hpp"

@@ -516,6 +516,16 @@ IRNNNodeParser::parseNNNode<IR::NNNode::AnyType_AtenDimNode>(const IR::NnNode*  
 
 template <>
 std::unique_ptr<nn_ir::NNNode>
+IRNNNodeParser::parseNNNode<IR::NNNode::AnyType_AtenDivNode>(const IR::NnNode* ir_node,
+                                                             const nn_ir::NodeInfo& node_info) {
+    auto aten_div_node = ir_node->nn_node_as_AtenDivNode();
+    Log::IR::E_IF(aten_div_node == nullptr) << "IRNNNodeParser::parseNNNode<NN::AtenDivNode>() => wrong node type!";
+
+    return std::make_unique<nn_ir::AtenDivNode>(node_info);
+}
+
+template <>
+std::unique_ptr<nn_ir::NNNode>
 IRNNNodeParser::parseNNNode<IR::NNNode::AnyType_AtenDropoutNode>(const IR::NnNode*      ir_node,
                                                                  const nn_ir::NodeInfo& node_info) {
     auto aten_dropout_node = ir_node->nn_node_as_AtenDropoutNode();

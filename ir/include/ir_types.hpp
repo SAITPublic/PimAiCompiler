@@ -335,6 +335,7 @@ enum class NodeType {
     ATENCOPY,
     ATENDERIVEINDEX,
     ATENDIM,
+    ATENDIV,
     ATENDROPOUT,
     ATENEMBEDDING,
     ATENEQ,
@@ -436,6 +437,7 @@ inline std::ostream& operator<<(std::ostream& s, nn_ir::NodeType type) {
         ENUM_STR(ATENCOPY)
         ENUM_STR(ATENDERIVEINDEX)
         ENUM_STR(ATENDIM)
+        ENUM_STR(ATENDIV)
         ENUM_STR(ATENDROPOUT)
         ENUM_STR(ATENEMBEDDING)
         ENUM_STR(ATENEQ)
