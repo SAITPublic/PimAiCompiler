@@ -306,10 +306,13 @@ IRParser::IRParser() {
         {IR::NNNode::AnyType_DummyNode, &IRNNNodeParser::parseNNNode<IR::NNNode::AnyType_DummyNode>},
         {IR::NNNode::AnyType_CopyNode, &IRNNNodeParser::parseNNNode<IR::NNNode::AnyType_CopyNode>},
 
+        {IR::NNNode::AnyType_AtenAppendNode, &IRNNNodeParser::parseNNNode<IR::NNNode::AnyType_AtenAppendNode>},
+        {IR::NNNode::AnyType_AtenCopyNode, &IRNNNodeParser::parseNNNode<IR::NNNode::AnyType_AtenCopyNode>},
         {IR::NNNode::AnyType_AtenDimNode, &IRNNNodeParser::parseNNNode<IR::NNNode::AnyType_AtenDimNode>},
         {IR::NNNode::AnyType_AtenFormatNode, &IRNNNodeParser::parseNNNode<IR::NNNode::AnyType_AtenFormatNode>},
         {IR::NNNode::AnyType_AtenListNode, &IRNNNodeParser::parseNNNode<IR::NNNode::AnyType_AtenListNode>},
         {IR::NNNode::AnyType_AtenNeNode, &IRNNNodeParser::parseNNNode<IR::NNNode::AnyType_AtenNeNode>},
+        {IR::NNNode::AnyType_AtenNegNode, &IRNNNodeParser::parseNNNode<IR::NNNode::AnyType_AtenNegNode>},
         {IR::NNNode::AnyType_AtenSizeNode, &IRNNNodeParser::parseNNNode<IR::NNNode::AnyType_AtenSizeNode>},
         {IR::NNNode::AnyType_AtenZerosNode, &IRNNNodeParser::parseNNNode<IR::NNNode::AnyType_AtenZerosNode>}
     };

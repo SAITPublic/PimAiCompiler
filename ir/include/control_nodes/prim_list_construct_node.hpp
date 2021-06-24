@@ -15,9 +15,6 @@ class PrimListConstructNode : public NodeMixin<PrimListConstructNode, CONTROLNod
             : NodeMixin(node_info, NodeType::PRIMLISTCONSTRUCT) {}
 
     std::string getNodeTypeAsString(void) const override { return "PrimListConstruct"; }
-
-private:
-
 }; // class PrimListConstructNode
 
 } // namespace nn_ir

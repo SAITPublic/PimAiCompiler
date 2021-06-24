@@ -193,10 +193,13 @@ class MatMulNode;
 class DummyNode;
 class CopyNode;
 
+class AtenAppendNode;
+class AtenCopyNode;
 class AtenDimNode;
 class AtenFormatNode;
 class AtenListNode;
 class AtenNeNode;
+class AtenNegNode;
 class AtenSizeNode;
 class AtenZerosNode;
 
@@ -281,10 +284,13 @@ enum class NodeType {
     DUMMY,
     COPY,
 
+    ATENAPPEND,
+    ATENCOPY,
     ATENDIM,
     ATENFORMAT,
     ATENLIST,
     ATENNE,
+    ATENNEG,
     ATENSIZE,
     ATENZEROS,
     LastNNNode, // end describing nn nodes
@@ -352,10 +358,13 @@ inline std::ostream& operator<<(std::ostream& s, nn_ir::NodeType type) {
         ENUM_STR(MATMUL)
         ENUM_STR(MAAELTWISE)
 
+        ENUM_STR(ATENAPPEND)
+        ENUM_STR(ATENCOPY)
         ENUM_STR(ATENDIM)
         ENUM_STR(ATENFORMAT)
         ENUM_STR(ATENLIST)
         ENUM_STR(ATENNE)
+        ENUM_STR(ATENNEG)
         ENUM_STR(ATENSIZE)
         ENUM_STR(ATENZEROS)
 

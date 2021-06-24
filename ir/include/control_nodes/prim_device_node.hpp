@@ -14,10 +14,7 @@ class PrimDeviceNode : public NodeMixin<PrimDeviceNode, CONTROLNode> {
     explicit PrimDeviceNode(const NodeInfo &node_info)
             : NodeMixin(node_info, NodeType::PRIMDEVICE) {}
 
-    std::string getNodeTypeAsString(void) const override { return "PrimDeviceNode"; }
-
-private:
-
+    std::string getNodeTypeAsString(void) const override { return "PrimDevice"; }
 }; // class PrimDeviceNode
 
 } // namespace nn_ir
