@@ -233,12 +233,20 @@ class EdgeExecutionStep;
 
 class MAAEltwiseNode;
 
+class PrimBlockNode;
 class PrimConstantNode;
 class PrimTupleConstructNode;
-
+class PrimDevice;
+class PrimDtype;
+class PrimIf;
+class PrimListConstruct;
+class PrimLoopIndex;
+class PrimLoop;
+class PrimTupleConstruct;
 
 enum class NodeType {
     CONTROLNode, // start describing control nodes
+    PRIMBLOCK,
     PRIMCONSTANT,
     PRIMDEVICE,
     PRIMDTYPE,
@@ -351,6 +359,7 @@ inline std::ostream& operator<<(std::ostream& s, nn_ir::NodeType type) {
         ENUM_STR(ATENSIZE)
         ENUM_STR(ATENZEROS)
 
+        ENUM_STR(PRIMBLOCK)
         ENUM_STR(PRIMCONSTANT)
         ENUM_STR(PRIMDEVICE)
         ENUM_STR(PRIMDTYPE)

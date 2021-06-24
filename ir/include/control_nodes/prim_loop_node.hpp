@@ -14,7 +14,7 @@ class PrimLoopNode : public NodeMixin<PrimLoopNode, CONTROLNode> {
     explicit PrimLoopNode(const NodeInfo &node_info, int64_t trip_count, bool cond)
             : NodeMixin(node_info, NodeType::PRIMLOOP), trip_count_(trip_count), cond_(cond) {}
 
-    std::string getNodeTypeAsString(void) const override { return "PrimLoopNode"; }
+    std::string getNodeTypeAsString(void) const override { return "PrimLoop"; }
 
     void setTripCount(const int64_t trip_count) { trip_count_ = trip_count; }
     void setCond(bool cond) { cond_ = cond; }

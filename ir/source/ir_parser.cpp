@@ -255,6 +255,9 @@ std::unique_ptr<nn_ir::QNode> IRParser::parseQNode<IR::QNode::AnyType_DequantNod
  */
 IRParser::IRParser() {
     control_node_parse_func_map_ = {
+        {IR::CONTROLNode::AnyType_PrimBlockNode,
+        &IRCONTROLNodeParser::parseControlNode<IR::CONTROLNode::AnyType_PrimBlockNode>},
+
         {IR::CONTROLNode::AnyType_PrimConstantNode,
         &IRCONTROLNodeParser::parseControlNode<IR::CONTROLNode::AnyType_PrimConstantNode>},
 

@@ -14,7 +14,7 @@ class PrimLoopIndexNode : public NodeMixin<PrimLoopIndexNode, CONTROLNode> {
     explicit PrimLoopIndexNode(const NodeInfo &node_info, int64_t index)
             : NodeMixin(node_info, NodeType::PRIMLOOPINDEX), index_(index) {}
 
-    std::string getNodeTypeAsString(void) const override { return "PrimLoopIndexNode"; }
+    std::string getNodeTypeAsString(void) const override { return "PrimLoopIndex"; }
 
     void setIndex(int64_t index) { index_ = index; }
 
