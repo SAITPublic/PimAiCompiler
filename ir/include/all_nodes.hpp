@@ -24,6 +24,7 @@
 #include "ir/include/nn_nodes/aten_addmm_node.hpp"
 #include "ir/include/nn_nodes/aten_append_node.hpp"
 #include "ir/include/nn_nodes/aten_cat_node.hpp"
+#include "ir/include/nn_nodes/aten_ceil_node.hpp"
 #include "ir/include/nn_nodes/aten_copy_node.hpp"
 #include "ir/include/nn_nodes/aten_derive_index_node.hpp"
 #include "ir/include/nn_nodes/aten_dim_node.hpp"

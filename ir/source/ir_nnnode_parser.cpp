@@ -483,6 +483,16 @@ IRNNNodeParser::parseNNNode<IR::NNNode::AnyType_AtenCatNode>(const IR::NnNode* i
 
 template <>
 std::unique_ptr<nn_ir::NNNode>
+IRNNNodeParser::parseNNNode<IR::NNNode::AnyType_AtenCeilNode>(const IR::NnNode* ir_node,
+                                                             const nn_ir::NodeInfo& node_info) {
+    auto aten_ceil_node = ir_node->nn_node_as_AtenCeilNode();
+    Log::IR::E_IF(aten_ceil_node == nullptr) << "IRNNNodeParser::parseNNNode<NN::AtenCeilNode>() => wrong node type!";
+
+    return std::make_unique<nn_ir::AtenCeilNode>(node_info);
+}
+
+template <>
+std::unique_ptr<nn_ir::NNNode>
 IRNNNodeParser::parseNNNode<IR::NNNode::AnyType_AtenCopyNode>(const IR::NnNode* ir_node,
                                                               const nn_ir::NodeInfo& node_info) {
     auto aten_copy_node = ir_node->nn_node_as_AtenCopyNode();
