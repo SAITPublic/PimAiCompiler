@@ -201,6 +201,7 @@ class AtenDropoutNode;
 class AtenEqNode;
 class AtenFormatNode;
 class AtenGetItemNode;
+class AtenGtNode;
 class AtenIntNode;
 class AtenItemNode;
 class AtenLenNode;
@@ -208,9 +209,10 @@ class AtenListNode;
 class AtenLSTMNode;
 class AtenNeNode;
 class AtenNegNode;
-class AtenNeNode;
 class AtenSizeNode;
 class AtenSliceNode;
+class AtenSubNode;
+class AtenTensorNode;
 class AtenUnsqueezeNode;
 class AtenZerosLikeNode;
 class AtenZerosNode;
@@ -306,6 +308,7 @@ enum class NodeType {
     ATENEQ,
     ATENFORMAT,
     ATENGETITEM,
+    ATENGT,
     ATENINT,
     ATENITEM,
     ATENLEN,
@@ -315,6 +318,8 @@ enum class NodeType {
     ATENNEG,
     ATENSIZE,
     ATENSLICE,
+    ATENSUB,
+    ATENTENSOR,
     ATENUNSQUEEZE,
     ATENZEROS,
     ATENZEROSLIKE,
@@ -391,6 +396,7 @@ inline std::ostream& operator<<(std::ostream& s, nn_ir::NodeType type) {
         ENUM_STR(ATENEQ)
         ENUM_STR(ATENFORMAT)
         ENUM_STR(ATENGETITEM)
+        ENUM_STR(ATENGT)
         ENUM_STR(ATENINT)
         ENUM_STR(ATENITEM)
         ENUM_STR(ATENLEN)
@@ -400,6 +406,8 @@ inline std::ostream& operator<<(std::ostream& s, nn_ir::NodeType type) {
         ENUM_STR(ATENNEG)
         ENUM_STR(ATENSIZE)
         ENUM_STR(ATENSLICE)
+        ENUM_STR(ATENSUB)
+        ENUM_STR(ATENTENSOR)
         ENUM_STR(ATENUNSQUEEZE)
         ENUM_STR(ATENZEROS)
         ENUM_STR(ATENZEROSLIKE)
