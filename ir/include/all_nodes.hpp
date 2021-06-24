@@ -20,9 +20,9 @@
 #include "ir/include/v_node.hpp"
 
 #include "ir/include/nn_nodes/activation_node.hpp"
-#include "ir/include/nn_nodes/aten_append_node.hpp"
 #include "ir/include/nn_nodes/aten_add_node.hpp"
 #include "ir/include/nn_nodes/aten_addmm_node.hpp"
+#include "ir/include/nn_nodes/aten_append_node.hpp"
 #include "ir/include/nn_nodes/aten_cat_node.hpp"
 #include "ir/include/nn_nodes/aten_copy_node.hpp"
 #include "ir/include/nn_nodes/aten_derive_index_node.hpp"
@@ -51,6 +51,7 @@
 #include "ir/include/nn_nodes/aten_slice_node.hpp"
 #include "ir/include/nn_nodes/aten_sub_node.hpp"
 #include "ir/include/nn_nodes/aten_tensor_node.hpp"
+#include "ir/include/nn_nodes/aten_to_node.hpp"
 #include "ir/include/nn_nodes/aten_transpose_node.hpp"
 #include "ir/include/nn_nodes/aten_unsqueeze_node.hpp"
 #include "ir/include/nn_nodes/aten_zeros_like_node.hpp"

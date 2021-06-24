@@ -439,8 +439,6 @@ IRNNNodeParser::parseNNNode<IR::NNNode::AnyType_CopyNode>(const IR::NnNode* ir_n
     return std::make_unique<nn_ir::CopyNode>(node_info);
 }
 
-
-
 template <>
 std::unique_ptr<nn_ir::NNNode>
 IRNNNodeParser::parseNNNode<IR::NNNode::AnyType_AtenAppendNode>(const IR::NnNode* ir_node,
@@ -780,6 +778,21 @@ IRNNNodeParser::parseNNNode<IR::NNNode::AnyType_AtenTensorNode>(const IR::NnNode
         << "IRNNNodeParser::parseNNNode<NN::AtenTensorNode>() => wrong node type!";
 
     return std::make_unique<nn_ir::AtenTensorNode>(node_info);
+}
+
+template <>
+std::unique_ptr<nn_ir::NNNode>
+IRNNNodeParser::parseNNNode<IR::NNNode::AnyType_AtenToNode>(const IR::NnNode* ir_node,
+                                                            const nn_ir::NodeInfo& node_info) {
+    auto aten_to_node = ir_node->nn_node_as_AtenToNode();
+    Log::IR::E_IF(aten_to_node == nullptr) << "IRNNNodeParser::parseNNNode<NN::AtenToNode>() => wrong node type!";
+
+    // Fixme(SRCX): Cast should be done in GraphGen ir builder?
+    nn_ir::DataType dtype = convertIrTypeToNNIr(static_cast<IR::Type::DataType>(aten_to_node->dtype()));
+    bool non_blocking = aten_to_node->non_blocking();
+    bool copy = aten_to_node->copy();
+    int64_t optional_memory_format = aten_to_node->optional_memory_format();
+    return std::make_unique<nn_ir::AtenToNode>(node_info, dtype, non_blocking, copy, optional_memory_format);
 }
 
 template <>

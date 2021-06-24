@@ -359,11 +359,11 @@ enum class NodeType {
     ATENSLICE,
     ATENSUB,
     ATENTENSOR,
+    ATENTO,
     ATENTRANSPOSE,
     ATENUNSQUEEZE,
     ATENZEROS,
     ATENZEROSLIKE,
-
     LastNNNode, // end describing nn nodes
 
     OPNode, // start describing op nodes
@@ -435,7 +435,6 @@ inline std::ostream& operator<<(std::ostream& s, nn_ir::NodeType type) {
         ENUM_STR(ATENCAT)
         ENUM_STR(ATENCOPY)
         ENUM_STR(ATENDERIVEINDEX)
-
         ENUM_STR(ATENDIM)
         ENUM_STR(ATENDROPOUT)
         ENUM_STR(ATENEMBEDDING)
@@ -461,6 +460,7 @@ inline std::ostream& operator<<(std::ostream& s, nn_ir::NodeType type) {
         ENUM_STR(ATENSLICE)
         ENUM_STR(ATENSUB)
         ENUM_STR(ATENTENSOR)
+        ENUM_STR(ATENTO)
         ENUM_STR(ATENTRANSPOSE)
         ENUM_STR(ATENUNSQUEEZE)
         ENUM_STR(ATENZEROS)
@@ -473,7 +473,7 @@ inline std::ostream& operator<<(std::ostream& s, nn_ir::NodeType type) {
         ENUM_STR(PRIMDTYPE)
         ENUM_STR(PRIMENDIF)
         ENUM_STR(PRIMENDLOOP)
-        ENUM_STR(PRIMIF)        
+        ENUM_STR(PRIMIF)
         ENUM_STR(PRIMLISTCONSTRUCT)
         ENUM_STR(PRIMLISTUNPACK)
         ENUM_STR(PRIMLOOPINDEX)
