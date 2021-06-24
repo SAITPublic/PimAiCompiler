@@ -1,19 +1,19 @@
 #pragma once
 
 #include "model_builder.h"
-#include "nnr_types.h"
+#include "nnrt_types.h"
 
-namespace nnr {
+namespace nnrt {
 
 class StreamExecutor {
 
   public:
     StreamExecutor(){}
 
-    int inferenceModel(/* RunnableNNIR IR,*/  NnrBuffer* inputBuffer, NnrBuffer* outputBuffer);
+    int inferenceModel(/* RunnableNNIR IR,*/  NnrtBuffer* inputBuffer, NnrtBuffer* outputBuffer);
   private:
 
 
 };
 
-} // namespace nnr
+} // namespace nnrt

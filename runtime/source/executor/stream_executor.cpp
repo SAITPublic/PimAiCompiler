@@ -1,12 +1,12 @@
 
 
-#include "nnr_types.h"
+#include "nnrt_types.h"
 #include "stream_executor.h"
 
-namespace nnr {
+namespace nnrt {
 
-int StreamExecutor::inferenceModel(/* RunnableNNIR IR,*/  NnrBuffer* inputBuffer, NnrBuffer* outputBuffer){
+int StreamExecutor::inferenceModel(/* RunnableNNIR IR,*/  NnrtBuffer* inputBuffer, NnrtBuffer* outputBuffer){
     return 0;
 }
 
-} // namespace nnr
+} // namespace nnrt

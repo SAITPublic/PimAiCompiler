@@ -2,11 +2,11 @@
 
 #include <memory>
 
-#include "nnr_types.h"
+#include "nnrt_types.h"
 #include "model_builder.h"
 #include "stream_executor.h"
 
-namespace nnr {
+namespace nnrt {
 
 class NNRuntime {
   public:
@@ -14,7 +14,7 @@ class NNRuntime {
 
     NNRuntime(const std::string torch_model_path);
 
-    int inferenceModel(NnrBuffer* inputBuffer, NnrBuffer* outputBuffer);
+    int inferenceModel(NnrtBuffer* inputBuffer, NnrtBuffer* outputBuffer);
   
     int test(void);
   private:
@@ -25,4 +25,4 @@ class NNRuntime {
     std::shared_ptr<StreamExecutor> executor;
 };
 
-} // namespace nnr
+} // namespace nnrt

@@ -1,6 +1,6 @@
 #pragma once
 
-namespace nnr {
+namespace nnrt {
 
 class ModelBuilder {
   public:
@@ -16,4 +16,4 @@ class ModelBuilder {
 
 };
 
-} // namespace nnr
+} // namespace nnrt

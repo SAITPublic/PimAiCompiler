@@ -11,9 +11,9 @@
 #include <gtest/gtest.h>
 #include "nn_runtime.h"
 
-using namespace nnr;
+using namespace nnrt;
 
-TEST(NnrUnitTest, simpleTest)
+TEST(NnrtUnitTest, simpleTest)
 {
     NNRuntime runtime;
     int ret = runtime.test();

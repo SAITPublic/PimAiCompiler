@@ -7,20 +7,20 @@
 #include <set>
 
 #include "nn_runtime.h"
-using namespace nnr;
+using namespace nnrt;
 
 int main(int argc, const char* argv[]) {
     google::InitGoogleLogging(argv[0]);
     FLAGS_logtostderr =true;
     FLAGS_colorlogtostderr =true; 
     LOG(INFO) << "Hello,info! ";
-    NNRuntime rnnt_runtime("/home/rnnt.torchscript");
+    NNRuntime runtime("/home/rnnt.torchscript");
 
-    rnnt_runtime.test(); 
-    NnrBuffer *inputBuffer = nullptr;
-    NnrBuffer *outputBuffer = nullptr;
+    runtime.test(); 
+    NnrtBuffer *inputBuffer = nullptr;
+    NnrtBuffer *outputBuffer = nullptr;
     
-    rnnt_runtime.inferenceModel(inputBuffer, outputBuffer);
+    runtime.inferenceModel(inputBuffer, outputBuffer);
 
     google::ShutdownGoogleLogging();
     return 0;

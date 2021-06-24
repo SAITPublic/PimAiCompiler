@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
-import Nnr
+import Nnrt
 
-n = Nnr.NNRuntime("/home/rnnt.torchscript")
+n = Nnrt.NNRuntime("/home/rnnt.torchscript")
 n.test()
 #n.inference()

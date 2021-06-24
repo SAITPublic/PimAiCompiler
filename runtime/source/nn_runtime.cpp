@@ -3,7 +3,7 @@
 #include <memory>
 
 #include "nn_runtime.h"
-namespace nnr {
+namespace nnrt {
 
 
 NNRuntime::NNRuntime(const std::string torch_model_path) {
@@ -18,7 +18,7 @@ NNRuntime::NNRuntime(const std::string torch_model_path) {
     this->executor = std::make_shared<StreamExecutor>();
 }
 
-int NNRuntime::inferenceModel(NnrBuffer *inputBuffer, NnrBuffer *outputBuffer) {
+int NNRuntime::inferenceModel(NnrtBuffer *inputBuffer, NnrtBuffer *outputBuffer) {
     LOG(INFO)<< "inferenceModel with inputBuffer and output in outputBuffer!";
     int ret = executor->inferenceModel(/*mbuilder->runnableIR,*/ inputBuffer, outputBuffer);
     return ret;
@@ -29,4 +29,4 @@ int NNRuntime::test(void) {
     return 0;
 }
 
-} // namespace nnr
+} // namespace nnrt

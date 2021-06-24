@@ -7,6 +7,6 @@ set(HCC_CXX_FLAGS  "--amdgpu-target=gfx906")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${HCC_CXX_FLAGS}")
 
 include_directories("${PROJECT_SOURCE_DIR}/runtime/include")
-add_executable(NnrUnitTest ${nnr_ut_source})
+add_executable(NnrtUnitTest ${nnr_ut_source})
 
-target_link_libraries(NnrUnitTest gtest_main gtest nn_runtime)
+target_link_libraries(NnrtUnitTest gtest_main gtest nn_runtime)
