@@ -197,12 +197,16 @@ class AtenAppendNode;
 class AtenCopyNode;
 class AtenDeriveIndexNode;
 class AtenDimNode;
-class AtenFormatNode;
 class AtenDropoutNode;
+class AtenEqNode;
+class AtenFormatNode;
+class AtenGetItemNode;
+class AtenLenNode;
 class AtenListNode;
 class AtenLSTMNode;
 class AtenNeNode;
 class AtenNegNode;
+class AtenNeNode;
 class AtenSizeNode;
 class AtenSliceNode;
 class AtenZerosLikeNode;
@@ -296,7 +300,10 @@ enum class NodeType {
     ATENDERIVEINDEX,
     ATENDIM,
     ATENDROPOUT,
+    ATENEQ,
     ATENFORMAT,
+    ATENGETITEM,
+    ATENLEN,
     ATENLIST,
     ATENLSTM,
     ATENNE,
@@ -305,7 +312,6 @@ enum class NodeType {
     ATENSLICE,
     ATENZEROS,
     ATENZEROSLIKE,
-
     LastNNNode, // end describing nn nodes
 
     OPNode, // start describing op nodes
@@ -376,7 +382,10 @@ inline std::ostream& operator<<(std::ostream& s, nn_ir::NodeType type) {
         ENUM_STR(ATENDERIVEINDEX)
         ENUM_STR(ATENDIM)
         ENUM_STR(ATENDROPOUT)
+        ENUM_STR(ATENEQ)
         ENUM_STR(ATENFORMAT)
+        ENUM_STR(ATENGETITEM)
+        ENUM_STR(ATENLEN)
         ENUM_STR(ATENLIST)
         ENUM_STR(ATENLSTM)
         ENUM_STR(ATENNE)

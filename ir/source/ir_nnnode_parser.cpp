@@ -529,6 +529,16 @@ IRNNNodeParser::parseNNNode<IR::NNNode::AnyType_AtenFormatNode>(const IR::NnNode
 
 template <>
 std::unique_ptr<nn_ir::NNNode>
+IRNNNodeParser::parseNNNode<IR::NNNode::AnyType_AtenEqNode>(const IR::NnNode*      ir_node,
+                                                            const nn_ir::NodeInfo& node_info) {
+    auto aten_eq_node = ir_node->nn_node_as_AtenEqNode();
+    Log::IR::E_IF(aten_eq_node == nullptr) << "IRNNNodeParser::parseNNNode<NN::AtenEqNode>() => wrong node type!";
+
+    return std::make_unique<nn_ir::AtenEqNode>(node_info);
+}
+
+template <>
+std::unique_ptr<nn_ir::NNNode>
 IRNNNodeParser::parseNNNode<IR::NNNode::AnyType_AtenListNode>(const IR::NnNode* ir_node, const nn_ir::NodeInfo& node_info) {
     auto atenlist_node = ir_node->nn_node_as_AtenListNode();
     Log::IR::E_IF(atenlist_node == nullptr) << "IRNNNodeParser::parseNNNode<NN::AtenListNode>() => wrong node type!";
@@ -537,8 +547,29 @@ IRNNNodeParser::parseNNNode<IR::NNNode::AnyType_AtenListNode>(const IR::NnNode* 
 
 template <>
 std::unique_ptr<nn_ir::NNNode>
-IRNNNodeParser::parseNNNode<IR::NNNode::AnyType_AtenNeNode>(const IR::NnNode*      ir_node,
+IRNNNodeParser::parseNNNode<IR::NNNode::AnyType_AtenGetItemNode>(const IR::NnNode*      ir_node,
+                                                                 const nn_ir::NodeInfo& node_info) {
+    auto aten_get_item_node = ir_node->nn_node_as_AtenGetItemNode();
+    Log::IR::E_IF(aten_get_item_node == nullptr)
+        << "IRNNNodeParser::parseNNNode<NN::AtenGetItemNode>() => wrong node type!";
+
+    return std::make_unique<nn_ir::AtenGetItemNode>(node_info);
+}
+
+template <>
+std::unique_ptr<nn_ir::NNNode>
+IRNNNodeParser::parseNNNode<IR::NNNode::AnyType_AtenLenNode>(const IR::NnNode*      ir_node,
                                                              const nn_ir::NodeInfo& node_info) {
+    auto aten_len_node = ir_node->nn_node_as_AtenLenNode();
+    Log::IR::E_IF(aten_len_node == nullptr) << "IRNNNodeParser::parseNNNode<NN::AtenLenNode>() => wrong node type!";
+
+    return std::make_unique<nn_ir::AtenLenNode>(node_info);
+}
+
+template <>
+std::unique_ptr<nn_ir::NNNode>
+IRNNNodeParser::parseNNNode<IR::NNNode::AnyType_AtenNeNode>(const IR::NnNode*      ir_node,
+                                                            const nn_ir::NodeInfo& node_info) {
     auto aten_ne_node = ir_node->nn_node_as_AtenNeNode();
     Log::IR::E_IF(aten_ne_node == nullptr) << "IRNNNodeParser::parseNNNode<NN::AtenNeNode>() => wrong node type!";
 

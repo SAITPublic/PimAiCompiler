@@ -290,9 +290,6 @@ IRParser::IRParser() {
     };
 
     nn_node_parse_func_map_ = {
-        {IR::NNNode::AnyType_AtenDeriveIndexNode, &IRNNNodeParser::parseNNNode<IR::NNNode::AnyType_AtenDeriveIndexNode>},
-        {IR::NNNode::AnyType_AtenSliceNode, &IRNNNodeParser::parseNNNode<IR::NNNode::AnyType_AtenSliceNode>},
-        {IR::NNNode::AnyType_AtenZerosLikeNode, &IRNNNodeParser::parseNNNode<IR::NNNode::AnyType_AtenZerosLikeNode>},
         {IR::NNNode::AnyType_InputNode, &IRNNNodeParser::parseNNNode<IR::NNNode::AnyType_InputNode>},
         {IR::NNNode::AnyType_ConvNode, &IRNNNodeParser::parseNNNode<IR::NNNode::AnyType_ConvNode>},
         {IR::NNNode::AnyType_PoolNode, &IRNNNodeParser::parseNNNode<IR::NNNode::AnyType_PoolNode>},
@@ -318,14 +315,21 @@ IRParser::IRParser() {
 
         {IR::NNNode::AnyType_AtenAppendNode, &IRNNNodeParser::parseNNNode<IR::NNNode::AnyType_AtenAppendNode>},
         {IR::NNNode::AnyType_AtenCopyNode, &IRNNNodeParser::parseNNNode<IR::NNNode::AnyType_AtenCopyNode>},
+        {IR::NNNode::AnyType_AtenDeriveIndexNode,
+         &IRNNNodeParser::parseNNNode<IR::NNNode::AnyType_AtenDeriveIndexNode>},
         {IR::NNNode::AnyType_AtenDimNode, &IRNNNodeParser::parseNNNode<IR::NNNode::AnyType_AtenDimNode>},
         {IR::NNNode::AnyType_AtenDropoutNode, &IRNNNodeParser::parseNNNode<IR::NNNode::AnyType_AtenDropoutNode>},
+        {IR::NNNode::AnyType_AtenEqNode, &IRNNNodeParser::parseNNNode<IR::NNNode::AnyType_AtenEqNode>},
         {IR::NNNode::AnyType_AtenFormatNode, &IRNNNodeParser::parseNNNode<IR::NNNode::AnyType_AtenFormatNode>},
+        {IR::NNNode::AnyType_AtenGetItemNode, &IRNNNodeParser::parseNNNode<IR::NNNode::AnyType_AtenGetItemNode>},
+        {IR::NNNode::AnyType_AtenLenNode, &IRNNNodeParser::parseNNNode<IR::NNNode::AnyType_AtenLenNode>},
         {IR::NNNode::AnyType_AtenListNode, &IRNNNodeParser::parseNNNode<IR::NNNode::AnyType_AtenListNode>},
         {IR::NNNode::AnyType_AtenLSTMNode, &IRNNNodeParser::parseNNNode<IR::NNNode::AnyType_AtenLSTMNode>},
         {IR::NNNode::AnyType_AtenNeNode, &IRNNNodeParser::parseNNNode<IR::NNNode::AnyType_AtenNeNode>},
         {IR::NNNode::AnyType_AtenNegNode, &IRNNNodeParser::parseNNNode<IR::NNNode::AnyType_AtenNegNode>},
         {IR::NNNode::AnyType_AtenSizeNode, &IRNNNodeParser::parseNNNode<IR::NNNode::AnyType_AtenSizeNode>},
+        {IR::NNNode::AnyType_AtenSliceNode, &IRNNNodeParser::parseNNNode<IR::NNNode::AnyType_AtenSliceNode>},
+        {IR::NNNode::AnyType_AtenZerosLikeNode, &IRNNNodeParser::parseNNNode<IR::NNNode::AnyType_AtenZerosLikeNode>},
         {IR::NNNode::AnyType_AtenZerosNode, &IRNNNodeParser::parseNNNode<IR::NNNode::AnyType_AtenZerosNode>}
     };
 
