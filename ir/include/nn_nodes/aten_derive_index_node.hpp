@@ -13,11 +13,11 @@ namespace nn_ir {
 class AtenDeriveIndexNode : public NodeMixin<AtenDeriveIndexNode, NNNode> {
  public:
     explicit AtenDeriveIndexNode(const NodeInfo& node_info, int64_t start, int64_t step)
-        : NodeMixin(node_info, NodeType::ATENZEROSLIKE), start_(start), step_(step) {}
+        : NodeMixin(node_info, NodeType::ATENDERIVEINDEX), start_(start), step_(step) {}
 
     std::string getNodeTypeAsString() const override { return "AtenDeriveIndex"; }
 
-    const int64_t getStatr() const {return start_; }
+    const int64_t getStart() const {return start_; }
     const int64_t getStep() const {return step_; }
 
  private:

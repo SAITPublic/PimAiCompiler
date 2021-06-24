@@ -170,9 +170,6 @@ class GlobalNode;
 class DataEdge;
 class ControlEdge;
 
-class AtenDeriveIndexNode;
-class AtenZerosLikeNode;
-
 class ActivationNode;
 class BatchNormNode;
 class ConvolutionNode;
@@ -198,6 +195,7 @@ class CopyNode;
 
 class AtenAppendNode;
 class AtenCopyNode;
+class AtenDeriveIndexNode;
 class AtenDimNode;
 class AtenFormatNode;
 class AtenDropoutNode;
@@ -206,6 +204,8 @@ class AtenLSTMNode;
 class AtenNeNode;
 class AtenNegNode;
 class AtenSizeNode;
+class AtenSliceNode;
+class AtenZerosLikeNode;
 class AtenZerosNode;
 
 class ShiftNode;
@@ -302,6 +302,7 @@ enum class NodeType {
     ATENNE,
     ATENNEG,
     ATENSIZE,
+    ATENSLICE,
     ATENZEROS,
     ATENZEROSLIKE,
 
@@ -379,8 +380,9 @@ inline std::ostream& operator<<(std::ostream& s, nn_ir::NodeType type) {
         ENUM_STR(ATENLIST)
         ENUM_STR(ATENLSTM)
         ENUM_STR(ATENNE)
-        ENUM_STR(ATENNEG)  
+        ENUM_STR(ATENNEG)
         ENUM_STR(ATENSIZE)
+        ENUM_STR(ATENSLICE)
         ENUM_STR(ATENZEROS)
         ENUM_STR(ATENZEROSLIKE)
 

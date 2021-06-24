@@ -533,10 +533,6 @@ IRNNNodeParser::parseNNNode<IR::NNNode::AnyType_AtenListNode>(const IR::NnNode* 
     auto atenlist_node = ir_node->nn_node_as_AtenListNode();
     Log::IR::E_IF(atenlist_node == nullptr) << "IRNNNodeParser::parseNNNode<NN::AtenListNode>() => wrong node type!";
     return std::make_unique<nn_ir::AtenListNode>(node_info);
-IRNNNodeParser::parseNNNode<IR::NNNode::AnyType_AtenZerosLikeNode>(const IR::NnNode* ir_node, const nn_ir::NodeInfo& node_info) {
-    auto aten_zero_like_node = ir_node->nn_node_as_AtenZerosLikeNode();
-    Log::IR::E_IF(aten_zero_like_node == nullptr) << "IRNNNodeParser::parseNNNode<NN::AtenZerosLikeNode>() => wrong node type!";
-    return std::make_unique<nn_ir::AtenZerosLikeNode>(node_info);
 }
 
 template <>
@@ -569,6 +565,18 @@ IRNNNodeParser::parseNNNode<IR::NNNode::AnyType_AtenSizeNode>(const IR::NnNode* 
 
     int64_t dim = aten_size_node->dim();
     return std::make_unique<nn_ir::AtenSizeNode>(node_info, dim);
+}
+
+template <>
+std::unique_ptr<nn_ir::NNNode>
+IRNNNodeParser::parseNNNode<IR::NNNode::AnyType_AtenSliceNode>(const IR::NnNode* ir_node, const nn_ir::NodeInfo& node_info) {
+    auto aten_slice_like_node = ir_node->nn_node_as_AtenSliceNode();
+    Log::IR::E_IF(aten_slice_like_node == nullptr) << "IRNNNodeParser::parseNNNode<NN::AtenSliceNode>() => wrong node type!";
+    int64_t dim = aten_slice_like_node->dim();
+    int64_t step = aten_slice_like_node->step();
+    int64_t start = aten_slice_like_node->start();
+    int64_t end = aten_slice_like_node->end();
+    return std::make_unique<nn_ir::AtenSliceNode>(node_info, dim, start, end, step);
 }
 
 template <>
