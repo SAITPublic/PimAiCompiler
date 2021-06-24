@@ -45,7 +45,7 @@ $ ./scripts/build.sh all -o .
 
 ## Middlend
 ```
-$ ./build/compiler/middlend/middlend -i frontend.ir
+$ ./build/compiler/middlend/middlend -c compiler/include/middlend/passes/pass_config.json -i frontend.ir
 ```
 # How to test
 

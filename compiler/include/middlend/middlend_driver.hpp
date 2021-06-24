@@ -6,6 +6,7 @@
 
 #include "compiler/include/middlend/context/compilation_context.hpp"
 #include "compiler/include/middlend/context/compilation_context_builder.hpp"
+#include "compiler/include/middlend/passes/pass_builder.hpp"
 #include "compiler/include/middlend/passes/pass_manager.hpp"
 #include "compiler/include/middlend/trait/trait_manager.hpp"
 #include "compiler/include/middlend/utils/util_builder.hpp"
@@ -65,6 +66,9 @@ class MiddlendDriver {
     void importIR();
 
     void buildPasses();
+
+    template <typename... ArgTs>
+    void buildPasses(const conf_json::Value& root, const PassBuilder<ArgTs...>& pass_builder);
 
     void exportIR();
 

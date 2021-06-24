@@ -1,0 +1,10 @@
+{
+    "passes": [
+        {
+            "name"         : "DeviceLabelingPass",
+            "type"         : "graph",
+            "is_mandatory" : true,
+            "enable"       : true
+        }
+    ]
+}
