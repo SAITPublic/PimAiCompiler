@@ -19,6 +19,8 @@
 #include "ir/include/q_node.hpp"
 #include "ir/include/v_node.hpp"
 
+#include "ir/include/nn_nodes/aten_zeros_like_node.hpp"
+
 #include "ir/include/nn_nodes/activation_node.hpp"
 #include "ir/include/nn_nodes/aten_dim_node.hpp"
 #include "ir/include/nn_nodes/aten_append_node.hpp"

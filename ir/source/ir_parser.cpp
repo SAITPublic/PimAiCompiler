@@ -290,6 +290,7 @@ IRParser::IRParser() {
     };
 
     nn_node_parse_func_map_ = {
+        {IR::NNNode::AnyType_AtenZerosLikeNode, &IRNNNodeParser::parseNNNode<IR::NNNode::AnyType_AtenZerosLikeNode>},
         {IR::NNNode::AnyType_InputNode, &IRNNNodeParser::parseNNNode<IR::NNNode::AnyType_InputNode>},
         {IR::NNNode::AnyType_ConvNode, &IRNNNodeParser::parseNNNode<IR::NNNode::AnyType_ConvNode>},
         {IR::NNNode::AnyType_PoolNode, &IRNNNodeParser::parseNNNode<IR::NNNode::AnyType_PoolNode>},

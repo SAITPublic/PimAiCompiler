@@ -170,6 +170,8 @@ class GlobalNode;
 class DataEdge;
 class ControlEdge;
 
+class AtenZerosLikeNode;
+
 class ActivationNode;
 class BatchNormNode;
 class ConvolutionNode;
@@ -265,6 +267,7 @@ enum class NodeType {
     LastCONTROLNode, // start describing control nodes
 
     NNNode, // start describing nn nodes
+    ATENZEROSLIKE,
     INPUT,
     CONVOLUTION,
     ACTIVATION,
@@ -376,6 +379,7 @@ inline std::ostream& operator<<(std::ostream& s, nn_ir::NodeType type) {
         ENUM_STR(ATENNEG)
         ENUM_STR(ATENSIZE)
         ENUM_STR(ATENZEROS)
+        ENUM_STR(ATENZEROSLIKE)
 
         ENUM_STR(PRIMBLOCK)
         ENUM_STR(PRIMCONSTANT)
