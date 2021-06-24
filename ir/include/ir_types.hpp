@@ -170,8 +170,6 @@ class GlobalNode;
 class DataEdge;
 class ControlEdge;
 
-class AtenFormatNode;
-class AtenListNode;
 class ActivationNode;
 class BatchNormNode;
 class ConvolutionNode;
@@ -194,9 +192,11 @@ class DepthToSpaceNode;
 class MatMulNode;
 class DummyNode;
 class CopyNode;
-class AtenDimNode;
-class AtenNeNode;
 
+class AtenDimNode;
+class AtenFormatNode;
+class AtenListNode;
+class AtenNeNode;
 class AtenSizeNode;
 class AtenZerosNode;
 
@@ -244,6 +244,7 @@ enum class NodeType {
     PRIMDTYPE,
     PRIMIF,
     PRIMLISTCONSTRUCT,
+    PRIMLOOPINDEX,
     PRIMLOOP,
     PRIMTUPLECONSTRUCT,
     LastCONTROLNode, // start describing control nodes
@@ -354,6 +355,7 @@ inline std::ostream& operator<<(std::ostream& s, nn_ir::NodeType type) {
         ENUM_STR(PRIMDEVICE)
         ENUM_STR(PRIMDTYPE)
         ENUM_STR(PRIMIF)
+        ENUM_STR(PRIMLOOPINDEX)
         ENUM_STR(PRIMLOOP)
         ENUM_STR(PRIMLISTCONSTRUCT)
         ENUM_STR(PRIMTUPLECONSTRUCT)

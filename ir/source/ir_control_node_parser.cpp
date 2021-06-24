@@ -76,6 +76,19 @@ IRCONTROLNodeParser::parseControlNode<IR::CONTROLNode::AnyType_PrimListConstruct
 
 template <>
 std::unique_ptr<nn_ir::CONTROLNode>
+IRCONTROLNodeParser::parseControlNode<IR::CONTROLNode::AnyType_PrimLoopIndexNode>(const IR::ControlNode*    ir_node,
+                                                           const nn_ir::NodeInfo& node_info) {
+    auto constant_node = ir_node->control_node_as_PrimLoopIndexNode();
+    Log::IR::E_IF(constant_node == nullptr)
+        << "IRCONTROLNodeParser::parseNNNode<Control::CONTROLNode>() => wrong node type!";
+
+    auto index = constant_node->index();
+
+    return std::make_unique<nn_ir::PrimLoopIndexNode>(node_info, index);
+}
+
+template <>
+std::unique_ptr<nn_ir::CONTROLNode>
 IRCONTROLNodeParser::parseControlNode<IR::CONTROLNode::AnyType_PrimLoopNode>(const IR::ControlNode*    ir_node,
                                                            const nn_ir::NodeInfo& node_info) {
     auto constant_node = ir_node->control_node_as_PrimLoopNode();
