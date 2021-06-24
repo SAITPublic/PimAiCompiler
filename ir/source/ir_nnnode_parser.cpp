@@ -500,6 +500,16 @@ IRNNNodeParser::parseNNNode<IR::NNNode::AnyType_AtenCopyNode>(const IR::NnNode* 
 
 template <>
 std::unique_ptr<nn_ir::NNNode>
+IRNNNodeParser::parseNNNode<IR::NNNode::AnyType_AtenDeriveIndexNode>(const IR::NnNode* ir_node, const nn_ir::NodeInfo& node_info) {
+    auto aten_zero_like_node = ir_node->nn_node_as_AtenDeriveIndexNode();
+    Log::IR::E_IF(aten_zero_like_node == nullptr) << "IRNNNodeParser::parseNNNode<NN::AtenDeriveIndexNode>() => wrong node type!";
+    int64_t step = aten_zero_like_node->step();
+    int64_t start = aten_zero_like_node->start();
+    return std::make_unique<nn_ir::AtenDeriveIndexNode>(node_info, start, step);
+}
+
+template <>
+std::unique_ptr<nn_ir::NNNode>
 IRNNNodeParser::parseNNNode<IR::NNNode::AnyType_AtenDimNode>(const IR::NnNode*      ir_node,
                                                              const nn_ir::NodeInfo& node_info) {
     auto aten_dim_node = ir_node->nn_node_as_AtenDimNode();
@@ -563,6 +573,14 @@ IRNNNodeParser::parseNNNode<IR::NNNode::AnyType_AtenSizeNode>(const IR::NnNode* 
 
 template <>
 std::unique_ptr<nn_ir::NNNode>
+IRNNNodeParser::parseNNNode<IR::NNNode::AnyType_AtenZerosLikeNode>(const IR::NnNode* ir_node, const nn_ir::NodeInfo& node_info) {
+    auto aten_zero_like_node = ir_node->nn_node_as_AtenZerosLikeNode();
+    Log::IR::E_IF(aten_zero_like_node == nullptr) << "IRNNNodeParser::parseNNNode<NN::AtenZerosLikeNode>() => wrong node type!";
+    return std::make_unique<nn_ir::AtenZerosLikeNode>(node_info);
+}
+
+template <>
+std::unique_ptr<nn_ir::NNNode>
 IRNNNodeParser::parseNNNode<IR::NNNode::AnyType_AtenZerosNode>(const IR::NnNode* ir_node,
                                                                const nn_ir::NodeInfo& node_info) {
     auto aten_zeros_node = ir_node->nn_node_as_AtenZerosNode();
@@ -599,4 +617,5 @@ std::unique_ptr<nn_ir::ShiftNode> IRNNNodeParser::getShiftNode(const nn_ir::Node
     nn_ir::NodeInfo shift_node_info(-1, node_info.name + "_shift", node_info.graph);
     return parseShiftNode(shift_node_info, ir_shift_node);
 }
+
 } // namespace nn_compiler

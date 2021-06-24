@@ -170,6 +170,7 @@ class GlobalNode;
 class DataEdge;
 class ControlEdge;
 
+class AtenDeriveIndexNode;
 class AtenZerosLikeNode;
 
 class ActivationNode;
@@ -267,7 +268,6 @@ enum class NodeType {
     LastCONTROLNode, // start describing control nodes
 
     NNNode, // start describing nn nodes
-    ATENZEROSLIKE,
     INPUT,
     CONVOLUTION,
     ACTIVATION,
@@ -293,6 +293,7 @@ enum class NodeType {
 
     ATENAPPEND,
     ATENCOPY,
+    ATENDERIVEINDEX,
     ATENDIM,
     ATENDROPOUT,
     ATENFORMAT,
@@ -302,6 +303,7 @@ enum class NodeType {
     ATENNEG,
     ATENSIZE,
     ATENZEROS,
+    ATENZEROSLIKE,
 
     LastNNNode, // end describing nn nodes
 
@@ -370,13 +372,14 @@ inline std::ostream& operator<<(std::ostream& s, nn_ir::NodeType type) {
 
         ENUM_STR(ATENAPPEND)
         ENUM_STR(ATENCOPY)
+        ENUM_STR(ATENDERIVEINDEX)
         ENUM_STR(ATENDIM)
         ENUM_STR(ATENDROPOUT)
         ENUM_STR(ATENFORMAT)
         ENUM_STR(ATENLIST)
         ENUM_STR(ATENLSTM)
         ENUM_STR(ATENNE)
-        ENUM_STR(ATENNEG)
+        ENUM_STR(ATENNEG)  
         ENUM_STR(ATENSIZE)
         ENUM_STR(ATENZEROS)
         ENUM_STR(ATENZEROSLIKE)
