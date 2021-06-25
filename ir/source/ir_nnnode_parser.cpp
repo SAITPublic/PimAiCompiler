@@ -558,6 +558,26 @@ IRNNNodeParser::parseNNNode<IR::NNNode::AnyType_AtenGetItemNode>(const IR::NnNod
 
 template <>
 std::unique_ptr<nn_ir::NNNode>
+IRNNNodeParser::parseNNNode<IR::NNNode::AnyType_AtenIntNode>(const IR::NnNode* ir_node,
+                                                             const nn_ir::NodeInfo& node_info) {
+    auto aten_int_node = ir_node->nn_node_as_AtenIntNode();
+    Log::IR::E_IF(aten_int_node == nullptr) << "IRNNNodeParser::parseNNNode<NN::AtenIntNode>() => wrong node type!";
+
+    return std::make_unique<nn_ir::AtenIntNode>(node_info);
+}
+
+template <>
+std::unique_ptr<nn_ir::NNNode>
+IRNNNodeParser::parseNNNode<IR::NNNode::AnyType_AtenItemNode>(const IR::NnNode* ir_node,
+                                                              const nn_ir::NodeInfo& node_info) {
+    auto aten_item_node = ir_node->nn_node_as_AtenItemNode();
+    Log::IR::E_IF(aten_item_node == nullptr) << "IRNNNodeParser::parseNNNode<NN::AtenItemNode>() => wrong node type!";
+
+    return std::make_unique<nn_ir::AtenItemNode>(node_info);
+}
+
+template <>
+std::unique_ptr<nn_ir::NNNode>
 IRNNNodeParser::parseNNNode<IR::NNNode::AnyType_AtenLenNode>(const IR::NnNode*      ir_node,
                                                              const nn_ir::NodeInfo& node_info) {
     auto aten_len_node = ir_node->nn_node_as_AtenLenNode();
@@ -608,6 +628,18 @@ IRNNNodeParser::parseNNNode<IR::NNNode::AnyType_AtenSliceNode>(const IR::NnNode*
     int64_t start = aten_slice_like_node->start();
     int64_t end = aten_slice_like_node->end();
     return std::make_unique<nn_ir::AtenSliceNode>(node_info, dim, start, end, step);
+}
+
+template <>
+std::unique_ptr<nn_ir::NNNode>
+IRNNNodeParser::parseNNNode<IR::NNNode::AnyType_AtenUnsqueezeNode>(const IR::NnNode* ir_node,
+                                                                   const nn_ir::NodeInfo& node_info) {
+    auto aten_unsqueeze_node = ir_node->nn_node_as_AtenUnsqueezeNode();
+    Log::IR::E_IF(aten_unsqueeze_node == nullptr)
+     << "IRNNNodeParser::parseNNNode<NN::AtenUnsqueezeNode>() => wrong node type!";
+
+    int64_t dim = aten_unsqueeze_node->dim();
+    return std::make_unique<nn_ir::AtenUnsqueezeNode>(node_info, dim);
 }
 
 template <>
