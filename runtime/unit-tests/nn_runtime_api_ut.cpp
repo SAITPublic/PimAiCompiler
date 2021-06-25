@@ -19,5 +19,3 @@ TEST(NnrtUnitTest, simpleTest)
     int ret = runtime.test();
     EXPECT_TRUE(ret == 0);
 }
-
-

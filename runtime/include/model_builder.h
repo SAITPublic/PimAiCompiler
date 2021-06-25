@@ -1,19 +1,19 @@
 #pragma once
 
-namespace nnrt {
-
-class ModelBuilder {
-  public:
-    ModelBuilder(){}
+namespace nnrt
+{
+class ModelBuilder
+{
+   public:
+    ModelBuilder() {}
 
     // TODO: NNIR(LLO) should be the output
     int compileModel(std::string torch_model_path);
 
     int preloadModel(/*NNIR(LLO) is the input */);
-  private:
 
+   private:
     // Runnable NNIR
-
 };
 
-} // namespace nnrt
+}  // namespace nnrt

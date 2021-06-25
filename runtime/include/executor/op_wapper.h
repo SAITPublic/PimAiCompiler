@@ -1,3 +1,2 @@
-// NNRuntime used ops 
+// NNRuntime used ops
 #pragma once
-

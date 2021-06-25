@@ -1,12 +1,15 @@
-#include <iostream>
 #include <string>
+#include <type_traits>
 #include <vector>
 #include <torch/script.h>
+#include "glog/logging.h"
+#include "nnrt_types.h"
 #include "executor/prim_utils.h"
+#include "executor/prim_ops.h"
 
 
-namespace nnrt {
-    
+namespace nnrt
+{
 c10::Device primDevice(const torch::Tensor& input_tensor)
 {
     // int device_idx = input_tensor.get_device();
@@ -95,6 +98,66 @@ void primListUnpack(std::vector<torch::IValue>& stack, size_t num_outputs)
     assert(list.size() == num_outputs);
     // insert the unpakced data
     stack.insert(stack.end(), list.begin(), list.end());
+}
+
+/**
+ * @brief The input to primIf is a cond with bool type
+ * the caller should choose execution edge based on the retruned value
+ *
+ * @param cond
+ * @return true/false
+ */
+bool primIf(bool cond) { return cond; }
+
+/**
+ * @brief primEndIf
+ *  The GraphGen add the prim::endif Op at the end of PrimIf's block.
+ *  Here's an example with primIf block, the input of primEndIf is %hx.3 or %hx0.2,
+ *  the output of primEndIf is the reference of primEndIf's input
+ *
+ *  %hx.2 : (Tensor, Tensor) = prim::If(%214)
+ *    block0():
+ *       %zeros.2 : Tensor = aten::zeros(%364, %24, %58, %363, %58)
+ *       %hx.3 : (Tensor, Tensor) = prim::TupleConstruct(%zeros.2, %zeros.2)
+ *       -> (%hx.3)
+ *    block1():
+ *       %hx0.2 : (Tensor, Tensor) = prim::unchecked_cast(%state1.1)
+ *       -> (%hx0.2)
+ *  out = prim::endif(%hx0.2 or %hx.3)
+ *
+ * @tparam T
+ * @param inputs
+ * @return T
+ */
+template <typename T>
+T primEndIf(T& inputs)
+{
+    auto ret = std::move<T>(inputs);
+    return ret;
+}
+
+// Scalars: FLOAT64,INT64(BOOL as treated as INT64)
+template <typename T>
+T primScalarConstant(T* data_ptr)
+{
+    if (std::is_same<T, int64_t>::value || std::is_same<T, int32_t>::value || std::is_same<T, float>::value ||
+        std::is_same<T, double>::value) {
+        return *data_ptr;
+    } else {
+        DLOG(ERROR) << "Unsupported scalar type!";
+    }
+}
+
+// STRING, DEVICE
+std::string primStrConstsnt(void* data_ptr)
+{
+    std::string ret = static_cast<char*>(data_ptr);
+    return ret;
+}
+
+torch::Tensor primTensorConstant(void* data_ptr, std::vector<int64_t>& shape, DataType dtype)
+{
+    return createPtTensor(data_ptr, shape, dtype);
 }
 
 }  // namespace nnrt

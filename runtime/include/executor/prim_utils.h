@@ -1,16 +1,18 @@
 #pragma once
 
-#include <torch/script.h>
 #include <vector>
+#include <torch/script.h>
+#include "../nnrt_types.h"
 
-namespace nnrt {
-    
-class NNRuntimeException : std::exception {
- public:
+namespace nnrt
+{
+class NNRuntimeException : std::exception
+{
+   public:
     NNRuntimeException(std::string& msg) { this->msg = msg; }
     const char* what() { return msg.c_str(); }
 
- private:
+   private:
     std::string msg;
 };
 
@@ -29,5 +31,7 @@ void push(std::vector<torch::jit::IValue>& stack, Types&&... args)
 {
     (void)std::initializer_list<int>{(push_one(stack, std::forward<Types>(args)), 0)...};
 }
+
+torch::Tensor createPtTensor(void* data_ptr, std::vector<int64_t>& shape, DataType dtype);
 
 }  // namespace nnrt

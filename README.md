@@ -60,7 +60,7 @@ $ ./build/examples/runtime/simpleMain
 [python API test]
 ```
 $ export LIBTORCH_DIR=/home/user/.local/lib/python3.6/site-packages/torch
-$ export export LD_LIBRARY_PATH=$LIBTORCH_DIR/lib:$LD_LIBRARY_PATH
+$ export LD_LIBRARY_PATH=$LIBTORCH_DIR/lib:$LD_LIBRARY_PATH
 $ export PYTHONPATH=$PYTHONPATH:/opt/rocm/lib/
 
 $ python3 ./examples/runtime/simpleMain.py

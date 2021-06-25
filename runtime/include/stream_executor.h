@@ -3,17 +3,16 @@
 #include "model_builder.h"
 #include "nnrt_types.h"
 
-namespace nnrt {
+namespace nnrt
+{
+class StreamExecutor
+{
+   public:
+    StreamExecutor() {}
 
-class StreamExecutor {
+    int inferenceModel(/* RunnableNNIR IR,*/ NnrtBuffer* inputBuffer, NnrtBuffer* outputBuffer);
 
-  public:
-    StreamExecutor(){}
-
-    int inferenceModel(/* RunnableNNIR IR,*/  NnrtBuffer* inputBuffer, NnrtBuffer* outputBuffer);
-  private:
-
-
+   private:
 };
 
-} // namespace nnrt
+}  // namespace nnrt
