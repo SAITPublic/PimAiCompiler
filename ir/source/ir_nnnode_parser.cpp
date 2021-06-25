@@ -642,6 +642,16 @@ IRNNNodeParser::parseNNNode<IR::NNNode::AnyType_AtenLSTMNode>(const IR::NnNode* 
 
 template <>
 std::unique_ptr<nn_ir::NNNode>
+IRNNNodeParser::parseNNNode<IR::NNNode::AnyType_AtenLtNode>(const IR::NnNode*      ir_node,
+                                                             const nn_ir::NodeInfo& node_info) {
+    auto aten_lt_node = ir_node->nn_node_as_AtenLtNode();
+    Log::IR::E_IF(aten_lt_node == nullptr) << "IRNNNodeParser::parseNNNode<NN::AtenLtNode>() => wrong node type!";
+
+    return std::make_unique<nn_ir::AtenLtNode>(node_info);
+}
+
+template <>
+std::unique_ptr<nn_ir::NNNode>
 IRNNNodeParser::parseNNNode<IR::NNNode::AnyType_AtenMatmulNode>(const IR::NnNode* ir_node,
                                                                 const nn_ir::NodeInfo& node_info) {
     auto aten_matmul_node = ir_node->nn_node_as_AtenMatmulNode();

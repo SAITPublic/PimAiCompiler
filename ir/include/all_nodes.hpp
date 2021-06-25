@@ -38,6 +38,7 @@
 #include "ir/include/nn_nodes/aten_len_node.hpp"
 #include "ir/include/nn_nodes/aten_list_node.hpp"
 #include "ir/include/nn_nodes/aten_lstm_node.hpp"
+#include "ir/include/nn_nodes/aten_lt_node.hpp"
 #include "ir/include/nn_nodes/aten_matmul_node.hpp"
 #include "ir/include/nn_nodes/aten_max_node.hpp"
 #include "ir/include/nn_nodes/aten_ne_node.hpp"

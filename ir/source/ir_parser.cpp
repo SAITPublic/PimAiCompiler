@@ -348,6 +348,7 @@ IRParser::IRParser() {
         {IR::NNNode::AnyType_AtenItemNode, &IRNNNodeParser::parseNNNode<IR::NNNode::AnyType_AtenItemNode>},
         {IR::NNNode::AnyType_AtenListNode, &IRNNNodeParser::parseNNNode<IR::NNNode::AnyType_AtenListNode>},
         {IR::NNNode::AnyType_AtenLSTMNode, &IRNNNodeParser::parseNNNode<IR::NNNode::AnyType_AtenLSTMNode>},
+        {IR::NNNode::AnyType_AtenLtNode, &IRNNNodeParser::parseNNNode<IR::NNNode::AnyType_AtenLtNode>},
         {IR::NNNode::AnyType_AtenMatmulNode, &IRNNNodeParser::parseNNNode<IR::NNNode::AnyType_AtenMatmulNode>},
         {IR::NNNode::AnyType_AtenMaxNode, &IRNNNodeParser::parseNNNode<IR::NNNode::AnyType_AtenMaxNode>},
         {IR::NNNode::AnyType_AtenNeNode, &IRNNNodeParser::parseNNNode<IR::NNNode::AnyType_AtenNeNode>},
