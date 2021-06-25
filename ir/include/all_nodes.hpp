@@ -41,6 +41,7 @@
 #include "ir/include/nn_nodes/aten_matmul_node.hpp"
 #include "ir/include/nn_nodes/aten_ne_node.hpp"
 #include "ir/include/nn_nodes/aten_neg_node.hpp"
+#include "ir/include/nn_nodes/aten_relu_node.hpp"
 #include "ir/include/nn_nodes/aten_select_node.hpp"
 #include "ir/include/nn_nodes/aten_size_node.hpp"
 #include "ir/include/nn_nodes/aten_slice_node.hpp"
