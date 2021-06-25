@@ -531,6 +531,21 @@ IRNNNodeParser::parseNNNode<IR::NNNode::AnyType_AtenDropoutNode>(const IR::NnNod
 
 template <>
 std::unique_ptr<nn_ir::NNNode>
+IRNNNodeParser::parseNNNode<IR::NNNode::AnyType_AtenEmbeddingNode>(const IR::NnNode*      ir_node,
+                                                             const nn_ir::NodeInfo& node_info) {
+    auto aten_embedding_node = ir_node->nn_node_as_AtenEmbeddingNode();
+    Log::IR::E_IF(aten_embedding_node == nullptr)
+    << "IRNNNodeParser::parseNNNode<NN::AtenEmbeddingNode>() => wrong node type!";
+
+    int64_t padding_idx = aten_embedding_node->padding_idx();
+    bool    scale_grad_by_freq = aten_embedding_node->scale_grad_by_freq();
+    bool    sparse = aten_embedding_node->sparse();
+
+    return std::make_unique<nn_ir::AtenEmbeddingNode>(node_info, padding_idx, scale_grad_by_freq, sparse);
+}
+
+template <>
+std::unique_ptr<nn_ir::NNNode>
 IRNNNodeParser::parseNNNode<IR::NNNode::AnyType_AtenEqNode>(const IR::NnNode*      ir_node,
                                                             const nn_ir::NodeInfo& node_info) {
     auto aten_eq_node = ir_node->nn_node_as_AtenEqNode();
