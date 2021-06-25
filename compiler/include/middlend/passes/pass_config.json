@@ -4,7 +4,9 @@
             "name"         : "DeviceLabelingPass",
             "type"         : "graph",
             "is_mandatory" : true,
-            "enable"       : true
+            "enable"       : true,
+            "ctx_data"     : [ {"name" : "DeviceLabelInfo", "mode" : "write"} ],
+            "utils"        : ["OpBasicUtil"]
         }
     ]
 }

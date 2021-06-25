@@ -99,8 +99,8 @@ void MiddlendDriver::buildPasses(const conf_json::Value&      root,
 
     for (const auto& node : root) {
         if (node.getBool("enable", false)) {
-            auto type_name           = node.getString("type", "");
-            auto pass_name           = node.getString("name", "");
+            auto type_name = node.getString("type", "");
+            auto pass_name = node.getString("name", "");
 
             if (auto utils = node.get("utils", conf_json::Value())) {
                 for (const auto& util_node : utils) {

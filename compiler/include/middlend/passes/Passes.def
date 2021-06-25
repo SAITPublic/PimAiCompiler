@@ -1,6 +1,6 @@
 #ifndef OPTIMIZATION_PASS
 #define OPTIMIZATION_PASS(PASS_TYPE)
 #endif
-// add Pass like: OPTIMIZATION_PASS(GraphLabelingPass)
+OPTIMIZATION_PASS(DeviceLabelingPass)
 
 #undef OPTIMIZATION_PASS

@@ -1,6 +1,7 @@
 #include "compiler/include/middlend/passes/pass_builder.hpp"
 
 // add pass files
+#include "compiler/include/middlend/passes/graph/device_labeling.hpp"
 
 #include <fstream>
 
