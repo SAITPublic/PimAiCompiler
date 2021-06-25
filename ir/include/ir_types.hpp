@@ -194,6 +194,7 @@ class DummyNode;
 class CopyNode;
 
 class AtenAppendNode;
+class AtenCatNode;
 class AtenCopyNode;
 class AtenDeriveIndexNode;
 class AtenDimNode;
@@ -209,13 +210,17 @@ class AtenListNode;
 class AtenLSTMNode;
 class AtenNeNode;
 class AtenNegNode;
+class AtenSelectNode;
 class AtenSizeNode;
 class AtenSliceNode;
 class AtenSubNode;
 class AtenTensorNode;
+class AtenTransposeNode;
 class AtenUnsqueezeNode;
 class AtenZerosLikeNode;
 class AtenZerosNode;
+
+class PrimEndIfNode;
 
 class ShiftNode;
 
@@ -268,6 +273,7 @@ enum class NodeType {
     PRIMDATA,
     PRIMDEVICE,
     PRIMDTYPE,
+    PRIMENDIF,
     PRIMIF,
     PRIMLISTCONSTRUCT,
     PRIMLOOPINDEX,
@@ -301,6 +307,7 @@ enum class NodeType {
     COPY,
 
     ATENAPPEND,
+    ATENCAT,
     ATENCOPY,
     ATENDERIVEINDEX,
     ATENDIM,
@@ -316,13 +323,16 @@ enum class NodeType {
     ATENLSTM,
     ATENNE,
     ATENNEG,
+    ATENSELECT,
     ATENSIZE,
     ATENSLICE,
     ATENSUB,
     ATENTENSOR,
+    ATENTRANSPOSE,
     ATENUNSQUEEZE,
     ATENZEROS,
     ATENZEROSLIKE,
+
     LastNNNode, // end describing nn nodes
 
     OPNode, // start describing op nodes
@@ -389,6 +399,7 @@ inline std::ostream& operator<<(std::ostream& s, nn_ir::NodeType type) {
         ENUM_STR(MAAELTWISE)
 
         ENUM_STR(ATENAPPEND)
+        ENUM_STR(ATENCAT)
         ENUM_STR(ATENCOPY)
         ENUM_STR(ATENDERIVEINDEX)
         ENUM_STR(ATENDIM)
@@ -404,10 +415,12 @@ inline std::ostream& operator<<(std::ostream& s, nn_ir::NodeType type) {
         ENUM_STR(ATENLSTM)
         ENUM_STR(ATENNE)
         ENUM_STR(ATENNEG)
+        ENUM_STR(ATENSELECT)
         ENUM_STR(ATENSIZE)
         ENUM_STR(ATENSLICE)
         ENUM_STR(ATENSUB)
         ENUM_STR(ATENTENSOR)
+        ENUM_STR(ATENTRANSPOSE)
         ENUM_STR(ATENUNSQUEEZE)
         ENUM_STR(ATENZEROS)
         ENUM_STR(ATENZEROSLIKE)
@@ -417,6 +430,7 @@ inline std::ostream& operator<<(std::ostream& s, nn_ir::NodeType type) {
         ENUM_STR(PRIMDATA)
         ENUM_STR(PRIMDEVICE)
         ENUM_STR(PRIMDTYPE)
+        ENUM_STR(PRIMENDIF)
         ENUM_STR(PRIMIF)
         ENUM_STR(PRIMLOOPINDEX)
         ENUM_STR(PRIMLOOP)
