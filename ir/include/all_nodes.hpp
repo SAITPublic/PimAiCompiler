@@ -33,6 +33,7 @@
 #include "ir/include/nn_nodes/aten_get_item_node.hpp"
 #include "ir/include/nn_nodes/aten_gt_node.hpp"
 #include "ir/include/nn_nodes/aten_int_node.hpp"
+#include "ir/include/nn_nodes/aten_is_node.hpp"
 #include "ir/include/nn_nodes/aten_item_node.hpp"
 #include "ir/include/nn_nodes/aten_len_node.hpp"
 #include "ir/include/nn_nodes/aten_list_node.hpp"

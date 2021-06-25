@@ -563,7 +563,7 @@ IRNNNodeParser::parseNNNode<IR::NNNode::AnyType_AtenGetItemNode>(const IR::NnNod
 template <>
 std::unique_ptr<nn_ir::NNNode>
 IRNNNodeParser::parseNNNode<IR::NNNode::AnyType_AtenGtNode>(const IR::NnNode*      ir_node,
-                                                             const nn_ir::NodeInfo& node_info) {
+                                                            const nn_ir::NodeInfo& node_info) {
     auto aten_gt_node = ir_node->nn_node_as_AtenGtNode();
     Log::IR::E_IF(aten_gt_node == nullptr) << "IRNNNodeParser::parseNNNode<NN::AtenGtNode>() => wrong node type!";
 
@@ -578,6 +578,16 @@ IRNNNodeParser::parseNNNode<IR::NNNode::AnyType_AtenIntNode>(const IR::NnNode* i
     Log::IR::E_IF(aten_int_node == nullptr) << "IRNNNodeParser::parseNNNode<NN::AtenIntNode>() => wrong node type!";
 
     return std::make_unique<nn_ir::AtenIntNode>(node_info);
+}
+
+template <>
+std::unique_ptr<nn_ir::NNNode>
+IRNNNodeParser::parseNNNode<IR::NNNode::AnyType_AtenIsNode>(const IR::NnNode*      ir_node,
+                                                             const nn_ir::NodeInfo& node_info) {
+    auto aten_is_node = ir_node->nn_node_as_AtenIsNode();
+    Log::IR::E_IF(aten_is_node == nullptr) << "IRNNNodeParser::parseNNNode<NN::AtenIsNode>() => wrong node type!";
+
+    return std::make_unique<nn_ir::AtenIsNode>(node_info);
 }
 
 template <>

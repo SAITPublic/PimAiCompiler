@@ -206,6 +206,7 @@ class AtenFormatNode;
 class AtenGetItemNode;
 class AtenGtNode;
 class AtenIntNode;
+class AtenIsNode;
 class AtenItemNode;
 class AtenLenNode;
 class AtenListNode;
@@ -329,6 +330,7 @@ enum class NodeType {
     ATENGETITEM,
     ATENGT,
     ATENINT,
+    ATENIS,
     ATENITEM,
     ATENLEN,
     ATENLIST,
@@ -425,6 +427,7 @@ inline std::ostream& operator<<(std::ostream& s, nn_ir::NodeType type) {
         ENUM_STR(ATENGETITEM)
         ENUM_STR(ATENGT)
         ENUM_STR(ATENINT)
+        ENUM_STR(ATENIS)
         ENUM_STR(ATENITEM)
         ENUM_STR(ATENLEN)
         ENUM_STR(ATENLIST)
