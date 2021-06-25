@@ -267,6 +267,8 @@ class PrimConstantNode;
 class PrimTupleConstructNode;
 class PrimDevice;
 class PrimDtype;
+class PrimEndIf;
+class PrimEndLoop;
 class PrimIf;
 class PrimListConstruct;
 class PrimLoopIndex;
@@ -277,7 +279,6 @@ class PrimTupleUnpack;
 class PrimUncheckedCast;
 class PrimUninitialized;
 
-
 enum class NodeType {
     CONTROLNode, // start describing control nodes
     PRIMBLOCK,
@@ -286,6 +287,7 @@ enum class NodeType {
     PRIMDEVICE,
     PRIMDTYPE,
     PRIMENDIF,
+    PRIMENDLOOP,
     PRIMIF,
     PRIMLISTCONSTRUCT,
     PRIMLOOPINDEX,
@@ -296,8 +298,7 @@ enum class NodeType {
     PRIMTUPLEUNPACK,
     PRIMUNCHECKEDCAST,
     PRIMUNINITIALIZED,
-
-    LastCONTROLNode, // start describing control nodes
+    LastCONTROLNode, // end describing control nodes
 
     NNNode, // start describing nn nodes
     INPUT,
@@ -463,6 +464,7 @@ inline std::ostream& operator<<(std::ostream& s, nn_ir::NodeType type) {
         ENUM_STR(PRIMDEVICE)
         ENUM_STR(PRIMDTYPE)
         ENUM_STR(PRIMENDIF)
+        ENUM_STR(PRIMENDLOOP)
         ENUM_STR(PRIMIF)
         ENUM_STR(PRIMLOOPINDEX)
         ENUM_STR(PRIMLOOP)

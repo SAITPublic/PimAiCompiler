@@ -273,6 +273,9 @@ IRParser::IRParser() {
         {IR::CONTROLNode::AnyType_PrimEndIfNode,
         &IRCONTROLNodeParser::parseControlNode<IR::CONTROLNode::AnyType_PrimEndIfNode>},
 
+        {IR::CONTROLNode::AnyType_PrimEndLoopNode,
+        &IRCONTROLNodeParser::parseControlNode<IR::CONTROLNode::AnyType_PrimEndLoopNode>},
+
         {IR::CONTROLNode::AnyType_PrimIfNode,
         &IRCONTROLNodeParser::parseControlNode<IR::CONTROLNode::AnyType_PrimIfNode>},
 

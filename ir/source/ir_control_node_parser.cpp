@@ -87,6 +87,17 @@ IRCONTROLNodeParser::parseControlNode<IR::CONTROLNode::AnyType_PrimEndIfNode>(co
 
 template <>
 std::unique_ptr<nn_ir::CONTROLNode>
+IRCONTROLNodeParser::parseControlNode<IR::CONTROLNode::AnyType_PrimEndLoopNode>(const IR::ControlNode* ir_node,
+                                                           const nn_ir::NodeInfo& node_info) {
+    auto end_loop_node = ir_node->control_node_as_PrimEndLoopNode();
+    Log::IR::E_IF(end_loop_node == nullptr)
+        << "IRCONTROLNodeParser::parseControlNode<Control::PrimEndLoopNode>() => wrong node type!";
+
+    return std::make_unique<nn_ir::PrimEndLoopNode>(node_info);
+}
+
+template <>
+std::unique_ptr<nn_ir::CONTROLNode>
 IRCONTROLNodeParser::parseControlNode<IR::CONTROLNode::AnyType_PrimIfNode>(const IR::ControlNode*    ir_node,
                                                            const nn_ir::NodeInfo& node_info) {
     auto prim_if_node = ir_node->control_node_as_PrimIfNode();
