@@ -454,6 +454,26 @@ IRNNNodeParser::parseNNNode<IR::NNNode::AnyType_AtenAppendNode>(const IR::NnNode
 
 template <>
 std::unique_ptr<nn_ir::NNNode>
+IRNNNodeParser::parseNNNode<IR::NNNode::AnyType_AtenAddNode>(const IR::NnNode* ir_node,
+                                                             const nn_ir::NodeInfo& node_info) {
+    auto aten_add_node = ir_node->nn_node_as_AtenAddNode();
+    Log::IR::E_IF(aten_add_node == nullptr)
+     << "IRNNNodeParser::parseNNNode<NN::AtenAddNode>() => wrong node type!";
+    return std::make_unique<nn_ir::AtenAddNode>(node_info);
+}
+
+template <>
+std::unique_ptr<nn_ir::NNNode>
+IRNNNodeParser::parseNNNode<IR::NNNode::AnyType_AtenAddmmNode>(const IR::NnNode* ir_node,
+                                                               const nn_ir::NodeInfo& node_info) {
+    auto aten_addmm_node = ir_node->nn_node_as_AtenAddmmNode();
+    Log::IR::E_IF(aten_addmm_node == nullptr)
+     << "IRNNNodeParser::parseNNNode<NN::AtenAddmmNode>() => wrong node type!";
+    return std::make_unique<nn_ir::AtenAddmmNode>(node_info);
+}
+
+template <>
+std::unique_ptr<nn_ir::NNNode>
 IRNNNodeParser::parseNNNode<IR::NNNode::AnyType_AtenCatNode>(const IR::NnNode* ir_node,
                                                               const nn_ir::NodeInfo& node_info) {
     auto aten_cat_node = ir_node->nn_node_as_AtenCatNode();
@@ -612,6 +632,16 @@ IRNNNodeParser::parseNNNode<IR::NNNode::AnyType_AtenLSTMNode>(const IR::NnNode* 
 
 template <>
 std::unique_ptr<nn_ir::NNNode>
+IRNNNodeParser::parseNNNode<IR::NNNode::AnyType_AtenMatmulNode>(const IR::NnNode* ir_node,
+                                                                const nn_ir::NodeInfo& node_info) {
+    auto aten_matmul_node = ir_node->nn_node_as_AtenMatmulNode();
+    Log::IR::E_IF(aten_matmul_node == nullptr)
+     << "IRNNNodeParser::parseNNNode<NN::AtenMatmulNode>() => wrong node type!";
+    return std::make_unique<nn_ir::AtenMatmulNode>(node_info);
+}
+
+template <>
+std::unique_ptr<nn_ir::NNNode>
 IRNNNodeParser::parseNNNode<IR::NNNode::AnyType_AtenNeNode>(const IR::NnNode*      ir_node,
                                                             const nn_ir::NodeInfo& node_info) {
     auto aten_ne_node = ir_node->nn_node_as_AtenNeNode();
@@ -757,4 +787,5 @@ std::unique_ptr<nn_ir::ShiftNode> IRNNNodeParser::getShiftNode(const nn_ir::Node
     nn_ir::NodeInfo shift_node_info(-1, node_info.name + "_shift", node_info.graph);
     return parseShiftNode(shift_node_info, ir_shift_node);
 }
+
 } // namespace nn_compiler
