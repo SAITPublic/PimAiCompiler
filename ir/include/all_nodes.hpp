@@ -101,3 +101,5 @@
 #include "ir/include/control_nodes/prim_tuple_index_node.hpp"
 #include "ir/include/control_nodes/prim_tuple_unpack_node.hpp"
 #include "ir/include/control_nodes/prim_unchecked_cast_node.hpp"
+#include "ir/include/control_nodes/prim_uninitialized_node.hpp"
+

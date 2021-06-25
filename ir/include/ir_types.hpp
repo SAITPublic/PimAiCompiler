@@ -272,6 +272,7 @@ class PrimTupleConstruct;
 class PrimTupleIndex;
 class PrimTupleUnpack;
 class PrimUncheckedCast;
+class PrimUninitialized;
 
 
 enum class NodeType {
@@ -291,6 +292,8 @@ enum class NodeType {
     PRIMTUPLEINDEX,
     PRIMTUPLEUNPACK,
     PRIMUNCHECKEDCAST,
+    PRIMUNINITIALIZED,
+
     LastCONTROLNode, // start describing control nodes
 
     NNNode, // start describing nn nodes
@@ -460,6 +463,7 @@ inline std::ostream& operator<<(std::ostream& s, nn_ir::NodeType type) {
         ENUM_STR(PRIMTUPLEINDEX)
         ENUM_STR(PRIMTUPLEUNPACK)
         ENUM_STR(PRIMUNCHECKEDCAST)
+        ENUM_STR(PRIMUNINITIALIZED)
 
 #undef ENUM_STR
         default:

@@ -191,4 +191,16 @@ IRCONTROLNodeParser::parseControlNode<IR::CONTROLNode::AnyType_PrimUncheckedCast
 
     return std::make_unique<nn_ir::PrimUncheckedCastNode>(node_info);
 }
+
+template <>
+std::unique_ptr<nn_ir::CONTROLNode>
+IRCONTROLNodeParser::parseControlNode<IR::CONTROLNode::AnyType_PrimUninitializedNode>(const IR::ControlNode*      ir_node,
+                                                                                      const nn_ir::NodeInfo& node_info) {
+    auto tuple_construct_node = ir_node->control_node_as_PrimUninitializedNode();
+    Log::IR::E_IF(tuple_construct_node == nullptr)
+    << "IRCONTROLNodeParser::parseControlNode<Control::PrimUninitializedNode>() => wrong node type!";
+
+    return std::make_unique<nn_ir::PrimUninitializedNode>(node_info);
+}
+
 } // namespace nn_compiler
