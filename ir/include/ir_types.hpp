@@ -212,6 +212,7 @@ class AtenLenNode;
 class AtenListNode;
 class AtenLSTMNode;
 class AtenMatmul;
+class AtenMaxNode;
 class AtenNeNode;
 class AtenNegNode;
 class AtenReluNode;
@@ -340,6 +341,7 @@ enum class NodeType {
     ATENLIST,
     ATENLSTM,
     ATENMATMUL,
+    ATENMAX,
     ATENNE,
     ATENNEG,
     ATENRELU,
@@ -438,6 +440,7 @@ inline std::ostream& operator<<(std::ostream& s, nn_ir::NodeType type) {
         ENUM_STR(ATENLIST)
         ENUM_STR(ATENLSTM)
         ENUM_STR(ATENMATMUL)
+        ENUM_STR(ATENMAX)
         ENUM_STR(ATENNE)
         ENUM_STR(ATENNEG)
         ENUM_STR(ATENRELU)
