@@ -100,6 +100,7 @@
 #include "ir/include/control_nodes/prim_end_loop_node.hpp"
 #include "ir/include/control_nodes/prim_if_node.hpp"
 #include "ir/include/control_nodes/prim_list_construct_node.hpp"
+#include "ir/include/control_nodes/prim_list_unpack_node.hpp"
 #include "ir/include/control_nodes/prim_loop_index_node.hpp"
 #include "ir/include/control_nodes/prim_loop_node.hpp"
 #include "ir/include/control_nodes/prim_raise_exception_node.hpp"

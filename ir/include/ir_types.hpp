@@ -272,6 +272,7 @@ class PrimEndIf;
 class PrimEndLoop;
 class PrimIf;
 class PrimListConstruct;
+class PrimListUnpack;
 class PrimLoopIndex;
 class PrimLoop;
 class PrimTupleConstruct;
@@ -291,6 +292,7 @@ enum class NodeType {
     PRIMENDLOOP,
     PRIMIF,
     PRIMLISTCONSTRUCT,
+    PRIMLISTUNPACK,
     PRIMLOOPINDEX,
     PRIMLOOP,
     PRIMRAISEEXCEPTION,
@@ -468,10 +470,11 @@ inline std::ostream& operator<<(std::ostream& s, nn_ir::NodeType type) {
         ENUM_STR(PRIMDTYPE)
         ENUM_STR(PRIMENDIF)
         ENUM_STR(PRIMENDLOOP)
-        ENUM_STR(PRIMIF)
+        ENUM_STR(PRIMIF)        
+        ENUM_STR(PRIMLISTCONSTRUCT)
+        ENUM_STR(PRIMLISTUNPACK)
         ENUM_STR(PRIMLOOPINDEX)
         ENUM_STR(PRIMLOOP)
-        ENUM_STR(PRIMLISTCONSTRUCT)
         ENUM_STR(PRIMRAISEEXCEPTION)
         ENUM_STR(PRIMTUPLECONSTRUCT)
         ENUM_STR(PRIMTUPLEINDEX)
