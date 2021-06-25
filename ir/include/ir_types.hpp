@@ -203,6 +203,7 @@ class AtenDimNode;
 class AtenDropoutNode;
 class AtenEmbeddingNode;
 class AtenEqNode;
+class AtenExpandNode;
 class AtenFormatNode;
 class AtenGetItemNode;
 class AtenGtNode;
@@ -337,6 +338,7 @@ enum class NodeType {
     ATENDROPOUT,
     ATENEMBEDDING,
     ATENEQ,
+    ATENEXPAND,
     ATENFORMAT,
     ATENGETITEM,
     ATENGT,
@@ -438,6 +440,7 @@ inline std::ostream& operator<<(std::ostream& s, nn_ir::NodeType type) {
         ENUM_STR(ATENDROPOUT)
         ENUM_STR(ATENEMBEDDING)
         ENUM_STR(ATENEQ)
+        ENUM_STR(ATENEXPAND)
         ENUM_STR(ATENFORMAT)
         ENUM_STR(ATENGETITEM)
         ENUM_STR(ATENGT)

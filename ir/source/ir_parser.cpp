@@ -346,6 +346,7 @@ IRParser::IRParser() {
         {IR::NNNode::AnyType_AtenDropoutNode, &IRNNNodeParser::parseNNNode<IR::NNNode::AnyType_AtenDropoutNode>},
         {IR::NNNode::AnyType_AtenEmbeddingNode, &IRNNNodeParser::parseNNNode<IR::NNNode::AnyType_AtenEmbeddingNode>},
         {IR::NNNode::AnyType_AtenEqNode, &IRNNNodeParser::parseNNNode<IR::NNNode::AnyType_AtenEqNode>},
+        {IR::NNNode::AnyType_AtenExpandNode, &IRNNNodeParser::parseNNNode<IR::NNNode::AnyType_AtenExpandNode>},
         {IR::NNNode::AnyType_AtenFormatNode, &IRNNNodeParser::parseNNNode<IR::NNNode::AnyType_AtenFormatNode>},
         {IR::NNNode::AnyType_AtenGetItemNode, &IRNNNodeParser::parseNNNode<IR::NNNode::AnyType_AtenGetItemNode>},
         {IR::NNNode::AnyType_AtenGtNode, &IRNNNodeParser::parseNNNode<IR::NNNode::AnyType_AtenGtNode>},

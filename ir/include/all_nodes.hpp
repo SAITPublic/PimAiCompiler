@@ -30,7 +30,7 @@
 #include "ir/include/nn_nodes/aten_dropout_node.hpp"
 #include "ir/include/nn_nodes/aten_embedding_node.hpp"
 #include "ir/include/nn_nodes/aten_eq_node.hpp"
-#include "ir/include/nn_nodes/aten_embedding_node.hpp"
+#include "ir/include/nn_nodes/aten_expand_node.hpp"
 #include "ir/include/nn_nodes/aten_format_node.hpp"
 #include "ir/include/nn_nodes/aten_get_item_node.hpp"
 #include "ir/include/nn_nodes/aten_gt_node.hpp"
