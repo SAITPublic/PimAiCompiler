@@ -290,6 +290,15 @@ IRParser::IRParser() {
 
         {IR::CONTROLNode::AnyType_PrimTupleConstructNode,
         &IRCONTROLNodeParser::parseControlNode<IR::CONTROLNode::AnyType_PrimTupleConstructNode>},
+
+        {IR::CONTROLNode::AnyType_PrimTupleIndexNode,
+        &IRCONTROLNodeParser::parseControlNode<IR::CONTROLNode::AnyType_PrimTupleIndexNode>},
+
+        {IR::CONTROLNode::AnyType_PrimTupleUnpackNode,
+        &IRCONTROLNodeParser::parseControlNode<IR::CONTROLNode::AnyType_PrimTupleUnpackNode>},
+
+        {IR::CONTROLNode::AnyType_PrimUncheckedCastNode,
+        &IRCONTROLNodeParser::parseControlNode<IR::CONTROLNode::AnyType_PrimUncheckedCastNode>},
     };
 
     nn_node_parse_func_map_ = {

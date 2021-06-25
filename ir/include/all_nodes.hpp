@@ -95,3 +95,6 @@
 #include "ir/include/control_nodes/prim_loop_node.hpp"
 #include "ir/include/control_nodes/prim_raise_exception_node.hpp"
 #include "ir/include/control_nodes/prim_tuple_construct_node.hpp"
+#include "ir/include/control_nodes/prim_tuple_index_node.hpp"
+#include "ir/include/control_nodes/prim_tuple_unpack_node.hpp"
+#include "ir/include/control_nodes/prim_unchecked_cast_node.hpp"
