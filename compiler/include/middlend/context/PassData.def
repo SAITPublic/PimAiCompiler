@@ -1,6 +1,6 @@
 #ifndef PASS_DATA
 #define PASS_DATA(DATA_TYPE)
 #endif
-// add PASS_DATA like: PASS_DATA(Schedule)
+PASS_DATA(DeviceLabelInfo)
 
 #undef PASS_DATA

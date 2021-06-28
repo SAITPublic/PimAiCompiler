@@ -1,6 +1,7 @@
 #include "compiler/include/middlend/context/compilation_context_builder.hpp"
 
 // Add new CompilationContext file here
+#include "compiler/include/middlend/context/device_label_info.hpp"
 
 namespace nn_compiler {
 
