@@ -1,5 +1,7 @@
 #include "compiler/include/middlend/utils/util_builder.hpp"
 
+#include "compiler/include/middlend/utils/op_basic_util.hpp"
+
 #include "common/include/utility.hpp"
 
 namespace nn_compiler {

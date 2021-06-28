@@ -1,7 +1,7 @@
 #ifndef UTIL
 #define UTIL(UTIL_TYPE)
 #endif
-// add UTIL like: UTIL(BlobTransformUtil)
+UTIL(OpBasicUtil)
 
 #undef UTIL
 
