@@ -9,9 +9,8 @@ set(CXX_FLAGS "-std=c++11")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}  ${HIPCC_FLAGS}")
 
 add_library(nn_runtime SHARED ${runtime_source})
-message("1111111111111 ${runtime_source}")
 target_include_directories(nn_runtime PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include)
-target_link_libraries (nn_runtime hsakmt glog torch)
+target_link_libraries (nn_runtime hsakmt glog torch c10)
 
 install ( TARGETS nn_runtime LIBRARY DESTINATION ${ROCM_PATH}/lib/)
 install ( FILES ${CMAKE_CURRENT_SOURCE_DIR}/../include/nn_runtime.h DESTINATION ${ROCM_PATH}/include )
