@@ -1,9 +1,9 @@
 #include <string>
-#include <type_traits>
+#include <unordered_map>
 #include <vector>
 #include <torch/script.h>
 #include "glog/logging.h"
-#include "nnrt_types.h"
+#include "stream_executor.h"
 #include "executor/prim_utils.h"
 #include "executor/prim_ops.h"
 
@@ -158,6 +158,39 @@ std::string primStrConstsnt(void* data_ptr)
 torch::Tensor primTensorConstant(void* data_ptr, std::vector<int64_t>& shape, DataType dtype)
 {
     return createPtTensor(data_ptr, shape, dtype);
+}
+
+std::vector<torch::Tensor> primEndLoop(const std::vector<torch::Tensor>& inputs) { return std::move(inputs); }
+
+// blobs is a Global table
+void primLoop(int max_trip_cnt, torch::Tensor& cond, int op_id, std::unordered_map<int, torch::Tensor>& blobs)
+{
+    // In Graphgen, Each PrimLoop Op contains a loop_index
+    // example: for(loop_index = 0; loop_index < max_trip_cnt; loop_index++) { }
+    OpNodeDescription* loop_index_node = getNextExecutionOp(new OpNodeDescription(op_id, "PrimLoop"));
+
+    // Set initail value for loop_index, default is zero
+    int loop_index = blobs.find(loop_index_node->id)->second.item().toInt();
+    loop_index = 0;
+    // modify the blob in blobs'table
+    blobs[loop_index_node->id] = torch::tensor(loop_index);
+
+    // skip LoopIndexNode
+    OpNodeDescription* loop_start_op  = getNextExecutionOp(loop_index_node);
+    OpNodeDescription* op_node = loop_start_op;
+    
+    // Generate a Loop
+    while (loop_index < max_trip_cnt && cond.item().toBool()) {
+        while (op_node->type != "PrimEndLoop") {
+            // the cond may changed while execution
+            executeOp(op_node);
+            op_node = getNextExecutionOp(op_node);
+        }
+        loop_index++;
+        blobs[loop_index_node->id] = torch::tensor(loop_index);
+        // move to start
+        op_node = loop_start_op;
+    }
 }
 
 }  // namespace nnrt

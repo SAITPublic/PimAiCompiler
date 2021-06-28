@@ -27,3 +27,13 @@ enum DataType {
     NONE,
     LIST
 };
+
+
+struct OpNodeDescription {
+    int id;
+    std::string type;
+
+    OpNodeDescription() {}
+    OpNodeDescription(int id, std::string type) : id(id), type(type) {}
+
+};

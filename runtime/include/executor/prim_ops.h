@@ -1,5 +1,6 @@
 #pragma once
 
+#include <unordered_map>
 #include <vector>
 #include <torch/script.h>
 #include "../nnrt_types.h"
@@ -37,5 +38,9 @@ T primScalarConstant(T* data_ptr);
 std::string primStrConstsnt(void* data_ptr);
 
 torch::Tensor primTensorConstant(void* data_ptr, std::vector<int64_t>& shape, DataType dtype);
+
+void primLoop(int max_trip_cnt, torch::Tensor& cond, std::unordered_map<int, torch::Tensor>& blobs);
+
+std::vector<torch::Tensor> primEndLoop(const std::vector<torch::Tensor>& inputs);
 
 }  // namespace nnrt
