@@ -30,9 +30,18 @@ class MiddlendDriver {
     /**
      * @brief     initialize a compilation pipeline
      * @details   This function initialize a compilation pipeline
+     * @inputs    std::string& in_ir_file_path
      * @returns   return code
      */
-    RetVal initialize();
+    RetVal initialize(const std::string& in_ir_file_path);
+
+    /**
+     * @brief     initialize a compilation pipeline
+     * @details   This function initialize a compilation pipeline
+     * @inputs    std::vector<std::unique_ptr<nn_compiler::nn_ir::NNIR>> NNIR_graphs
+     * @returns   return code
+     */
+    RetVal initialize(const std::vector<std::shared_ptr<nn_compiler::nn_ir::NNIR>>& NNIR_graphs);
 
     /**
      * @brief   Import IR file and compose a pass pipeline
@@ -63,6 +72,8 @@ class MiddlendDriver {
     RetVal finalize();
 
  private:
+    std::string in_ir_file_path_ = "";
+
     void importIR();
 
     void buildPasses();

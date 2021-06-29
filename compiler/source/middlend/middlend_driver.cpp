@@ -6,10 +6,6 @@
 #include "compiler/include/middlend/middlend_driver.hpp"
 
 /// Command-line options
-// File path
-static cl_opt::Option<std::string>
-    in_ir_file_path(std::vector<std::string>{"-i", "--input"}, "<file>", "IR file path", cl_opt::Required::YES);
-
 static cl_opt::Option<int> verify_level("-v",
                                         "<level>",
                                         "verification level. Possible values: 0, 1, 2 (default: 0)",
@@ -26,14 +22,23 @@ static cl_opt::Option<std::string> pass_config_file_path(std::vector<std::string
 namespace nn_compiler {
 namespace middlend {
 
-RetVal MiddlendDriver::initialize() {
+RetVal MiddlendDriver::initialize(const std::string& in_ir_file_path) {
+    in_ir_file_path_ = in_ir_file_path;
+    importIR();
+
+    return RetVal::SUCCESS;
+}
+
+RetVal MiddlendDriver::initialize(const std::vector<std::shared_ptr<nn_compiler::nn_ir::NNIR>>& NNIR_graphs) {
+    for(auto iter = NNIR_graphs.begin(); iter != NNIR_graphs.end(); iter++) {
+        graphs_.push_back(*iter);
+    }
+
     return RetVal::SUCCESS;
 }
 
 RetVal MiddlendDriver::build() {
     Log::ME::I() << "NNCompiler MiddlendDriver::build() is called";
-    importIR();
-
     buildPasses();
 
     return RetVal::SUCCESS;
@@ -73,7 +78,7 @@ RetVal MiddlendDriver::finalize() {
 
 void MiddlendDriver::importIR() {
     IRImporter ir_importer;
-    ir_importer.getNNIRFromFile(in_ir_file_path, graphs_);
+    ir_importer.getNNIRFromFile(in_ir_file_path_, graphs_);
 }
 
 void MiddlendDriver::buildPasses() {
