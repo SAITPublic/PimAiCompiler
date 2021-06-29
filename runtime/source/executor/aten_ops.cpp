@@ -1,10 +1,65 @@
 //
 // Created by heguoqiang on 2021/6/23.
 //
+#include "glog/logging.h"
 #include "executor/aten_ops.h"
 
 namespace nnrt
 {
+int64_t atenDeriveIndex(int64_t start, int64_t index, int64_t step) { return start + index * step; }
+
+static int64_t normalizeIndex(int64_t idx, int64_t list_size)
+{
+    if (idx < 0) {
+        // Handle negative indexing
+        idx = list_size + idx;
+    }
+    return idx;
+}
+
+at::IValue atenGetItem(const c10::List<at::IValue> &list, int idx)
+{
+    const int64_t list_size = list.size();
+    const int64_t normalized_idx = normalizeIndex(idx, list_size);
+    if (normalized_idx < 0 || normalized_idx >= list_size) {
+        throw std::out_of_range("list index out of range");
+    }
+    return list.get(normalized_idx);
+}
+
+bool atenIs(const at::IValue &self, const at::IValue &other) { return self.is(other); }
+
+void atenAppend(c10::List<at::IValue> list, at::IValue el) { list.push_back(std::move(el)); }
+
+int64_t atenDim(const at::Tensor &tensor) { return tensor.dim(); }
+
+int64_t atenLen(const c10::List<at::IValue> &list) { return list.size(); }
+
+int64_t atenInt(const at::Tensor &a) { return a.item<int64_t>(); }
+
+int64_t atenInt(const bool &b) { return static_cast<int64_t>(b); }
+
+int64_t atenInt(const float &f) { return static_cast<int64_t>(f); }
+
+int64_t atenInt(const at::IValue &scalar)
+{
+    if (scalar.isInt()) {
+        return scalar.toInt();
+    } else {
+        return static_cast<int64_t>(scalar.toScalar().toInt());
+    }
+}
+
+c10::List<std::string> atenList(std::string &str)
+{
+    c10::List<std::string> chars;
+    chars.reserve(str.size());
+    for (auto c : str) {
+        chars.push_back(std::string(1, c));
+    }
+    return chars;
+}
+
 at::Tensor atenAdd(const at::Tensor &self, at::Scalar other, at::Scalar alpha) { return at::add(self, other, alpha); }
 
 at::Tensor atenAdd(const at::Tensor &self, const at::Tensor &other, at::Scalar alpha)
@@ -31,6 +86,7 @@ at::Tensor atenAddmm(const at::Tensor &self, const at::Tensor &mat1, const at::T
 at::Tensor atenCat(at::TensorList tensors, int64_t dim) { return at::cat(tensors, dim); }
 
 at::Tensor atenCat(at::TensorList tensors, at::Dimname dim) { return at::cat(tensors, dim); }
+
 at::Tensor atenCeil(const at::Tensor &self) { return at::ceil(self); }
 
 at::Tensor &atenCopy_(at::Tensor &self, const at::Tensor &src, bool non_blocking)
@@ -57,6 +113,28 @@ at::Tensor atenEq(const at::Tensor &self, const at::Scalar &other) { return at::
 at::Tensor atenExpand(const at::Tensor &self, at::IntArrayRef size, bool implicit)
 {
     return at::native::expand(self, size, implicit);
+}
+
+static std::string atenFormat(const std::string &fmt)
+{
+    int index = fmt.find_first_of("{}");
+    if (index != std::string::npos) {
+        DLOG(ERROR) << "Too few arguments for format string:" << fmt;
+    }
+    return fmt;
+}
+
+template <typename T, typename... Types>
+std::string atenFormat(std::string &fmt, const T &next, const Types &... args)
+{
+    int index = fmt.find_first_of("{}");
+    if (index == std::string::npos) {
+        return fmt;
+    }
+    std::stringstream oss;
+    oss << next;
+    fmt.replace(index, 2, oss.str());
+    return atenFormat(fmt, args...);
 }
 
 at::Tensor atenEq(const at::Tensor &self, const at::Tensor &other) { return at::eq(self, other); }
@@ -158,10 +236,12 @@ at::Tensor atenTo(const at::Tensor &self, const at::Tensor &other, bool non_bloc
 }
 
 at::Tensor atenTranspose(const at::Tensor &self, int64_t dim0, int64_t dim1) { return at::transpose(self, dim0, dim1); }
+
 at::Tensor atenTranspose(const at::Tensor &self, at::Dimname dim0, at::Dimname dim1)
 {
     return at::transpose(self, dim0, dim1);
 }
+
 at::Tensor atenUnsqueeze(const at::Tensor &self, int64_t dim) { return at::unsqueeze(self, dim); }
 
 at::Tensor atenZeros(at::IntArrayRef size, c10::optional<at::DimnameList> names, at::TensorOptions options)
