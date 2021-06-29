@@ -20,7 +20,7 @@ int main(int argc, const char* argv[]) {
     NnrtBuffer *inputBuffer = nullptr;
     NnrtBuffer *outputBuffer = nullptr;
     
-    runtime.inferenceModel(inputBuffer, outputBuffer);
+    // runtime.inferenceModel(inputBuffer, outputBuffer);
 
     google::ShutdownGoogleLogging();
     return 0;

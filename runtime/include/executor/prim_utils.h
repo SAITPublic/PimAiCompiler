@@ -1,5 +1,6 @@
 #pragma once
 
+#include <exception>
 #include <vector>
 #include <torch/script.h>
 #include "../nnrt_types.h"

@@ -1,18 +1,19 @@
 #pragma once
 
 #include <string>
+#include <torch/script.h>
 #include "model_builder.h"
 #include "nnrt_types.h"
 
-namespace nnrt
-{
-class StreamExecutor
-{
-   public:
-    StreamExecutor() {}
+namespace nnrt {
 
-    int inferenceModel(/* RunnableNNIR IR,*/ NnrtBuffer* inputBuffer, NnrtBuffer* outputBuffer);
+class StreamExecutor {
 
+  public:
+    StreamExecutor(){}
+
+    int inferenceModel(/* RunnableNNIR IR,*/  NnrtBuffer* inputBuffer, NnrtBuffer* outputBuffer);
+    int inferenceModel(const std::vector<torch::Tensor>& input_tensors, std::vector<torch::Tensor>& output_tensors);
    private:
 };
 

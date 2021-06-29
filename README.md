@@ -35,6 +35,18 @@ if you do not have libtorch, you can get it from 75.12.84.67:/home/srcxfim/share
 and install the torch in container first
 ```
 $ pip install torch-1.7.0a0-cp36-cp36m-linux_x86_64.whl
+
+```
+
+**modify Caffe2Targets.cmake**, while `find_package(Torch REQUIRED)` can't find **gloo_hip** 
+
+```
+$ cd $LIBTORCH_DIR/share/cmake/Caffe2
+
+# delete **gloo_hip**
+Caffe2Targets.cmake 93: INTERFACE_LINK_LIBRARIES c10_hip;torch_cpu_library; ... gloo_hip" 
+Caffe2Targets.cmake 161: foreach(_target "protobuf::libprotobuf" "gloo_hip" )
+
 ```
 
 [clean build & install]

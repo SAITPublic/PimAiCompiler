@@ -1,6 +1,5 @@
-
-
 #include "stream_executor.h"
+#include <torch/script.h>
 #include "nnrt_types.h"
 
 namespace nnrt
@@ -27,5 +26,10 @@ OpNodeDescription* getNextExecutionOp(OpNodeDescription* cur_op)
     // TODO
 }
 
-} // namespace nnrt
+int StreamExecutor::inferenceModel(const std::vector<torch::Tensor>& input_tensors, std::vector<torch::Tensor>& output_tensors)
+{
+    return 0;
+}
+
+}  // namespace nnrt
 
