@@ -194,12 +194,14 @@ class DummyNode;
 class CopyNode;
 
 class AtenAppendNode;
-class AtenAdd;
-class AtenAddmm;
+class AtenAddNode;
+class AtenAddmmNode;
 class AtenCatNode;
+class AtenCeilNode;
 class AtenCopyNode;
 class AtenDeriveIndexNode;
 class AtenDimNode;
+class AtenDivNode;
 class AtenDropoutNode;
 class AtenEmbeddingNode;
 class AtenEqNode;
@@ -214,7 +216,7 @@ class AtenLenNode;
 class AtenListNode;
 class AtenLSTMNode;
 class AtenLtNode;
-class AtenMatmul;
+class AtenMatmulNode;
 class AtenMaxNode;
 class AtenNeNode;
 class AtenNegNode;
@@ -224,12 +226,11 @@ class AtenSizeNode;
 class AtenSliceNode;
 class AtenSubNode;
 class AtenTensorNode;
+class AtenToNode;
 class AtenTransposeNode;
 class AtenUnsqueezeNode;
 class AtenZerosLikeNode;
 class AtenZerosNode;
-
-class PrimEndIfNode;
 
 class ShiftNode;
 
@@ -266,21 +267,22 @@ class MAAEltwiseNode;
 
 class PrimBlockNode;
 class PrimConstantNode;
+class PrimDataNode;
+class PrimDeviceNode;
+class PrimDtypeNode;
+class PrimEndIfNode;
+class PrimEndLoopNode;
+class PrimIfNode;
+class PrimListConstructNode;
+class PrimListUnpackNode;
+class PrimLoopIndexNode;
+class PrimLoopNode;
+class PrimRaiseExceptionNode;
 class PrimTupleConstructNode;
-class PrimDevice;
-class PrimDtype;
-class PrimEndIf;
-class PrimEndLoop;
-class PrimIf;
-class PrimListConstruct;
-class PrimListUnpack;
-class PrimLoopIndex;
-class PrimLoop;
-class PrimTupleConstruct;
-class PrimTupleIndex;
-class PrimTupleUnpack;
-class PrimUncheckedCast;
-class PrimUninitialized;
+class PrimTupleIndexNode;
+class PrimTupleUnpackNode;
+class PrimUncheckedCastNode;
+class PrimUninitializedNode;
 
 enum class NodeType {
     CONTROLNode, // start describing control nodes
@@ -328,9 +330,9 @@ enum class NodeType {
     DUMMY,
     COPY,
 
-    ATENAPPEND,
     ATENADD,
     ATENADDMM,
+    ATENAPPEND,
     ATENCAT,
     ATENCEIL,
     ATENCOPY,
