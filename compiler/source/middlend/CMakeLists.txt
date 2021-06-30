@@ -6,3 +6,4 @@ add_library(middlend "STATIC" ${middlend_src})
 
 target_link_libraries(middlend common)
 target_link_libraries(middlend ir)
+target_link_libraries(middlend -lstdc++fs)

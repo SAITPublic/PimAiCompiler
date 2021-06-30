@@ -14,10 +14,13 @@ static cl_opt::Option<int> verify_level("-v",
                                         static_cast<int>(nn_compiler::PassManager<>::VerificationLevelType::NONE),
                                         std::vector<std::string>{"0", "1", "2"});
 
-static cl_opt::Option<std::string> pass_config_file_path(std::vector<std::string>{"-c", "--configuration"},
-                                                         "<file>",
-                                                         "passes configuration file path",
-                                                         cl_opt::Required::YES);
+static cl_opt::Option<std::string>
+        pass_config_file_path("-c",
+                              "<configuration file>",
+                              "pass config file path, default: compiler/include/middlend/passes/pass_config.json",
+                              cl_opt::Required::NO,
+                              cl_opt::Hidden::NO,
+                              "compiler/include/middlend/passes/pass_config.json");
 
 namespace nn_compiler {
 namespace middlend {
