@@ -10,19 +10,19 @@
 using namespace nnrt;
 
 int main(int argc, const char* argv[]) {
-    google::InitGoogleLogging(argv[0]);
-    FLAGS_logtostderr =true;
-    FLAGS_colorlogtostderr =true; 
-    LOG(INFO) << "Hello,info! ";
-    NNRuntime runtime("/home/rnnt.torchscript");
+    LOG(INFO) << "start runtime! ";
+    if (argc <2 ) {
+        LOG(ERROR) << "Usage: ./simpleMian model_path!";
+        return -1;
+
+    }
+    NNRuntime runtime(argv[1]);
 
     runtime.test(); 
-    NnrtBuffer *inputBuffer = nullptr;
-    NnrtBuffer *outputBuffer = nullptr;
     
-    // runtime.inferenceModel(inputBuffer, outputBuffer);
-
-    google::ShutdownGoogleLogging();
+    std::vector<torch::Tensor> input_tensors;
+    input_tensors.push_back(torch::zeros({10,10}, torch::kF16));
+    auto output_tensors = runtime.inferenceModel(input_tensors);
     return 0;
 }
 

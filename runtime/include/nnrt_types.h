@@ -1,13 +1,10 @@
 #pragma once
 
 #include "osal_types.h"
+#include "common/include/types.hpp"
 
 namespace nnrt
 {
-typedef struct __NnrtBuffer {
-    void* addr;   /*!< buffer address */
-    int32_t size; /*!< size of buffer */
-} NnrtBuffer;
 
 // these dtype are same with GraphGen
 enum DataType {

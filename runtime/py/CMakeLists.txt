@@ -47,7 +47,7 @@ find_library(TORCH_PYTHON_LIBRARY torch_python PATHS "${TORCH_INSTALL_PREFIX}/li
 
 target_include_directories(Nnrt PRIVATE ${TORCH_INCLUDE_DIR})
 target_link_libraries(Nnrt PRIVATE nn_runtime pybind11::module pybind11::lto ${TORCH_LIBRARIES} ${TORCH_PYTHON_LIBRARY})
-set_property(TARGET Nnrt PROPERTY CXX_STANDARD 14)
+set_property(TARGET Nnrt PROPERTY CXX_STANDARD 17)
 
 
 pybind11_extension(Nnrt)

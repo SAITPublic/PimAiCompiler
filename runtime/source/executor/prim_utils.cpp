@@ -1,9 +1,9 @@
+#include "executor/prim_utils.h"
 #include <torch/script.h>
 #include <stdexcept>
 #include <vector>
 #include "glog/logging.h"
 #include "nnrt_types.h"
-#include "executor/prim_utils.h"
 
 namespace nnrt
 {

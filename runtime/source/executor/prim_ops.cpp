@@ -1,7 +1,9 @@
+#include "executor/prim_ops.h"
+#include <torch/script.h>
 #include <string>
 #include <unordered_map>
 #include <vector>
-#include <torch/script.h>
+#include "executor/prim_utils.h"
 #include "glog/logging.h"
 #include "stream_executor.h"
 #include "executor/prim_utils.h"

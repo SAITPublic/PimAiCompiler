@@ -9,7 +9,11 @@ import Nnrt
 
 if __name__ == '__main__':
     # help(Nnrt)
-    rt = Nnrt.NNRuntime("/home/rnnt.torchscript")
+    if len(sys.argv) < 2:
+        print("Usage: simpleMain.py model_path!")
+        exit()
+
+    rt = Nnrt.NNRuntime(sys.argv[1])
     rt.test()
 
     inputs = [torch.randn(5, 5) for i in range(3)]

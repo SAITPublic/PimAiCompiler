@@ -5,6 +5,7 @@ add_subdirectory(middlend)
 include_directories(${PROJECT_SOURCE_DIR})
 include_directories(${PROJECT_SOURCE_DIR}/compiler/include)
 
+set(CMAKE_CXX_FLAGS "-std=c++17 -fPIC")
 file(GLOB_RECURSE nncompiler_src *.cpp)
 add_library(nncompiler "STATIC" ${nncompiler_src})
 

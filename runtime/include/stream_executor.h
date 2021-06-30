@@ -12,8 +12,7 @@ class StreamExecutor {
   public:
     StreamExecutor(){}
 
-    int inferenceModel(/* RunnableNNIR IR,*/  NnrtBuffer* inputBuffer, NnrtBuffer* outputBuffer);
-    int inferenceModel(const std::vector<torch::Tensor>& input_tensors, std::vector<torch::Tensor>& output_tensors);
+    RetVal inferenceModel(const std::vector<torch::Tensor>& input_tensors, std::vector<torch::Tensor>& output_tensors);
    private:
 };
 

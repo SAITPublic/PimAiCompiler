@@ -1,19 +1,30 @@
 #pragma once
 
+#include "ir/include/nn_ir.hpp"
+
+
+namespace nncir = nn_compiler::nn_ir;
+
 namespace nnrt
 {
 class ModelBuilder
 {
    public:
-    ModelBuilder() {}
+    ModelBuilder(std::string model_path) {
+        this->model_path = model_path;
+        this->runnable_ir = nullptr;
+    }
 
-    // TODO: NNIR(LLO) should be the output
-    int compileModel(std::string torch_model_path);
+    // compiler intput model_path; output NNIR(LLO)
+    RetVal compileModel();
 
-    int preloadModel(/*NNIR(LLO) is the input */);
+    RetVal preloadModel();
 
-   private:
     // Runnable NNIR
+    std::shared_ptr<nncir::NNIR> runnable_ir;
+   private:
+    std::string model_path;
+
 };
 
 }  // namespace nnrt

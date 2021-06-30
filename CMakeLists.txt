@@ -18,8 +18,11 @@ if(GCC_EXPECTED_VERSION VERSION_GREATER CMAKE_CXX_COMPILER_VERSION)
     message(FATAL_ERROR "GCC: NNCompiler-c++ requires atleast version ${GCC_EXPECTED_VERSION}")
 endif()
 
+add_definitions(-DC10_USE_GLOG)
+
 #include(Torch.cmake)
-include_directories("${PROJECT_SOURCE_DIR}/runtime/include"
+include_directories("${PROJECT_SOURCE_DIR}"
+                    "${PROJECT_SOURCE_DIR}/runtime/include"
                     "${PROJECT_SOURCE_DIR}/external_libs/include"
                     "${ROCM_PATH}/include" "${LIBTORCH_DIR}/include/")
 link_directories("${ROCM_PATH}/hsa/lib" "${ROCM_PATH}/libhsakmt/lib" "${ROCM_PATH}/lib" "${PROJECT_SOURCE_DIR}/external_libs" "${LIBTORCH_DIR}/lib/")
@@ -35,6 +38,6 @@ add_subdirectory(ir)
 add_subdirectory(runtime)
 add_subdirectory(compiler)
 #add_subdirectory(python_libs)
-# add_subdirectory(examples)
+add_subdirectory(examples)
 #add_subdirectory(external_libs)
 add_dependencies(nn_runtime flatc_cpp_generator)

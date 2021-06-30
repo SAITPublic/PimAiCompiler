@@ -5,7 +5,7 @@
 #include <vector>
 #include "model_builder.h"
 #include "nnrt_types.h"
-#include "stream_executor.h"
+#include "executor/stream_executor.h"
 
 namespace nnrt
 {
@@ -16,8 +16,6 @@ class NNRuntime
 
     NNRuntime(const std::string torch_model_path);
 
-    // int inferenceModel(NnrtBuffer* inputBuffer, NnrtBuffer* outputBuffer);
-    
     std::vector<torch::Tensor> inferenceModel(const std::vector<torch::Tensor>& input_tensors);
 
     int test(void);

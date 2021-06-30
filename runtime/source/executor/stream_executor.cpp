@@ -1,18 +1,25 @@
-#include "stream_executor.h"
+#include "executor/stream_executor.h"
 #include <torch/script.h>
 #include "nnrt_types.h"
+#include "ir/include/nn_ir.hpp"
+
+namespace nncir = nn_compiler::nn_ir;
 
 namespace nnrt
 {
-int StreamExecutor::inferenceModel(/* RunnableNNIR IR,*/ NnrtBuffer* inputBuffer, NnrtBuffer* outputBuffer)
+
+RetVal StreamExecutor::inferenceModel(const std::shared_ptr<nncir::NNIR> graph, const std::vector<torch::Tensor>& input_tensors,
+                                   std::vector<torch::Tensor>& output_tensors)
 {
-    return 0;
+    for (auto&& node : graph->getNodes()) {
+        LOG(INFO) <<"Node id:" <<node.getId() <<" name:" <<node.getName() << " type:" << node.getNodeType();
+    }
+    return RetVal::SUCCESS;
 }
 
-// execute current op in runtime
 void executeOp(OpNodeDescription* cur_op)
 {
-    // TODO
+
 }
 
 /**
@@ -24,12 +31,9 @@ void executeOp(OpNodeDescription* cur_op)
 OpNodeDescription* getNextExecutionOp(OpNodeDescription* cur_op)
 {
     // TODO
+    return nullptr;
 }
 
-int StreamExecutor::inferenceModel(const std::vector<torch::Tensor>& input_tensors, std::vector<torch::Tensor>& output_tensors)
-{
-    return 0;
-}
 
 }  // namespace nnrt
 
