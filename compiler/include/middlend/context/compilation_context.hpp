@@ -3,7 +3,7 @@
 #include "common/include/ctti.hpp"
 #include "common/include/pretty_print.hpp"
 
-#include "compiler/include/middlend/common/log.hpp"
+#include "compiler/include/common/log.hpp"
 
 #include <unordered_map>
 

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "compiler/include/middlend/common/log.hpp"
+#include "compiler/include/common/log.hpp"
 
 #include "common/include/ctti.hpp"
 

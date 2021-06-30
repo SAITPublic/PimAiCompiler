@@ -1,6 +1,6 @@
 #include "common/include/command_line_parser.hpp"
 
-#include "compiler/include/middlend/common/log.hpp"
+#include "compiler/include/common/log.hpp"
 #include "ir/include/ir_importer.hpp"
 
 #include "compiler/include/middlend/middlend_driver.hpp"

@@ -3,7 +3,7 @@
 #include <optional>
 #include <regex> // NOLINT
 
-#include "compiler/include/middlend/common/log.hpp"
+#include "compiler/include/common/log.hpp"
 #include "compiler/include/middlend/passes/pass_service/conf_json/conf_json.hpp"
 
 namespace conf_json {

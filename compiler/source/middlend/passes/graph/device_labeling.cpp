@@ -1,6 +1,6 @@
 #include "common/include/common.hpp"
 #include "ir/include/ir_includes.hpp"
-#include "compiler/include/middlend/common/log.hpp"
+#include "compiler/include/common/log.hpp"
 
 #include "compiler/include/middlend/passes/graph/device_labeling.hpp"
 

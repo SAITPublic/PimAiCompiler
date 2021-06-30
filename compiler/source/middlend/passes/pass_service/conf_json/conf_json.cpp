@@ -5,7 +5,7 @@
 #include "common/include/algorithm_ext.hpp"
 #include "common/include/utility.hpp"
 
-#include "compiler/include/middlend/common/log.hpp"
+#include "compiler/include/common/log.hpp"
 #include "compiler/include/middlend/passes/pass_service/conf_json/conf_json.hpp"
 #include "compiler/include/middlend/passes/pass_service/conf_json/expr_eval.hpp"
 #include "compiler/include/middlend/passes/pass_service/conf_json/utility.hpp"

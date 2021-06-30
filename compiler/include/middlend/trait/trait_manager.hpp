@@ -1,7 +1,7 @@
 #pragma once
 
 #include "common/include/command_line_parser.hpp"
-#include "compiler/include/middlend/common/log.hpp"
+#include "compiler/include/common/log.hpp"
 
 #include <unordered_map>
 

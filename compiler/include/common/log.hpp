@@ -3,7 +3,10 @@
 #include "common/include/common.hpp"
 #include "common/include/log.hpp"
 
+DEFINE_LOGGER(NC, "[NNCompiler]")
+DEFINE_LOGGER(FE, "[FrontEnd]")
 DEFINE_LOGGER(ME, "[MiddleEnd]")
+DEFINE_LOGGER(BE, "[BackEnd]")
 
 /*
  * This definition is legacy and obsolete. Please do not use it

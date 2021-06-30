@@ -1,6 +1,6 @@
 #include "compiler/include/middlend/utils/op_basic_util.hpp"
 
-#include "compiler/include/middlend/common/log.hpp"
+#include "compiler/include/common/log.hpp"
 
 namespace nn_compiler {
 
