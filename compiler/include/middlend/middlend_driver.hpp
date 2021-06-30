@@ -25,7 +25,7 @@ class MiddlendDriver {
     MiddlendDriver(MiddlendDriver&&)      = delete;
 
     MiddlendDriver& operator=(const MiddlendDriver&) = delete;
-    MiddlendDriver& operator=(MiddlendDriver&&) = delete;
+    MiddlendDriver& operator=(MiddlendDriver&&)      = delete;
 
     /**
      * @brief     initialize a compilation pipeline
@@ -77,7 +77,7 @@ class MiddlendDriver {
 
     void bumpPassCounter() { pass_counter_++; }
 
-    std::vector<std::unique_ptr<nn_compiler::nn_ir::NNIR>> graphs_;
+    std::vector<std::shared_ptr<nn_compiler::nn_ir::NNIR>> graphs_;
 
     // manager of compiler passes and utils
     PassManager<>      base_pass_manager_;

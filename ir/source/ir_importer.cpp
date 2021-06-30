@@ -24,7 +24,7 @@ namespace nn_compiler {
  * @param[out]. graphs NNIR graph list
  * @returns.    nn_ir::NNIR
  */
-RetVal IRImporter::getNNIRFromFile(const std::string& file_path, std::vector<std::unique_ptr<nn_ir::NNIR>>& graphs) {
+RetVal IRImporter::getNNIRFromFile(const std::string& file_path, std::vector<std::shared_ptr<nn_ir::NNIR>>& graphs) {
     Log::IR::I() << "IRImporter::getNNIRFromFile() is called, path: " << file_path;
 
     if (file_path.find("frontend.ir") != std::string::npos) {
@@ -53,7 +53,7 @@ RetVal IRImporter::getNNIRFromFile(const std::string& file_path, std::vector<std
     return buildNNIRFromData(data.get(), graphs);
 }
 
-RetVal IRImporter::buildNNIRFromData(const char* data, std::vector<std::unique_ptr<nn_ir::NNIR>>& graphs) {
+RetVal IRImporter::buildNNIRFromData(const char* data, std::vector<std::shared_ptr<nn_ir::NNIR>>& graphs) {
     Log::IR::I() << "IRBuilder::buildNNIRFromData() is called";
 
     // Build graphs in IR

@@ -46,7 +46,7 @@ class IRImporter {
      * @param[out]. graphs nn_ir::NNIR graph list
      * @returns.    return code
      */
-    RetVal getNNIRFromFile(const std::string& file_path, std::vector<std::unique_ptr<nn_ir::NNIR>>& graphs);
-    RetVal buildNNIRFromData(const char* data, std::vector<std::unique_ptr<nn_ir::NNIR>>& graphs);
+    RetVal getNNIRFromFile(const std::string& file_path, std::vector<std::shared_ptr<nn_ir::NNIR>>& graphs);
+    RetVal buildNNIRFromData(const char* data, std::vector<std::shared_ptr<nn_ir::NNIR>>& graphs);
 }; // class IRImporter
 } // namespace nn_compiler
