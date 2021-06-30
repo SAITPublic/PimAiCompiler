@@ -27,31 +27,29 @@ TEST(NnrUnitTest, addTest)
 {
     // result = tensor1 + tensor2 * alpha
     int shape = 4;
-    float tensor1Data[]{42, 0, 0, 0};
-    float tensor2_value = 2;
-    float alpha_value = 4;
+    float l_data[]{42, 42, 42, 42};
+    float r_value = 2;
+    float a_value = 4;
+    Scalar r_s = r_value;
+    Scalar alpha = a_value;
 
-    auto tensor1 = from_blob(tensor1Data, {shape}, kCPU);
-    auto tensor1_gpu = tensor1.to(kCUDA);
+    auto l = from_blob(l_data, {shape}, kCPU);
+    auto l_gpu = l.to(kCUDA);
+    auto rt = add(l_gpu, r_s, alpha);
+    rt.to(kCPU);
 
-    Scalar scalar_cpu = tensor2_value;
-    Scalar alpha = alpha_value;
+    float r_data[]{r_value, r_value, r_value, r_value};
+    auto r = from_blob(r_data, {shape}, kCPU);
+    auto r_gpu = r.to(kCUDA);
+    auto rt_v = add(l_gpu, r_gpu, alpha);
+    rt_v.to(kCPU);
 
-    auto result_tensor_scalar = add(tensor1_gpu, scalar_cpu, alpha);
-    result_tensor_scalar.to(kCPU);
-
-    float tensor2Data[]{tensor2_value, tensor2_value, tensor2_value, tensor2_value};
-    auto tensor2 = from_blob(tensor2Data, {shape}, kCPU);
-    auto tensor2_gpu = tensor2.to(kCUDA);
-    auto result_tensor_tensor = add(tensor1_gpu, tensor2_gpu, alpha);
-    result_tensor_tensor.to(kCPU);
-
-    float bench[]{tensor1Data[0] + tensor2_value * alpha_value, tensor1Data[1] + tensor2_value * alpha_value,
-                  tensor1Data[2] + tensor2_value * alpha_value, tensor1Data[3] + tensor2_value * alpha_value};
+    float tmp = r_value * a_value;
+    float bench[]{l_data[0] + tmp, l_data[1] + tmp, l_data[2] + tmp, l_data[3] + tmp};
     int ret = 0;
     for (int i = 0; i < shape; ++i) {
-        if (result_tensor_scalar.data_ptr<float>()[i] != result_tensor_tensor.data_ptr<float>()[i] ||
-            bench[i] != result_tensor_scalar.data_ptr<float>()[i]) {
+        if (rt.data_ptr<float>()[i] != rt_v.data_ptr<float>()[i] ||
+            bench[i] != rt.data_ptr<float>()[i]) {
             ret = -1;
             break;
         }
@@ -246,7 +244,7 @@ TEST(NnrUnitTest, lstmTest)
     c10::ArrayRef<at::Tensor> param_tuple_gpu(param_tmp_gpu.data(), 2);
 
     auto r_gpu =  lstm(input_gpu, h_tuple_gpu, param_tuple_gpu, has_bias, num_layer, dropout, train, bidirectional, batch_first);
-    // ASSERT_EQUAL(((std::get<0>(r_gpu))[0]).to(kCPU), std::get<0>(r)[0]);
+    // ASSERT_EQUAL((((std::get<0>(r_gpu))[0]).to(kCPU)), (std::get<0>(r)[0]));
     std::cout << ((std::get<0>(r_gpu))[0]).to(kCPU) << std::endl;
     std::cout << std::get<0>(r)[0] << std::endl;
 }
@@ -401,6 +399,207 @@ TEST(NnrUnitTest, negTest)
     ASSERT_EQUAL(t_n_gpu.to(kCPU), t_n);
 }
 
+TEST(NnrUnitTest, maxTest)
+{
+    // max(tensor) max value from tensor
+    // r_i = t_i > d_i ? t_i : d_i;
+    // max(tensor, dim, keepdim) = dim_max, index
+    int n = 10;
+    int m = 9;
+    int64_t dim = 0;
+    auto foo = Symbol::dimname("width");
+    ASSERT_TRUE(Dimname::isValidName("width"));
+    auto dimname = Dimname::fromSymbol(foo);
+    bool keep_dim = true;
+
+    auto t = randn({n}, kCPU);
+    auto d = randn({n}, kCPU);
+    auto t_d = randn({m, n}, kCPU);
+    // std::cout << t << std::endl;
+    // std::cout << d << std::endl;
+    // std::cout << t_d << std::endl;
+    // auto t_gpu = t.to(kCUDA);
+    // auto d_gpu = d.to(kCUDA);
+    // std::cout << t << std::endl;
+    auto r = max(t);
+    auto r_m = max(t, d);
+    auto r_d = max(t_d, dim, keep_dim);
+    // std::cout << r << std::endl;
+    // std::cout << r_m << std::endl;
+    // std::cout << std::get<0>(r_d) << std::endl;
+    // std::cout << std::get<1>(r_d) << std::endl;
+}
+
+TEST(NnrUnitTest, reluTest)
+{
+    // r = relu(tensor)
+    int n = 10;
+    auto t = randn({n}, kCPU);
+    auto t_gpu = t.to(kCUDA);
+    auto r = relu(t);
+    auto r_gpu = relu(t_gpu);
+    ASSERT_EQUAL(r_gpu.to(kCPU), r);
+}
+
+TEST(NnrUnitTest, selectTest)
+{
+    int n = 10;
+    int m = 9;
+    int64_t dim = 0;
+    int64_t index = 1;
+    auto foo = Symbol::dimname("batch");
+    ASSERT_TRUE(Dimname::isValidName("batch"));
+    auto t = randn({m, n}, kCPU);
+    auto t_gpu = t.to(kCUDA);
+    // std::cout << t << std::endl;
+    auto r = select(t, dim, index);
+    auto r_gpu = select(t_gpu, dim, index);
+    // std::cout << r << std::endl;
+    ASSERT_EQUAL(r_gpu.to(kCPU), r);
+}
+
+TEST(NnrUnitTest, sizeTest)
+{
+    // size of tensor dim
+    // dim 0 = 9, dim 1 = 10
+    int n = 10;
+    int m = 9;
+    int64_t dim = 0;
+    auto foo = Symbol::dimname("batch");
+    ASSERT_TRUE(Dimname::isValidName("batch"));
+
+    auto t = randn({m, n}, kCPU);
+    auto t_gpu = t.to(kCUDA);
+    int64_t r = size(t, dim);
+    int64_t r_gpu = size(t_gpu, dim);
+    // std::cout << r << std::endl;
+    ASSERT_TRUE(r == r_gpu);
+}
+
+TEST(NnrUnitTest, sliceTest)
+{
+    int n = 10;
+    int m = 9;
+    int64_t dim = 0;
+    int64_t start = 1;
+    int64_t end = 6;
+    int64_t step = 2;
+    auto t = randn({m, n}, kCPU);
+    auto t_gpu = t.to(kCUDA);
+    // std::cout << t << std::endl;
+    auto r = slice(t, dim, start, end, step);
+    auto r_gpu = slice(t_gpu, dim, start, end, step);
+    // std::cout << r << std::endl;
+    ASSERT_EQUAL(r_gpu.to(kCPU), r);
+}
+
+TEST(NnrUnitTest, subTest)
+{
+    // result = tensor1 - tensor2 * alpha
+    int n = 10;
+    int m = 9;
+    float alpha_value = 4;
+    auto l = randn({m, n}, kCPU);
+    auto l_gpu = l.to(kCUDA);
+    auto r = randn({m, n}, kCPU);
+    auto r_gpu = r.to(kCUDA);
+    Scalar alpha = alpha_value;
+
+    auto re = sub(l, r, alpha);
+    auto re_gpu = sub(l_gpu, r_gpu, alpha);
+    ASSERT_EQUAL(re_gpu.to(kCPU), re);
+}
+
+TEST(NnrUnitTest, tensorTest)
+{
+    // from value to tensor
+    int64_t a = 8;
+    float b = 10.f;
+    auto r_a = tensor(a);
+    // std::cout << r_a << std::endl;
+    auto r_b = tensor(b);
+    // std::cout << r_b << std::endl;
+}
+
+TEST(NnrUnitTest, toTest)
+{
+    // from tensor to another tensor
+    int n = 10;
+    int m = 9;
+    auto t = randn({m, n}, kCPU);
+    // std::cout << t <<  std::endl;
+    bool non_blocking = false;
+    bool copy = false;
+    ScalarType dtype(kFloat);
+    c10::optional<MemoryFormat> optional_memory_format(MemoryFormat::Preserve);
+    at::Device device(kCPU);
+    auto r = at::native::to(t, device, dtype, non_blocking, copy, optional_memory_format);
+    // std::cout << r << std::endl;
+    auto d = randn({m, n}, kCPU);
+    auto rt = at::native::to(t, d, non_blocking, copy, optional_memory_format);
+    // std::cout << d << std::endl;
+    // std::cout << rt << std::endl;
+    ASSERT_EQUAL(r, rt);
+}
+
+TEST(NnrUnitTest, transposeTest)
+{
+    // r = transpose(a)
+    int n = 10;
+    int m = 9;
+    auto t = randn({m, n}, kCUDA);
+    int64_t dim0 = 0;
+    int64_t dim1 = 1;
+    ASSERT_EQUAL(transpose(transpose(t, dim0, dim1), dim0, dim1), t);
+}
+
+TEST(NnrUnitTest, unsqueezeTest)
+{
+    // r = unsqueeze(a)
+    int n = 10;
+    int m = 9;
+    int64_t dim = 1;
+    auto t = randn({m, n}, kCUDA);
+    // std::cout << t << std::endl;
+    auto r = unsqueeze(t, dim);
+    // std::cout << r << std::endl;
+}
+
+TEST(NnrUnitTest, zeroTest)
+{
+    // r = zero()
+    int n = 10;
+    int m = 9;
+    int dim = 2;
+    int64_t s[] = {m, n}; 
+    ArrayRef<int64_t> s_v(s, dim);
+    auto options = TensorOptions()
+    .dtype(kFloat)
+    .layout(kStrided)
+    .device(kCUDA)
+    .requires_grad(true);
+    auto r = zeros(s_v, options);
+    // std::cout << r << std::endl;
+}
+
+TEST(NnrUnitTest, zeros_likeTest)
+{
+    // tensor = 0
+    int n = 10;
+    int m = 9;
+    auto t = randn({m, n});
+    // std::cout << t << std::endl;
+
+    auto options = TensorOptions()
+    .dtype(kFloat)
+    .layout(kStrided)
+    .device(kCPU);
+    c10::optional<MemoryFormat> memory_format(MemoryFormat::Preserve);
+    auto r = zeros_like(t, options, memory_format);
+    auto r_gpu = r.to(kCPU);
+    // std::cout << r << std::endl;
+    ASSERT_EQUAL(r_gpu.to(kCPU), r);
+}
 
 TEST(NnrUnitTest, matmulTest)
 {
