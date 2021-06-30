@@ -65,6 +65,7 @@ torch::Tensor primTupleIndex(const std::vector<torch::Tensor>& inputs, int64_t i
 
 // the unpacked tensors will append to stack
 // torch::jit::Value can convert to tensor/int/bool/float and so-on
+// tuple: c10::ivalue::Tuple
 void primTupleConstruct(std::vector<torch::IValue>& stack, size_t num_inputs)
 {
     std::vector<torch::jit::IValue> elems{std::make_move_iterator(stack.end() - num_inputs),
@@ -73,11 +74,14 @@ void primTupleConstruct(std::vector<torch::IValue>& stack, size_t num_inputs)
     nnrt::push(stack, c10::ivalue::Tuple::create(std::move(elems)));
 }
 
-// the unpacked tensors will append to stack
-void primTupleUnpack(std::vector<torch::IValue>& stack)
+
+std::vector<torch::IValue> primTupleUnpack(c10::intrusive_ptr<c10::ivalue::Tuple> tuple)
 {
-    auto tuple = nnrt::pop(stack).toTuple();
-    stack.insert(stack.end(), tuple->elements().begin(), tuple->elements().end());
+    std::vector<torch::IValue> ret;
+    for(auto& item : tuple->elements()){
+        ret.push_back(item);
+    }
+    return ret;
 }
 
 // For Tensor[], list_type=at::ListType::ofTensors()

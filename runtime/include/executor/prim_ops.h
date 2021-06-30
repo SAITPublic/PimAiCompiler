@@ -24,7 +24,7 @@ torch::Tensor primTupleIndex(const std::vector<torch::Tensor>& inputs, int64_t i
 
 void primTupleConstruct(std::vector<torch::IValue>& stack, size_t num_inputs);
 
-void primTupleUnpack(std::vector<torch::IValue>& stack);
+std::vector<torch::IValue> primTupleUnpack(c10::intrusive_ptr<c10::ivalue::Tuple> tuple);
 
 void primListConstruct(std::vector<torch::IValue>& stack, size_t num_inputs, at::ListTypePtr type);
 
