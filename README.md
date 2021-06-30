@@ -19,7 +19,7 @@ launch-container.sh <image name> [directory to be mapped]
 
 # How to build
 
-Ensure that the HTTP proxy settings are correct。
+Ensure that the HTTP proxy settings are correct.
 
 [update submodule]   
 ```
@@ -43,9 +43,19 @@ $ ./scripts/build.sh all -o .
 ```
 # How to run
 
-## Middlend
+## Compiler
 ```
-$ ./build/compiler/middlend/middlend -c compiler/include/middlend/passes/pass_config.json -i frontend.ir
+./build/compiler/compiler -h [--help]
+
+General Options:
+  -h [ --help ]             help info
+  -i, --input <file>        Input file path
+  -l <compile level>        compile level. Possible values (default: 0):
+                                                    0 (frontend->middlend->backend);
+                                                    1 (middlend->backend);
+                                                    2 (backend)
+  -v <level>                [middlend] verification level. Possible values: 0, 1, 2 (default: 0)
+  -c <configuration file>   [middlend] passes configuration file path. default: compiler/include/middlend/passes/pass_config.json
 ```
 # How to test
 

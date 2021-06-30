@@ -2,9 +2,10 @@
 
 namespace nn_compiler {
 
-RetVal NNCompiler::initialize(const std::string& file_path) {
-    Log::ME::I() << "NNCompiler::initialize() is called";
+RetVal NNCompiler::initialize(const int& compile_level, const std::string& file_path) {
+    Log::NC::I() << "NNCompiler::initialize() is called";
 
+    compile_level_ = compile_level;
     input_file_path_ = file_path;
 
     //TODO: frontend initialize
@@ -18,22 +19,45 @@ RetVal NNCompiler::initialize(const std::string& file_path) {
 }
 
 RetVal NNCompiler::compile() {
-    Log::ME::I() << "NNCompiler::compile() is called";
+    Log::NC::I() << "NNCompiler::compile() is called";
 
-    // frontend();
-    middlend(input_file_path_);
-    // backend();
+    switch(compile_level_) {
+        case 0:
+            frontend(input_file_path_);
+            middlend();
+            backend();
+            break;
+        case 1:
+            middlend(input_file_path_);
+            backend();
+        case 2:
+            backend(input_file_path_);
+            break;
+        default:
+            return RetVal::FAILURE;
+    }
 
     return RetVal::SUCCESS;
 }
 
-RetVal NNCompiler::compile(std::vector<std::shared_ptr<const nn_compiler::nn_ir::NNIR>>& NNIR_graphs) {
-    Log::ME::I() << "NNCompiler::compile() is called";
+RetVal NNCompiler::compile(std::vector<std::shared_ptr<nn_compiler::nn_ir::NNIR>>& NNIR_graphs) {
+    Log::NC::I() << "NNCompiler::compile() is called";
 
-    // frontend();
-    middlend(input_file_path_);
-    // backend();
-
+    switch(compile_level_) {
+        case 0:
+            frontend(input_file_path_);
+            middlend();
+            backend();
+            break;
+        case 1:
+            middlend(input_file_path_);
+            backend();
+        case 2:
+            backend(input_file_path_);
+            break;
+        default:
+            return RetVal::FAILURE;
+    }
     for (auto graph : NNIR_graphs_) {
         NNIR_graphs.push_back(graph);
     }
@@ -42,19 +66,19 @@ RetVal NNCompiler::compile(std::vector<std::shared_ptr<const nn_compiler::nn_ir:
 }
 
 RetVal NNCompiler::finalize() {
-    Log::ME::I() << "NNCompiler::finalize() is called";
+    Log::NC::I() << "NNCompiler::finalize() is called";
 
     return RetVal::SUCCESS;
 }
 
-RetVal NNCompiler::frontend() {
-    Log::ME::I() << "NNCompiler::frontend() is called";
+RetVal NNCompiler::frontend(const std::string& file_path) {
+    Log::NC::I() << "NNCompiler::frontend() is called";
 
     return RetVal::SUCCESS;
 }
 
 RetVal NNCompiler::middlend(const std::string& file_path) {
-    Log::ME::I() << "NNCompiler::middlend() is called";
+    Log::NC::I() << "NNCompiler::middlend() is called";
 
     middlend_driver_->initialize(file_path);
     middlend_driver_->build();
@@ -65,8 +89,28 @@ RetVal NNCompiler::middlend(const std::string& file_path) {
     return RetVal::SUCCESS;
 }
 
+RetVal NNCompiler::middlend() {
+    Log::NC::I() << "NNCompiler::middlend() is called";
+
+    middlend_driver_->initialize(NNIR_graphs_);
+    middlend_driver_->build();
+    middlend_driver_->run();
+    middlend_driver_->wrapup();
+    middlend_driver_->finalize();
+
+    return RetVal::SUCCESS;
+}
+
+RetVal NNCompiler::backend(const std::string& file_path) {
+    Log::NC::I() << "NNCompiler::backend() is called";
+
+    // TODO: backend pipeline
+
+    return RetVal::SUCCESS;
+}
+
 RetVal NNCompiler::backend() {
-    Log::ME::I() << "NNCompiler::backend() is called";
+    Log::NC::I() << "NNCompiler::backend() is called";
 
     // TODO: backend pipeline
 

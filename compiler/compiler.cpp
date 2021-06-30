@@ -14,6 +14,13 @@
 static cl_opt::Option<std::string>
 input_file_path(std::vector<std::string>{"-i", "--input"}, "<file>", "Input file path", cl_opt::Required::YES);
 
+static cl_opt::Option<int> compile_level("-l",
+                                         "<compile level>",
+                                         "compile level. Possible values: 0 (frontend->middlend->backend),\
+                                          1 (middlend->backend), 2 (backend) (default: 0)",
+                                         cl_opt::Required::YES,
+                                         cl_opt::Hidden::NO);
+
 int main(int argc, char* argv[]) {
     // parse arguments
     cl_opt::CommandLineParser::getInstance().parseCommandLine(argc, argv);
@@ -22,7 +29,7 @@ int main(int argc, char* argv[]) {
     nn_compiler::NNCompiler compiler;
 
     // initialize
-    compiler.initialize(static_cast<std::string>(input_file_path));
+    compiler.initialize(static_cast<int>(compile_level), static_cast<std::string>(input_file_path));
 
     // compile
     compiler.compile();

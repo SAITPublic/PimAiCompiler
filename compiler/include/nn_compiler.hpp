@@ -32,7 +32,7 @@ class NNCompiler {
      * @inputs  int compile_level, std::string file_path
      * @returns return code: success or failure.
      */
-    RetVal initialize(const std::string& file_path);
+    RetVal initialize(const int& compile_level, const std::string& file_path);
 
     /**
      * @brief   run compiler.
@@ -48,7 +48,7 @@ class NNCompiler {
      * @inputs  an empty vector ready to put NNIR(LLO) graphs
      * @returns const NNIR vector
      */
-    RetVal compile(std::vector<std::shared_ptr<const nn_compiler::nn_ir::NNIR>>& NNIR_graphs);
+    RetVal compile(std::vector<std::shared_ptr<nn_compiler::nn_ir::NNIR>>& NNIR_graphs);
 
     /**
      * @brief   Destroy all data of class.
@@ -61,10 +61,10 @@ class NNCompiler {
     /**
      * @brief   Frontend compilation pipeline.
      * @details This function runs frontend compilation pipeline with torchscript IR input.
-     * @inputs  .
+     * @inputs  torchscript IR file path
      * @returns return code: success or failure.
      */
-    RetVal frontend();
+    RetVal frontend(const std::string& file_path);
 
     /**
      * @brief   Milddlend compilation pipeline.
@@ -75,6 +75,23 @@ class NNCompiler {
     RetVal middlend(const std::string& file_path);
 
     /**
+     * @brief   Milddlend compilation pipeline.
+     * @details This function runs middlend compilation pipeline with no input,
+     *          NNIR graphs have been parsed and get prepared by frontend.
+     * @inputs  .
+     * @returns return code: success or failure.
+     */
+    RetVal middlend();
+
+    /**
+     * @brief   Backend compilation pipeline.
+     * @details This function runs backend compilation pipeline with NNIR input.
+     * @inputs  NNIR file path
+     * @returns return code: success or failure.
+     */
+    RetVal backend(const std::string& file_path);
+
+    /**
      * @brief   Backend compilation pipeline.
      * @details This function runs backend compilation pipeline with no input,
      *          NNIR graphs have been parsed and get prepared by frontend or middlend.
@@ -82,6 +99,14 @@ class NNCompiler {
      * @returns return code: success or failure.
      */
     RetVal backend();
+
+    /**
+     * @details Compile level, possible values(0, 1, 2), which stands for different components of compilation pipeline.
+     *          0 : frontend->middlend->backend;
+     *          1 : middlend->backend;
+     *          2 : backend.
+     */
+    int compile_level_ = 0;
 
     std::string input_file_path_  = "";
 
