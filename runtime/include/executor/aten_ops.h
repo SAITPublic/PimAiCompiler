@@ -88,13 +88,13 @@ at::Tensor atenMax(const at::Tensor &self);
 
 at::Tensor atenMax(const at::Tensor &self, const at::Tensor &other);
 
-inline ::std::tuple<at::Tensor, at::Tensor> atenMax(const at::Tensor &self, int64_t dim,
+std::tuple<at::Tensor, at::Tensor> atenMax(const at::Tensor &self, int64_t dim,
 
-                                                    bool keepdim = false);
+                                           bool keepdim = false);
 
-inline ::std::tuple<at::Tensor, at::Tensor> atenMax(const at::Tensor &self, at::Dimname dim,
+std::tuple<at::Tensor, at::Tensor> atenMax(const at::Tensor &self, at::Dimname dim,
 
-                                                    bool keepdim = false);
+                                           bool keepdim = false);
 
 at::Tensor atenNe(const at::Tensor &self, const at::Tensor &other);
 

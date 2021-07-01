@@ -93,12 +93,12 @@ at::Tensor atenMax(const at::Tensor &self) { return at::max(self); }
 
 at::Tensor atenMax(const at::Tensor &self, const at::Tensor &other) { return at::max(self, other); }
 
-inline ::std::tuple<at::Tensor, at::Tensor> atenMax(const at::Tensor &self, int64_t dim, bool keepdim)
+std::tuple<at::Tensor, at::Tensor> atenMax(const at::Tensor &self, int64_t dim, bool keepdim)
 {
     return at::max(self, dim, keepdim);
 }
 
-inline ::std::tuple<at::Tensor, at::Tensor> atenMax(const at::Tensor &self, at::Dimname dim, bool keepdim)
+std::tuple<at::Tensor, at::Tensor> atenMax(const at::Tensor &self, at::Dimname dim, bool keepdim)
 {
     return at::max(self, dim, keepdim);
 }
