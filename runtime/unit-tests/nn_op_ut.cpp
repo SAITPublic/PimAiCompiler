@@ -10,6 +10,7 @@
 
 #include <gtest/gtest.h>
 #include "ATen/ATen.h"
+#include "glog/logging.h"
 // #include "aten_op.h"
 // #include "hip/hip_runtime.h"
 // #include "prim_op_utils"
@@ -48,8 +49,7 @@ TEST(NnrUnitTest, addTest)
     float bench[]{l_data[0] + tmp, l_data[1] + tmp, l_data[2] + tmp, l_data[3] + tmp};
     int ret = 0;
     for (int i = 0; i < shape; ++i) {
-        if (rt.data_ptr<float>()[i] != rt_v.data_ptr<float>()[i] ||
-            bench[i] != rt.data_ptr<float>()[i]) {
+        if (rt.data_ptr<float>()[i] != rt_v.data_ptr<float>()[i] || bench[i] != rt.data_ptr<float>()[i]) {
             ret = -1;
             break;
         }
@@ -146,9 +146,9 @@ TEST(NnrUnitTest, divTest)
     Scalar d_s = 3.0f;
     auto r_s = div(t, d_s);
     auto r_s_gpu = div(t_gpu, d_s);
-    // std::cout << t << std::endl;
-    // std::cout << d << std::endl;
-    // std::cout << r << std::endl;
+    DLOG(INFO) << t;
+    DLOG(INFO) << d;
+    DLOG(INFO) << r;
     ASSERT_EQUAL(r_gpu.to(kCPU), r);
 }
 
@@ -163,9 +163,9 @@ TEST(NnrUnitTest, dropoutTest)
     bool train = false;
     auto r = dropout(t, d_s, train);
     auto r_gpu = dropout(t_gpu, d_s, train);
-    // std::cout << t << std::endl;
-    // std::cout << d_s << std::endl;
-    // std::cout << r << std::endl;
+    DLOG(INFO) << t;
+    DLOG(INFO) << d_s;
+    DLOG(INFO) << r;
     ASSERT_EQUAL(r_gpu.to(kCPU), r);
 }
 
@@ -180,17 +180,17 @@ TEST(NnrUnitTest, embeddingTest)
     bool sparse = false;
 
     auto t = randn({shape_h, shape_w}, kCPU);
-    // std::cout << t << std::endl;
+    DLOG(INFO) << t;
     auto t_gpu = t.to(kCUDA);
 
     int shape_indices = 4;
     int64_t tensorData[] = {1, 2, 6, 3};
     auto indices = from_blob(tensorData, {shape_indices}, TensorOptions().dtype(kLong).device(kCPU));
-    // std::cout << indices << std::endl;
+    DLOG(INFO) << indices;
     auto r = embedding(t, indices, padding_idx, scale_grad_by_freq, sparse);
     auto indices_gpu = indices.to(kCUDA);
     auto r_gpu = embedding(t_gpu, indices_gpu, padding_idx, scale_grad_by_freq, sparse);
-    // std::cout <<  r << std::endl;
+    DLOG(INFO) << r;
     ASSERT_EQUAL(r_gpu.to(kCPU), r);
 }
 
@@ -211,7 +211,7 @@ TEST(NnrUnitTest, lstmTest)
     auto input = randn({seq_len, batch_size, input_size}, kCPU);
     auto hx = randn({num_layer, batch_size, hidden_size}, kCPU);
     auto hc = randn({num_layer, batch_size, hidden_size}, kCPU);
-    
+
     std::vector<Tensor> h_tmp;
     h_tmp.push_back(hx);
     h_tmp.push_back(hc);
@@ -243,13 +243,13 @@ TEST(NnrUnitTest, lstmTest)
     param_tmp_gpu.push_back(param_h_gpu);
     c10::ArrayRef<at::Tensor> param_tuple_gpu(param_tmp_gpu.data(), 2);
 
-    auto r_gpu =  lstm(input_gpu, h_tuple_gpu, param_tuple_gpu, has_bias, num_layer, dropout, train, bidirectional, batch_first);
-    // ASSERT_EQUAL((((std::get<0>(r_gpu))[0]).to(kCPU)), (std::get<0>(r)[0]));
-    std::cout << ((std::get<0>(r_gpu))[0]).to(kCPU) << std::endl;
-    std::cout << std::get<0>(r)[0] << std::endl;
+    auto r_gpu =
+        lstm(input_gpu, h_tuple_gpu, param_tuple_gpu, has_bias, num_layer, dropout, train, bidirectional, batch_first);
+    DLOG(INFO) << ((std::get<0>(r_gpu))[0]).to(kCPU);
+    DLOG(INFO) << std::get<0>(r)[0];
 }
 
-TEST(NnrUnitTest, copyTest) 
+TEST(NnrUnitTest, copyTest)
 {
     bool non_blocking = false;
     int n = 100;
@@ -257,12 +257,12 @@ TEST(NnrUnitTest, copyTest)
     auto d = randn({n}, kCPU);
     auto g = randn({n}, kCUDA);
     auto r = randn({n}, kCUDA);
-   
+
     // cpu to cpu
     at::native::copy_(d, t, non_blocking);
-    ASSERT_EQUAL(d, t);    
+    ASSERT_EQUAL(d, t);
 
-     // cpu to gpu 
+    // cpu to gpu
     at::native::copy_(g, d, non_blocking);
     ASSERT_EQUAL(g.to(kCPU), d);
 
@@ -277,17 +277,17 @@ TEST(NnrUnitTest, expandTest)
     int n = 10;
     int m = 5;
     int dim = 2;
-    int64_t s[] = {m, n}; 
+    int64_t s[] = {m, n};
     bool implicit = false;
 
     auto t = randn({n}, kCPU);
     auto t_gpu = t.to(kCUDA);
     ArrayRef<int64_t> s_v(s, dim);
-    // std::cout << t << std::endl;
+    DLOG(INFO) << t;
 
     auto r = at::native::expand(t, s_v, implicit);
     auto r_gpu = at::native::expand(t_gpu, s_v, implicit);
-    // std::cout << r << std::endl;
+    DLOG(INFO) << r;
     ASSERT_EQUAL(r_gpu.to(kCPU), r);
 }
 
@@ -299,13 +299,13 @@ TEST(NnrUnitTest, itemTest)
 
     auto t = randn({n}, kCPU);
     auto t_gpu = t.to(kCUDA);
-    // std::cout << t << std::endl;
+    DLOG(INFO) << t;
 
     auto r = at::native::item(t);
     auto r_gpu = at::native::item(t_gpu);
-    //  std::cout << r << std::endl;
-    // std::cout << r_gpu << std::endl;
-    // ASSERT_EQUAL(r_gpu, r);
+    DLOG(INFO) << r;
+    DLOG(INFO) << r_gpu;
+    EXPECT_TRUE(r.toFloat() == r_gpu.toFloat());
 }
 
 TEST(NnrUnitTest, eqTest)
@@ -321,7 +321,7 @@ TEST(NnrUnitTest, eqTest)
 
     auto r_s = eq(tensor1, b_scalar);
     auto r = eq(tensor1, tensor2);
-    // std::cout << r_s << std::endl;
+    DLOG(INFO) << r_s;
     ASSERT_EQUAL(r_s, r);
 }
 
@@ -340,8 +340,8 @@ TEST(NnrUnitTest, gtTest)
 
     auto r_s = gt(tensor1, b_scalar);
     auto r = gt(tensor1, tensor2);
-    // std::cout << r_s << std::endl;
-    // std::cout << r << std::endl;
+    DLOG(INFO) << r_s;
+    DLOG(INFO) << r;
     ASSERT_EQUAL(r_s, r);
 }
 
@@ -360,8 +360,8 @@ TEST(NnrUnitTest, ltTest)
 
     auto r_s = lt(tensor1, b_scalar);
     auto r = lt(tensor1, tensor2);
-    // std::cout << r_s << std::endl;
-    // std::cout << r << std::endl;
+    DLOG(INFO) << r_s;
+    DLOG(INFO) << r;
     ASSERT_EQUAL(r_s, r);
 }
 
@@ -380,8 +380,8 @@ TEST(NnrUnitTest, neTest)
 
     auto r_s = ne(tensor1, b_scalar);
     auto r = ne(tensor1, tensor2);
-    // std::cout << r_s << std::endl;
-    // std::cout << r << std::endl;
+    DLOG(INFO) << r_s;
+    DLOG(INFO) << r;
     ASSERT_EQUAL(r_s, r);
 }
 
@@ -391,10 +391,10 @@ TEST(NnrUnitTest, negTest)
     int n = 10;
     auto t = randn({n}, kCPU);
     auto t_gpu = t.to(kCUDA);
-    // std::cout << t << std::endl;
+    DLOG(INFO) << t;
     auto t_n = neg(t);
     auto t_n_gpu = neg(t_gpu);
-    // std::cout << t_n << std::endl;
+    DLOG(INFO) << t_n;
     ASSERT_EQUAL(neg(neg(t)), t);
     ASSERT_EQUAL(t_n_gpu.to(kCPU), t_n);
 }
@@ -410,24 +410,23 @@ TEST(NnrUnitTest, maxTest)
     auto foo = Symbol::dimname("width");
     ASSERT_TRUE(Dimname::isValidName("width"));
     auto dimname = Dimname::fromSymbol(foo);
+    DLOG(INFO) << dimname;
     bool keep_dim = true;
 
     auto t = randn({n}, kCPU);
     auto d = randn({n}, kCPU);
     auto t_d = randn({m, n}, kCPU);
-    // std::cout << t << std::endl;
-    // std::cout << d << std::endl;
-    // std::cout << t_d << std::endl;
-    // auto t_gpu = t.to(kCUDA);
-    // auto d_gpu = d.to(kCUDA);
-    // std::cout << t << std::endl;
+    DLOG(INFO) << t;
+    DLOG(INFO) << d;
+    DLOG(INFO) << t_d;
+    DLOG(INFO) << t;
     auto r = max(t);
     auto r_m = max(t, d);
     auto r_d = max(t_d, dim, keep_dim);
-    // std::cout << r << std::endl;
-    // std::cout << r_m << std::endl;
-    // std::cout << std::get<0>(r_d) << std::endl;
-    // std::cout << std::get<1>(r_d) << std::endl;
+    DLOG(INFO) << r;
+    DLOG(INFO) << r_m;
+    DLOG(INFO) << std::get<0>(r_d);
+    DLOG(INFO) << std::get<1>(r_d);
 }
 
 TEST(NnrUnitTest, reluTest)
@@ -447,14 +446,13 @@ TEST(NnrUnitTest, selectTest)
     int m = 9;
     int64_t dim = 0;
     int64_t index = 1;
-    auto foo = Symbol::dimname("batch");
-    ASSERT_TRUE(Dimname::isValidName("batch"));
+    
     auto t = randn({m, n}, kCPU);
     auto t_gpu = t.to(kCUDA);
-    // std::cout << t << std::endl;
+    DLOG(INFO) << t;
     auto r = select(t, dim, index);
     auto r_gpu = select(t_gpu, dim, index);
-    // std::cout << r << std::endl;
+    DLOG(INFO) << r;
     ASSERT_EQUAL(r_gpu.to(kCPU), r);
 }
 
@@ -465,14 +463,12 @@ TEST(NnrUnitTest, sizeTest)
     int n = 10;
     int m = 9;
     int64_t dim = 0;
-    auto foo = Symbol::dimname("batch");
-    ASSERT_TRUE(Dimname::isValidName("batch"));
 
     auto t = randn({m, n}, kCPU);
     auto t_gpu = t.to(kCUDA);
     int64_t r = size(t, dim);
     int64_t r_gpu = size(t_gpu, dim);
-    // std::cout << r << std::endl;
+    DLOG(INFO) << r;
     ASSERT_TRUE(r == r_gpu);
 }
 
@@ -486,10 +482,10 @@ TEST(NnrUnitTest, sliceTest)
     int64_t step = 2;
     auto t = randn({m, n}, kCPU);
     auto t_gpu = t.to(kCUDA);
-    // std::cout << t << std::endl;
+    DLOG(INFO) << t;
     auto r = slice(t, dim, start, end, step);
     auto r_gpu = slice(t_gpu, dim, start, end, step);
-    // std::cout << r << std::endl;
+    DLOG(INFO) << r;
     ASSERT_EQUAL(r_gpu.to(kCPU), r);
 }
 
@@ -516,9 +512,9 @@ TEST(NnrUnitTest, tensorTest)
     int64_t a = 8;
     float b = 10.f;
     auto r_a = tensor(a);
-    // std::cout << r_a << std::endl;
+    DLOG(INFO) << r_a;
     auto r_b = tensor(b);
-    // std::cout << r_b << std::endl;
+    DLOG(INFO) << r_b;
 }
 
 TEST(NnrUnitTest, toTest)
@@ -527,18 +523,18 @@ TEST(NnrUnitTest, toTest)
     int n = 10;
     int m = 9;
     auto t = randn({m, n}, kCPU);
-    // std::cout << t <<  std::endl;
+    DLOG(INFO) << t;
     bool non_blocking = false;
     bool copy = false;
     ScalarType dtype(kFloat);
     c10::optional<MemoryFormat> optional_memory_format(MemoryFormat::Preserve);
     at::Device device(kCPU);
     auto r = at::native::to(t, device, dtype, non_blocking, copy, optional_memory_format);
-    // std::cout << r << std::endl;
+    DLOG(INFO) << r;
     auto d = randn({m, n}, kCPU);
     auto rt = at::native::to(t, d, non_blocking, copy, optional_memory_format);
-    // std::cout << d << std::endl;
-    // std::cout << rt << std::endl;
+    DLOG(INFO) << d;
+    DLOG(INFO) << rt;
     ASSERT_EQUAL(r, rt);
 }
 
@@ -560,9 +556,9 @@ TEST(NnrUnitTest, unsqueezeTest)
     int m = 9;
     int64_t dim = 1;
     auto t = randn({m, n}, kCUDA);
-    // std::cout << t << std::endl;
+    DLOG(INFO) << t;
     auto r = unsqueeze(t, dim);
-    // std::cout << r << std::endl;
+    DLOG(INFO) << r;
 }
 
 TEST(NnrUnitTest, zeroTest)
@@ -571,15 +567,11 @@ TEST(NnrUnitTest, zeroTest)
     int n = 10;
     int m = 9;
     int dim = 2;
-    int64_t s[] = {m, n}; 
+    int64_t s[] = {m, n};
     ArrayRef<int64_t> s_v(s, dim);
-    auto options = TensorOptions()
-    .dtype(kFloat)
-    .layout(kStrided)
-    .device(kCUDA)
-    .requires_grad(true);
+    auto options = TensorOptions().dtype(kFloat).layout(kStrided).device(kCUDA).requires_grad(true);
     auto r = zeros(s_v, options);
-    // std::cout << r << std::endl;
+    DLOG(INFO) << r;
 }
 
 TEST(NnrUnitTest, zeros_likeTest)
@@ -588,16 +580,13 @@ TEST(NnrUnitTest, zeros_likeTest)
     int n = 10;
     int m = 9;
     auto t = randn({m, n});
-    // std::cout << t << std::endl;
+    DLOG(INFO) << t;
 
-    auto options = TensorOptions()
-    .dtype(kFloat)
-    .layout(kStrided)
-    .device(kCPU);
+    auto options = TensorOptions().dtype(kFloat).layout(kStrided).device(kCPU);
     c10::optional<MemoryFormat> memory_format(MemoryFormat::Preserve);
     auto r = zeros_like(t, options, memory_format);
     auto r_gpu = r.to(kCPU);
-    // std::cout << r << std::endl;
+    DLOG(INFO) << r;
     ASSERT_EQUAL(r_gpu.to(kCPU), r);
 }
 
