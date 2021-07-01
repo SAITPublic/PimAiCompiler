@@ -2,7 +2,8 @@
 
 #include "osal_types.h"
 
-
+namespace nnrt
+{
 typedef struct __NnrtBuffer {
     void* addr;   /*!< buffer address */
     int32_t size; /*!< size of buffer */
@@ -28,12 +29,12 @@ enum DataType {
     LIST
 };
 
-
 struct OpNodeDescription {
     int id;
     std::string type;
 
     OpNodeDescription() {}
     OpNodeDescription(int id, std::string type) : id(id), type(type) {}
-
 };
+
+}  // namespace nnrt

@@ -2,6 +2,7 @@
 #include <stdint.h>
 #include <vector>
 #include <torch/script.h>
+#include "glog/logging.h"
 #include "executor/prim_ops.h"
 #include "ut_utils.h"
 
@@ -143,9 +144,9 @@ TEST(NnrUnitTest, primConstant)
             std::vector<int64_t> shape;
             for (auto& item : tensor.sizes()) shape.push_back(item);
             if (tp == torch::kHalf) {
-                ASSERT_EQUAL(nnrt::primTensorConstant(tensor.data_ptr(), shape, DataType::FLOAT16), tensor);
+                ASSERT_EQUAL(nnrt::primTensorConstant(tensor.data_ptr(), shape, nnrt::DataType::FLOAT16), tensor);
             } else if (tp == torch::kFloat32) {
-                ASSERT_EQUAL(nnrt::primTensorConstant(tensor.data_ptr(), shape, DataType::FLOAT32), tensor);
+                ASSERT_EQUAL(nnrt::primTensorConstant(tensor.data_ptr(), shape, nnrt::DataType::FLOAT32), tensor);
             }
         }
     }
@@ -266,4 +267,10 @@ TEST(NnrUnitTest, primUncheckedCast)
     int sz = 10;
     torch::Tensor tensor = torch::randn({sz, sz});
     ASSERT_EQUAL(tensor, nnrt::primUncheckedCast(tensor));
+}
+
+TEST(NnrUnitTest, primUninitialized)
+{
+    auto ret = nnrt::primUninitialized().tagKind();
+    DLOG(INFO) << "TAG:" << ret;
 }

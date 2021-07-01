@@ -10,7 +10,7 @@ namespace nnrt
 class NNRuntimeException : std::exception
 {
    public:
-    NNRuntimeException(std::string& msg) { this->msg = msg; }
+    NNRuntimeException(std::string msg) { this->msg = msg; }
     const char* what() { return msg.c_str(); }
 
    private:

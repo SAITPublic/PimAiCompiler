@@ -23,7 +23,7 @@ T& primUncheckedCast(T& inputs)
     return inputs;
 }
 
-void primRaiseException(std::string& msg);
+void primRaiseException(std::string msg);
 
 torch::Tensor primTupleIndex(const std::vector<torch::Tensor>& inputs, int64_t index);
 

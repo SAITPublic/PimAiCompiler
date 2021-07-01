@@ -36,7 +36,7 @@ torch::IValue primUninitialized()
 }
 
 
-void primRaiseException(std::string& msg) { throw nnrt::NNRuntimeException(msg); }
+void primRaiseException(std::string msg) { throw nnrt::NNRuntimeException(msg); }
 
 torch::Tensor primTupleIndex(const std::vector<torch::Tensor>& inputs, int64_t index)
 {
