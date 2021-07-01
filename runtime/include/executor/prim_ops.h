@@ -1,8 +1,8 @@
 #pragma once
 
+#include <torch/script.h>
 #include <unordered_map>
 #include <vector>
-#include <torch/script.h>
 #include "glog/logging.h"
 #include "../nnrt_types.h"
 

@@ -2,7 +2,6 @@
 
 #include "ir/include/nn_ir.hpp"
 
-
 namespace nncir = nn_compiler::nn_ir;
 
 namespace nnrt
@@ -10,9 +9,10 @@ namespace nnrt
 class ModelBuilder
 {
    public:
-    ModelBuilder(std::string model_path) {
-        this->model_path = model_path;
-        this->runnable_ir = nullptr;
+    ModelBuilder(std::string model_path)
+    {
+        this->model_path_ = model_path;
+        this->runnable_ir_ = nullptr;
     }
 
     // compiler intput model_path; output NNIR(LLO)
@@ -20,11 +20,14 @@ class ModelBuilder
 
     RetVal preloadModel();
 
-    // Runnable NNIR
-    std::shared_ptr<nncir::NNIR> runnable_ir;
+    std::shared_ptr<nncir::NNIR> get_runnable_ir(){
+        return this->runnable_ir_;
+    }
    private:
-    std::string model_path;
+    // Runnable NNIR
+    std::shared_ptr<nncir::NNIR> runnable_ir_;
 
+    std::string model_path_;
 };
 
 }  // namespace nnrt

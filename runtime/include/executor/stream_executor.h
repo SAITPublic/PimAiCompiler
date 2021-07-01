@@ -1,9 +1,9 @@
 #pragma once
 #include <torch/script.h>
 #include <string>
+#include "ir/include/nn_ir.hpp"
 #include "model_builder.h"
 #include "nnrt_types.h"
-#include "ir/include/nn_ir.hpp"
 
 namespace nncir = nn_compiler::nn_ir;
 
@@ -14,7 +14,8 @@ class StreamExecutor
    public:
     StreamExecutor() {}
 
-     RetVal inferenceModel(const std::shared_ptr<nncir::NNIR> runnable_ir, const std::vector<torch::Tensor>& input_tensors, std::vector<torch::Tensor>& output_tensors);
+    RetVal inferenceModel(const std::shared_ptr<nncir::NNIR> runnable_ir,
+                          const std::vector<torch::Tensor>& input_tensors, std::vector<torch::Tensor>& output_tensors);
 
    private:
 };

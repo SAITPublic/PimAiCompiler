@@ -1,7 +1,7 @@
 #pragma once
 
-#include "osal_types.h"
 #include "common/include/types.hpp"
+#include "osal_types.h"
 
 namespace nnrt
 {

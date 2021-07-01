@@ -3,12 +3,10 @@
 #include <string>
 #include <unordered_map>
 #include <vector>
+#include "executor/prim_ops.h"
 #include "executor/prim_utils.h"
 #include "glog/logging.h"
 #include "stream_executor.h"
-#include "executor/prim_utils.h"
-#include "executor/prim_ops.h"
-
 
 namespace nnrt
 {
@@ -164,9 +162,9 @@ void primLoop(int max_trip_cnt, torch::Tensor& cond, int op_id, std::unordered_m
     blobs[loop_index_node->id] = torch::tensor(loop_index);
 
     // skip LoopIndexNode
-    OpNodeDescription* loop_start_op  = getNextExecutionOp(loop_index_node);
+    OpNodeDescription* loop_start_op = getNextExecutionOp(loop_index_node);
     OpNodeDescription* op_node = loop_start_op;
-    
+
     // Generate a Loop
     while (loop_index < max_trip_cnt && cond.item().toBool()) {
         while (op_node->type != "PrimEndLoop") {

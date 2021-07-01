@@ -10,5 +10,4 @@ PYBIND11_MODULE(Nnrt, m)
         .def(py::init<const std::string>())
         .def("test", &NNRuntime::test)
         .def("inferenceModel", &NNRuntime::inferenceModel, py::arg("input_tensors"));
-
 }

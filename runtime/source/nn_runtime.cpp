@@ -1,6 +1,6 @@
 #include "nn_runtime.h"
-#include <cstdio>
 #include <glog/logging.h>
+#include <cstdio>
 #include <memory>
 #include <tuple>
 
@@ -15,11 +15,10 @@ NNRuntime::NNRuntime(const std::string torch_model_path)
     builder.compileModel();
     builder.preloadModel();
 
-    this->mbuilder = std::make_shared<ModelBuilder>(builder);
+    this->mbuilder_ = std::make_shared<ModelBuilder>(builder);
 
-    this->executor = std::make_shared<StreamExecutor>();
+    this->executor_ = std::make_shared<StreamExecutor>();
 }
-
 
 std::vector<torch::Tensor> NNRuntime::inferenceModel(const std::vector<torch::Tensor>& input_tensors)
 {
@@ -29,13 +28,13 @@ std::vector<torch::Tensor> NNRuntime::inferenceModel(const std::vector<torch::Te
     }
 
     std::vector<torch::Tensor> output_tensors;
-    auto status = executor->inferenceModel((this->mbuilder->runnable_ir), input_tensors, output_tensors);
-    if(status != RetVal::SUCCESS) {
-        LOG(ERROR) <<" inference model fail!";
+    auto status = executor_->inferenceModel(this->mbuilder_->get_runnable_ir(), input_tensors, output_tensors);
+    if (status != RetVal::SUCCESS) {
+        LOG(ERROR) << " inference model fail!";
     }
 
     // for simple test, fill zeros to outputs
-    //output_tensors.push_back(torch::zeros({10, 10}, torch::kF16));
+    // output_tensors.push_back(torch::zeros({10, 10}, torch::kF16));
 
     DLOG(INFO) << "numOutps:" << output_tensors.size() << std::endl;
 

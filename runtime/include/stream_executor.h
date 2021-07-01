@@ -1,18 +1,19 @@
 #pragma once
 
-#include <string>
 #include <torch/script.h>
+#include <string>
 #include "model_builder.h"
 #include "nnrt_types.h"
 
-namespace nnrt {
-
-class StreamExecutor {
-
-  public:
-    StreamExecutor(){}
+namespace nnrt
+{
+class StreamExecutor
+{
+   public:
+    StreamExecutor() {}
 
     RetVal inferenceModel(const std::vector<torch::Tensor>& input_tensors, std::vector<torch::Tensor>& output_tensors);
+
    private:
 };
 
@@ -27,5 +28,4 @@ void executeOp(OpNodeDescription* cur_op);
  */
 OpNodeDescription* getNextExecutionOp(OpNodeDescription* cur_op);
 
-} // namespace nnrt
-
+}  // namespace nnrt

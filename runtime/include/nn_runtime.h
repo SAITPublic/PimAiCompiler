@@ -3,9 +3,9 @@
 #include <memory>
 #include <tuple>
 #include <vector>
+#include "executor/stream_executor.h"
 #include "model_builder.h"
 #include "nnrt_types.h"
-#include "executor/stream_executor.h"
 
 namespace nnrt
 {
@@ -22,9 +22,9 @@ class NNRuntime
 
    private:
     // Runnable NNIR in ModelBuilder
-    std::shared_ptr<ModelBuilder> mbuilder;
+    std::shared_ptr<ModelBuilder> mbuilder_;
 
-    std::shared_ptr<StreamExecutor> executor;
+    std::shared_ptr<StreamExecutor> executor_;
 };
 
 }  // namespace nnrt
