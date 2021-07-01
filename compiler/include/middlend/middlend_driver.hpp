@@ -65,6 +65,14 @@ class MiddlendDriver {
     RetVal wrapup();
 
     /**
+     * @brief   Do post-compile actions
+     * @details This function writes the result and verifies the result IR (optional)
+     * @inputs  a vector of NNIR graphs
+     * @returns return code
+     */
+    RetVal wrapup(std::vector<std::shared_ptr<nn_compiler::nn_ir::NNIR>>& NNIR_graphs);
+
+    /**
      * @brief   Destroy all data and terminate the program
      * @details This function destroies all remained data and releases allocated memories
      * @returns return code

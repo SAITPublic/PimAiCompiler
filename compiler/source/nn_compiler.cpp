@@ -85,7 +85,7 @@ RetVal NNCompiler::middlend(const std::string& file_path) {
     middlend_driver_->initialize(file_path);
     middlend_driver_->build();
     middlend_driver_->run();
-    middlend_driver_->wrapup();
+    middlend_driver_->wrapup(NNIR_graphs_);
     middlend_driver_->finalize();
 
     return RetVal::SUCCESS;
@@ -97,7 +97,7 @@ RetVal NNCompiler::middlend() {
     middlend_driver_->initialize(NNIR_graphs_);
     middlend_driver_->build();
     middlend_driver_->run();
-    middlend_driver_->wrapup();
+    middlend_driver_->wrapup(NNIR_graphs_);
     middlend_driver_->finalize();
 
     return RetVal::SUCCESS;

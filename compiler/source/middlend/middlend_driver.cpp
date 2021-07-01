@@ -75,6 +75,16 @@ RetVal MiddlendDriver::wrapup() {
     return RetVal::SUCCESS;
 }
 
+RetVal MiddlendDriver::wrapup(std::vector<std::shared_ptr<nn_compiler::nn_ir::NNIR>>& NNIR_graphs) {
+    Log::ME::I() << "NNCompiler MiddlendDriver::wrapup() is called";
+
+    NNIR_graphs.clear();
+    for (auto graph : graphs_) {
+        NNIR_graphs.push_back(graph);
+    }
+    return RetVal::SUCCESS;
+}
+
 RetVal MiddlendDriver::finalize() {
     return RetVal::SUCCESS;
 }
