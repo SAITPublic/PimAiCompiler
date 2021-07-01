@@ -9,19 +9,12 @@
  */
 
 #include <gtest/gtest.h>
-#include "ATen/ATen.h"
 #include "executor/aten_ops.h"
 #include "glog/logging.h"
-
-// #include "aten_op.h"
-// #include "hip/hip_runtime.h"
-// #include "prim_op_utils"
-// #include "executor/prim_ops.h"
 
 using namespace torch;
 using namespace at;
 using namespace c10;
-// using namespace nnr;
 
 #define ASSERT_EQUAL(t1, t2) ASSERT_TRUE(t1.equal(t2));
 
