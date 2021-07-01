@@ -1,5 +1,6 @@
-#include <vector>
 #include <gtest/gtest.h>
+#include <stdint.h>
+#include <vector>
 #include <torch/script.h>
 #include "executor/prim_ops.h"
 #include "ut_utils.h"
@@ -121,4 +122,148 @@ TEST(NnrUnitTest, primTupleUnpack)
         EXPECT_TRUE(ret.at(i).isTensor());
         ASSERT_EQUAL(ret.at(i).toTensor(), tensors.at(i));
     }
+}
+
+TEST(NnrUnitTest, primConstant)
+{
+    // case 1: scalar type
+    {
+        int64_t sint64 = 128;
+        double sdouble = 128.5;
+        EXPECT_TRUE(sint64 == nnrt::primScalarConstant<int64_t>(&sint64));
+        EXPECT_TRUE(sdouble == nnrt::primScalarConstant<double>(&sdouble));
+    }
+
+    // case 2: Tensor type
+    {
+        int sz = 10;
+        vector<c10::ScalarType> types{torch::kFloat32, torch::kHalf};
+        for (auto& tp : types) {
+            torch::Tensor tensor = torch::randn({sz, sz}, tp);
+            std::vector<int64_t> shape;
+            for (auto& item : tensor.sizes()) shape.push_back(item);
+            if (tp == torch::kHalf) {
+                ASSERT_EQUAL(nnrt::primTensorConstant(tensor.data_ptr(), shape, DataType::FLOAT16), tensor);
+            } else if (tp == torch::kFloat32) {
+                ASSERT_EQUAL(nnrt::primTensorConstant(tensor.data_ptr(), shape, DataType::FLOAT32), tensor);
+            }
+        }
+    }
+
+    // case 3: Str type
+    {
+        char* str = "PIMRuntime";
+        EXPECT_TRUE(strcmp(nnrt::primStrConstsnt(static_cast<void*>(str)).c_str(), str) == 0);
+    }
+}
+
+TEST(NnrUnitTest, primListConstructAndUnpack)
+{   
+#define LIST_CONSTRUCT_TEST(name)                                        \
+    vector<torch::IValue> iv;                                            \
+    iv.clear();                                                          \
+    for (auto& item : vars) {                                            \
+        iv.push_back({item});                                            \
+    }                                                                    \
+    nnrt::primListConstruct(iv, iv.size(), at::ListType::of##name##s());
+
+    // case 1: int, int --> int[]
+    {
+        // Pack
+        std::vector<int> vars = {1, 2, 3, 4};
+        LIST_CONSTRUCT_TEST(Int);
+
+        for (int i = 0; i < vars.size(); i++) {
+            EXPECT_TRUE(iv[0].toIntList().get(i) == vars[i]);
+        }
+
+        // Unpack
+        nnrt::primListUnpack(iv, vars.size());
+        for(int i=0;i<iv.size(); i++){
+            EXPECT_TRUE(iv[i].toInt() == vars[i]);
+        }
+
+    }
+
+    // case 2: tensor, tensor --> tensor[]
+    {
+        // Pack
+        int sz = 20;
+        std::vector<torch::Tensor> vars = {torch::randn({sz, sz}, torch::kHalf),
+                                           torch::randn({sz / 2, sz / 2}, torch::kHalf),
+                                           torch::randn({sz / 2, sz / 2}, torch::kHalf)};
+        
+        LIST_CONSTRUCT_TEST(Tensor);
+        for (int i = 0; i < vars.size(); i++) {
+            ASSERT_EQUAL(iv[0].toTensorList().get(i), vars[i]);
+        }
+
+        // Unpack
+        nnrt::primListUnpack(iv, vars.size());
+        for(int i=0;i<iv.size();i++){
+            ASSERT_EQUAL(iv[i].toTensor(), vars[i]);
+        }
+    }
+}
+
+TEST(NnrUnitTest, primIf)
+{
+    /**
+     *  A Simple TestCase
+     *
+     * a1 = 10
+     * b1 = 5
+     * c1 = 3
+     * d1 = 2
+     * bool x1 = a1 > b1
+     * if x1:
+     *      y1 = a1 + b1
+     *      y2 = y1 * c1
+     *      return y2
+     * else:
+     *      z1 = a1 * b1
+     *      z2 = z1 + d1
+     *      return z2
+     *
+     */
+
+    int a1 = 10, b1 = 5, c1 = 3, d1 = 2;
+    bool x1 = a1 > b1;
+
+    auto fun_1 = [=]() {
+        int ret = 0;
+        if (x1) {
+            int y1 = a1 + b1;
+            int y2 = y1 * c1;
+            ret = y2;
+        } else {
+            int z1 = a1 * b1;
+            int z2 = z1 + d1;
+            ret = z2;
+        }
+        return ret;
+    };
+
+    auto fun_2 = [=]() {
+        int ret = 0;
+        if (nnrt::primIf(x1)) {
+            int y1 = a1 + b1;
+            int y2 = y1 * c1;
+            ret = nnrt::primEndIf(y2);
+        } else {
+            int z1 = a1 * b1;
+            int z2 = z1 + d1;
+            ret = nnrt::primEndIf(z2);
+        }
+        return ret;
+    };
+
+    EXPECT_TRUE(fun_1() == fun_2());
+}
+
+TEST(NnrUnitTest, primUncheckedCast)
+{
+    int sz = 10;
+    torch::Tensor tensor = torch::randn({sz, sz});
+    ASSERT_EQUAL(tensor, nnrt::primUncheckedCast(tensor));
 }

@@ -27,21 +27,20 @@ void drop(std::vector<torch::jit::IValue>& stack, size_t n) { stack.erase(stack.
 torch::Tensor createPtTensor(void* data_ptr, std::vector<int64_t>& shape, DataType dtype)
 {
     c10::ScalarType scalar_type;
-    if (dtype == DataType::FLOAT32)
+
+    if (dtype == DataType::FLOAT32) {
         scalar_type = c10::ScalarType::Float;
-    else if (dtype == DataType::FLOAT16)
+    }
+    else if (dtype == DataType::FLOAT16) {
         scalar_type = c10::ScalarType::Half;
-    else if (dtype == DataType::INT32)
+    } else if (dtype == DataType::INT32) {
         scalar_type = c10::ScalarType::Int;
-    else {
+    } else {
         DLOG(ERROR) << "Unsupport dtype when create Tensor";
     }
 
-    c10::TensorOptions option;
-    option.dtype(scalar_type);
-
     auto sizes = c10::IntArrayRef(shape);
-    return torch::from_blob(data_ptr, sizes, option);
+    return torch::from_blob(data_ptr, sizes, c10::TensorOptions().dtype(scalar_type));
 }
 
 }  // namespace nnrt

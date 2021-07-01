@@ -35,13 +35,6 @@ torch::IValue primUninitialized()
     return ret;
 }
 
-template <typename T>
-T primUncheckedCast(const T& inputs)
-{
-    // no
-    auto outputs = inputs;
-    return outputs;
-}
 
 void primRaiseException(std::string& msg) { throw nnrt::NNRuntimeException(msg); }
 
@@ -133,24 +126,13 @@ bool primIf(bool cond) { return cond; }
  * @param inputs
  * @return T
  */
-template <typename T>
-T primEndIf(T& inputs)
-{
-    auto ret = std::move<T>(inputs);
-    return ret;
-}
+// template <typename T>
+// T primEndIf(T& inputs)
+// {
+//     auto ret = std::move<T>(inputs);
+//     return ret;
+// }
 
-// Scalars: FLOAT64,INT64(BOOL as treated as INT64)
-template <typename T>
-T primScalarConstant(T* data_ptr)
-{
-    if (std::is_same<T, int64_t>::value || std::is_same<T, int32_t>::value || std::is_same<T, float>::value ||
-        std::is_same<T, double>::value) {
-        return *data_ptr;
-    } else {
-        DLOG(ERROR) << "Unsupported scalar type!";
-    }
-}
 
 // STRING, DEVICE
 std::string primStrConstsnt(void* data_ptr)
