@@ -9,8 +9,9 @@
  */
 
 #include <gtest/gtest.h>
-#include "executor/aten_ops.h"
 #include "glog/logging.h"
+#include "executor/aten_ops.h"
+#include "executor/prim_ops.h"
 
 using namespace torch;
 using namespace at;
@@ -29,13 +30,13 @@ TEST(NnrUnitTest, addTest)
     Scalar r_s = r_value;
     Scalar alpha = a_value;
 
-    auto l = from_blob(l_data, {shape}, kCPU);
+    auto l = at::from_blob(l_data, {shape}, kCPU);
     auto l_gpu = l.to(kCUDA);
     auto rt = nnrt::atenAdd(l_gpu, r_s, alpha);
     rt.to(kCPU);
 
     float r_data[]{r_value, r_value, r_value, r_value};
-    auto r = from_blob(r_data, {shape}, kCPU);
+    auto r = at::from_blob(r_data, {shape}, kCPU);
     auto r_gpu = r.to(kCUDA);
     auto rt_v = nnrt::atenAdd(l_gpu, r_gpu, alpha);
     rt_v.to(kCPU);
@@ -72,11 +73,11 @@ TEST(NnrUnitTest, addmmTest)
         bench[i] = i;
     }
 
-    auto tensor_left = from_blob(tensorData, {shape_m, shape_k}, kCPU);
+    auto tensor_left = at::from_blob(tensorData, {shape_m, shape_k}, kCPU);
     auto tensor_left_gpu = tensor_left.to(kCUDA);
-    auto tensor_right = from_blob(tensorData, {shape_k, shape_n}, kCPU);
+    auto tensor_right = at::from_blob(tensorData, {shape_k, shape_n}, kCPU);
     auto tensor_right_gpu = tensor_right.to(kCUDA);
-    auto result = from_blob(tensorData, {shape_m, shape_n}, kCPU);
+    auto result = at::from_blob(tensorData, {shape_m, shape_n}, kCPU);
     auto result_gpu = result.to(kCUDA);
 
     result_gpu = nnrt::atenAddmm(result_gpu, tensor_left_gpu, tensor_right_gpu, beta, alpha);
@@ -108,7 +109,7 @@ TEST(NnrUnitTest, catTest)
     int shape_h = 3;
     int shape_w = 4;
     int dim = 1;
-    auto t = randn({shape_h, shape_w}, kCUDA);
+    auto t = at::randn({shape_h, shape_w}, kCUDA);
     auto t_list = split(t, 1, dim);
     auto r = nnrt::atenCat(t_list, dim);
     ASSERT_EQUAL(t, r);
@@ -118,7 +119,7 @@ TEST(NnrUnitTest, ceilTest)
 {
     // smallest integer value not less than arg.
     int shape_w = 5;
-    auto t = randn({shape_w}, kCPU);
+    auto t = at::randn({shape_w}, kCPU);
     auto t_gpu = t.to(kCUDA);
     auto t_ceil = nnrt::atenCeil(t_gpu);
     auto t_cpu = nnrt::atenCeil(t);
@@ -129,8 +130,8 @@ TEST(NnrUnitTest, divTest)
 {
     // result = tensor_a / tensor_b;
     int shape = 6;
-    auto t = randn({shape}, kCPU);
-    auto d = randn({shape}, kCPU);
+    auto t = at::randn({shape}, kCPU);
+    auto d = at::randn({shape}, kCPU);
     auto r = nnrt::atenDiv(t, d);
 
     auto t_gpu = t.to(kCUDA);
@@ -151,7 +152,7 @@ TEST(NnrUnitTest, dropoutTest)
 {
     // result = dropout(tensor, probability([0 ~ 1]);
     int shape = 6;
-    auto t = randn({shape}, kCPU);
+    auto t = at::randn({shape}, kCPU);
     auto t_gpu = t.to(kCUDA);
     double d_s = 0.25;
 
@@ -174,13 +175,13 @@ TEST(NnrUnitTest, embeddingTest)
     bool scale_grad_by_freq = false;
     bool sparse = false;
 
-    auto t = randn({shape_h, shape_w}, kCPU);
+    auto t = at::randn({shape_h, shape_w}, kCPU);
     DLOG(INFO) << t;
     auto t_gpu = t.to(kCUDA);
 
     int shape_indices = 4;
     int64_t tensorData[] = {1, 2, 6, 3};
-    auto indices = from_blob(tensorData, {shape_indices}, TensorOptions().dtype(kLong).device(kCPU));
+    auto indices = at::from_blob(tensorData, {shape_indices}, TensorOptions().dtype(kLong).device(kCPU));
     DLOG(INFO) << indices;
     auto r = nnrt::atenEmbedding(t, indices, padding_idx, scale_grad_by_freq, sparse);
     auto indices_gpu = indices.to(kCUDA);
@@ -203,17 +204,17 @@ TEST(NnrUnitTest, lstmTest)
     bool bidirectional = false;
     double dropout = 0.0;
 
-    auto input = randn({seq_len, batch_size, input_size}, kCPU);
-    auto hx = randn({num_layer, batch_size, hidden_size}, kCPU);
-    auto hc = randn({num_layer, batch_size, hidden_size}, kCPU);
+    auto input = at::randn({seq_len, batch_size, input_size}, kCPU);
+    auto hx = at::randn({num_layer, batch_size, hidden_size}, kCPU);
+    auto hc = at::randn({num_layer, batch_size, hidden_size}, kCPU);
 
     std::vector<Tensor> h_tmp;
     h_tmp.push_back(hx);
     h_tmp.push_back(hc);
     c10::ArrayRef<at::Tensor> h_tuple(h_tmp.data(), 2);
 
-    auto param_i = randn({4 * hidden_size, input_size}, kCPU);
-    auto param_h = randn({4 * hidden_size, hidden_size}, kCPU);
+    auto param_i = at::randn({4 * hidden_size, input_size}, kCPU);
+    auto param_h = at::randn({4 * hidden_size, hidden_size}, kCPU);
     std::vector<Tensor> param_tmp;
     param_tmp.push_back(param_i);
     param_tmp.push_back(param_h);
@@ -249,10 +250,10 @@ TEST(NnrUnitTest, copyTest)
 {
     bool non_blocking = false;
     int n = 100;
-    auto t = randn({n}, kCPU);
-    auto d = randn({n}, kCPU);
-    auto g = randn({n}, kCUDA);
-    auto r = randn({n}, kCUDA);
+    auto t = at::randn({n}, kCPU);
+    auto d = at::randn({n}, kCPU);
+    auto g = at::randn({n}, kCUDA);
+    auto r = at::randn({n}, kCUDA);
 
     // cpu to cpu
     nnrt::atenCopy_(d, t, non_blocking);
@@ -276,7 +277,7 @@ TEST(NnrUnitTest, expandTest)
     int64_t s[] = {m, n};
     bool implicit = false;
 
-    auto t = randn({n}, kCPU);
+    auto t = at::randn({n}, kCPU);
     auto t_gpu = t.to(kCUDA);
     ArrayRef<int64_t> s_v(s, dim);
     DLOG(INFO) << t;
@@ -293,7 +294,7 @@ TEST(NnrUnitTest, itemTest)
     int n = 1;
     EXPECT_TRUE(n == 1);
 
-    auto t = randn({n}, kCPU);
+    auto t = at::randn({n}, kCPU);
     auto t_gpu = t.to(kCUDA);
     DLOG(INFO) << t;
 
@@ -311,8 +312,8 @@ TEST(NnrUnitTest, eqTest)
     float b = 42;
     float tensor1Data[]{b, b, b, b};
 
-    auto tensor1 = from_blob(tensor1Data, {shape}, kCPU);
-    auto tensor2 = from_blob(tensor1Data, {shape}, kCPU);
+    auto tensor1 = at::from_blob(tensor1Data, {shape}, kCPU);
+    auto tensor2 = at::from_blob(tensor1Data, {shape}, kCPU);
     auto b_scalar = b;
 
     auto r_s = nnrt::atenEq(tensor1, b_scalar);
@@ -330,8 +331,8 @@ TEST(NnrUnitTest, gtTest)
     float tensor1Data[]{b, b, b, b};
     float tensor2Data[]{b + c, b + c, b + c, b + c};
 
-    auto tensor1 = from_blob(tensor1Data, {shape}, kCPU);
-    auto tensor2 = from_blob(tensor2Data, {shape}, kCPU);
+    auto tensor1 = at::from_blob(tensor1Data, {shape}, kCPU);
+    auto tensor2 = at::from_blob(tensor2Data, {shape}, kCPU);
     auto b_scalar = b + c;
 
     auto r_s = nnrt::atenGt(tensor1, b_scalar);
@@ -350,8 +351,8 @@ TEST(NnrUnitTest, ltTest)
     float tensor1Data[]{b, b, b, b};
     float tensor2Data[]{b + c, b + c, b + c, b + c};
 
-    auto tensor1 = from_blob(tensor1Data, {shape}, kCPU);
-    auto tensor2 = from_blob(tensor2Data, {shape}, kCPU);
+    auto tensor1 = at::from_blob(tensor1Data, {shape}, kCPU);
+    auto tensor2 = at::from_blob(tensor2Data, {shape}, kCPU);
     auto b_scalar = b + c;
 
     auto r_s = nnrt::atenLt(tensor1, b_scalar);
@@ -370,8 +371,8 @@ TEST(NnrUnitTest, neTest)
     float tensor1Data[]{b, b, b, b};
     float tensor2Data[]{b + c, b + c, b + c, b + c};
 
-    auto tensor1 = from_blob(tensor1Data, {shape}, kCPU);
-    auto tensor2 = from_blob(tensor2Data, {shape}, kCPU);
+    auto tensor1 = at::from_blob(tensor1Data, {shape}, kCPU);
+    auto tensor2 = at::from_blob(tensor2Data, {shape}, kCPU);
     auto b_scalar = b + c;
 
     auto r_s = nnrt::atenNe(tensor1, b_scalar);
@@ -385,7 +386,7 @@ TEST(NnrUnitTest, negTest)
 {
     // r = -a;
     int n = 10;
-    auto t = randn({n}, kCPU);
+    auto t = at::randn({n}, kCPU);
     auto t_gpu = t.to(kCUDA);
     DLOG(INFO) << t;
     auto t_n = nnrt::atenNeg(t);
@@ -409,9 +410,9 @@ TEST(NnrUnitTest, maxTest)
     DLOG(INFO) << dimname;
     bool keep_dim = true;
 
-    auto t = randn({n}, kCPU);
-    auto d = randn({n}, kCPU);
-    auto t_d = randn({m, n}, kCPU);
+    auto t = at::randn({n}, kCPU);
+    auto d = at::randn({n}, kCPU);
+    auto t_d = at::randn({m, n}, kCPU);
     DLOG(INFO) << t;
     DLOG(INFO) << d;
     DLOG(INFO) << t_d;
@@ -429,7 +430,7 @@ TEST(NnrUnitTest, reluTest)
 {
     // r = relu(tensor)
     int n = 10;
-    auto t = randn({n}, kCPU);
+    auto t = at::randn({n}, kCPU);
     auto t_gpu = t.to(kCUDA);
     auto r = nnrt::atenRelu(t);
     auto r_gpu = nnrt::atenRelu(t_gpu);
@@ -443,7 +444,7 @@ TEST(NnrUnitTest, selectTest)
     int64_t dim = 0;
     int64_t index = 1;
 
-    auto t = randn({m, n}, kCPU);
+    auto t = at::randn({m, n}, kCPU);
     auto t_gpu = t.to(kCUDA);
     DLOG(INFO) << t;
     auto r = nnrt::atenSelect(t, dim, index);
@@ -460,7 +461,7 @@ TEST(NnrUnitTest, sizeTest)
     int m = 9;
     int64_t dim = 0;
 
-    auto t = randn({m, n}, kCPU);
+    auto t = at::randn({m, n}, kCPU);
     auto t_gpu = t.to(kCUDA);
     int64_t r = nnrt::atenSize(t, dim);
     int64_t r_gpu = nnrt::atenSize(t_gpu, dim);
@@ -476,7 +477,7 @@ TEST(NnrUnitTest, sliceTest)
     int64_t start = 1;
     int64_t end = 6;
     int64_t step = 2;
-    auto t = randn({m, n}, kCPU);
+    auto t = at::randn({m, n}, kCPU);
     auto t_gpu = t.to(kCUDA);
     DLOG(INFO) << t;
     auto r = nnrt::atenSlice(t, dim, start, end, step);
@@ -491,9 +492,9 @@ TEST(NnrUnitTest, subTest)
     int n = 10;
     int m = 9;
     float alpha_value = 4;
-    auto l = randn({m, n}, kCPU);
+    auto l = at::randn({m, n}, kCPU);
     auto l_gpu = l.to(kCUDA);
-    auto r = randn({m, n}, kCPU);
+    auto r = at::randn({m, n}, kCPU);
     auto r_gpu = r.to(kCUDA);
     Scalar alpha = alpha_value;
 
@@ -518,7 +519,7 @@ TEST(NnrUnitTest, toTest)
     // from tensor to another tensor
     int n = 10;
     int m = 9;
-    auto t = randn({m, n}, kCPU);
+    auto t = at::randn({m, n}, kCPU);
     DLOG(INFO) << t;
     bool non_blocking = false;
     bool copy = false;
@@ -527,7 +528,7 @@ TEST(NnrUnitTest, toTest)
     at::Device device(kCPU);
     auto r = nnrt::atenTo(t, device, dtype, non_blocking, copy, optional_memory_format);
     DLOG(INFO) << r;
-    auto d = randn({m, n}, kCPU);
+    auto d = at::randn({m, n}, kCPU);
     auto rt = nnrt::atenTo(t, d, non_blocking, copy, optional_memory_format);
     DLOG(INFO) << d;
     DLOG(INFO) << rt;
@@ -539,7 +540,7 @@ TEST(NnrUnitTest, transposeTest)
     // r = transpose(a)
     int n = 10;
     int m = 9;
-    auto t = randn({m, n}, kCUDA);
+    auto t = at::randn({m, n}, kCUDA);
     int64_t dim0 = 0;
     int64_t dim1 = 1;
     ASSERT_EQUAL(nnrt::atenTranspose(nnrt::atenTranspose(t, dim0, dim1), dim0, dim1), t);
@@ -551,7 +552,7 @@ TEST(NnrUnitTest, unsqueezeTest)
     int n = 10;
     int m = 9;
     int64_t dim = 1;
-    auto t = randn({m, n}, kCUDA);
+    auto t = at::randn({m, n}, kCUDA);
     DLOG(INFO) << t;
     auto r = nnrt::atenUnsqueeze(t, dim);
     DLOG(INFO) << r;
@@ -575,7 +576,7 @@ TEST(NnrUnitTest, zeros_likeTest)
     // tensor = 0
     int n = 10;
     int m = 9;
-    auto t = randn({m, n});
+    auto t = at::randn({m, n});
     DLOG(INFO) << t;
 
     auto options = TensorOptions().dtype(kFloat).layout(kStrided).device(kCPU);
@@ -599,9 +600,9 @@ TEST(NnrUnitTest, matmulTest)
         tensorData[i] = i;
     }
 
-    auto tensor_left = from_blob(tensorData, {shape_m, shape_k}, kCPU);
+    auto tensor_left = at::from_blob(tensorData, {shape_m, shape_k}, kCPU);
     auto tensor_left_gpu = tensor_left.to(kCUDA);
-    auto tensor_right = from_blob(tensorData, {shape_k, shape_n}, kCPU);
+    auto tensor_right = at::from_blob(tensorData, {shape_k, shape_n}, kCPU);
     auto tensor_right_gpu = tensor_right.to(kCUDA);
 
     auto result = nnrt::atenMatmul(tensor_left_gpu, tensor_right_gpu);
@@ -626,4 +627,120 @@ TEST(NnrUnitTest, matmulTest)
         }
     }
     EXPECT_TRUE(ret == 0);
+}
+
+TEST(NnrUnitTest, deriveTest)
+{
+    // r = start + index * step
+    int64_t start = 10;
+    int64_t index = 9;
+    int64_t step = 8; 
+    int64_t t = start + index * step;
+    int64_t r = nnrt::atenDeriveIndex(start, index, step); 
+    EXPECT_TRUE(t == r);
+}
+
+TEST(NnrUnitTest, getItemTest)
+{
+    #define LIST_CONSTRUCT_TEST(name)                                        \
+    std::vector<torch::IValue> iv;                                            \
+    iv.clear();                                                          \
+    for (auto& item : vars) {                                            \
+        iv.push_back({item});                                            \
+    }                                                                    \
+    at::ListTypePtr type = at::ListType::of##name##s();
+
+    std::vector<int> vars = {1, 2, 3, 4};
+    LIST_CONSTRUCT_TEST(Int);
+     
+    c10::List<torch::jit::IValue> vals(type->getElementType());
+    vals.reserve(iv.size());
+    for (size_t i = iv.size() - iv.size(); i < iv.size(); ++i) {
+        vals.emplace_back(std::move(iv[i]));
+    }
+    for(int i=0;i<iv.size(); i++){
+        auto r = nnrt::atenGetItem(vals, i) ; 
+        EXPECT_TRUE(r.toInt() == vars[i]);
+    }
+}
+
+TEST(NnrUnitTest, isTest)
+{
+    int n = 10;
+    int m = 9;
+    auto t = at::randn({m, n});
+    auto s = t.to(kCUDA);
+    EXPECT_TRUE(nnrt::atenIs(t, t) == true);
+    EXPECT_TRUE(nnrt::atenIs(t, s) == false);
+}
+
+TEST(NnrUnitTest,  appendLenTest)
+{
+    #define LIST_CONSTRUCT_TEST(name)                                        \
+    std::vector<torch::IValue> iv;                                            \
+    iv.clear();                                                          \
+    for (auto& item : vars) {                                            \
+        iv.push_back({item});                                            \
+    }                                                                    \
+    at::ListTypePtr type = at::ListType::of##name##s();
+
+    std::vector<int> vars = {1, 2, 3, 4};
+    LIST_CONSTRUCT_TEST(Int);
+     
+    c10::List<torch::jit::IValue> vals(type->getElementType());
+    vals.reserve(iv.size());
+    for (size_t i = iv.size() - iv.size(); i < iv.size(); ++i) {
+        vals.emplace_back(std::move(iv[i]));
+    }
+    int t_i = 5;
+    torch::IValue tmp(t_i);
+    nnrt::atenAppend(vals, tmp);
+    auto r = nnrt::atenGetItem(vals, 4) ;
+    EXPECT_TRUE(r.toInt() == t_i);
+
+    int64_t rt = nnrt::atenLen(vals);
+    EXPECT_TRUE(rt == 5);
+}
+
+TEST(NnrUnitTest,  dimTest)
+{
+    int n = 10;
+    int m = 9;
+    auto t = at::randn({m, n});
+    int64_t r = nnrt::atenDim(t);
+    EXPECT_TRUE(r == 2);
+}
+
+TEST(NnrUnitTest, intTest)
+{
+    int n = 1;
+    int m = 1;
+    auto t = at::randn({m, n});
+    int64_t r = nnrt::atenInt(t);
+    EXPECT_TRUE(r == t.item<int64_t>());
+    bool i = false;
+    r = nnrt::atenInt(i);
+    EXPECT_TRUE(r == 0);
+    float f = 2.f;
+    r = nnrt::atenInt(f);
+    EXPECT_TRUE(r == 2);
+    at::IValue scalar(n);
+    r = nnrt::atenInt(scalar);
+    EXPECT_TRUE(r == n);
+}
+
+TEST(NnrUnitTest, formatTest)
+{
+    std::string t("{abc}");
+    std::string d("d");
+    std::string a("__");
+    auto r = nnrt::atenFormat(t, d, a);
+    EXPECT_TRUE(r == "dbc__");
+}
+
+TEST(NnrUnitTest, listTest)
+{
+    std::string t("abc");
+    auto r = nnrt::atenList(t);
+    EXPECT_TRUE(r.get(0) == "a");
 }

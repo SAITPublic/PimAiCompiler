@@ -60,8 +60,27 @@ at::Tensor atenEq(const at::Tensor &self, const at::Tensor &other);
 
 at::Tensor atenExpand(const at::Tensor &self, at::IntArrayRef size, bool implicit = false);
 
+static std::string atenFormat(const std::string &fmt)
+{
+    int index = fmt.find_first_of("{}");
+    if (index != std::string::npos) {
+        DLOG(ERROR) << "Too few arguments for format string:" << fmt;
+    }
+    return fmt;
+}
+
 template <typename T, typename... Types>
-std::string atenFormat(std::string &fmt, const T &next, const Types &... args);
+std::string atenFormat(std::string &fmt, const T &next, const Types &... args)
+{
+    int index = fmt.find_first_of("{}");
+    if (index == std::string::npos) {
+        return fmt;
+    }
+    std::stringstream oss;
+    oss << next;
+    fmt.replace(index, 2, oss.str());
+    return atenFormat(fmt, args...);
+}
 
 at::Tensor atenGt(const at::Tensor &self, const at::Scalar &other);
 
