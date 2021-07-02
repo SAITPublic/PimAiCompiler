@@ -7,6 +7,15 @@
             "enable"       : true,
             "ctx_data"     : [ {"name" : "DeviceLabelInfo", "mode" : "write"} ],
             "utils"        : ["OpBasicUtil"]
+        },
+        {
+            "name"         : "MemoryLabelingPass",
+            "type"         : "memory",
+            "is_mandatory" : true,
+            "enable"       : true,
+            "ctx_data"     : [ {"name" : "MemoryLabelInfo", "mode" : "write"},
+                               {"name" : "DeviceLabelInfo", "mode" : "write"}],
+            "utils"        : ["OpBasicUtil"]
         }
     ]
 }

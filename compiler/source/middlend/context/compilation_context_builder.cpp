@@ -2,6 +2,7 @@
 
 // Add new CompilationContext file here
 #include "compiler/include/middlend/context/device_label_info.hpp"
+#include "compiler/include/middlend/context/memory_label_info.hpp"
 
 namespace nn_compiler {
 

@@ -2,6 +2,8 @@
 
 // add pass files
 #include "compiler/include/middlend/passes/graph/device_labeling.hpp"
+#include "compiler/include/middlend/passes/memory/memory_labeling.hpp"
+
 
 #include <experimental/filesystem>
 #include <unistd.h>
