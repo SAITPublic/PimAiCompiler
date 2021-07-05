@@ -9,9 +9,9 @@
  */
 
 #include <gtest/gtest.h>
-#include "glog/logging.h"
 #include "executor/aten_ops.h"
 #include "executor/prim_ops.h"
+#include "glog/logging.h"
 
 using namespace torch;
 using namespace at;
@@ -634,32 +634,32 @@ TEST(NnrUnitTest, deriveTest)
     // r = start + index * step
     int64_t start = 10;
     int64_t index = 9;
-    int64_t step = 8; 
+    int64_t step = 8;
     int64_t t = start + index * step;
-    int64_t r = nnrt::atenDeriveIndex(start, index, step); 
+    int64_t r = nnrt::atenDeriveIndex(start, index, step);
     EXPECT_TRUE(t == r);
 }
 
 TEST(NnrUnitTest, getItemTest)
 {
-    #define LIST_CONSTRUCT_TEST(name)                                        \
-    std::vector<torch::IValue> iv;                                            \
-    iv.clear();                                                          \
-    for (auto& item : vars) {                                            \
-        iv.push_back({item});                                            \
-    }                                                                    \
+#define LIST_CONSTRUCT_TEST(name)  \
+    std::vector<torch::IValue> iv; \
+    iv.clear();                    \
+    for (auto& item : vars) {      \
+        iv.push_back({item});      \
+    }                              \
     at::ListTypePtr type = at::ListType::of##name##s();
 
     std::vector<int> vars = {1, 2, 3, 4};
     LIST_CONSTRUCT_TEST(Int);
-     
+
     c10::List<torch::jit::IValue> vals(type->getElementType());
     vals.reserve(iv.size());
-    for (size_t i = iv.size() - iv.size(); i < iv.size(); ++i) {
+    for (size_t i = 0; i < iv.size(); ++i) {
         vals.emplace_back(std::move(iv[i]));
     }
-    for(int i=0;i<iv.size(); i++){
-        auto r = nnrt::atenGetItem(vals, i) ; 
+    for (int i = 0; i < iv.size(); i++) {
+        auto r = nnrt::atenGetItem(vals, i);
         EXPECT_TRUE(r.toInt() == vars[i]);
     }
 }
@@ -674,19 +674,19 @@ TEST(NnrUnitTest, isTest)
     EXPECT_TRUE(nnrt::atenIs(t, s) == false);
 }
 
-TEST(NnrUnitTest,  appendLenTest)
+TEST(NnrUnitTest, appendLenTest)
 {
-    #define LIST_CONSTRUCT_TEST(name)                                        \
-    std::vector<torch::IValue> iv;                                            \
-    iv.clear();                                                          \
-    for (auto& item : vars) {                                            \
-        iv.push_back({item});                                            \
-    }                                                                    \
+#define LIST_CONSTRUCT_TEST(name)  \
+    std::vector<torch::IValue> iv; \
+    iv.clear();                    \
+    for (auto& item : vars) {      \
+        iv.push_back({item});      \
+    }                              \
     at::ListTypePtr type = at::ListType::of##name##s();
 
     std::vector<int> vars = {1, 2, 3, 4};
     LIST_CONSTRUCT_TEST(Int);
-     
+
     c10::List<torch::jit::IValue> vals(type->getElementType());
     vals.reserve(iv.size());
     for (size_t i = iv.size() - iv.size(); i < iv.size(); ++i) {
@@ -695,14 +695,14 @@ TEST(NnrUnitTest,  appendLenTest)
     int t_i = 5;
     torch::IValue tmp(t_i);
     nnrt::atenAppend(vals, tmp);
-    auto r = nnrt::atenGetItem(vals, 4) ;
+    auto r = nnrt::atenGetItem(vals, 4);
     EXPECT_TRUE(r.toInt() == t_i);
 
     int64_t rt = nnrt::atenLen(vals);
     EXPECT_TRUE(rt == 5);
 }
 
-TEST(NnrUnitTest,  dimTest)
+TEST(NnrUnitTest, dimTest)
 {
     int n = 10;
     int m = 9;
@@ -731,11 +731,12 @@ TEST(NnrUnitTest, intTest)
 
 TEST(NnrUnitTest, formatTest)
 {
-    std::string t("{abc}");
+    std::string t("{}abc{}");
     std::string d("d");
     std::string a("__");
     auto r = nnrt::atenFormat(t, d, a);
-    EXPECT_TRUE(r == "dbc__");
+    std::cout << r << std::endl;
+    EXPECT_TRUE(r == "dabc__");
 }
 
 TEST(NnrUnitTest, listTest)
