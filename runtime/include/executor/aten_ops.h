@@ -5,6 +5,7 @@
 #ifndef NNCOMPILER_ATEN_OP_H
 #define NNCOMPILER_ATEN_OP_H
 #include "ATen/ATen.h"
+#include "glog/logging.h"
 
 namespace nnrt
 {
@@ -22,8 +23,8 @@ at::Tensor &atenAdd_(at::Tensor &self, const at::Tensor &other, at::Scalar alpha
 
 at::Tensor &atenAdd_(at::Tensor &self, at::Scalar other, at::Scalar alpha = 1);
 
-at::Tensor atenAddmm(const at::Tensor &self, const at::Tensor &mat1, const at::Tensor &mat2,
-                     const at::Scalar &beta = 1, const at::Scalar &alpha = 1);
+at::Tensor atenAddmm(const at::Tensor &self, const at::Tensor &mat1, const at::Tensor &mat2, const at::Scalar &beta = 1,
+                     const at::Scalar &alpha = 1);
 
 void atenAppend(c10::List<at::IValue> list, at::IValue el);
 
@@ -39,13 +40,11 @@ int64_t atenDim(const at::Tensor &tensor);
 
 at::Tensor atenDiv(const at::Tensor &self, const at::Tensor &other);
 
-at::Tensor atenDiv(const at::Tensor &self, const at::Tensor &other,
-                   c10::optional<c10::string_view> rounding_mode);
+at::Tensor atenDiv(const at::Tensor &self, const at::Tensor &other, c10::optional<c10::string_view> rounding_mode);
 
 at::Tensor atenDiv(const at::Tensor &self, const at::Scalar &other);
 
-at::Tensor atenDiv(const at::Tensor &self, const at::Scalar &other,
-                   c10::optional<c10::string_view> rounding_mode);
+at::Tensor atenDiv(const at::Tensor &self, const at::Scalar &other, c10::optional<c10::string_view> rounding_mode);
 
 at::Tensor atenDropout(const at::Tensor &input, double p, bool train);
 
@@ -62,17 +61,24 @@ at::Tensor atenExpand(const at::Tensor &self, at::IntArrayRef size, bool implici
 
 static std::string atenFormat(const std::string &fmt)
 {
-    int index = fmt.find_first_of("{}");
+    int index = fmt.find("{}");
     if (index != std::string::npos) {
         DLOG(ERROR) << "Too few arguments for format string:" << fmt;
     }
     return fmt;
 }
 
+/**
+ * @brief  Replace {} using strings in variadic arguments like python format()
+ * @param  fmt formatter string which contains curly braces {}
+ * @param  next the first string after fmt
+ * @param  args argument list which holds variadic arguments
+ * @return A new string after formatting
+ */
 template <typename T, typename... Types>
 std::string atenFormat(std::string &fmt, const T &next, const Types &... args)
 {
-    int index = fmt.find_first_of("{}");
+    int index = fmt.find("{}");
     if (index == std::string::npos) {
         return fmt;
     }
@@ -101,13 +107,12 @@ int64_t atenLen(const c10::List<at::IValue> &list);
 c10::List<std::string> atenList(std::string &str);
 
 std::tuple<at::Tensor, at::Tensor, at::Tensor> atenLstm(const at::Tensor &input, at::TensorList hx,
-                                                        at::TensorList params, bool has_biases,
-                                                        int64_t num_layers, double dropout, bool train,
-                                                        bool bidirectional, bool batch_first);
+                                                        at::TensorList params, bool has_biases, int64_t num_layers,
+                                                        double dropout, bool train, bool bidirectional,
+                                                        bool batch_first);
 
-std::tuple<at::Tensor, at::Tensor, at::Tensor> atenLstm(const at::Tensor &data,
-                                                        const at::Tensor &batch_sizes, at::TensorList hx,
-                                                        at::TensorList params, bool has_biases,
+std::tuple<at::Tensor, at::Tensor, at::Tensor> atenLstm(const at::Tensor &data, const at::Tensor &batch_sizes,
+                                                        at::TensorList hx, at::TensorList params, bool has_biases,
                                                         int64_t num_layers, double dropout, bool train,
                                                         bool bidirectional);
 
@@ -143,8 +148,8 @@ at::Tensor atenSelect(const at::Tensor &self, int64_t dim, int64_t index);
 
 int64_t atenSize(const at::Tensor &tensor, int64_t dim);
 
-at::Tensor atenSlice(const at::Tensor &self, int64_t dim = 0, int64_t start = 0,
-                     int64_t end = 9223372036854775807, int64_t step = 1);
+at::Tensor atenSlice(const at::Tensor &self, int64_t dim = 0, int64_t start = 0, int64_t end = 9223372036854775807,
+                     int64_t step = 1);
 
 at::Tensor atenSub(const at::Tensor &self, const at::Tensor &other, const at::Scalar &alpha = 1);
 

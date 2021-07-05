@@ -1,8 +1,4 @@
-file(GLOB_RECURSE runtime_source
-        ${CMAKE_CURRENT_SOURCE_DIR}/*.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/source/executor/*.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/source/manager/*.cpp)
-
+file(GLOB_RECURSE runtime_source *.cpp)
 set(CMAKE_CXX_COMPILER "${ROCM_PATH}/bin/hipcc")
 set(HIPCC_FLAGS "--amdgpu-target=gfx906")
 set(CXX_FLAGS "-std=c++17 -fPIC")

@@ -1,7 +1,6 @@
 //
 // Created by heguoqiang on 2021/6/23.
 //
-#include "glog/logging.h"
 #include "executor/aten_ops.h"
 
 namespace nnrt
