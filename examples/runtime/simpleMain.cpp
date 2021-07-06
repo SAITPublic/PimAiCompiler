@@ -16,6 +16,7 @@ int main(int argc, const char* argv[]) {
         return -1;
 
     }
+
     NNRuntime runtime(argv[1]);
 
     runtime.test(); 

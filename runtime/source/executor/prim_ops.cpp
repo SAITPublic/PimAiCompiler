@@ -6,7 +6,7 @@
 #include "executor/prim_ops.h"
 #include "executor/prim_utils.h"
 #include "glog/logging.h"
-#include "stream_executor.h"
+#include "executor/stream_executor.h"
 
 namespace nnrt
 {
