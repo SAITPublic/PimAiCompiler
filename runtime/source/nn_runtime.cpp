@@ -17,7 +17,7 @@ NNRuntime::NNRuntime(const std::string torch_model_path)
 
     this->mbuilder_ = std::make_shared<ModelBuilder>(builder);
 
-    this->executor_ = std::make_shared<StreamExecutor>();
+    this->executor_ = std::make_shared<StreamExecutor>(this->mbuilder_->get_runnable_ir());
 }
 
 std::vector<torch::Tensor> NNRuntime::inferenceModel(const std::vector<torch::Tensor>& input_tensors)

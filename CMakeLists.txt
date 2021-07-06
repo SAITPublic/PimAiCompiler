@@ -19,6 +19,7 @@ if(GCC_EXPECTED_VERSION VERSION_GREATER CMAKE_CXX_COMPILER_VERSION)
 endif()
 
 add_definitions(-DC10_USE_GLOG)
+add_definitions(-D_GLIBCXX_USE_CXX11_ABI=1)
 
 #include(Torch.cmake)
 include_directories("${PROJECT_SOURCE_DIR}"

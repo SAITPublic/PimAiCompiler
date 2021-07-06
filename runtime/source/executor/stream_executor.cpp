@@ -9,111 +9,40 @@
 #include "executor/stream_executor.h"
 #include "executor/aten_ops_executor.h"
 #include "executor/prim_ops_executor.h"
+#include "ir/include/control_nodes/prim_constant_node.hpp"
 
 namespace nncir = nn_compiler::nn_ir;
 
 namespace nnrt
 {
-// RetVal StreamExecutor::inferenceModel(const std::shared_ptr<nncir::NNIR> graph,
-//                                       const std::vector<torch::Tensor>& input_tensors,
-//                                       std::vector<torch::Tensor>& output_tensors)
-// {
-//     // Set input tensors
-//     int idx = 0;
-//     for (auto& tensor : input_tensors) {
-//         this->updateBlob(idx++, DataType::TENSOR, tensorToIValue(tensor));
-//     }
-
-//     // Execute Graph
-//     for (auto& node : graph->getNodes()) {
-//         LOG(INFO) << "Node id:" << node.getId() << " name:" << node.getName() << " type:" << node.getNodeType();
-//         auto node_type = node.getNodeType();
-
-//         if (node_type == nncir::NodeType::PRIMIF) {
-//             // Get initial cond
-//             // PrimIf only have one input, convert to DataEdge
-//             auto& data_edge = cast<nncir::DataEdge>(node.getFirstInEdge());
-
-//             int64_t blob_id = data_edge.getBlobId();
-//             assert(findBlob(blob_id).first == DataType::INT64);
-//             auto cond = findBlob(blob_id).second.toInt()
-
-//             if (cond) {
-//                 // Get first output edge --> node
-//                 // execute to EndIf Node
-//                 auto true_edge = node.getOutEdge(0);
-//                 node = true_edge.dst;
-
-//             } else {
-//                 auto op_node = node.getOutEdge(1);
-//             }
-
-//             while(op_node.getNodeType()!=nncir::NodeType::PRIMENDIF){
-
-//             }
-
-//             // TODO
-//         } else if (node_type == nncir::NodeType::PRIMLOOP) {
-//             // TODO
-//         } else {
-//             // Call execute Op
-//             auto op_executor = this->findOpExecutor(node.getNodeType());
-//             op_executor(node, *this);
-//         }
-//     }
-
-//     return RetVal::SUCCESS;
-// }
-
 
 RetVal StreamExecutor::inferenceModel(const std::shared_ptr<nncir::NNIR> graph,
                                       const std::vector<torch::Tensor>& input_tensors,
                                       std::vector<torch::Tensor>& output_tensors)
 {
-    // Set input tensors
-    int idx = 0;
-    for (auto& tensor : input_tensors) {
-        this->updateBlob(idx++, DataType::TENSOR, tensorToIValue(tensor));
+    // Set Input Tensors
+    for(auto& in : input_tensors) {
+        LOG(INFO) << "Input Tensor:" <<in.sizes() <<" data:"<<in;
     }
+    this->setInputTensors(input_tensors);
 
     // Execute Graph
-    int cursor = 0;
-    for(cursor = 0; cursor < graph->getNodeCount(); ) {
+    for (auto& node : graph->getNodes()) {
+        LOG(INFO) << "Node id:" << node.getId() << " name:" << node.getName() << " type:" << node.getNodeType();
+        auto node_type = node.getNodeType();
 
-        auto op_node = graph->getNode(cursor);
-        auto node_type = op_node->getNodeType();
 
-        LOG(INFO) << "Node id:" << op_node->getId() << " name:" << op_node->getName() << " type:" << op_node->getNodeType();
-
-        if(node_type == nncir::NodeType::PRIMIF){
-            // Get initial cond
-            // PrimIf only have one input, convert to DataEdge
-            auto& data_edge = cast<nncir::DataEdge>(op_node->getFirstInEdge());
-            int64_t blob_id = data_edge.getBlobId();
-            assert(findBlob(blob_id).first == DataType::INT64);
-            auto cond = findBlob(blob_id).second.toInt();
-
-            // In GraphIR, the true branch is firstOutput Edge, the false branch
-            // is SecondOutput Edge
-            if(cond){
-                auto& edge_true =  cast<nncir::DataEdge>(op_node->getOutEdge(0));
-                // move sursor
-                cursor = edge_true.getOutNodeId();
-            }else{
-                auto& edge_false =  cast<nncir::DataEdge>(op_node->getOutEdge(1));
-                cursor = edge_false.getOutNodeId();
-            }
-        } else if (node_type == nncir::NodeType::PRIMLOOP) {
-            // TODO
-
-        } else {
-
+        if(node_type != nncir::NodeType::PRIMINPUT && node_type != nncir::NodeType::PRIMOUTPUT){
             // Call execute Op
-            auto op_executor = this->findOpExecutor(op_node->getNodeType());
-            op_executor(*op_node, *this);
-            cursor++;
+            auto op_executor = this->findOpExecutor(node.getNodeType());
+            op_executor(node, *this);
         }
+    }
 
+    // Read Output Tensors
+    this->getOutputTensors(output_tensors);
+    for(auto& out : output_tensors) {
+        LOG(INFO) << "Output Tensor:" <<out.sizes() <<" data:"<<out;
     }
 
     return RetVal::SUCCESS;
@@ -142,6 +71,9 @@ std::pair<DataType, torch::jit::IValue>& StreamExecutor::findBlob(int64_t blob_i
 OpExecutorFn StreamExecutor::findOpExecutor(nncir::NodeType op_type)
 {
     auto it = this->global_op_register_.find(op_type);
+    if(it == this->global_op_register_.end()) {
+        DLOG(ERROR) << "Runtime error, Unregistered Op !";
+    }
     assert(it != this->global_op_register_.end());
     return it->second;
 }
@@ -153,6 +85,27 @@ void StreamExecutor::registerOp()
     this->global_op_register_.insert({nncir::NodeType::PRIMCONSTANT, executePrimConstant});
     this->global_op_register_.insert({nncir::NodeType::PRIMDTYPE, executePrimDtype});
     // Register Aten Ops
+}
+
+void StreamExecutor::setInputTensors(const std::vector<torch::Tensor>& input_tensors) {
+    if(input_tensors.size() != this->input_blob_ids_.size()) {
+        DLOG(ERROR) << "Num tensors must match the num inputs of Graph," <<"the Graph needs "<<this->input_blob_ids_.size()<<"inputs !";
+    }
+    // Set the input tensors to placeholder, assume all inputs & outputs are Tensor type
+    int k = 0;
+    for(auto& id_ : this->input_blob_ids_) {
+        this->updateBlob(id_, DataType::TENSOR, tensorToIValue(input_tensors.at(k)));
+        k++;
+    }
+}
+
+void StreamExecutor::getOutputTensors(std::vector<torch::Tensor>& output_tensors){
+    output_tensors.clear();
+    // Read the output tensors
+    for(auto& id_ : this->output_blob_ids_) {
+        auto blob = this->findBlob(id_);
+        output_tensors.push_back(blob.second.toTensor());
+    }
 }
 
 void executeOp(OpNodeDescription* cur_op) {}

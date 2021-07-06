@@ -18,11 +18,14 @@ int main(int argc, const char* argv[]) {
     }
 
     NNRuntime runtime(argv[1]);
-
     runtime.test(); 
     
     std::vector<torch::Tensor> input_tensors;
-    input_tensors.push_back(torch::zeros({10,10}, torch::kF16));
+    // Set test inputs
+    input_tensors.push_back(torch::tensor({{1, 2, 3}, {4, 5, 6}}));
+    input_tensors.push_back(torch::tensor({{10, 20, 20}, {40, 50, 60}}));
+
+    // Inference
     auto output_tensors = runtime.inferenceModel(input_tensors);
     return 0;
 }

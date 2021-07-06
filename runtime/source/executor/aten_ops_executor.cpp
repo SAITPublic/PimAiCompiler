@@ -16,7 +16,8 @@ void executorAtenAdd(const nncir::Node& op_node, StreamExecutor& stream_executor
     DLOG(INFO) << "execute Aten Add node";
 
     auto add_node = cast<nncir::AtenAddNode>(op_node);
-    assert(add_node.getNumInputs() == 2);
+    // addOp has 3 inputs
+    assert(add_node.getNumInputs() == 3);   
 
     auto& input_self = cast<nncir::DataEdge>(add_node.getInEdge(0));
     auto& input_other = cast<nncir::DataEdge>(add_node.getInEdge(1));

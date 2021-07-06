@@ -6,6 +6,7 @@
 #include "executor/utils.h"
 #include "ir/include/control_nodes/prim_constant_node.hpp"
 #include "ir/include/control_nodes/prim_dtype_node.hpp"
+#include "ir/include/control_nodes/prim_if_node.hpp"
 #include "ir/include/data_edge.hpp"
 #include "ir/include/edge.hpp"
 #include "ir/include/nn_ir.hpp"
@@ -31,6 +32,10 @@ void executePrimConstant(const nncir::Node& op_node, StreamExecutor& stream_exec
     // Get the data_ptr
     uint8_t* ptr = const_cast<uint8_t*>(constant_node.getData().data());
 
+    // dont del these 2 line, otherwise the data will be error
+    std::vector<uint8_t> tmp_data = constant_node.getData();
+    int len = tmp_data.size();
+
     if (ntype == "str") {
         std::string str = primStrConstsnt((void*)ptr);
         iv = strToIValue(str);
@@ -43,7 +48,11 @@ void executePrimConstant(const nncir::Node& op_node, StreamExecutor& stream_exec
 
     } else if (ntype == "int" || ntype == "bool") {
         // set bool as int64
-        iv = scalarToIValue<int64_t>(*(int64_t*)ptr);
+        int64_t tmp = 0;
+        tmp = *(int64_t*)ptr;
+        LOG(INFO) << "Set Data: " << tmp;
+        iv = scalarToIValue(tmp);
+        LOG(INFO) << "IV: " << iv;
         dtype = DataType::INT64;
 
     } else if (ntype == "float") {
@@ -71,8 +80,7 @@ void executePrimConstant(const nncir::Node& op_node, StreamExecutor& stream_exec
         iv = tensorToIValue(tensor);
         dtype = DataType::TENSOR;
 
-    } 
-    else {
+    } else {
         DLOG(ERROR) << "PrimConstant Error, unsupport data type!";
     }
 
@@ -81,7 +89,6 @@ void executePrimConstant(const nncir::Node& op_node, StreamExecutor& stream_exec
     auto& out_edge = cast<nncir::DataEdge>(constant_node.getOutEdge(0));
     DLOG(INFO) << "BlobId:" << out_edge.getBlobId();
     stream_executor.updateBlob(out_edge.getBlobId(), dtype, iv);
-  
 }
 
 void executePrimDtype(const nncir::Node& op_node, StreamExecutor& stream_executor)
