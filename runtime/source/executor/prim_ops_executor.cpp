@@ -5,7 +5,7 @@
 #include "executor/stream_executor.h"
 #include "executor/utils.h"
 #include "glog/logging.h"
-
+#include "ir/include/all_nodes.hpp"
 #include "ir/include/data_edge.hpp"
 #include "ir/include/edge.hpp"
 #include "ir/include/nn_ir.hpp"
@@ -430,6 +430,123 @@ void executePrimVariable(const nncir::Node& op_node, StreamExecutor& stream_exec
         auto& out_edge = cast<nncir::DataEdge>(variable_node.getFirstOutEdge());
         stream_executor.updateBlob(out_edge.getBlobId(), DataType::LIST, inputs.at(0));
     }
+}
+
+void executePrimIf(const nncir::Node& op_node, StreamExecutor& stream_executor)
+{
+    DLOG(INFO) << "executePrimIf";
+
+    // cast Node
+    auto if_node = cast_if<nncir::PrimIfNode>(op_node);
+    assert(if_node->getNumInputs() == 1);
+
+    DLOG(INFO) << "PrimIfNode.if" << if_node->getId();
+
+    // Find input edge, primIf only have one input
+    auto& data_edge = cast<nncir::DataEdge>(if_node->getFirstInEdge());
+    // Get input blob
+    int input_blob_id = data_edge.getBlobId();
+    // Find the input blob, named condition, it is a int64/bool value
+    torch::jit::IValue iv = stream_executor.findBlob(input_blob_id).second;
+    assert(iv.isInt());
+    int64_t condiction = iv.toInt();
+    assert(condiction == 0 || condiction == 1);
+
+    int64_t next_node_id = -1;
+    nncir::Node* next_node = nullptr;
+
+    // ref: https://github.sec.samsung.net/PIM/NNCompiler/pull/74/files
+    if (condiction == 1) {
+        DLOG(INFO) << "PrimIf(True branch)";
+        // choose then_net
+        // next_node = if_node.id + 1
+        next_node_id = if_node->getId() + 1;
+    } else {
+        DLOG(INFO) << "PrimIf(False branch)";
+        // getElseNetStartNode
+        next_node_id = if_node->getElseNetStartNode();
+    }
+
+    DLOG(INFO) << "PrimIf_next_node_id:" << next_node_id;
+    stream_executor.setCursor(next_node_id);
+}
+
+void executePrimEndIf(const nncir::Node& op_node, StreamExecutor& stream_executor)
+{
+    DLOG(INFO) << "executePrimEndIf";
+    DLOG(INFO) << "Node_id:" << op_node.getId();
+
+    // cast Node
+    auto end_if_node = cast_if<nncir::PrimEndIfNode>(op_node);
+    int if_id = end_if_node->getIfNodeId();
+
+    DLOG(INFO) << "end_if_id: " << end_if_node->getId();
+    DLOG(INFO) << "if_id: " << if_id;
+
+    int64_t next_node_id = -1;
+    nncir::Node* next_node = nullptr;
+
+    // if --- endif -(else body)--- end
+    // EndIfNode.kind == IF
+    // need to skip else_body
+    if (!end_if_node->getIsElseNet()) {
+        next_node_id = end_if_node->getGotoNode();
+        DLOG(INFO) << "EndIfNode.kind==IF";
+    } else {
+        DLOG(INFO) << "EndIfNode.kind==ELSE";
+
+        // EndIfNode.kind == ELSE
+        // next_node_id = end_if_node.getId() + 1;
+        next_node_id = op_node.getId() + 1;
+        DLOG(INFO) << "EndIfNode.next_node_id:" << next_node_id;
+
+        // Only elseKind EndIf has inputs & outputs
+        if (end_if_node->getNumInputs() > 0) {
+            int if_id = end_if_node->getIfNodeId();
+            nncir::Node* if_node = stream_executor.getGraph()->getNode(if_id);
+            // get the condition: bool/int64
+
+            // Find input edge, primIf only have one input
+            auto& data_edge = cast<nncir::DataEdge>(if_node->getFirstInEdge());
+            // Get input blob
+            int input_blob_id = data_edge.getBlobId();
+            // Find the input blob, named condition, it is a int64/bool value
+            torch::jit::IValue iv = stream_executor.findBlob(input_blob_id).second;
+            assert(iv.isInt());
+            int64_t condiction = iv.toInt();
+
+            std::vector<int64_t> in_blob_ids;
+            assert(end_if_node->getNumInputs() % 2 == 0);
+            int num_input = end_if_node->getNumInputs();
+            DLOG(INFO) << "Num Input: " << num_input;
+            if (condiction == 1) {
+                // Then Net ---> Endif
+                // Get the TenNet's output
+                for (int i = 0; i < end_if_node->getNumInputs() / 2; i++) {
+                    int in_blob_id = cast<nncir::DataEdge>(end_if_node->getInEdge(i)).getBlobId();
+                    in_blob_ids.push_back(in_blob_id);
+                }
+            } else {
+                // Else Net --> Endif
+                for (int i = end_if_node->getNumInputs() / 2; i < end_if_node->getNumInputs(); i++) {
+                    int in_blob_id = cast<nncir::DataEdge>(end_if_node->getInEdge(i)).getBlobId();
+                    in_blob_ids.push_back(in_blob_id);
+                }
+            }
+
+            // Set inputs --> output
+            // multi-inputs --> multi-outputs
+            assert(in_blob_ids.size() == end_if_node->getOutEdgeIds().size());
+            auto out_blob_ids = getOutBlobIds(op_node);
+            for (int i = 0; i < in_blob_ids.size(); i++) {
+                auto in_data = stream_executor.findBlob(in_blob_ids[i]);
+                stream_executor.updateBlob(out_blob_ids[i], in_data.first, in_data.second);
+            }
+        }
+    }
+
+    // update the output Blobs
+    stream_executor.setCursor(next_node_id);
 }
 
 }  // namespace nnrt

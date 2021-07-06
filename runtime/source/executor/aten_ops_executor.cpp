@@ -484,7 +484,20 @@ void executorAtenGt(const nncir::Node& op_node, StreamExecutor& stream_executor)
     // Find the input blob
     torch::jit::IValue iv_self = stream_executor.findBlob(input_self_blob_id).second;
     torch::jit::IValue iv_other = stream_executor.findBlob(input_other_blob_id).second;
-    assert(iv_self.isTensor());
+
+    int tmp_self = iv_self.toScalar().toInt();
+    // DLOG(INFO) <<"AtenGt: "<<"iv_self:"<<iv_self.toScalar();
+    DLOG(INFO) <<"AtenGt: "<<"iv_other:"<<iv_other.toInt();
+    DLOG(INFO) <<"AtenGt:" <<"tmp_self:"<<tmp_self;
+
+    int64_t output = tmp_self > iv_other.toInt();
+    DLOG(INFO) <<"AtenGt:" <<"output:"<<output;
+
+    auto& out_edge = cast<nncir::DataEdge>(node.getFirstOutEdge());
+    stream_executor.updateBlob(out_edge.getBlobId(), DataType::INT64, scalarToIValue<int64_t>(output));
+
+#if 0
+    // assert(iv_self.isTensor());
     at::Tensor self_tensor = iv_self.toTensor();
     auto dtype = stream_executor.findBlob(input_other_blob_id).first;
     if (dtype == DataType::TENSOR) {
@@ -502,6 +515,8 @@ void executorAtenGt(const nncir::Node& op_node, StreamExecutor& stream_executor)
         auto& out_edge = cast<nncir::DataEdge>(node.getFirstOutEdge());
         stream_executor.updateBlob(out_edge.getBlobId(), DataType::TENSOR, tensorToIValue(output));
     }
+
+#endif // 0
 }
 
 void executorAtenGetItem(const nncir::Node& op_node, StreamExecutor& stream_executor) {
@@ -808,6 +823,7 @@ void executorAtenMatmul(const nncir::Node& op_node, StreamExecutor& stream_execu
 
     auto node = cast<nncir::AtenMatmulNode>(op_node);
     assert(node.getNumInputs() == 2);
+
 
     auto& input_self = cast<nncir::DataEdge>(node.getInEdge(0));
     auto& input_other = cast<nncir::DataEdge>(node.getInEdge(1));

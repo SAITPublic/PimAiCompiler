@@ -38,3 +38,11 @@ ir_generated.h
 
 # cmake-build-debug
 cmake-build-debug
+
+# pytorch data files
+*.pt
+*pth
+
+# graphviz files
+*.gv
+*.svg

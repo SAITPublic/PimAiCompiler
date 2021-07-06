@@ -1,5 +1,8 @@
 #pragma once
 
+#include<torch/script.h>
+#include<string>
+
 #define ASSERT_EQUAL(t1, t2) ASSERT_TRUE(t1.equal(t2));
 
 #define ASSERT_ALLCLOSE(t1, t2)       \

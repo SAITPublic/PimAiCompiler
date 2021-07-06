@@ -10,6 +10,7 @@
 #include "ir/include/data_edge.hpp"
 #include "ir/include/edge.hpp"
 #include "ir/include/nn_ir.hpp"
+#include "utils.h"
 
 // #include "prim_ops_executor.h"
 
@@ -17,25 +18,24 @@ namespace nncir = nn_compiler::nn_ir;
 
 namespace nnrt
 {
-
 class StreamExecutor;
 using OpExecutorFn = std::function<void(const nncir::Node&, StreamExecutor& stream_executor)>;
 
 class StreamExecutor
 {
    public:
-
-    StreamExecutor(const std::shared_ptr<nncir::NNIR> ir_graph_) { 
+    StreamExecutor(const std::shared_ptr<nncir::NNIR> ir_graph_)
+    {
         registerOp();
 
         // Get the output & input node from ir_graph at once
         this->input_blob_ids_.clear();
         this->output_blob_ids_.clear();
-        for(auto& op_node : ir_graph_->getNodes()){
-            if(op_node.getNodeType() == nncir::NodeType::PRIMINPUT){
+        for (auto& op_node : ir_graph_->getNodes()) {
+            if (op_node.getNodeType() == nncir::NodeType::PRIMINPUT) {
                 auto& data_edge = cast<nncir::DataEdge>(op_node.getOutEdge(0));
                 this->input_blob_ids_.push_back(data_edge.getBlobId());
-            }else if(op_node.getNodeType() == nncir::NodeType::PRIMOUTPUT){
+            } else if (op_node.getNodeType() == nncir::NodeType::PRIMOUTPUT) {
                 auto& data_edge = cast<nncir::DataEdge>(op_node.getInEdge(0));
                 this->output_blob_ids_.push_back(data_edge.getBlobId());
             }
@@ -48,9 +48,9 @@ class StreamExecutor
             DLOG(ERROR) << "The Graph must have >= 1 inputs and outputs!";
         }
 
+        this->ir_graph_ = ir_graph_;
     }
 
-    
     RetVal inferenceModel(const std::shared_ptr<nncir::NNIR> runnable_ir,
                           const std::vector<torch::Tensor>& input_tensors, std::vector<torch::Tensor>& output_tensors);
 
@@ -66,6 +66,20 @@ class StreamExecutor
 
     void getOutputTensors(std::vector<torch::Tensor>& output_tensors);
 
+    const std::shared_ptr<nncir::NNIR> getGraph();
+
+    void setCursor(int64_t cursor)
+    {
+        assert(cursor >= 0);
+        cursor_ = cursor;
+    }
+
+    void showBlobs() {
+        for(auto& item : this->global_blobs_) {
+            DLOG(INFO) <<"blob_id: "<<item.first <<" dtype: "<< getDataTypeStr(item.second.first);
+        }
+    }
+
    public:
     // Global input & output vars
     std::unordered_map<int64_t, std::pair<DataType, torch::jit::IValue>> global_blobs_;
@@ -74,6 +88,10 @@ class StreamExecutor
 
     std::vector<int64_t> input_blob_ids_;
     std::vector<int64_t> output_blob_ids_;
+
+    std::shared_ptr<nncir::NNIR> ir_graph_;
+
+    int64_t cursor_ = 0;  // like the program counter
 };
 
 // execute current op in runtime
@@ -88,4 +106,3 @@ void executeOp(OpNodeDescription* cur_op);
 OpNodeDescription* getNextExecutionOp(OpNodeDescription* cur_op);
 
 }  // namespace nnrt
-

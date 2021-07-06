@@ -1,6 +1,7 @@
 #pragma once
 
 #include <torch/script.h>
+#include "ir/include/nn_ir.hpp"
 
 #include "ir/include/nn_ir.hpp"
 #include "nnrt_types.h"
@@ -56,4 +57,9 @@ torch::jit::IValue tupleToIValue(std::tuple<T...> tuple) { return torch::jit::IV
 
 bool isScalarType(DataType dtype);
 
+std::vector<int64_t> getOutBlobIds(const nn_compiler::nn_ir::Node& node);
+
+std::vector<int64_t> getInBlobIds(const nn_compiler::nn_ir::Node& node);
+
+std::string getDataTypeStr(DataType dtype);
 }  // namespace nnrt

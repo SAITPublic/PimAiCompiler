@@ -1,15 +1,13 @@
+#include "executor/stream_executor.h"
 #include <torch/script.h>
+#include "common/include/cast.hpp"
+#include "executor/aten_ops_executor.h"
+#include "executor/prim_ops_executor.h"
+#include "executor/utils.h"
 #include "ir/include/data_edge.hpp"
 #include "ir/include/edge.hpp"
 #include "ir/include/ir_types.hpp"
 #include "ir/include/nn_ir.hpp"
-
-#include "common/include/cast.hpp"
-#include "executor/aten_ops_executor.h"
-#include "executor/prim_ops_executor.h"
-#include "executor/stream_executor.h"
-#include "executor/utils.h"
-#include "ir/include/control_nodes/prim_constant_node.hpp"
 #include "nnrt_types.h"
 
 namespace nncir = nn_compiler::nn_ir;
@@ -26,15 +24,27 @@ RetVal StreamExecutor::inferenceModel(const std::shared_ptr<nncir::NNIR> graph,
     }
     this->setInputTensors(input_tensors);
 
-    // Execute Graph
-    for (auto& node : graph->getNodes()) {
-        LOG(INFO) << "Node id:" << node.getId() << " name:" << node.getName() << " type:" << node.getNodeType();
-        auto node_type = node.getNodeType();
+    // cursor skiped the InputNode and OutputNode
+    // [cursor_begin, cursor_end)
+    int cursor_begin = input_tensors.size();
+    int cursor_end = graph->getNodeCount() - this->output_blob_ids_.size();
 
-        if (node_type != nncir::NodeType::PRIMINPUT && node_type != nncir::NodeType::PRIMOUTPUT) {
-            // Call execute Op
-            auto op_executor = this->findOpExecutor(node.getNodeType());
-            op_executor(node, *this);
+    // control_op will move cursor by itself
+    auto is_control_op = [](nncir::NodeType type) {
+        return (type == nncir::NodeType::PRIMIF || type == nncir::NodeType::PRIMENDIF);
+    };
+
+    // Execute Graph
+    for (cursor_ = cursor_begin; cursor_ < cursor_end;) {
+        nncir::Node* node = graph->getNode(cursor_);
+        LOG(INFO) << "Node id:" << node->getId() << " name:" << node->getName() << " type:" << node->getNodeType();
+        auto node_type = node->getNodeType();
+
+        auto op_executor = this->findOpExecutor(node_type);
+        op_executor(*node, *this);
+
+        if (!is_control_op(node_type)) {
+            cursor_++;
         }
     }
 
@@ -44,6 +54,8 @@ RetVal StreamExecutor::inferenceModel(const std::shared_ptr<nncir::NNIR> graph,
         LOG(INFO) << "Output Tensor:" << out.sizes() << " data:" << out;
     }
 
+    // for debug
+    this->showBlobs();
     return RetVal::SUCCESS;
 }
 
@@ -79,7 +91,6 @@ OpExecutorFn StreamExecutor::findOpExecutor(nncir::NodeType op_type)
 
 void StreamExecutor::registerOp()
 {
-    // Register Ops: {OP_TYPE, OP_FUNCTION}
     this->global_op_register_.insert({nncir::NodeType::ATENADD, executorAtenAdd});
     this->global_op_register_.insert({nncir::NodeType::ATENADDMM, executorAtenAddmm});
     this->global_op_register_.insert({nncir::NodeType::ATENAPPEND, executorAtenAppend});
@@ -123,6 +134,8 @@ void StreamExecutor::registerOp()
     this->global_op_register_.insert({nncir::NodeType::PRIMDEVICE, executePrimDevice});
     this->global_op_register_.insert({nncir::NodeType::PRIMDTYPE, executePrimDtype});
     this->global_op_register_.insert({nncir::NodeType::PRIMENDLOOP, executePrimEndLoop});
+    this->global_op_register_.insert({nncir::NodeType::PRIMIF, executePrimIf});
+    this->global_op_register_.insert({nncir::NodeType::PRIMENDIF, executePrimEndIf});
     this->global_op_register_.insert({nncir::NodeType::PRIMLISTCONSTRUCT, executePrimListConstruct});
     this->global_op_register_.insert({nncir::NodeType::PRIMLISTUNPACK, executePrimListUnpack});
     this->global_op_register_.insert({nncir::NodeType::PRIMRAISEEXCEPTION, executePrimRaiseException});
@@ -157,6 +170,8 @@ void StreamExecutor::getOutputTensors(std::vector<torch::Tensor>& output_tensors
         output_tensors.push_back(blob.second.toTensor());
     }
 }
+
+const std::shared_ptr<nncir::NNIR> StreamExecutor::getGraph() { return this->ir_graph_; }
 
 void executeOp(OpNodeDescription* cur_op) {}
 

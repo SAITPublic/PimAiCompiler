@@ -1,10 +1,20 @@
 #include <torch/script.h>
 #include <string>
+#include <string>
+#include <vector>
+#include <torch/script.h>
+#include "ir/include/data_edge.hpp"
+#include "ir/include/edge.hpp"
+#include "ir/include/nn_ir.hpp"
+#include "nnrt_types.h"
 
 #include "executor/utils.h"
 
 namespace nnrt
 {
+  
+namespace nncir = nn_compiler::nn_ir;
+
 torch::jit::IValue tensorToIValue(const torch::Tensor& tensor) { return torch::jit::IValue(tensor); }
 
 torch::jit::IValue tensorListToIValue(const torch::TensorList& tensor_list) { return torch::jit::IValue(tensor_list); }
@@ -54,6 +64,7 @@ at::MemoryFormat getMemoryFormat(int optional_memory_format)
             DLOG(ERROR) << "Wrong reference to aten MemoryFormat.";
     }
 }
+
 torch::jit::IValue intToIValue(const int64_t& value) { return torch::jit::IValue(value); }
 
 torch::jit::IValue boolToIValue(const bool& value) { return torch::jit::IValue(value); }
@@ -67,4 +78,35 @@ bool isScalarType(DataType dtype) {
             dtype == DataType::BOOL;
 }
 
+std::vector<int64_t> getInBlobIds(const nncir::Node& node)
+{
+    std::vector<int64_t> ret;
+    for (int i = 0; i < node.getInEdgeIds().size(); i++) {
+        auto& data_edge = cast<nncir::DataEdge>(node.getInEdge(i));
+        ret.push_back(data_edge.getBlobId());
+    }
+    return ret;
+}
+
+std::vector<int64_t> getOutBlobIds(const nncir::Node& node)
+{
+    std::vector<int64_t> ret;
+    for (int i = 0; i < node.getOutEdgeIds().size(); i++) {
+        auto& data_edge = cast<nncir::DataEdge>(node.getOutEdge(i));
+        ret.push_back(data_edge.getBlobId());
+    }
+    return ret;
+}
+
+static std::unordered_map<DataType, std::string> dtype_to_str_map = {
+    {DataType::UNDEFINED, "UNDEFINED"}, {DataType::INT8, "INT8"},
+    {DataType::UINT8, "UINT8"},         {DataType::INT16, "INT16"},
+    {DataType::UINT16, "UINT16"},       {DataType::INT32, "INT32"},
+    {DataType::INT64, "INT64"},         {DataType::FLOAT16, "FLOAT16"},
+    {DataType::FLOAT32, "FLOAT32"},     {DataType::FLOAT64, "FLOAT64"},
+    {DataType::BOOL, "BOOL"},           {DataType::STRING, "STRING"},
+    {DataType::DEVICE, "DEVICE"},       {DataType::TENSOR, "TENSOR"},
+    {DataType::NONE, "NONE"},           {DataType::LIST, "LIST"}};
+
+std::string getDataTypeStr(DataType dtype) { return dtype_to_str_map[dtype]; }
 }  // namespace nnrt

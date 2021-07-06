@@ -7,8 +7,6 @@
 #include "ir/include/all_nodes.hpp"
 #include "ir/include/nn_ir.hpp"
 
-// class ExecutorContext;
-
 namespace nnrt
 {
 void executePrimConstant(const nncir::Node& op_node, StreamExecutor& stream_executor);
@@ -16,6 +14,8 @@ void executePrimData(const nncir::Node& op_node, StreamExecutor& stream_executor
 void executePrimDevice(const nncir::Node& op_node, StreamExecutor& stream_executor);
 void executePrimDtype(const nncir::Node& op_node, StreamExecutor& stream_executor);
 void executePrimEndLoop(const nncir::Node& op_node, StreamExecutor& stream_executor);
+void executePrimEndIf(const nncir::Node& op_node, StreamExecutor& stream_executor);
+void executePrimIf(const nncir::Node& op_node, StreamExecutor& stream_executor);
 void executePrimListConstruct(const nncir::Node& op_node, StreamExecutor& stream_executor);
 void executePrimListUnpack(const nncir::Node& op_node, StreamExecutor& stream_executor);
 void executePrimRaiseException(const nncir::Node& op_node, StreamExecutor& stream_executor);
