@@ -210,6 +210,7 @@ NNIR_Node_Config_Type_ parseConfigType(IR_Node_Config_Type_& type) {
                     {IR::Type::DataType_BOOL, nn_ir::DataType::BOOL},
                     {IR::Type::DataType_DEVICE, nn_ir::DataType::DEVICE},
                     {IR::Type::DataType_LIST, nn_ir::DataType::LIST},
+                    {IR::Type::DataType_NONE, nn_ir::DataType::NONE},
                     {IR::Type::DataType_STRING, nn_ir::DataType::STRING},
                     {IR::Type::DataType_TENSOR, nn_ir::DataType::TENSOR},
                 };
@@ -286,6 +287,7 @@ IR_Node_Config_Type_ parseConfigType(NNIR_Node_Config_Type_& type) {
                     {nn_ir::DataType::BOOL, IR::Type::DataType_BOOL},
                     {nn_ir::DataType::DEVICE, IR::Type::DataType_DEVICE},
                     {nn_ir::DataType::LIST, IR::Type::DataType_LIST},
+                    {nn_ir::DataType::NONE, IR::Type::DataType_NONE},
                     {nn_ir::DataType::STRING, IR::Type::DataType_STRING},
                     {nn_ir::DataType::TENSOR, IR::Type::DataType_TENSOR},
                 };

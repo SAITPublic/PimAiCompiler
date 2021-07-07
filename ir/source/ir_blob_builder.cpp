@@ -113,7 +113,7 @@ std::unique_ptr<nn_ir::Blob> IRBlobBuilder::createBlob(const IR::Blob* blob, nn_
 
     auto ir_type = convertIrTypeToNNIr(ir_data_type);
     switch (ir_type) {
-        case nn_ir::DataType::NONE:
+        //case nn_ir::DataType::NONE:
         case nn_ir::DataType::UINT32:
             Log::IR::E() << "IRBlobBuilder::createBlob() => unknown data type!";
             break;
@@ -164,10 +164,10 @@ std::unique_ptr<nn_ir::Blob> IRBlobBuilder::createBlob(const IR::Blob* blob, nn_
         DATATYPE(INT64, FIXED_64, int64_t)
         DATATYPE(INT4, FIXED_4, int4_t)
         DATATYPE(UINT4, FIXED_4U, uint4_t)
-        
         DATATYPE(BOOL, BOOL, int8_t)
         DATATYPE(DEVICEL, DEVICE, int8_t)
         DATATYPE(LIST, LIST, int8_t)
+        DATATYPE(NONE, NONE, int8_t)
         DATATYPE(STRING, STRING, int8_t)
         DATATYPE(TENSOR, TENSOR, int8_t)
         default: {

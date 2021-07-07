@@ -30,6 +30,7 @@ IRCONTROLNodeParser::parseControlNode<IR::CONTROLNode::AnyType_PrimConstantNode>
     auto data = makeDataArrFromVector<uint8_t>(data_arr);
     auto bit_width = prim_constant_node->bit_width();
     auto data_type = prim_constant_node->data_type();
+    auto ntype = prim_constant_node->ntype()->c_str();
     auto ir_shape = prim_constant_node->tensor_shape();
     nn_ir::Shape4D shape;
     // type is NONE
@@ -39,7 +40,7 @@ IRCONTROLNodeParser::parseControlNode<IR::CONTROLNode::AnyType_PrimConstantNode>
         shape = std::get<nn_ir::Shape4D>(nn_ir::parseParam(ir_shape));
     }
 
-    return std::make_unique<nn_ir::PrimConstantNode>(node_info, data, bit_width, data_type, shape);
+    return std::make_unique<nn_ir::PrimConstantNode>(node_info, ntype, data, bit_width, data_type, shape);
 }
 
 template <>
