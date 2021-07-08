@@ -276,8 +276,11 @@ IRParser::IRParser() {
         {IR::CONTROLNode::AnyType_PrimEndLoopNode,
         &IRCONTROLNodeParser::parseControlNode<IR::CONTROLNode::AnyType_PrimEndLoopNode>},
 
+        {IR::CONTROLNode::AnyType_PrimInputNode,
+        &IRCONTROLNodeParser::parseControlNode<IR::CONTROLNode::AnyType_PrimInputNode>},
+
         {IR::CONTROLNode::AnyType_PrimIfNode,
-        &IRCONTROLNodeParser::parseControlNode<IR::CONTROLNode::AnyType_PrimIfNode>},        
+        &IRCONTROLNodeParser::parseControlNode<IR::CONTROLNode::AnyType_PrimIfNode>},
 
         {IR::CONTROLNode::AnyType_PrimListConstructNode,
         &IRCONTROLNodeParser::parseControlNode<IR::CONTROLNode::AnyType_PrimListConstructNode>},
@@ -290,6 +293,9 @@ IRParser::IRParser() {
 
         {IR::CONTROLNode::AnyType_PrimLoopNode,
         &IRCONTROLNodeParser::parseControlNode<IR::CONTROLNode::AnyType_PrimLoopNode>},
+
+        {IR::CONTROLNode::AnyType_PrimOutputNode,
+        &IRCONTROLNodeParser::parseControlNode<IR::CONTROLNode::AnyType_PrimOutputNode>},
 
         {IR::CONTROLNode::AnyType_PrimRaiseExceptionNode,
         &IRCONTROLNodeParser::parseControlNode<IR::CONTROLNode::AnyType_PrimRaiseExceptionNode>},
