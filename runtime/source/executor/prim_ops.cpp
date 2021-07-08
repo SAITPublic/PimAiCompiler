@@ -146,11 +146,11 @@ torch::Tensor primTensorConstant(void* data_ptr, std::vector<int64_t>& shape, Da
     return createPtTensor(data_ptr, shape, dtype);
 }
 
-std::vector<torch::Tensor> primEndLoop(const std::vector<torch::Tensor>& inputs) { return std::move(inputs); }
+template <typename T>
+std::vector<T>& primEndLoop(const std::vector<T>& inputs) { return inputs; }
 
 // blobs is a Global table
-void primLoop(int max_trip_cnt, torch::Tensor& cond, int op_id, std::unordered_map<int, torch::Tensor>& blobs)
-{
+void primLoop(int max_trip_cnt, torch::Tensor& cond, int op_id, std::unordered_map<int, torch::Tensor>& blobs) {
     // In Graphgen, Each PrimLoop Op contains a loop_index
     // example: for(loop_index = 0; loop_index < max_trip_cnt; loop_index++) { }
     OpNodeDescription* loop_index_node = getNextExecutionOp(new OpNodeDescription(op_id, "PrimLoop"));

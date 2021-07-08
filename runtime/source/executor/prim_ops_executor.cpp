@@ -116,4 +116,23 @@ void executePrimDtype(const nncir::Node& op_node, StreamExecutor& stream_executo
     stream_executor.updateBlob(out_edge.getBlobId(), DataType::TENSOR, scalarToIValue(scalar_type));
 }
 
+void executePrimEndLoop(const nncir::Node& op_node, StreamExecutor& stream_executor) {
+    DLOG(INFO) << "executePrimEndLoop";
+
+    // cast Node -> PrimEndLoopNode
+    auto end_loop_node = cast<nncir::PrimEndLoopNode>(op_node);
+    auto inedges = end_loop_node.getInEdgeIds();
+    auto outedges = end_loop_node.getOutEdgeIds();
+    std::vector<torch::Tensor> input_tensor;
+    for (uint32_t id = 0; id < inedges.size(); id++) {
+        auto& in_edge = cast<nncir::DataEdge>(end_loop_node.getInEdge(inedges.at(id)));
+        auto input_blob_id = in_edge.getBlobId();
+        auto value_map = stream_executor.findBlob(input_blob_id);
+        torch::jit::IValue iv = value_map.second;
+        auto type = value_map.first;
+        auto& out_edge = cast<nncir::DataEdge>(end_loop_node.getOutEdge(outedges.at(id)));
+        stream_executor.updateBlob(out_edge.getBlobId(), type, tensorToIValue(out_tensor.at(id)));
+    }
+}
+
 }  // namespace nnrt
