@@ -7,6 +7,7 @@
 #include "nnrt_types.h"
 #include "executor/utils.h"
 #include "executor/stream_executor.h"
+#include "executor/aten_ops_executor.h"
 #include "executor/prim_ops_executor.h"
 
 namespace nncir = nn_compiler::nn_ir;
@@ -148,9 +149,9 @@ OpExecutorFn StreamExecutor::findOpExecutor(nncir::NodeType op_type)
 void StreamExecutor::registerOp()
 {
     // Register Prim Ops: {OP_TYPE, OP_FUNCTION}
+    this->global_op_register_.insert({nncir::NodeType::ATENADD, executorAtenAdd});
     this->global_op_register_.insert({nncir::NodeType::PRIMCONSTANT, executePrimConstant});
     this->global_op_register_.insert({nncir::NodeType::PRIMDTYPE, executePrimDtype});
-
     // Register Aten Ops
 }
 
