@@ -71,6 +71,7 @@ bool OpBasicUtil::isPrimOp(const nn_ir::Node& node) const {
                 nn_ir::PrimTupleIndexNode,
                 nn_ir::PrimTupleUnpackNode,
                 nn_ir::PrimUncheckedCastNode,
+                nn_ir::PrimVariableNode,
                 nn_ir::PrimUninitializedNode>(control_node)) {
             return true;
         }

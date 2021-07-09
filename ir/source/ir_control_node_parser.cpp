@@ -1,9 +1,6 @@
 #include "ir/include/ir_control_node_parser.hpp"
-#include "ir/include/ir_nnnode_parser.hpp"
-#include "ir/include/common/log.hpp"
 #include "ir/include/ir_includes.hpp"
 #include "ir/include/ir_tools.hpp"
-#include "ir/include/ir_types.hpp"
 
 namespace nn_compiler {
 
@@ -248,6 +245,33 @@ IRCONTROLNodeParser::parseControlNode<IR::CONTROLNode::AnyType_PrimUninitialized
         << "IRCONTROLNodeParser::parseControlNode<Control::PrimUninitializedNode>() => wrong node type!";
 
     return std::make_unique<nn_ir::PrimUninitializedNode>(node_info);
+}
+
+template <>
+std::unique_ptr<nn_ir::CONTROLNode>
+IRCONTROLNodeParser::parseControlNode<IR::CONTROLNode::AnyType_PrimVariableNode>
+                                    (const IR::ControlNode* ir_node,
+                                     const nn_ir::NodeInfo& node_info) {
+    auto prim_variable_node = ir_node->control_node_as_PrimVariableNode();
+    Log::IR::E_IF(prim_variable_node == nullptr)
+            << "IRCONTROLNodeParser::parseControlNode<Control::PrimVariableNode>() => wrong node type!";
+    auto data_arr = prim_variable_node->data();
+    auto data = makeDataArrFromVector<uint8_t>(data_arr);
+    auto data_type = prim_variable_node->node_data_type()->c_str();
+
+    auto tensor_data_type_arr = prim_variable_node->tensor_data_type();
+    std::vector<std::string> tensor_data_type;
+    for (auto type_item : *tensor_data_type_arr) {
+        tensor_data_type.push_back(type_item->c_str());
+    }
+
+    auto shape_arr = prim_variable_node->tensor_shape();
+    std::vector<nn_ir::Shape4D> shape;
+    for (auto shape_item : *shape_arr) {
+        shape.push_back(std::get<nn_ir::Shape4D>(nn_ir::parseParam(shape_item)));
+    }
+
+    return std::make_unique<nn_ir::PrimVariableNode>(node_info, data, shape, data_type, tensor_data_type);
 }
 
 } // namespace nn_compiler

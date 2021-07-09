@@ -313,7 +313,10 @@ IRParser::IRParser() {
         &IRCONTROLNodeParser::parseControlNode<IR::CONTROLNode::AnyType_PrimUncheckedCastNode>},
 
         {IR::CONTROLNode::AnyType_PrimUninitializedNode,
-        &IRCONTROLNodeParser::parseControlNode<IR::CONTROLNode::AnyType_PrimUninitializedNode>}
+        &IRCONTROLNodeParser::parseControlNode<IR::CONTROLNode::AnyType_PrimUninitializedNode>},
+
+        {IR::CONTROLNode::AnyType_PrimVariableNode,
+                    &IRCONTROLNodeParser::parseControlNode<IR::CONTROLNode::AnyType_PrimVariableNode>}
     };
 
     nn_node_parse_func_map_ = {
