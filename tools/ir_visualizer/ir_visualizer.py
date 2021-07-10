@@ -250,7 +250,12 @@ class Visualizer():
                 node_label = labeler.list_table([ir_node_title, 'Unknown Node'])
 
             # Draw
-            cluster.node(node_name, labeler.html_str(node_label), shape='rectangle')
+            if 'prim::Input' in ir_node_title or 'prim::Output' in ir_node_title:
+                cluster.node(node_name, labeler.html_str(node_label), shape='rectangle', fillcolor='cornflowerblue', style="filled", fontsize='14')
+            elif 'prim::Constant' in ir_node_title:
+                cluster.node(node_name, labeler.html_str(node_label), shape='rectangle', fillcolor='green', style="filled")
+            else:
+                cluster.node(node_name, labeler.html_str(node_label), shape='rectangle')
 
 
     def __draw_edges(self, ir_graph: IR.Graph.Graph, cluster: Digraph):

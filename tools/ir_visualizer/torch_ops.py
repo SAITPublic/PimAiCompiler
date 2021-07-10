@@ -87,6 +87,8 @@ import IR.NNNode.AtenZerosNode
 # Torch Prim Ops
 import IR.CONTROLNode
 import IR.CONTROLNode.AnyType
+import IR.CONTROLNode.PrimInputNode
+import IR.CONTROLNode.PrimOutputNode
 import IR.CONTROLNode.PrimBlockNode
 import IR.CONTROLNode.PrimCallMethodNode
 import IR.CONTROLNode.PrimConstantNode
@@ -267,6 +269,8 @@ def create_prim_op_map():
     create a dict that contains all torch::prim Ops of RNNT
     '''
     op_dict = {
+        IR.CONTROLNode.AnyType.AnyType().PrimInputNode : 'PrimInputNode',
+        IR.CONTROLNode.AnyType.AnyType().PrimOutputNode : 'PrimOutputNode',
         IR.CONTROLNode.AnyType.AnyType().PrimBlockNode : 'PrimBlockNode',
         IR.CONTROLNode.AnyType.AnyType().PrimCallMethodNode : 'PrimCallMethodNode',
         IR.CONTROLNode.AnyType.AnyType().PrimConstantNode : 'PrimConstantNode',
@@ -299,6 +303,8 @@ prim_ops_dict = create_prim_op_map()
 these torch::prim Ops have no attribute
 '''
 prim_ops_no_attr_dict = {
+    'PrimInputNode' : IR.CONTROLNode.PrimInputNode.PrimInputNode(),
+    'PrimOutputNode' : IR.CONTROLNode.PrimOutputNode.PrimOutputNode(),
     'PrimBlockNode' : IR.CONTROLNode.PrimBlockNode.PrimBlockNode(),
     'PrimDataNode' : IR.CONTROLNode.PrimDataNode.PrimDataNode(),
     'PrimDeviceNode' : IR.CONTROLNode.PrimDeviceNode.PrimDeviceNode(),
