@@ -18,12 +18,16 @@ class PrimEndIfNode : public NodeMixin<PrimEndIfNode, CONTROLNode> {
 
     void setGotoNode(int64_t goto_node) { goto_node_ = goto_node; }
     void setIsElseNet(bool is_else_net) { is_else_net_ = is_else_net; }
+    void setIfNodeId(int64_t if_node_id) { if_node_id_ = if_node_id; }
 
     int64_t getGotoNode() { return goto_node_; }
     bool getIsElseNet() { return is_else_net_; }
+    int64_t getIfNodeId() { return if_node_id_; }
+
  private:
     int64_t goto_node_;
     bool is_else_net_ = false;
+    int64_t if_node_id_;
 }; // class PrimEndIfNode
 
 } // namespace nn_ir

@@ -40,6 +40,7 @@ RetVal ControlNodeExecutionPass::run(nn_ir::NNIR& graph, CompilationContext& con
         } else if (node.getNodeType() == nn_compiler::nn_ir::NodeType::PRIMENDIF) {
             auto prim_if_node = if_nodes.top();
             auto prim_end_if_node = cast_if<nn_ir::PrimEndIfNode>(node);
+            prim_end_if_node->setIfNodeId(prim_if_node->getId());
             if (then_net) {
                 prim_if_node->setElseNetStartNode(prim_end_if_node->getId() + 1);
                 prim_end_if_node->setIsElseNet(false);
