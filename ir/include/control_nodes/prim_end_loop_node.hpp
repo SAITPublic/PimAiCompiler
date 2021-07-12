@@ -15,6 +15,13 @@ class PrimEndLoopNode : public NodeMixin<PrimEndLoopNode, CONTROLNode> {
             : NodeMixin(node_info, NodeType::PRIMENDLOOP) {}
 
     std::string getNodeTypeAsString(void) const override { return "PrimEndLoop"; }
+
+    void setGotoNode(int64_t goto_node) { goto_node_ = goto_node; }
+
+    int64_t getGotoNode() { return goto_node_; }
+
+ private:
+    int64_t goto_node_;
 }; // class PrimEndLoopNode
 
 } // namespace nn_ir

@@ -16,6 +16,14 @@
             "ctx_data"     : [ {"name" : "MemoryLabelInfo", "mode" : "write"},
                                {"name" : "DeviceLabelInfo", "mode" : "write"}],
             "utils"        : ["OpBasicUtil"]
+        },
+        {
+            "name"         : "ControlNodeExecutionPass",
+            "type"         : "stream",
+            "is_mandatory" : true,
+            "enable"       : true,
+            "ctx_data"     : [],
+            "utils"        : []
         }
     ]
 }

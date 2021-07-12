@@ -16,6 +16,14 @@ class PrimEndIfNode : public NodeMixin<PrimEndIfNode, CONTROLNode> {
 
     std::string getNodeTypeAsString(void) const override { return "PrimEndIf"; }
 
+    void setGotoNode(int64_t goto_node) { goto_node_ = goto_node; }
+    void setIsElseNet(bool is_else_net) { is_else_net_ = is_else_net; }
+
+    int64_t getGotoNode() { return goto_node_; }
+    bool getIsElseNet() { return is_else_net_; }
+ private:
+    int64_t goto_node_;
+    bool is_else_net_ = false;
 }; // class PrimEndIfNode
 
 } // namespace nn_ir

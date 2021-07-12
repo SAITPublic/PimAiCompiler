@@ -15,6 +15,13 @@ class PrimIfNode : public NodeMixin<PrimIfNode, CONTROLNode> {
             : NodeMixin(node_info, NodeType::PRIMIF) {}
 
     std::string getNodeTypeAsString(void) const override { return "PrimIf"; }
+
+    void setElseNetStartNode(int64_t else_net_start_node) { else_net_start_node_ = else_net_start_node; }
+
+    int64_t getElseNetStartNode() { return else_net_start_node_; }
+
+ private:
+    int64_t else_net_start_node_;
 }; // class PrimIfNode
 
 } // namespace nn_ir
