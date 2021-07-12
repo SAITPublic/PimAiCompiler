@@ -761,7 +761,9 @@ IRNNNodeParser::parseNNNode<IR::NNNode::AnyType_AtenSelectNode>(const IR::NnNode
     Log::IR::E_IF(aten_select_node == nullptr)
         << "IRNNNodeParser::parseNNNode<NN::AtenSelectNode>() => wrong node type!";
 
-    return std::make_unique<nn_ir::AtenSelectNode>(node_info);
+    auto dim   = aten_select_node->dim();
+    auto index = aten_select_node->index();
+    return std::make_unique<nn_ir::AtenSelectNode>(node_info, dim, index);
 }
 
 template <>

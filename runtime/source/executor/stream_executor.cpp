@@ -84,6 +84,7 @@ void StreamExecutor::registerOp()
     this->global_op_register_.insert({nncir::NodeType::ATENADD, executorAtenAdd});
     this->global_op_register_.insert({nncir::NodeType::ATENEQ, executorAtenEq});
     this->global_op_register_.insert({nncir::NodeType::ATENNE, executorAtenNe});
+    this->global_op_register_.insert({nncir::NodeType::ATENSELECT, executorAtenSelect});
 
     this->global_op_register_.insert({nncir::NodeType::PRIMCONSTANT, executePrimConstant});
     this->global_op_register_.insert({nncir::NodeType::PRIMDTYPE, executePrimDtype});

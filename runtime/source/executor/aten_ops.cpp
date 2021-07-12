@@ -2,7 +2,6 @@
 // Created by heguoqiang on 2021/6/23.
 //
 #include "executor/aten_ops.h"
-#include "../../../../../../../usr/include/assert.h"
 
 namespace nnrt
 {
