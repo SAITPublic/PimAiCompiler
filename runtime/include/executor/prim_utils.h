@@ -37,4 +37,8 @@ void push(std::vector<torch::jit::IValue>& stack, Types&&... args)
 
 torch::Tensor createPtTensor(void* data_ptr, std::vector<int64_t>& shape, DataType dtype);
 
+DataType inferDataType(torch::jit::IValue ival);
+
+at::ListTypePtr inferTypeFromDataType(DataType type);
+
 }  // namespace nnrt
