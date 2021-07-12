@@ -5,23 +5,24 @@
 #include "ir/include/nn_ir.hpp"
 
 #include "common/include/cast.hpp"
-#include "nnrt_types.h"
-#include "executor/utils.h"
-#include "executor/stream_executor.h"
 #include "executor/aten_ops_executor.h"
 #include "executor/prim_ops_executor.h"
+#include "executor/stream_executor.h"
+#include "executor/utils.h"
 #include "ir/include/control_nodes/prim_constant_node.hpp"
+#include "nnrt_types.h"
 
 namespace nncir = nn_compiler::nn_ir;
 
-namespace nnrt {
-
+namespace nnrt
+{
 RetVal StreamExecutor::inferenceModel(const std::shared_ptr<nncir::NNIR> graph,
                                       const std::vector<torch::Tensor>& input_tensors,
-                                      std::vector<torch::Tensor>& output_tensors) {
+                                      std::vector<torch::Tensor>& output_tensors)
+{
     // Set Input Tensors
     for (auto& in : input_tensors) {
-        LOG(INFO) << "Input Tensor:" <<in.sizes() <<" data:" << in;
+        LOG(INFO) << "Input Tensor:" << in.sizes() << " data:" << in;
     }
     this->setInputTensors(input_tensors);
 
@@ -29,7 +30,6 @@ RetVal StreamExecutor::inferenceModel(const std::shared_ptr<nncir::NNIR> graph,
     for (auto& node : graph->getNodes()) {
         LOG(INFO) << "Node id:" << node.getId() << " name:" << node.getName() << " type:" << node.getNodeType();
         auto node_type = node.getNodeType();
-
 
         if (node_type != nncir::NodeType::PRIMINPUT && node_type != nncir::NodeType::PRIMOUTPUT) {
             // Call execute Op
@@ -41,13 +41,14 @@ RetVal StreamExecutor::inferenceModel(const std::shared_ptr<nncir::NNIR> graph,
     // Read Output Tensors
     this->getOutputTensors(output_tensors);
     for (auto& out : output_tensors) {
-        LOG(INFO) << "Output Tensor:" << out.sizes() <<" data:" << out;
+        LOG(INFO) << "Output Tensor:" << out.sizes() << " data:" << out;
     }
 
     return RetVal::SUCCESS;
 }
 
-void StreamExecutor::updateBlob(int64_t blob_id, DataType dtype, const torch::jit::IValue& iv) {
+void StreamExecutor::updateBlob(int64_t blob_id, DataType dtype, const torch::jit::IValue& iv)
+{
     auto it = this->global_blobs_.find(blob_id);
     if (it == this->global_blobs_.end()) {
         // Not exist, insert
@@ -59,13 +60,15 @@ void StreamExecutor::updateBlob(int64_t blob_id, DataType dtype, const torch::ji
     }
 }
 
-std::pair<DataType, torch::jit::IValue>& StreamExecutor::findBlob(int64_t blob_id) {
+std::pair<DataType, torch::jit::IValue>& StreamExecutor::findBlob(int64_t blob_id)
+{
     auto it = global_blobs_.find(blob_id);
     assert(it != this->global_blobs_.end());
     return it->second;
 }
 
-OpExecutorFn StreamExecutor::findOpExecutor(nncir::NodeType op_type) {
+OpExecutorFn StreamExecutor::findOpExecutor(nncir::NodeType op_type)
+{
     auto it = this->global_op_register_.find(op_type);
     if (it == this->global_op_register_.end()) {
         DLOG(ERROR) << "Runtime error, Unregistered Op !";
@@ -74,7 +77,8 @@ OpExecutorFn StreamExecutor::findOpExecutor(nncir::NodeType op_type) {
     return it->second;
 }
 
-void StreamExecutor::registerOp() {
+void StreamExecutor::registerOp()
+{
     // Register Ops: {OP_TYPE, OP_FUNCTION}
     this->global_op_register_.insert({nncir::NodeType::ATENADD, executorAtenAdd});
     this->global_op_register_.insert({nncir::NodeType::ATENCAT, executorAtenCat});
@@ -86,15 +90,29 @@ void StreamExecutor::registerOp() {
     this->global_op_register_.insert({nncir::NodeType::ATENSELECT, executorAtenSelect});
     this->global_op_register_.insert({nncir::NodeType::ATENTRANSPOSE, executorAtenTranspose});
     this->global_op_register_.insert({nncir::NodeType::ATENTO, executorAtenTo});
-
+    this->global_op_register_.insert({nncir::NodeType::ATENDERIVEINDEX, executorAtenDeriveIndex});
+    this->global_op_register_.insert({nncir::NodeType::ATENGETITEM, executorAtenGetItem});
+    this->global_op_register_.insert({nncir::NodeType::ATENIS, executorAtenIs});
+    this->global_op_register_.insert({nncir::NodeType::ATENADDMM, executorAtenAddMM});
+    this->global_op_register_.insert({nncir::NodeType::ATENAPPEND, executorAtenAppend});
+    this->global_op_register_.insert({nncir::NodeType::ATENCEIL, executorAtenCeil});
+    this->global_op_register_.insert({nncir::NodeType::ATENDIM, executorAtenDim});
+    this->global_op_register_.insert({nncir::NodeType::ATENNEG, executorAtenNeg});
+    this->global_op_register_.insert({nncir::NodeType::ATENRELU, executorAtenRelu});
+    this->global_op_register_.insert({nncir::NodeType::ATENSIZE, executorAtenSize});
+    this->global_op_register_.insert({nncir::NodeType::ATENSLICE, executorAtenSlice});
+    this->global_op_register_.insert({nncir::NodeType::ATENSUB, executorAtenSub});
+    this->global_op_register_.insert({nncir::NodeType::ATENUNSQUEEZE, executorAtenUnsqueeze});
+    this->global_op_register_.insert({nncir::NodeType::ATENZEROSLIKE, executorAtenZerosLike});
     this->global_op_register_.insert({nncir::NodeType::PRIMCONSTANT, executePrimConstant});
     this->global_op_register_.insert({nncir::NodeType::PRIMDTYPE, executePrimDtype});
 }
 
-void StreamExecutor::setInputTensors(const std::vector<torch::Tensor>& input_tensors) {
+void StreamExecutor::setInputTensors(const std::vector<torch::Tensor>& input_tensors)
+{
     if (input_tensors.size() != this->input_blob_ids_.size()) {
-        DLOG(ERROR) << "Num tensors must match the num inputs of Graph," <<"the Graph needs "<<
-                    this->input_blob_ids_.size() << "inputs !";
+        DLOG(ERROR) << "Num tensors must match the num inputs of Graph,"
+                    << "the Graph needs " << this->input_blob_ids_.size() << "inputs !";
     }
     // Set the input tensors to placeholder, assume all inputs & outputs are Tensor type
     int k = 0;
@@ -104,7 +122,8 @@ void StreamExecutor::setInputTensors(const std::vector<torch::Tensor>& input_ten
     }
 }
 
-void StreamExecutor::getOutputTensors(std::vector<torch::Tensor>& output_tensors) {
+void StreamExecutor::getOutputTensors(std::vector<torch::Tensor>& output_tensors)
+{
     output_tensors.clear();
     // Read the output tensors
     for (auto& id_ : this->output_blob_ids_) {

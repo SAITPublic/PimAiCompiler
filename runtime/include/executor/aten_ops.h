@@ -26,7 +26,7 @@ at::Tensor &atenAdd_(at::Tensor &self, at::Scalar other, at::Scalar alpha = 1);
 at::Tensor atenAddmm(const at::Tensor &self, const at::Tensor &mat1, const at::Tensor &mat2, const at::Scalar &beta = 1,
                      const at::Scalar &alpha = 1);
 
-void atenAppend(c10::List<at::IValue> list, at::IValue el);
+void atenAppend(c10::List<at::IValue> &list, at::IValue el);
 
 at::Tensor atenCat(at::TensorList tensors, int64_t dim = 0);
 
@@ -107,6 +107,8 @@ at::Scalar atenItem(const at::Tensor &self);
 int64_t atenLen(const c10::List<at::IValue> &list);
 
 c10::List<std::string> atenList(std::string &str);
+
+c10::List<at::IValue> atenList(const c10::List<at::IValue> &list);
 
 std::tuple<at::Tensor, at::Tensor, at::Tensor> atenLstm(const at::Tensor &input, at::TensorList hx,
                                                         at::TensorList params, bool has_biases, int64_t num_layers,

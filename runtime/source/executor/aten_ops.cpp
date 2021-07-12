@@ -28,7 +28,7 @@ at::IValue atenGetItem(const c10::List<at::IValue> &list, int idx)
 
 bool atenIs(const at::IValue &self, const at::IValue &other) { return self.is(other); }
 
-void atenAppend(c10::List<at::IValue> list, at::IValue el) { list.push_back(std::move(el)); }
+void atenAppend(c10::List<at::IValue> &list, at::IValue el) { list.push_back(std::move(el)); }
 
 int64_t atenDim(const at::Tensor &tensor) { return tensor.dim(); }
 
@@ -58,6 +58,8 @@ c10::List<std::string> atenList(std::string &str)
     }
     return chars;
 }
+
+c10::List<at::IValue> atenList(const c10::List<at::IValue> &list) { return list.copy(); }
 
 at::Tensor atenAdd(const at::Tensor &self, at::Scalar other, at::Scalar alpha) { return at::add(self, other, alpha); }
 
@@ -109,7 +111,8 @@ at::Tensor atenEmbedding(const at::Tensor &weight, const at::Tensor &indices, in
 
 at::Tensor atenEq(const at::Tensor &self, const at::Scalar &other) { return at::eq(self, other); }
 
-bool atenEq(const at::Scalar &self, const at::Scalar &other) {
+bool atenEq(const at::Scalar &self, const at::Scalar &other)
+{
     assert(self.type() == other.type());
     if (self.isIntegral(true)) {
         return (self.to<int>() == other.to<int>());
@@ -173,7 +176,8 @@ at::Tensor atenNe(const at::Tensor &self, const at::Tensor &other) { return at::
 
 at::Tensor atenNe(const at::Tensor &self, const at::Scalar &other) { return at::ne(self, other); }
 
-bool atenNe(const at::Scalar &self, const at::Scalar &other) {
+bool atenNe(const at::Scalar &self, const at::Scalar &other)
+{
     if (self.type() != other.type()) {
         return false;
     }
