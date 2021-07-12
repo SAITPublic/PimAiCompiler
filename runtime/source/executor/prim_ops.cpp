@@ -71,7 +71,7 @@ void primTupleConstruct(std::vector<torch::IValue>& stack, size_t num_inputs)
 std::vector<torch::IValue> primTupleUnpack(c10::intrusive_ptr<c10::ivalue::Tuple> tuple)
 {
     std::vector<torch::IValue> ret;
-    for(auto& item : tuple->elements()){
+    for (auto& item : tuple->elements()) {
         ret.push_back(item);
     }
     return ret;
