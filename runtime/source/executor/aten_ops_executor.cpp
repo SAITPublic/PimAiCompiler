@@ -14,6 +14,7 @@
 #include "ir/include/nn_nodes/aten_ne_node.hpp"
 #include "ir/include/nn_nodes/aten_select_node.hpp"
 #include "ir/include/nn_nodes/aten_transpose_node.hpp"
+#include "ir/include/nn_nodes/aten_to_node.hpp"
 
 namespace nnrt
 {
@@ -196,6 +197,38 @@ void executorAtenTranspose(const nncir::Node& op_node, StreamExecutor& stream_ex
     auto output    = nnrt::atenTranspose(self_tensor, dim0, dim1);
     auto& out_edge = cast<nncir::DataEdge>(transpose_node.getFirstOutEdge());
     stream_executor.updateBlob(out_edge.getBlobId(), DataType::TENSOR, tensorToIValue(output));
+}
+
+void executorAtenTo(const nncir::Node& op_node, StreamExecutor& stream_executor) {
+   DLOG(INFO) << "execute Aten To node";
+
+    auto to_node = cast<nncir::AtenToNode>(op_node);
+
+    auto dtype                  = convertDTypeToATScalarType(to_node.getDType());
+    auto non_blocking           = to_node.getNonBlocking();
+    auto copy                   = to_node.getCopy();
+    auto optional_memory_format = to_node.getOptionalMemoryFormat();
+
+    auto& input_self = cast<nncir::DataEdge>(to_node.getInEdge(0));
+    int input_self_blob_id = input_self.getBlobId();
+
+    auto data_type = stream_executor.findBlob(input_self_blob_id).first;
+    torch::jit::IValue iv_self = stream_executor.findBlob(input_self_blob_id).second;
+    assert(iv_self.isTensor());
+    at::Tensor self_tensor = iv_self.toTensor();
+
+    if (optional_memory_format == -1) { // optional_memory_format = NONE
+        auto output = nnrt::atenTo(self_tensor, dtype, non_blocking, copy);
+        // update output
+        auto& out_edge = cast<nncir::DataEdge>(to_node.getFirstOutEdge());
+        stream_executor.updateBlob(out_edge.getBlobId(), DataType::TENSOR, tensorToIValue(output));
+    } else {
+        auto memory_format = getMemoryFormat(optional_memory_format);
+        auto output = nnrt::atenTo(self_tensor, dtype, non_blocking, copy, memory_format);
+        // update output
+        auto& out_edge = cast<nncir::DataEdge>(to_node.getFirstOutEdge());
+        stream_executor.updateBlob(out_edge.getBlobId(), DataType::TENSOR, tensorToIValue(output));
+    }
 }
 
 }  // namespace nnrt

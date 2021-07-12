@@ -823,7 +823,8 @@ IRNNNodeParser::parseNNNode<IR::NNNode::AnyType_AtenToNode>(const IR::NnNode*   
     nn_ir::DataType dtype = convertIrTypeToNNIr(static_cast<IR::Type::DataType>(aten_to_node->dtype()));
     bool non_blocking = aten_to_node->non_blocking();
     bool copy = aten_to_node->copy();
-    int64_t optional_memory_format = aten_to_node->optional_memory_format();
+    int optional_memory_format = aten_to_node->optional_memory_format();
+
     return std::make_unique<nn_ir::AtenToNode>(node_info, dtype, non_blocking, copy, optional_memory_format);
 }
 

@@ -25,17 +25,33 @@ class AtenToNode : public NodeMixin<AtenToNode, NNNode> {
                         DataType            dtype,
                         bool                non_blocking,
                         bool                copy,
-                        bool                optional_memory_format)
+                        int                 optional_memory_format)
         : NodeMixin(node_info, NodeType::ATENTO), dtype_(dtype), non_blocking_(non_blocking),
           copy_(copy), optional_memory_format_(optional_memory_format) {}
 
     std::string getNodeTypeAsString(void) const override { return "AtenTo"; }
 
+    void setDType(DataType dtype) { dtype_ = dtype; }
+
+    DataType getDType() { return dtype_; }
+
+    void setNonBlocking(bool non_blocking) { non_blocking_ = non_blocking; }
+
+    bool getNonBlocking() { return non_blocking_; }
+
+    void setCopy(bool copy) { copy_ = copy; }
+
+    bool getCopy() { return copy_; }
+
+    void setOptionalMemoryFormat(int optional_memory_format) { optional_memory_format_ = optional_memory_format; }
+
+    int getOptionalMemoryFormat() { return optional_memory_format_; }
+
  private:
-    DataType dtype_;
+    DataType dtype_ = DataType::NONE;
     bool non_blocking_ = false;
     bool copy_ = false;
-    int64_t optional_memory_format_ = 0;
+    int optional_memory_format_ = -1;
 }; // class AtenToNode
 
 } // namespace nn_ir

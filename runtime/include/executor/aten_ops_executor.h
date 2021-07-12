@@ -22,4 +22,6 @@ void executorAtenSelect(const nncir::Node& op_node, StreamExecutor& stream_execu
 
 void executorAtenTranspose(const nncir::Node& op_node, StreamExecutor& stream_executor);
 
+void executorAtenTo(const nncir::Node& op_node, StreamExecutor& stream_executor);
+
 }  // namespace nnrt
