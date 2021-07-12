@@ -13,6 +13,7 @@
 #include "ir/include/nn_nodes/aten_eq_node.hpp"
 #include "ir/include/nn_nodes/aten_ne_node.hpp"
 #include "ir/include/nn_nodes/aten_select_node.hpp"
+#include "ir/include/nn_nodes/aten_transpose_node.hpp"
 
 namespace nnrt
 {
@@ -63,10 +64,10 @@ void executorAtenCat(const nncir::Node& op_node, StreamExecutor& stream_executor
     std::vector<at::Tensor> tensor_vec;
 
     auto& input_list_edge = cast<nncir::DataEdge>(cat_node.getInEdge(0));
-    auto input__blob_id   = input_list_edge.getBlobId();
+    auto input_blob_id    = input_list_edge.getBlobId();
 
-    auto dtype  = stream_executor.findBlob(input__blob_id).first;
-    auto ivalue = stream_executor.findBlob(input__blob_id).second;
+    auto dtype  = stream_executor.findBlob(input_blob_id).first;
+    auto ivalue = stream_executor.findBlob(input_blob_id).second;
     assert(ivalue.isTensorList());
 
     auto c10_tensor_list = ivalue.toTensorList();
@@ -174,6 +175,26 @@ void executorAtenSelect(const nncir::Node& op_node, StreamExecutor& stream_execu
     auto output = nnrt::atenSelect(self_tensor, dim, index);
     // update output
     auto& out_edge = cast<nncir::DataEdge>(select_node.getFirstOutEdge());
+    stream_executor.updateBlob(out_edge.getBlobId(), DataType::TENSOR, tensorToIValue(output));
+}
+
+void executorAtenTranspose(const nncir::Node& op_node, StreamExecutor& stream_executor) {
+    DLOG(INFO) << "execute Aten Transpose node";
+
+    auto transpose_node = cast<nncir::AtenTransposeNode>(op_node);
+    auto dim0 = transpose_node.getDim0();
+    auto dim1 = transpose_node.getDim1();
+
+    auto& input_self = cast<nncir::DataEdge>(transpose_node.getInEdge(0));
+    int input_self_blob_id = input_self.getBlobId();
+
+    auto dtype = stream_executor.findBlob(input_self_blob_id).first;
+    torch::jit::IValue iv_self = stream_executor.findBlob(input_self_blob_id).second;
+    assert(iv_self.isTensor());
+    at::Tensor self_tensor = iv_self.toTensor();
+
+    auto output    = nnrt::atenTranspose(self_tensor, dim0, dim1);
+    auto& out_edge = cast<nncir::DataEdge>(transpose_node.getFirstOutEdge());
     stream_executor.updateBlob(out_edge.getBlobId(), DataType::TENSOR, tensorToIValue(output));
 }
 
