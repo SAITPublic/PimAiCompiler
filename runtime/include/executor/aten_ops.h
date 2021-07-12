@@ -57,6 +57,8 @@ at::Tensor atenEq(const at::Tensor &self, const at::Scalar &other);
 
 at::Tensor atenEq(const at::Tensor &self, const at::Tensor &other);
 
+bool atenEq(const at::Scalar &self, const at::Scalar &other);
+
 at::Tensor atenExpand(const at::Tensor &self, at::IntArrayRef size, bool implicit = false);
 
 static std::string atenFormat(const std::string &fmt)

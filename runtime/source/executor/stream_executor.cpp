@@ -80,11 +80,12 @@ OpExecutorFn StreamExecutor::findOpExecutor(nncir::NodeType op_type)
 
 void StreamExecutor::registerOp()
 {
-    // Register Prim Ops: {OP_TYPE, OP_FUNCTION}
+    // Register Ops: {OP_TYPE, OP_FUNCTION}
     this->global_op_register_.insert({nncir::NodeType::ATENADD, executorAtenAdd});
+    this->global_op_register_.insert({nncir::NodeType::ATENEQ, executorAtenEq});
+
     this->global_op_register_.insert({nncir::NodeType::PRIMCONSTANT, executePrimConstant});
     this->global_op_register_.insert({nncir::NodeType::PRIMDTYPE, executePrimDtype});
-    // Register Aten Ops
 }
 
 void StreamExecutor::setInputTensors(const std::vector<torch::Tensor>& input_tensors) {

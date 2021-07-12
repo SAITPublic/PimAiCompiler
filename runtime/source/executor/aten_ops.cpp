@@ -2,6 +2,7 @@
 // Created by heguoqiang on 2021/6/23.
 //
 #include "executor/aten_ops.h"
+#include "../../../../../../../usr/include/assert.h"
 
 namespace nnrt
 {
@@ -108,6 +109,17 @@ at::Tensor atenEmbedding(const at::Tensor &weight, const at::Tensor &indices, in
 }
 
 at::Tensor atenEq(const at::Tensor &self, const at::Scalar &other) { return at::eq(self, other); }
+
+bool atenEq(const at::Scalar &self, const at::Scalar &other) {
+    assert(self.type() == other.type());
+    if (self.isIntegral(true)) {
+        return (self.to<int>() == other.to<int>());
+    } else if (self.isBoolean()) {
+        return (self.to<bool>() == other.to<bool>());
+    } else if (self.isFloatingPoint()) {
+        return (self.to<double>() == other.to<double>());
+    }
+}
 
 at::Tensor atenExpand(const at::Tensor &self, at::IntArrayRef size, bool implicit)
 {

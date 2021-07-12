@@ -8,6 +8,7 @@
 #include "ir/include/ir_types.hpp"
 #include "ir/include/nn_ir.hpp"
 #include "ir/include/nn_nodes/aten_add_node.hpp"
+#include "ir/include/nn_nodes/aten_eq_node.hpp"
 
 namespace nnrt
 {
@@ -49,4 +50,43 @@ void executorAtenAdd(const nncir::Node& op_node, StreamExecutor& stream_executor
         stream_executor.updateBlob(out_edge.getBlobId(), DataType::TENSOR, tensorToIValue(output));
     }
 }  // executorAtenAdd
+
+void executorAtenEq(const nncir::Node& op_node, StreamExecutor& stream_executor) {
+    DLOG(INFO) << "execute Aten Eq node";
+
+    auto eq_node = cast<nncir::AtenEqNode>(op_node);
+    assert(eq_node.getNumInputs() == 2);
+
+    auto& input_self = cast<nncir::DataEdge>(eq_node.getInEdge(0));
+    auto& input_other = cast<nncir::DataEdge>(eq_node.getInEdge(1));
+
+    // Get input blob
+    int input_self_blob_id = input_self.getBlobId();
+    int input_other_blob_id = input_other.getBlobId();
+
+    // Find the input blob
+    torch::jit::IValue iv_self = stream_executor.findBlob(input_self_blob_id).second;
+    torch::jit::IValue iv_other = stream_executor.findBlob(input_other_blob_id).second;
+
+    if (iv_self.isTensor()) {
+        assert(iv_other.isTensor());
+        at::Tensor self_tensor  = iv_self.toTensor();
+        at::Tensor other_tensor = iv_other.toTensor();
+        auto output = nnrt::atenEq(self_tensor, other_tensor);
+        // update output
+        auto& out_edge = cast<nncir::DataEdge>(eq_node.getFirstOutEdge());
+        stream_executor.updateBlob(out_edge.getBlobId(), DataType::TENSOR, tensorToIValue(output));
+    } else if (iv_self.isScalar()) {
+        assert(iv_other.isScalar());
+        at::Scalar self_scalar  = iv_self.toScalar();
+        at::Scalar other_scalar = iv_other.toScalar();
+        auto output = nnrt::atenEq(self_scalar, other_scalar);
+        // update output
+        auto& out_edge = cast<nncir::DataEdge>(eq_node.getFirstOutEdge());
+        stream_executor.updateBlob(out_edge.getBlobId(), DataType::BOOL, scalarToIValue(output));
+    } else {
+        DLOG(ERROR) << "Unsupported input type for aten::eq";
+    }
+}
+
 }  // namespace nnrt
