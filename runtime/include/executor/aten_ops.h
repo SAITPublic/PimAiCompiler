@@ -140,6 +140,8 @@ at::Tensor atenNe(const at::Tensor &self, const at::Tensor &other);
 
 at::Tensor atenNe(const at::Tensor &self, const at::Scalar &other);
 
+bool atenNe(const at::Scalar &self, const at::Scalar &other);
+
 at::Tensor atenNeg(const at::Tensor &self);
 
 at::Tensor atenRelu(const at::Tensor &self);

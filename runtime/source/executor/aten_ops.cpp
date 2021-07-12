@@ -174,6 +174,19 @@ at::Tensor atenNe(const at::Tensor &self, const at::Tensor &other) { return at::
 
 at::Tensor atenNe(const at::Tensor &self, const at::Scalar &other) { return at::ne(self, other); }
 
+bool atenNe(const at::Scalar &self, const at::Scalar &other) {
+    if (self.type() != other.type()) {
+        return false;
+    }
+    if (self.isIntegral(true)) {
+        return (self.to<int>() != other.to<int>());
+    } else if (self.isBoolean()) {
+        return (self.to<bool>() != other.to<bool>());
+    } else if (self.isFloatingPoint()) {
+        return (self.to<double>() != other.to<double>());
+    }
+}
+
 at::Tensor atenNeg(const at::Tensor &self) { return at::neg(self); }
 
 at::Tensor atenRelu(const at::Tensor &self) { return at::relu(self); }
