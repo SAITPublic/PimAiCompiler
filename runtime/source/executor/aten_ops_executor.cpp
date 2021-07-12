@@ -16,8 +16,7 @@ void executorAtenAdd(const nncir::Node& op_node, StreamExecutor& stream_executor
     DLOG(INFO) << "execute Aten Add node";
 
     auto add_node = cast<nncir::AtenAddNode>(op_node);
-    // addOp has 3 inputs
-    assert(add_node.getNumInputs() == 3);   
+    int64_t alpha = add_node.getAlpha();
 
     auto& input_self = cast<nncir::DataEdge>(add_node.getInEdge(0));
     auto& input_other = cast<nncir::DataEdge>(add_node.getInEdge(1));
@@ -35,7 +34,7 @@ void executorAtenAdd(const nncir::Node& op_node, StreamExecutor& stream_executor
     if (dtype == DataType::TENSOR) {
         assert(iv_other.isTensor());
         at::Tensor other_tensor = iv_other.toTensor();
-        auto output = nnrt::atenAdd(self_tensor, other_tensor);
+        auto output = nnrt::atenAdd(self_tensor, other_tensor, alpha);
         // update output
         auto& out_edge = cast<nncir::DataEdge>(add_node.getFirstOutEdge());
         stream_executor.updateBlob(out_edge.getBlobId(), DataType::TENSOR, tensorToIValue(output));
@@ -44,7 +43,7 @@ void executorAtenAdd(const nncir::Node& op_node, StreamExecutor& stream_executor
                dtype == DataType::FLOAT32 || dtype == DataType::FLOAT64 || dtype == DataType::BOOL) {
         assert(iv_other.isScalar());
         at::Scalar other_scalar = iv_other.toScalar();
-        auto output = nnrt::atenAdd(self_tensor, other_scalar);
+        auto output = nnrt::atenAdd(self_tensor, other_scalar, alpha);
         // update output
         auto& out_edge = cast<nncir::DataEdge>(add_node.getFirstOutEdge());
         stream_executor.updateBlob(out_edge.getBlobId(), DataType::TENSOR, tensorToIValue(output));

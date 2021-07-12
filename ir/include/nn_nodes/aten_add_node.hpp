@@ -21,9 +21,17 @@ namespace nn_ir {
 
 class AtenAddNode : public NodeMixin<AtenAddNode, NNNode> {
  public:
-    explicit AtenAddNode(const NodeInfo& node_info): NodeMixin(node_info, NodeType::ATENADD) {}
+    explicit AtenAddNode(const NodeInfo& node_info, int64_t alpha) :
+            NodeMixin(node_info, NodeType::ATENADD), alpha_(alpha) {}
 
     std::string getNodeTypeAsString(void) const override { return "AtenAdd"; }
+
+    void setAlpha(int64_t alpha) { alpha_ = alpha; }
+
+    int64_t getAlpha() { return alpha_; }
+
+ private:
+    int64_t alpha_ = 1;
 }; // class AtenAddNode
 
 } // namespace nn_ir
