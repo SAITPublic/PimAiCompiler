@@ -7,7 +7,9 @@
 #include "ir/include/edge.hpp"
 #include "ir/include/ir_types.hpp"
 #include "ir/include/nn_ir.hpp"
+
 #include "ir/include/nn_nodes/aten_add_node.hpp"
+#include "ir/include/nn_nodes/aten_cat_node.hpp"
 #include "ir/include/nn_nodes/aten_eq_node.hpp"
 #include "ir/include/nn_nodes/aten_ne_node.hpp"
 #include "ir/include/nn_nodes/aten_select_node.hpp"
@@ -52,6 +54,31 @@ void executorAtenAdd(const nncir::Node& op_node, StreamExecutor& stream_executor
         stream_executor.updateBlob(out_edge.getBlobId(), DataType::TENSOR, tensorToIValue(output));
     }
 }  // executorAtenAdd
+
+void executorAtenCat(const nncir::Node& op_node, StreamExecutor& stream_executor) {
+    DLOG(INFO) << "execute Aten Cat node";
+
+    auto cat_node = cast<nncir::AtenCatNode>(op_node);
+    auto dim      = cat_node.getDim();
+    std::vector<at::Tensor> tensor_vec;
+
+    auto& input_list_edge = cast<nncir::DataEdge>(cat_node.getInEdge(0));
+    auto input__blob_id   = input_list_edge.getBlobId();
+
+    auto dtype  = stream_executor.findBlob(input__blob_id).first;
+    auto ivalue = stream_executor.findBlob(input__blob_id).second;
+    assert(ivalue.isTensorList());
+
+    auto c10_tensor_list = ivalue.toTensorList();
+    for (auto tensor : c10_tensor_list) {
+        tensor_vec.push_back(tensor);
+    }
+    at::TensorList tensor_list(tensor_vec);
+
+    auto output    = nnrt::atenCat(tensor_list, dim);
+    auto& out_edge = cast<nncir::DataEdge>(cat_node.getFirstOutEdge());
+    stream_executor.updateBlob(out_edge.getBlobId(), DataType::TENSOR, tensorListToIValue(output));
+}
 
 void executorAtenEq(const nncir::Node& op_node, StreamExecutor& stream_executor) {
     DLOG(INFO) << "execute Aten Eq node";

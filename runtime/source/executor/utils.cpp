@@ -6,7 +6,8 @@ namespace nnrt
 
 torch::jit::IValue tensorToIValue(const torch::Tensor& tensor) { return torch::jit::IValue(tensor); }
 
-torch::jit::IValue strToIValue(std::string str) { return torch::jit::IValue(str); }
+torch::jit::IValue tensorListToIValue(const torch::TensorList& tensor_list) { return torch::jit::IValue(tensor_list); }
 
+torch::jit::IValue strToIValue(std::string str) { return torch::jit::IValue(str); }
 
 }  // namespace nnrt

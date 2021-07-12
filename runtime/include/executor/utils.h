@@ -12,6 +12,8 @@ torch::jit::IValue scalarToIValue(const T& scalar)
 
 torch::jit::IValue tensorToIValue(const torch::Tensor& tensor);
 
+torch::jit::IValue tensorListToIValue(const torch::TensorList& tensor_list);
+
 torch::jit::IValue strToIValue(std::string str);
 
 }  // namespace nnrt

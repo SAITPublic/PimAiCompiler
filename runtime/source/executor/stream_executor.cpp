@@ -82,6 +82,7 @@ void StreamExecutor::registerOp()
 {
     // Register Ops: {OP_TYPE, OP_FUNCTION}
     this->global_op_register_.insert({nncir::NodeType::ATENADD, executorAtenAdd});
+    this->global_op_register_.insert({nncir::NodeType::ATENCAT, executorAtenCat});
     this->global_op_register_.insert({nncir::NodeType::ATENEQ, executorAtenEq});
     this->global_op_register_.insert({nncir::NodeType::ATENNE, executorAtenNe});
     this->global_op_register_.insert({nncir::NodeType::ATENSELECT, executorAtenSelect});
@@ -92,7 +93,8 @@ void StreamExecutor::registerOp()
 
 void StreamExecutor::setInputTensors(const std::vector<torch::Tensor>& input_tensors) {
     if(input_tensors.size() != this->input_blob_ids_.size()) {
-        DLOG(ERROR) << "Num tensors must match the num inputs of Graph," <<"the Graph needs "<<this->input_blob_ids_.size()<<"inputs !";
+        DLOG(ERROR) << "Num tensors must match the num inputs of Graph," <<"the Graph needs "<<
+                    this->input_blob_ids_.size()<<"inputs !";
     }
     // Set the input tensors to placeholder, assume all inputs & outputs are Tensor type
     int k = 0;
