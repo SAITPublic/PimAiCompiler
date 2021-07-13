@@ -47,8 +47,8 @@ RetVal ControlNodeExecutionPass::run(nn_ir::NNIR& graph, CompilationContext& con
                 then_net_end_if_nodes.push(prim_end_if_node);
             } else {
                 auto then_net_end_if_node = then_net_end_if_nodes.top();
-                then_net_end_if_node->setGotoNode(prim_end_if_node->getId() + 1);
-                prim_end_if_node->setGotoNode(then_net_end_if_node->getId());
+                then_net_end_if_node->setGotoNode(prim_end_if_node->getId());
+                prim_end_if_node->setGotoNode(prim_end_if_node->getId() + 1);
                 prim_end_if_node->setIsElseNet(true);
                 then_net_end_if_nodes.pop();
             }
