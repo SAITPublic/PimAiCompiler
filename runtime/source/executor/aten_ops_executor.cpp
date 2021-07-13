@@ -12,6 +12,7 @@
 #include "ir/include/nn_nodes/aten_cat_node.hpp"
 #include "ir/include/nn_nodes/aten_div_node.hpp"
 #include "ir/include/nn_nodes/aten_eq_node.hpp"
+#include "ir/include/nn_nodes/aten_int_node.hpp"
 #include "ir/include/nn_nodes/aten_ne_node.hpp"
 #include "ir/include/nn_nodes/aten_select_node.hpp"
 #include "ir/include/nn_nodes/aten_transpose_node.hpp"
@@ -159,6 +160,26 @@ void executorAtenEq(const nncir::Node& op_node, StreamExecutor& stream_executor)
     } else {
         DLOG(ERROR) << "Unsupported input type for aten::eq";
     }
+}
+
+void executorAtenInt(const nncir::Node& op_node, StreamExecutor& stream_executor) {
+    DLOG(INFO) << "execute Aten Int node";
+
+    auto int_node = cast<nncir::AtenIntNode>(op_node);
+    assert(div_node.getNumInputs() == 1);
+
+    auto& input_self = cast<nncir::DataEdge>(int_node.getInEdge(0));
+    int input_self_blob_id = input_self.getBlobId();
+
+    auto dtype = stream_executor.findBlob(input_self_blob_id).first;
+    torch::jit::IValue iv_self = stream_executor.findBlob(input_self_blob_id).second;
+    assert(iv_self.isScalar());
+    auto self_scalar = iv_self.toScalar();
+
+    auto output = nnrt::atenInt(self_scalar);
+    // update output
+    auto& out_edge = cast<nncir::DataEdge>(int_node.getFirstOutEdge());
+    stream_executor.updateBlob(out_edge.getBlobId(), DataType::INT64, scalarToIValue(output));
 }
 
 void executorAtenNe(const nncir::Node& op_node, StreamExecutor& stream_executor) {
