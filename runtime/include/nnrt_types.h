@@ -23,7 +23,8 @@ enum DataType {
     DEVICE,
     TENSOR,
     NONE,
-    LIST
+    LIST,
+    TUPLE
 };
 
 struct OpNodeDescription {

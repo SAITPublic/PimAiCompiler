@@ -13,6 +13,7 @@
 #include "ir/include/nn_nodes/aten_div_node.hpp"
 #include "ir/include/nn_nodes/aten_eq_node.hpp"
 #include "ir/include/nn_nodes/aten_int_node.hpp"
+#include "ir/include/nn_nodes/aten_max_node.hpp"
 #include "ir/include/nn_nodes/aten_ne_node.hpp"
 #include "ir/include/nn_nodes/aten_select_node.hpp"
 #include "ir/include/nn_nodes/aten_transpose_node.hpp"
@@ -182,6 +183,46 @@ void executorAtenInt(const nncir::Node& op_node, StreamExecutor& stream_executor
     stream_executor.updateBlob(out_edge.getBlobId(), DataType::INT64, scalarToIValue(output));
 }
 
+void executorAtenMax(const nncir::Node& op_node, StreamExecutor& stream_executor) {
+    DLOG(INFO) << "execute Aten Max node";
+
+    auto max_node = cast<nncir::AtenMaxNode>(op_node);
+
+    auto& input_self = cast<nncir::DataEdge>(max_node.getInEdge(0));
+    auto& input_other = cast<nncir::DataEdge>(max_node.getInEdge(1));
+
+    // Get input blob
+    int input_self_blob_id = input_self.getBlobId();
+    int input_other_blob_id = input_other.getBlobId();
+
+    // Find the input blob
+    torch::jit::IValue iv_self = stream_executor.findBlob(input_self_blob_id).second;
+    torch::jit::IValue iv_other = stream_executor.findBlob(input_other_blob_id).second;
+    assert(iv_self.isTensor());
+    at::Tensor self_tensor = iv_self.toTensor();
+    auto dtype = stream_executor.findBlob(input_other_blob_id).first;
+    if (dtype == DataType::TENSOR) {
+        // aten::max(Tensor, Tensor)
+        assert(iv_other.isTensor());
+        at::Tensor other_tensor = iv_other.toTensor();
+        auto output = nnrt::atenMax(self_tensor, other_tensor);
+        // update output
+        auto& out_edge = cast<nncir::DataEdge>(max_node.getFirstOutEdge());
+        stream_executor.updateBlob(out_edge.getBlobId(), DataType::TENSOR, tensorToIValue(output));
+    } else if (dtype == DataType::INT8 || dtype == DataType::UINT8 || dtype == DataType::INT16 ||
+               dtype == DataType::UINT16 || dtype == DataType::INT32 || dtype == DataType::INT64 ||
+               dtype == DataType::FLOAT32 || dtype == DataType::FLOAT64 || dtype == DataType::BOOL) {
+        // aten::max(Tensor, dim, keepdim)
+        auto dim      = max_node.getDim();
+        auto keep_dim = max_node.getKeepDim();
+
+        auto output = nnrt::atenMax(self_tensor, dim, keep_dim);
+        // update output
+        auto& out_edge = cast<nncir::DataEdge>(max_node.getFirstOutEdge());
+        stream_executor.updateBlob(out_edge.getBlobId(), DataType::TUPLE, tupleToIValue(output));
+    }
+}
+
 void executorAtenNe(const nncir::Node& op_node, StreamExecutor& stream_executor) {
     DLOG(INFO) << "execute Aten Ne node";
 
@@ -262,7 +303,7 @@ void executorAtenTranspose(const nncir::Node& op_node, StreamExecutor& stream_ex
 }
 
 void executorAtenTo(const nncir::Node& op_node, StreamExecutor& stream_executor) {
-   DLOG(INFO) << "execute Aten To node";
+    DLOG(INFO) << "execute Aten To node";
 
     auto to_node = cast<nncir::AtenToNode>(op_node);
 

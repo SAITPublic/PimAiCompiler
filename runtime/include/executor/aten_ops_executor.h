@@ -20,6 +20,8 @@ void executorAtenEq(const nncir::Node& op_node, StreamExecutor& stream_executor)
 
 void executorAtenInt(const nncir::Node& op_node, StreamExecutor& stream_executor);
 
+void executorAtenMax(const nncir::Node& op_node, StreamExecutor& stream_executor);
+
 void executorAtenNe(const nncir::Node& op_node, StreamExecutor& stream_executor);
 
 void executorAtenSelect(const nncir::Node& op_node, StreamExecutor& stream_executor);

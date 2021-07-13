@@ -21,9 +21,22 @@ namespace nn_ir {
 
 class AtenMaxNode : public NodeMixin<AtenMaxNode, NNNode> {
  public:
-    explicit AtenMaxNode(const NodeInfo& node_info): NodeMixin(node_info, NodeType::ATENMAX) {}
+    explicit AtenMaxNode(const NodeInfo& node_info, int64_t dim, bool keep_dim)
+            : NodeMixin(node_info, NodeType::ATENMAX), dim_(dim), keep_dim_(keep_dim) {}
 
     std::string getNodeTypeAsString(void) const override { return "AtenMax"; }
+
+    void setDim(int64_t dim) { dim_ = dim; }
+
+    int64_t getDim() { return dim_; }
+
+    void setKeepDim(bool keep_dim) { keep_dim_ = keep_dim; }
+
+    bool getKeepDim() { return keep_dim_; }
+
+private:
+    int64_t dim_   = 0;
+    bool keep_dim_ = false;
 }; // class AtenMaxNode
 
 } // namespace nn_ir

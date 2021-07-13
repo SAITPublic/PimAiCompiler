@@ -719,7 +719,10 @@ IRNNNodeParser::parseNNNode<IR::NNNode::AnyType_AtenMaxNode>(const IR::NnNode*  
     auto aten_max_node = ir_node->nn_node_as_AtenMaxNode();
     Log::IR::E_IF(aten_max_node == nullptr) << "IRNNNodeParser::parseNNNode<NN::AtenMaxNode>() => wrong node type!";
 
-    return std::make_unique<nn_ir::AtenMaxNode>(node_info);
+    auto dim = aten_max_node->dim();
+    auto keep_dim = aten_max_node->keep_dim();
+
+    return std::make_unique<nn_ir::AtenMaxNode>(node_info, dim, keep_dim);
 }
 
 template <>
