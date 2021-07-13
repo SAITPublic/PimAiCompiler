@@ -167,7 +167,7 @@ void executorAtenInt(const nncir::Node& op_node, StreamExecutor& stream_executor
     DLOG(INFO) << "execute Aten Int node";
 
     auto int_node = cast<nncir::AtenIntNode>(op_node);
-    assert(div_node.getNumInputs() == 1);
+    assert(int_node.getNumInputs() == 1);
 
     auto& input_self = cast<nncir::DataEdge>(int_node.getInEdge(0));
     int input_self_blob_id = input_self.getBlobId();

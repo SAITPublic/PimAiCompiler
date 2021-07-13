@@ -1,8 +1,9 @@
 #include <torch/script.h>
-#include "ir/include/nn_ir.hpp"
-#include "ir/include/ir_types.hpp"
 #include "ir/include/data_edge.hpp"
 #include "ir/include/edge.hpp"
+#include "ir/include/ir_types.hpp"
+#include "ir/include/nn_ir.hpp"
+
 #include "common/include/cast.hpp"
 #include "nnrt_types.h"
 #include "executor/utils.h"
@@ -13,16 +14,14 @@
 
 namespace nncir = nn_compiler::nn_ir;
 
-namespace nnrt
-{
+namespace nnrt {
 
 RetVal StreamExecutor::inferenceModel(const std::shared_ptr<nncir::NNIR> graph,
                                       const std::vector<torch::Tensor>& input_tensors,
-                                      std::vector<torch::Tensor>& output_tensors)
-{
+                                      std::vector<torch::Tensor>& output_tensors) {
     // Set Input Tensors
-    for(auto& in : input_tensors) {
-        LOG(INFO) << "Input Tensor:" <<in.sizes() <<" data:"<<in;
+    for (auto& in : input_tensors) {
+        LOG(INFO) << "Input Tensor:" <<in.sizes() <<" data:" << in;
     }
     this->setInputTensors(input_tensors);
 
@@ -32,7 +31,7 @@ RetVal StreamExecutor::inferenceModel(const std::shared_ptr<nncir::NNIR> graph,
         auto node_type = node.getNodeType();
 
 
-        if(node_type != nncir::NodeType::PRIMINPUT && node_type != nncir::NodeType::PRIMOUTPUT){
+        if (node_type != nncir::NodeType::PRIMINPUT && node_type != nncir::NodeType::PRIMOUTPUT) {
             // Call execute Op
             auto op_executor = this->findOpExecutor(node.getNodeType());
             op_executor(node, *this);
@@ -41,15 +40,14 @@ RetVal StreamExecutor::inferenceModel(const std::shared_ptr<nncir::NNIR> graph,
 
     // Read Output Tensors
     this->getOutputTensors(output_tensors);
-    for(auto& out : output_tensors) {
-        LOG(INFO) << "Output Tensor:" <<out.sizes() <<" data:"<<out;
+    for (auto& out : output_tensors) {
+        LOG(INFO) << "Output Tensor:" << out.sizes() <<" data:" << out;
     }
 
     return RetVal::SUCCESS;
 }
 
-void StreamExecutor::updateBlob(int64_t blob_id, DataType dtype, const torch::jit::IValue& iv)
-{
+void StreamExecutor::updateBlob(int64_t blob_id, DataType dtype, const torch::jit::IValue& iv) {
     auto it = this->global_blobs_.find(blob_id);
     if (it == this->global_blobs_.end()) {
         // Not exist, insert
@@ -61,25 +59,22 @@ void StreamExecutor::updateBlob(int64_t blob_id, DataType dtype, const torch::ji
     }
 }
 
-std::pair<DataType, torch::jit::IValue>& StreamExecutor::findBlob(int64_t blob_id)
-{
+std::pair<DataType, torch::jit::IValue>& StreamExecutor::findBlob(int64_t blob_id) {
     auto it = global_blobs_.find(blob_id);
     assert(it != this->global_blobs_.end());
     return it->second;
 }
 
-OpExecutorFn StreamExecutor::findOpExecutor(nncir::NodeType op_type)
-{
+OpExecutorFn StreamExecutor::findOpExecutor(nncir::NodeType op_type) {
     auto it = this->global_op_register_.find(op_type);
-    if(it == this->global_op_register_.end()) {
+    if (it == this->global_op_register_.end()) {
         DLOG(ERROR) << "Runtime error, Unregistered Op !";
     }
     assert(it != this->global_op_register_.end());
     return it->second;
 }
 
-void StreamExecutor::registerOp()
-{
+void StreamExecutor::registerOp() {
     // Register Ops: {OP_TYPE, OP_FUNCTION}
     this->global_op_register_.insert({nncir::NodeType::ATENADD, executorAtenAdd});
     this->global_op_register_.insert({nncir::NodeType::ATENCAT, executorAtenCat});
@@ -97,22 +92,22 @@ void StreamExecutor::registerOp()
 }
 
 void StreamExecutor::setInputTensors(const std::vector<torch::Tensor>& input_tensors) {
-    if(input_tensors.size() != this->input_blob_ids_.size()) {
+    if (input_tensors.size() != this->input_blob_ids_.size()) {
         DLOG(ERROR) << "Num tensors must match the num inputs of Graph," <<"the Graph needs "<<
-                    this->input_blob_ids_.size()<<"inputs !";
+                    this->input_blob_ids_.size() << "inputs !";
     }
     // Set the input tensors to placeholder, assume all inputs & outputs are Tensor type
     int k = 0;
-    for(auto& id_ : this->input_blob_ids_) {
+    for (auto& id_ : this->input_blob_ids_) {
         this->updateBlob(id_, DataType::TENSOR, tensorToIValue(input_tensors.at(k)));
         k++;
     }
 }
 
-void StreamExecutor::getOutputTensors(std::vector<torch::Tensor>& output_tensors){
+void StreamExecutor::getOutputTensors(std::vector<torch::Tensor>& output_tensors) {
     output_tensors.clear();
     // Read the output tensors
-    for(auto& id_ : this->output_blob_ids_) {
+    for (auto& id_ : this->output_blob_ids_) {
         auto blob = this->findBlob(id_);
         output_tensors.push_back(blob.second.toTensor());
     }

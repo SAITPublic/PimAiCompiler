@@ -5,17 +5,15 @@
 #include <vector>
 #include "../nnrt_types.h"
 
-namespace nnrt
-{
-class NNRuntimeException : std::exception
-{
-    using std::exception::what;
+namespace nnrt {
+class NNRuntimeException : std::exception {
+using std::exception::what;
 
-   public:
-    NNRuntimeException(std::string msg) { this->msg = msg; }
+ public:
+    explicit NNRuntimeException(std::string msg) { this->msg = msg; }
     const char* what() { return msg.c_str(); }
 
-   private:
+ private:
     std::string msg;
 };
 

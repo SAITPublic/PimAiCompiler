@@ -13,9 +13,13 @@
 #include "ir/include/control_nodes/prim_end_loop_node.hpp"
 #include "ir/include/control_nodes/prim_if_node.hpp"
 #include "ir/include/control_nodes/prim_list_construct_node.hpp"
+#include "ir/include/control_nodes/prim_list_unpack_node.hpp"
+#include "ir/include/control_nodes/prim_raise_exception_node.hpp"
 #include "ir/include/control_nodes/prim_tuple_construct_node.hpp"
 #include "ir/include/control_nodes/prim_tuple_index_node.hpp"
 #include "ir/include/control_nodes/prim_tuple_unpack_node.hpp"
+#include "ir/include/control_nodes/prim_unchecked_cast_node.hpp"
+#include "ir/include/control_nodes/prim_uninitialized_node.hpp"
 #include "ir/include/data_edge.hpp"
 #include "ir/include/edge.hpp"
 #include "ir/include/nn_ir.hpp"
@@ -261,11 +265,14 @@ void executePrimListConstruct(const nncir::Node& op_node, StreamExecutor& stream
     auto inedges = list_construct_node.getInEdgeIds();
 
     std::vector<torch::IValue> inputs;
+    DataType type = DataType::NONE;
     for (auto edge_id : inedges) {
         auto& data_edge = cast<nncir::DataEdge>(list_construct_node.getInEdge(edge_id));
         int input_blob_id = data_edge.getBlobId();
         // Find the input blob
-        torch::jit::IValue iv = stream_executor.findBlob(input_blob_id).second;
+        auto value_map = stream_executor.findBlob(input_blob_id);
+        torch::jit::IValue iv = value_map.second;
+        type = value_map.first;
         inputs.push_back(iv);
     }
     // Call OpKernel
@@ -274,6 +281,74 @@ void executePrimListConstruct(const nncir::Node& op_node, StreamExecutor& stream
     // update output
     auto& out_edge = cast<nncir::DataEdge>(list_construct_node.getFirstOutEdge());
     stream_executor.updateBlob(out_edge.getBlobId(), DataType::LIST, scalarToIValue(inputs.at(0)));
+}
+
+void executePrimListUnpack(const nncir::Node& op_node, StreamExecutor& stream_executor) {
+    DLOG(INFO) << "executePrimListUnpack";
+
+    // cast Node -> PrimListUnpackNode
+    auto list_unpack_node = cast<nncir::PrimListUnpackNode>(op_node);
+    auto& data_edge = cast<nncir::DataEdge>(list_unpack_node.getFirstInEdge());
+    int input_blob_id = data_edge.getBlobId();
+    // Find the input blob
+    torch::jit::IValue iv = stream_executor.findBlob(input_blob_id).second;
+    std::vector<torch::IValue> inputs;
+    for (auto item : iv.toTuple()->elements()) {
+        inputs.push_back(item);
+    }
+    // Call OpKernel
+    primListUnpack(inputs, inputs.size());
+    // update output
+    auto outedges = list_unpack_node.getOutEdgeIds();
+    for (uint32_t idx = 0; idx < outedges.size(); idx++) {
+        auto& out_edge = cast<nncir::DataEdge>(list_unpack_node.getOutEdge(outedges.at(idx)));
+        auto type = inferDataType(inputs.at(idx));
+        stream_executor.updateBlob(out_edge.getBlobId(),  type, inputs.at(idx));
+    }
+}
+
+void executePrimRaiseException(const nncir::Node& op_node, StreamExecutor& stream_executor) {
+    DLOG(INFO) << "executePrimRaiseException";
+
+    // cast Node -> PrimRaiseExceptionNode
+    auto raise_exception_node = cast<nncir::PrimRaiseExceptionNode>(op_node);
+    auto& data_edge = cast<nncir::DataEdge>(raise_exception_node.getFirstInEdge());
+    int input_blob_id = data_edge.getBlobId();
+    // Find the input blob
+    torch::jit::IValue iv = stream_executor.findBlob(input_blob_id).second;
+    // Call OpKernel
+    primRaiseException(iv.toString()->string());
+}
+
+void executePrimUncheckedCast(const nncir::Node& op_node, StreamExecutor& stream_executor) {
+    DLOG(INFO) << "executeprimUncheckedCast";
+
+    // cast Node -> PrimUncheckedCastNode
+    auto unchecked_cast_node = cast<nncir::PrimUncheckedCastNode>(op_node);
+    auto& data_edge = cast<nncir::DataEdge>(unchecked_cast_node.getFirstInEdge());
+    int input_blob_id = data_edge.getBlobId();
+    auto map_value = stream_executor.findBlob(input_blob_id);
+    auto type = map_value.first;
+    // Find the input blob
+    torch::jit::IValue iv = map_value.second;
+    // Call OpKernel
+    auto output = primUncheckedCast(iv);
+    // update output
+    auto& out_edge = cast<nncir::DataEdge>(unchecked_cast_node.getFirstOutEdge());
+    stream_executor.updateBlob(out_edge.getBlobId(), type, output);
+}
+
+void executePrimUninitialized(const nncir::Node& op_node, StreamExecutor& stream_executor) {
+    DLOG(INFO) << "executePrimUninitialized";
+
+    // cast Node -> PrimUninitializedNode
+    auto uninitialized_node = cast<nncir::PrimUninitializedNode>(op_node);
+    // Call OpKernel
+    auto output = primUninitialized();
+    // update output
+    auto& out_edge = cast<nncir::DataEdge>(uninitialized_node.getFirstOutEdge());
+    auto type = inferDataType(output);
+    stream_executor.updateBlob(out_edge.getBlobId(), type, output);
 }
 
 }  // namespace nnrt
