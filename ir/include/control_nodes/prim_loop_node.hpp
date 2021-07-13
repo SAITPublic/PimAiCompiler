@@ -20,9 +20,9 @@ class PrimLoopNode : public NodeMixin<PrimLoopNode, CONTROLNode> {
     void setCond(bool cond) { cond_ = cond; }
     void setGotoNode(int64_t goto_node) { goto_node_ = goto_node; }
 
-    const int64_t getTripCount() { return trip_count_; }
-    bool getCond() { return cond_; }
-    int64_t getGotoNode() { return goto_node_; }
+    int64_t getTripCount() const { return trip_count_; }
+    bool getCond() const { return cond_; }
+    int64_t getGotoNode() const { return goto_node_; }
 
 
  private:

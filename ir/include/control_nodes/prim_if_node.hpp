@@ -18,7 +18,7 @@ class PrimIfNode : public NodeMixin<PrimIfNode, CONTROLNode> {
 
     void setElseNetStartNode(int64_t else_net_start_node) { else_net_start_node_ = else_net_start_node; }
 
-    int64_t getElseNetStartNode() { return else_net_start_node_; }
+    int64_t getElseNetStartNode() const { return else_net_start_node_; }
 
  private:
     int64_t else_net_start_node_;

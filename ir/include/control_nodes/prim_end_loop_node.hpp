@@ -18,7 +18,7 @@ class PrimEndLoopNode : public NodeMixin<PrimEndLoopNode, CONTROLNode> {
 
     void setGotoNode(int64_t goto_node) { goto_node_ = goto_node; }
 
-    int64_t getGotoNode() { return goto_node_; }
+    int64_t getGotoNode() const { return goto_node_; }
 
  private:
     int64_t goto_node_;

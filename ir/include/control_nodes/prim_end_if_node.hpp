@@ -20,9 +20,9 @@ class PrimEndIfNode : public NodeMixin<PrimEndIfNode, CONTROLNode> {
     void setIsElseNet(bool is_else_net) { is_else_net_ = is_else_net; }
     void setIfNodeId(int64_t if_node_id) { if_node_id_ = if_node_id; }
 
-    int64_t getGotoNode() { return goto_node_; }
-    bool getIsElseNet() { return is_else_net_; }
-    int64_t getIfNodeId() { return if_node_id_; }
+    int64_t getGotoNode() const { return goto_node_; }
+    bool getIsElseNet() const { return is_else_net_; }
+    int64_t getIfNodeId() const { return if_node_id_; }
 
  private:
     int64_t goto_node_;
