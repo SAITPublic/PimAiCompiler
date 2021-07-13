@@ -87,6 +87,8 @@ void executorAtenAdd(const nncir::Node& op_node, StreamExecutor& stream_executor
         // update output
         auto& out_edge = cast<nncir::DataEdge>(add_node.getFirstOutEdge());
         stream_executor.updateBlob(out_edge.getBlobId(), DataType::TENSOR, tensorToIValue(output));
+    } else {
+        DLOG(ERROR) << "Unsupported input type for aten::add";
     }
 }  // executorAtenAdd
 
@@ -324,6 +326,65 @@ void executorAtenEq(const nncir::Node& op_node, StreamExecutor& stream_executor)
     }
 }
 
+void executorAtenFormat(const nncir::Node& op_node, StreamExecutor& stream_executor) {
+    DLOG(INFO) << "execute Aten Format node";
+
+    auto format_node = cast<nncir::AtenFormatNode>(op_node);
+    auto assembly_format = format_node.getAssemblyFormat();
+
+    auto &input1 = cast<nncir::DataEdge>(format_node.getInEdge(1));
+    auto &input2 = cast<nncir::DataEdge>(format_node.getInEdge(2));
+
+    // Get input blob
+    int input1_blob_id = input1.getBlobId();
+    int input2_blob_id = input2.getBlobId();
+
+    // Find the input blob
+    auto i_value1 = stream_executor.findBlob(input1_blob_id).second;
+    auto i_value2 = stream_executor.findBlob(input2_blob_id).second;
+
+    auto dtype = stream_executor.findBlob(input1_blob_id).first;
+    if (dtype == DataType::TUPLE) {
+        // aten::format(string, tuple(int,..., int), list(int,..., int))
+        c10::intrusive_ptr <c10::ivalue::Tuple> i_tuple_values = i_value1.toTuple();
+        auto i_list_values = i_value2.toList();
+        std::vector<std::string> value1;
+        std::vector<std::string> value2;
+        for (auto &item : i_tuple_values->elements()) {
+            value1.push_back(*(item.toString()));
+        }
+        for (auto item : i_list_values) {
+            auto ivalue_item = static_cast<c10::IValue>(item);
+            value2.push_back(*(ivalue_item.toString()));
+        }
+        assert(value1.size() > 0 && value2.size() > 0);
+        std::string str1 = value1[0], str2 = value2[0];
+        for (int idx = 1; idx < value1.size(); idx++) {
+            str1 += (", " + value1[idx]);
+        }
+        for (int idx = 1; idx < value2.size(); idx++) {
+            str2 += (", " + value2[idx]);
+        }
+
+        auto output = nnrt::atenFormat(assembly_format, str1, str2);
+        // update output
+        auto &out_edge = cast<nncir::DataEdge>(format_node.getFirstOutEdge());
+        stream_executor.updateBlob(out_edge.getBlobId(), DataType::STRING, strToIValue(output));
+    } else if (dtype == DataType::INT8 || dtype == DataType::UINT8 || dtype == DataType::INT16 ||
+               dtype == DataType::UINT16 || dtype == DataType::INT32 || dtype == DataType::INT64) {
+        // aten::format(string, int, int)
+        std::string str1 = std::to_string(i_value1.toInt());
+        std::string str2 = std::to_string(i_value2.toInt());
+
+        auto output = nnrt::atenFormat(assembly_format, str1, str2);
+        // update output
+        auto &out_edge = cast<nncir::DataEdge>(format_node.getFirstOutEdge());
+        stream_executor.updateBlob(out_edge.getBlobId(), DataType::STRING, strToIValue(output));
+    } else {
+        DLOG(ERROR) << "Unsupported input type for aten::format";
+    }
+}
+
 void executorAtenGt(const nncir::Node& op_node, StreamExecutor& stream_executor)
 {
     DLOG(INFO) << "execute Aten Gt node";
@@ -545,6 +606,8 @@ void executorAtenMax(const nncir::Node& op_node, StreamExecutor& stream_executor
         // update output
         auto& out_edge = cast<nncir::DataEdge>(max_node.getFirstOutEdge());
         stream_executor.updateBlob(out_edge.getBlobId(), DataType::TUPLE, tupleToIValue(output));
+    } else {
+        DLOG(ERROR) << "Unsupported input type for aten::max";
     }
 }
 
@@ -715,6 +778,8 @@ void executorAtenTo(const nncir::Node& op_node, StreamExecutor& stream_executor)
         // update output
         auto& out_edge = cast<nncir::DataEdge>(to_node.getFirstOutEdge());
         stream_executor.updateBlob(out_edge.getBlobId(), DataType::TENSOR, tensorToIValue(output));
+    } else {
+        DLOG(ERROR) << "Unsupported input type for aten::to";
     }
 }
 

@@ -86,6 +86,7 @@ void StreamExecutor::registerOp()
     this->global_op_register_.insert({nncir::NodeType::ATENDROPOUT, executorAtenDropout});
     this->global_op_register_.insert({nncir::NodeType::ATENEMBEDDING, executorAtenEmbedding});
     this->global_op_register_.insert({nncir::NodeType::ATENEQ, executorAtenEq});
+    this->global_op_register_.insert({nncir::NodeType::ATENFORMAT, executorAtenFormat});
     this->global_op_register_.insert({nncir::NodeType::ATENINT, executorAtenInt});
     this->global_op_register_.insert({nncir::NodeType::ATENITEM, executorAtenItem});
     this->global_op_register_.insert({nncir::NodeType::ATENLEN, executorAtenLen});
