@@ -1174,6 +1174,10 @@ def prim_constant_node_label(prim_constant_node: IR.CONTROLNode.PrimConstantNode
         retval += 'DataType: {}<br/>'.format(named_datatype[data_type])
     if bit_width is not None:
         retval += 'BitWidth: {}<br/>'.format(bit_width)
+    ScalarValueType = ['INT8','UINT8','INT16','UINT16','INT32','INT64','FLOAT16','FLOAT32','FLOAT64','BOOL']
+    numpy_data = prim_constant_node.DataAsNumpy()
+    if named_datatype[data_type] in ScalarValueType:
+        retval += 'Value: {}<br/>'.format(numpy_data[0])
     return list_table([retval])
 
 
