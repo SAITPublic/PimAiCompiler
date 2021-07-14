@@ -10,11 +10,7 @@
 #include "executor/stream_executor.h"
 #include "executor/utils.h"
 #include "ir/include/control_nodes/prim_constant_node.hpp"
-<<<<<<< HEAD
 #include "nnrt_types.h"
-=======
-#include "../../../ir/include/ir_types.hpp"
->>>>>>> feat: 🎸 support aten::tensor in runtime executor
 
 namespace nncir = nn_compiler::nn_ir;
 

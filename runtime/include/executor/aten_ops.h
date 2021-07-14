@@ -163,7 +163,9 @@ at::Tensor atenTensor(int64_t value);
 
 at::Tensor atenTensor(float value);
 
-at::Tensor atenTensor(at::IntArrayRef array, const at::TensorOptions &options);
+at::Tensor atenTensor(at::ArrayRef<int64_t> array, const at::TensorOptions &options);
+
+at::Tensor atenTensor(at::ArrayRef<double> array, const at::TensorOptions &options);
 
 at::Tensor atenTo(const at::Tensor &self, const at::TensorOptions &options = {}, bool non_blocking = false,
                   bool copy = false, c10::optional<at::MemoryFormat> memory_format = c10::nullopt);

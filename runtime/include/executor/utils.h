@@ -34,4 +34,25 @@ torch::jit::IValue intToIValue(const int64_t& value);
 
 torch::jit::IValue listToIValue(const c10::List<at::IValue>& value);
 
+template <typename T>
+at::ArrayRef<T> parseIValueArrayRef(const at::ArrayRef<at::IValue>& ivalue_array) {
+    assert(ivalue_array.size() > 0);
+    std::vector<T> vec;
+
+    if (ivalue_array[0].isInt()) {
+        for (auto item : ivalue_array) {
+            vec.push_back(item.toInt());
+        }
+    } else if (ivalue_array[0].isDouble()) {
+        for (auto item : ivalue_array) {
+            vec.push_back(item.toDouble());
+        }
+    } else {
+        DLOG(ERROR) << "Unsupported data type occurs in parseIValueInArrayRef().";
+    }
+
+    at::ArrayRef<T> array_ref(vec);
+    return array_ref;
+}
+
 }  // namespace nnrt

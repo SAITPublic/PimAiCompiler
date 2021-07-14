@@ -758,13 +758,6 @@ void executorAtenTensor(const nncir::Node& op_node, StreamExecutor& stream_execu
     torch::jit::IValue iv_self = stream_executor.findBlob(input_self_blob_id).second;
     assert(iv_self.isList());
 
-    auto self_list = iv_self.toListRef();
-    std::vector<int64_t> vec;
-    for (auto item : self_list) {
-        vec.push_back(item.toInt());
-    }
-    at::IntArrayRef array_ref(vec);
-
     at::TensorOptions options;
     auto& edge_dtype      = cast<nncir::DataEdge>(tensor_node.getInEdge(1));
     auto& edge_layout     = cast<nncir::DataEdge>(tensor_node.getInEdge(2));
@@ -781,7 +774,19 @@ void executorAtenTensor(const nncir::Node& op_node, StreamExecutor& stream_execu
     options = options.layout(iv_layout.toLayout());
     options = options.pinned_memory(iv_pin_memory.toBool());
 
-    auto output = nnrt::atenTensor(array_ref, options);
+    auto self_list = iv_self.toListRef();
+    assert(self_list.size() > 0);
+    at::Tensor output;
+    if (self_list[0].isInt()) {
+        auto array_ref = parseIValueArrayRef<int64_t>(self_list);
+        output = nnrt::atenTensor(array_ref, options);
+    } else if (self_list[0].isDouble()) {
+        auto array_ref = parseIValueArrayRef<double>(self_list);
+        output = nnrt::atenTensor(array_ref, options);
+    } else {
+        DLOG(ERROR) << "Unsupported data type to parse ArrayRef.";
+    }
+
     auto& out_edge = cast<nncir::DataEdge>(tensor_node.getFirstOutEdge());
     stream_executor.updateBlob(out_edge.getBlobId(), DataType::TENSOR, tensorToIValue(output));
 }
@@ -868,11 +873,7 @@ void executorAtenZeros(const nncir::Node& op_node, StreamExecutor& stream_execut
 
     auto self_list = iv_self.toListRef();
     // input list -> at::IntArrayRef size, so datatype of elements in list must be int.
-    std::vector<int64_t> vec;
-    for (auto item : self_list) {
-        vec.push_back(item.toInt());
-    }
-    at::IntArrayRef array_ref(vec);
+    auto array_ref = parseIValueArrayRef<int64_t>(self_list);
 
     at::TensorOptions options;
     auto& edge_dtype      = cast<nncir::DataEdge>(zeros_node.getInEdge(1));

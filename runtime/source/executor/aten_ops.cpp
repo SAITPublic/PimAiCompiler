@@ -216,7 +216,11 @@ at::Tensor atenTensor(int64_t value) { return at::tensor(value); }
 
 at::Tensor atenTensor(float value) { return at::tensor(value); }
 
-at::Tensor atenTensor(at::IntArrayRef array, const at::TensorOptions &options) {
+at::Tensor atenTensor(at::ArrayRef<int64_t> array, const at::TensorOptions &options) {
+    return at::tensor(array, options);
+}
+
+at::Tensor atenTensor(at::ArrayRef<double> array, const at::TensorOptions &options) {
     return at::tensor(array, options);
 }
 
