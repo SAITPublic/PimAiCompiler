@@ -10,7 +10,11 @@
 #include "executor/stream_executor.h"
 #include "executor/utils.h"
 #include "ir/include/control_nodes/prim_constant_node.hpp"
+<<<<<<< HEAD
 #include "nnrt_types.h"
+=======
+#include "../../../ir/include/ir_types.hpp"
+>>>>>>> feat: 🎸 support aten::tensor in runtime executor
 
 namespace nncir = nn_compiler::nn_ir;
 
@@ -108,6 +112,7 @@ void StreamExecutor::registerOp()
     this->global_op_register_.insert({nncir::NodeType::ATENSIZE, executorAtenSize});
     this->global_op_register_.insert({nncir::NodeType::ATENSLICE, executorAtenSlice});
     this->global_op_register_.insert({nncir::NodeType::ATENSUB, executorAtenSub});
+    this->global_op_register_.insert({nncir::NodeType::ATENTENSOR, executorAtenTensor});
     this->global_op_register_.insert({nncir::NodeType::ATENTRANSPOSE, executorAtenTranspose});
     this->global_op_register_.insert({nncir::NodeType::ATENTO, executorAtenTo});
     this->global_op_register_.insert({nncir::NodeType::ATENUNSQUEEZE, executorAtenUnsqueeze});

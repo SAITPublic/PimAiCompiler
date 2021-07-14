@@ -748,6 +748,44 @@ void executorAtenSub(const nncir::Node& op_node, StreamExecutor& stream_executor
     // TODO need new changes from npu_ir repo
 }
 
+void executorAtenTensor(const nncir::Node& op_node, StreamExecutor& stream_executor) {
+    DLOG(INFO) << "execute Aten Tensor node";
+
+    auto tensor_node = cast<nncir::AtenTensorNode>(op_node);
+
+    auto& input_self = cast<nncir::DataEdge>(tensor_node.getInEdge(0));
+    int input_self_blob_id = input_self.getBlobId();
+    torch::jit::IValue iv_self = stream_executor.findBlob(input_self_blob_id).second;
+    assert(iv_self.isList());
+
+    auto self_list = iv_self.toListRef();
+    std::vector<int64_t> vec;
+    for (auto item : self_list) {
+        vec.push_back(item.toInt());
+    }
+    at::IntArrayRef array_ref(vec);
+
+    at::TensorOptions options;
+    auto& edge_dtype      = cast<nncir::DataEdge>(tensor_node.getInEdge(1));
+    auto& edge_layout     = cast<nncir::DataEdge>(tensor_node.getInEdge(2));
+    // Fixme(SRCX): device may also be an input for aten::tensor
+    //auto& edge_device     = cast<nncir::DataEdge>(tensor_node.getInEdge(3));
+    auto& edge_pin_memory = cast<nncir::DataEdge>(tensor_node.getInEdge(3));
+    auto dtype_id      = edge_dtype.getBlobId();
+    auto layout_id     = edge_layout.getBlobId();
+    auto pin_memory_id = edge_pin_memory.getBlobId();
+    auto iv_dtype      = stream_executor.findBlob(dtype_id).second;
+    auto iv_layout     = stream_executor.findBlob(layout_id).second;
+    auto iv_pin_memory = stream_executor.findBlob(pin_memory_id).second;
+    options = options.dtype(iv_dtype.toScalarType());
+    options = options.layout(iv_layout.toLayout());
+    options = options.pinned_memory(iv_pin_memory.toBool());
+
+    auto output = nnrt::atenTensor(array_ref, options);
+    auto& out_edge = cast<nncir::DataEdge>(tensor_node.getFirstOutEdge());
+    stream_executor.updateBlob(out_edge.getBlobId(), DataType::TENSOR, tensorToIValue(output));
+}
+
 void executorAtenTo(const nncir::Node& op_node, StreamExecutor& stream_executor)
 {
     DLOG(INFO) << "execute Aten To node";
@@ -830,11 +868,11 @@ void executorAtenZeros(const nncir::Node& op_node, StreamExecutor& stream_execut
 
     auto self_list = iv_self.toListRef();
     // input list -> at::IntArrayRef size, so datatype of elements in list must be int.
-    std::vector<int64_t> int_vec;
+    std::vector<int64_t> vec;
     for (auto item : self_list) {
-        int_vec.push_back(item.toInt());
+        vec.push_back(item.toInt());
     }
-    at::IntArrayRef int_array(int_vec);
+    at::IntArrayRef array_ref(vec);
 
     at::TensorOptions options;
     auto& edge_dtype      = cast<nncir::DataEdge>(zeros_node.getInEdge(1));
@@ -854,7 +892,7 @@ void executorAtenZeros(const nncir::Node& op_node, StreamExecutor& stream_execut
     options = options.device(iv_device.toDevice());
     options = options.pinned_memory(iv_pin_memory.toBool());
 
-    auto output = nnrt::atenZeros(int_array, options);
+    auto output = nnrt::atenZeros(array_ref, options);
     auto& out_edge = cast<nncir::DataEdge>(zeros_node.getFirstOutEdge());
     stream_executor.updateBlob(out_edge.getBlobId(), DataType::TENSOR, tensorToIValue(output));
 }

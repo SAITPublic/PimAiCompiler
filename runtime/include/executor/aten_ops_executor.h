@@ -39,6 +39,7 @@ void executorAtenSelect(const nncir::Node& op_node, StreamExecutor& stream_execu
 void executorAtenSize(const nncir::Node& op_node, StreamExecutor& stream_executor);
 void executorAtenSlice(const nncir::Node& op_node, StreamExecutor& stream_executor);
 void executorAtenSub(const nncir::Node& op_node, StreamExecutor& stream_executor);
+void executorAtenTensor(const nncir::Node& op_node, StreamExecutor& stream_executor);
 void executorAtenTo(const nncir::Node& op_node, StreamExecutor& stream_executor);
 void executorAtenTranspose(const nncir::Node& op_node, StreamExecutor& stream_executor);
 void executorAtenUnsqueeze(const nncir::Node& op_node, StreamExecutor& stream_executor);

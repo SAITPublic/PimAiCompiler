@@ -216,6 +216,10 @@ at::Tensor atenTensor(int64_t value) { return at::tensor(value); }
 
 at::Tensor atenTensor(float value) { return at::tensor(value); }
 
+at::Tensor atenTensor(at::IntArrayRef array, const at::TensorOptions &options) {
+    return at::tensor(array, options);
+}
+
 at::Tensor atenTo(const at::Tensor &self, const at::TensorOptions &options, bool non_blocking, bool copy,
                   c10::optional<at::MemoryFormat> memory_format)
 {
