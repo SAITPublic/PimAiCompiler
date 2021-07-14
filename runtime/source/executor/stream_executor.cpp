@@ -81,37 +81,39 @@ void StreamExecutor::registerOp()
 {
     // Register Ops: {OP_TYPE, OP_FUNCTION}
     this->global_op_register_.insert({nncir::NodeType::ATENADD, executorAtenAdd});
+    this->global_op_register_.insert({nncir::NodeType::ATENADDMM, executorAtenAddMM});
+    this->global_op_register_.insert({nncir::NodeType::ATENAPPEND, executorAtenAppend});
     this->global_op_register_.insert({nncir::NodeType::ATENCAT, executorAtenCat});
+    this->global_op_register_.insert({nncir::NodeType::ATENCEIL, executorAtenCeil});
+    this->global_op_register_.insert({nncir::NodeType::ATENDERIVEINDEX, executorAtenDeriveIndex});
+    this->global_op_register_.insert({nncir::NodeType::ATENDIM, executorAtenDim});
     this->global_op_register_.insert({nncir::NodeType::ATENDIV, executorAtenDiv});
     this->global_op_register_.insert({nncir::NodeType::ATENDROPOUT, executorAtenDropout});
     this->global_op_register_.insert({nncir::NodeType::ATENEMBEDDING, executorAtenEmbedding});
     this->global_op_register_.insert({nncir::NodeType::ATENEQ, executorAtenEq});
     this->global_op_register_.insert({nncir::NodeType::ATENFORMAT, executorAtenFormat});
+    this->global_op_register_.insert({nncir::NodeType::ATENGETITEM, executorAtenGetItem});
     this->global_op_register_.insert({nncir::NodeType::ATENINT, executorAtenInt});
     this->global_op_register_.insert({nncir::NodeType::ATENITEM, executorAtenItem});
+    this->global_op_register_.insert({nncir::NodeType::ATENIS, executorAtenIs});
     this->global_op_register_.insert({nncir::NodeType::ATENLEN, executorAtenLen});
     this->global_op_register_.insert({nncir::NodeType::ATENLIST, executorAtenList});
     this->global_op_register_.insert({nncir::NodeType::ATENLT, executorAtenLt});
     this->global_op_register_.insert({nncir::NodeType::ATENMATMUL, executorAtenMatmul});
     this->global_op_register_.insert({nncir::NodeType::ATENMAX, executorAtenMax});
     this->global_op_register_.insert({nncir::NodeType::ATENNE, executorAtenNe});
-    this->global_op_register_.insert({nncir::NodeType::ATENSELECT, executorAtenSelect});
-    this->global_op_register_.insert({nncir::NodeType::ATENTRANSPOSE, executorAtenTranspose});
-    this->global_op_register_.insert({nncir::NodeType::ATENTO, executorAtenTo});
-    this->global_op_register_.insert({nncir::NodeType::ATENDERIVEINDEX, executorAtenDeriveIndex});
-    this->global_op_register_.insert({nncir::NodeType::ATENGETITEM, executorAtenGetItem});
-    this->global_op_register_.insert({nncir::NodeType::ATENIS, executorAtenIs});
-    this->global_op_register_.insert({nncir::NodeType::ATENADDMM, executorAtenAddMM});
-    this->global_op_register_.insert({nncir::NodeType::ATENAPPEND, executorAtenAppend});
-    this->global_op_register_.insert({nncir::NodeType::ATENCEIL, executorAtenCeil});
-    this->global_op_register_.insert({nncir::NodeType::ATENDIM, executorAtenDim});
     this->global_op_register_.insert({nncir::NodeType::ATENNEG, executorAtenNeg});
     this->global_op_register_.insert({nncir::NodeType::ATENRELU, executorAtenRelu});
+    this->global_op_register_.insert({nncir::NodeType::ATENSELECT, executorAtenSelect});
     this->global_op_register_.insert({nncir::NodeType::ATENSIZE, executorAtenSize});
     this->global_op_register_.insert({nncir::NodeType::ATENSLICE, executorAtenSlice});
     this->global_op_register_.insert({nncir::NodeType::ATENSUB, executorAtenSub});
+    this->global_op_register_.insert({nncir::NodeType::ATENTRANSPOSE, executorAtenTranspose});
+    this->global_op_register_.insert({nncir::NodeType::ATENTO, executorAtenTo});
     this->global_op_register_.insert({nncir::NodeType::ATENUNSQUEEZE, executorAtenUnsqueeze});
+    this->global_op_register_.insert({nncir::NodeType::ATENZEROS, executorAtenZeros});
     this->global_op_register_.insert({nncir::NodeType::ATENZEROSLIKE, executorAtenZerosLike});
+
     this->global_op_register_.insert({nncir::NodeType::PRIMCONSTANT, executePrimConstant});
     this->global_op_register_.insert({nncir::NodeType::PRIMDTYPE, executePrimDtype});
 }

@@ -31,7 +31,7 @@ class AtenZerosNode : public NodeMixin<AtenZerosNode, NNNode> {
     explicit AtenZerosNode(const NodeInfo& node_info)
         : NodeMixin(node_info, NodeType::ATENZEROS) {}
 
-    std::string getNodeTypeAsString() const override { return "AtenSizeNode"; }
+    std::string getNodeTypeAsString() const override { return "AtenZerosNode"; }
 
  private:
 

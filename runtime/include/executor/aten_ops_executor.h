@@ -42,5 +42,7 @@ void executorAtenSub(const nncir::Node& op_node, StreamExecutor& stream_executor
 void executorAtenTo(const nncir::Node& op_node, StreamExecutor& stream_executor);
 void executorAtenTranspose(const nncir::Node& op_node, StreamExecutor& stream_executor);
 void executorAtenUnsqueeze(const nncir::Node& op_node, StreamExecutor& stream_executor);
+void executorAtenZeros(const nncir::Node& op_node, StreamExecutor& stream_executor);
 void executorAtenZerosLike(const nncir::Node& op_node, StreamExecutor& stream_executor);
+
 }  // namespace nnrt
