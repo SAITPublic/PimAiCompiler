@@ -435,6 +435,26 @@ void executorAtenGt(const nncir::Node& op_node, StreamExecutor& stream_executor)
     }
 }
 
+void executorAtenGetItem(const nncir::Node& op_node, StreamExecutor& stream_executor) {
+    DLOG(INFO) << "execute Aten GetItem node";
+
+    auto get_item_node = cast<nncir::AtenGetItemNode>(op_node);
+    int idx = get_item_node.getIdx();
+
+    auto& input_self = cast<nncir::DataEdge>(get_item_node.getInEdge(0));
+    int input_self_blob_id = input_self.getBlobId();
+
+    auto dtype = stream_executor.findBlob(input_self_blob_id).first;
+    torch::jit::IValue iv_self = stream_executor.findBlob(input_self_blob_id).second;
+    assert(iv_self.isList());
+    auto self_list = iv_self.toList();
+
+    auto output = nnrt::atenGetItem(self_list, idx);
+    // update output
+    auto& out_edge = cast<nncir::DataEdge>(get_item_node.getFirstOutEdge());
+    stream_executor.updateBlob(out_edge.getBlobId(), DataType::IVALUE, output);
+}
+
 void executorAtenInt(const nncir::Node& op_node, StreamExecutor& stream_executor)
 {
     DLOG(INFO) << "execute Aten Int node";

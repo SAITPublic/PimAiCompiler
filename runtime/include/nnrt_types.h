@@ -24,7 +24,8 @@ enum DataType {
     TENSOR,
     NONE,
     LIST,
-    TUPLE
+    TUPLE,
+    IVALUE
 };
 
 struct OpNodeDescription {

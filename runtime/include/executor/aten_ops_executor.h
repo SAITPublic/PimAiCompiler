@@ -25,6 +25,7 @@ void executorAtenEmbedding(const nncir::Node& op_node, StreamExecutor& stream_ex
 void executorAtenEq(const nncir::Node& op_node, StreamExecutor& stream_executor);
 void executorAtenFormat(const nncir::Node& op_node, StreamExecutor& stream_executor);
 void executorAtenGt(const nncir::Node& op_node, StreamExecutor& stream_executor);
+void executorAtenGetItem(const nncir::Node& op_node, StreamExecutor& stream_executor);
 void executorAtenInt(const nncir::Node& op_node, StreamExecutor& stream_executor);
 void executorAtenItem(const nncir::Node& op_node, StreamExecutor& stream_executor);
 void executorAtenLen(const nncir::Node& op_node, StreamExecutor& stream_executor);

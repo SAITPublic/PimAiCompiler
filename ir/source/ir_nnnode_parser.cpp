@@ -607,7 +607,8 @@ IRNNNodeParser::parseNNNode<IR::NNNode::AnyType_AtenGetItemNode>(const IR::NnNod
     Log::IR::E_IF(aten_get_item_node == nullptr)
         << "IRNNNodeParser::parseNNNode<NN::AtenGetItemNode>() => wrong node type!";
 
-    return std::make_unique<nn_ir::AtenGetItemNode>(node_info);
+    int idx = aten_get_item_node->idx();
+    return std::make_unique<nn_ir::AtenGetItemNode>(node_info, idx);
 }
 
 template <>
