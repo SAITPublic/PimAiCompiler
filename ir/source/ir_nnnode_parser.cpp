@@ -510,12 +510,12 @@ template <>
 std::unique_ptr<nn_ir::NNNode>
 IRNNNodeParser::parseNNNode<IR::NNNode::AnyType_AtenDeriveIndexNode>(const IR::NnNode*      ir_node,
                                                                      const nn_ir::NodeInfo& node_info) {
-    auto aten_zero_like_node = ir_node->nn_node_as_AtenDeriveIndexNode();
-    Log::IR::E_IF(aten_zero_like_node == nullptr)
+    auto aten_derive_index_node = ir_node->nn_node_as_AtenDeriveIndexNode();
+    Log::IR::E_IF(aten_derive_index_node == nullptr)
         << "IRNNNodeParser::parseNNNode<NN::AtenDeriveIndexNode>() => wrong node type!";
-    int64_t step = aten_zero_like_node->step();
-    int64_t start = aten_zero_like_node->start();
-    return std::make_unique<nn_ir::AtenDeriveIndexNode>(node_info, start, step);
+    int64_t step = aten_derive_index_node->step();
+    int64_t index = aten_derive_index_node->index();
+    return std::make_unique<nn_ir::AtenDeriveIndexNode>(node_info, index, step);
 }
 
 template <>

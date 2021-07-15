@@ -31,18 +31,6 @@ bool isScalarType(DataType dtype)
            dtype == DataType::FLOAT32 || dtype == DataType::FLOAT64 || dtype == DataType::BOOL;
 }
 
-void executorAtenDeriveIndex(const nncir::Node& op_node, StreamExecutor& stream_executor)
-{
-    DLOG(INFO) << "execute Aten DeriveIndex node";
-    // TODO need new changes from npu_ir repo
-}
-
-void executorAtenGetItem(const nncir::Node& op_node, StreamExecutor& stream_executor)
-{
-    DLOG(INFO) << "execute Aten GetItem node";
-    // TODO need new changes from npu_ir repo
-}
-
 void executorAtenIs(const nncir::Node& op_node, StreamExecutor& stream_executor)
 {
     DLOG(INFO) << "execute Aten Is node";
@@ -66,6 +54,7 @@ void executorAtenIs(const nncir::Node& op_node, StreamExecutor& stream_executor)
     auto& out_edge = cast<nncir::DataEdge>(node.getFirstOutEdge());
     stream_executor.updateBlob(out_edge.getBlobId(), DataType::BOOL, boolToIValue(output));
 }
+
 void executorAtenAdd(const nncir::Node& op_node, StreamExecutor& stream_executor)
 {
     DLOG(INFO) << "execute Aten Add node";
@@ -211,6 +200,40 @@ void executorAtenCeil(const nncir::Node& op_node, StreamExecutor& stream_executo
     // update output
     auto& out_edge = cast<nncir::DataEdge>(node.getFirstOutEdge());
     stream_executor.updateBlob(out_edge.getBlobId(), DataType::TENSOR, torch::jit::IValue(output));
+}
+
+void executorAtenDeriveIndex(const nncir::Node& op_node, StreamExecutor& stream_executor) {
+    DLOG(INFO) << "execute Aten derive_index node";
+
+    auto derive_index_node = cast<nncir::AtenDeriveIndexNode>(op_node);
+    auto index   = derive_index_node.getIndex();
+    auto step    = derive_index_node.getStep();
+    auto inedges = derive_index_node.getInEdgeIds();
+    int edge_id = 0;
+    auto& data_edge = cast<nncir::DataEdge>(derive_index_node.getInEdge(edge_id));
+    auto input_blob_id    = data_edge.getBlobId();
+    torch::jit::IValue iv = stream_executor.findBlob(input_blob_id).second;
+    auto start = iv.toInt();
+    /*edge_id++;
+
+    //if (nn_compiler::nn_ir::isDefaultValue<int64_t>(index)) {
+    auto& index_data_edge = cast<nncir::DataEdge>(derive_index_node.getInEdge(edge_id));
+    input_blob_id    = index_data_edge.getBlobId();
+    iv = stream_executor.findBlob(input_blob_id).second;
+    index = iv.toInt();
+    edge_id++;
+    //}
+    //if (nn_compiler::nn_ir::isDefaultValue<int64_t>(step)) {
+    auto& step_data_edge = cast<nncir::DataEdge>(derive_index_node.getInEdge(edge_id));
+    input_blob_id    = step_data_edge.getBlobId();
+    iv = stream_executor.findBlob(input_blob_id).second;
+    step = iv.toInt();
+    edge_id++;
+    //}*/
+
+    auto output    = nnrt::atenDeriveIndex(start, index, step);
+    auto& out_edge = cast<nncir::DataEdge>(derive_index_node.getFirstOutEdge());
+    stream_executor.updateBlob(out_edge.getBlobId(), DataType::INT64, scalarToIValue(output));
 }
 
 void executorAtenDim(const nncir::Node& op_node, StreamExecutor& stream_executor)

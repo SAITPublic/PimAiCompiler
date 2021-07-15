@@ -18,6 +18,7 @@ void executorAtenAppend(const nncir::Node& op_node, StreamExecutor& stream_execu
 void executorAtenAddmm(const nncir::Node& op_node, StreamExecutor& stream_executor);
 void executorAtenCat(const nncir::Node& op_node, StreamExecutor& stream_executor);
 void executorAtenCeil(const nncir::Node& op_node, StreamExecutor& stream_executor);
+void executorAtenDeriveIndex(const nncir::Node& op_node, StreamExecutor& stream_executor);
 void executorAtenDim(const nncir::Node& op_node, StreamExecutor& stream_executor);
 void executorAtenDiv(const nncir::Node& op_node, StreamExecutor& stream_executor);
 void executorAtenDropout(const nncir::Node& op_node, StreamExecutor& stream_executor);
