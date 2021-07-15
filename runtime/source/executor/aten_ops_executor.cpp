@@ -105,10 +105,37 @@ void executorAtenAdd(const nncir::Node& op_node, StreamExecutor& stream_executor
     }
 }  // executorAtenAdd
 
-void executorAtenAddMM(const nncir::Node& op_node, StreamExecutor& stream_executor)
-{
+void executorAtenAddmm(const nncir::Node& op_node, StreamExecutor& stream_executor) {
     DLOG(INFO) << "execute Aten Addmm node";
-    // TODO need new changes from npu_ir repo
+
+    auto addmm_node = cast<nncir::AtenAddmmNode>(op_node);
+
+    auto& input_self = cast<nncir::DataEdge>(addmm_node.getInEdge(0));
+    auto& input_mat1 = cast<nncir::DataEdge>(addmm_node.getInEdge(1));
+    auto& input_mat2 = cast<nncir::DataEdge>(addmm_node.getInEdge(2));
+    auto& input_beta = cast<nncir::DataEdge>(addmm_node.getInEdge(3));
+    auto& input_alpha = cast<nncir::DataEdge>(addmm_node.getInEdge(4));
+
+    // Get input blob
+    int input_self_blob_id = input_self.getBlobId();
+    int input_mat1_blob_id = input_mat1.getBlobId();
+    int input_mat2_blob_id = input_mat2.getBlobId();
+    int input_beta_blob_id = input_beta.getBlobId();
+    int input_alpha_blob_id = input_alpha.getBlobId();
+
+    // Find the input blob
+    torch::jit::IValue iv_self = stream_executor.findBlob(input_self_blob_id).second;
+    torch::jit::IValue iv_mat1 = stream_executor.findBlob(input_mat1_blob_id).second;
+    torch::jit::IValue iv_mat2 = stream_executor.findBlob(input_mat2_blob_id).second;
+    assert(iv_self.isTensor() && iv_mat1.isTensor() && iv_mat2.isTensor());
+    torch::jit::IValue iv_beta = stream_executor.findBlob(input_beta_blob_id).second;
+    torch::jit::IValue iv_alpha = stream_executor.findBlob(input_alpha_blob_id).second;
+
+    auto output = nnrt::atenAddmm(iv_self.toTensor(), iv_mat1.toTensor(), iv_mat2.toTensor(),
+                                  iv_beta.toScalar(), iv_alpha.toScalar());
+    // update output
+    auto& out_edge = cast<nncir::DataEdge>(addmm_node.getFirstOutEdge());
+    stream_executor.updateBlob(out_edge.getBlobId(), DataType::TENSOR, tensorToIValue(output));
 }
 
 void executorAtenAppend(const nncir::Node& op_node, StreamExecutor& stream_executor)

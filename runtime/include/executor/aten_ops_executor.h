@@ -14,8 +14,8 @@ void executorAtenDeriveIndex(const nncir::Node& op_node, StreamExecutor& stream_
 void executorAtenGetItem(const nncir::Node& op_node, StreamExecutor& stream_executor);
 void executorAtenIs(const nncir::Node& op_node, StreamExecutor& stream_executor);
 void executorAtenAdd(const nncir::Node& op_node, StreamExecutor& stream_executor);
-void executorAtenAddMM(const nncir::Node& op_node, StreamExecutor& stream_executor);
 void executorAtenAppend(const nncir::Node& op_node, StreamExecutor& stream_executor);
+void executorAtenAddmm(const nncir::Node& op_node, StreamExecutor& stream_executor);
 void executorAtenCat(const nncir::Node& op_node, StreamExecutor& stream_executor);
 void executorAtenCeil(const nncir::Node& op_node, StreamExecutor& stream_executor);
 void executorAtenDim(const nncir::Node& op_node, StreamExecutor& stream_executor);
