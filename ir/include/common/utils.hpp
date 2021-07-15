@@ -20,9 +20,9 @@ bool isDefaultValue(T& input) {
         return true;
     } else if (typeid(input).name() == typeid(b).name() && input == INT64_MAX) {
         return true;
-    } else if (typeid(input).name() == typeid(c).name() && (fabs(input - FLT_MAX) <= FLT_EPSINON)) {
+    } else if (typeid(input).name() == typeid(c).name() && (fabs(input - FLT_MAX) <= FLT_EPSILON)) {
         return true;
-    } else if (typeid(input).name() == typeid(d).name() && (fabs(input - DBL_MAX) <= DBL_EPSINON)) {
+    } else if (typeid(input).name() == typeid(d).name() && (fabs(input - DBL_MAX) <= DBL_EPSILON)) {
         return true;
     } else {
         return false;

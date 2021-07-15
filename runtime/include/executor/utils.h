@@ -25,11 +25,6 @@ at::ScalarType convertDTypeToATScalarType(nncir::DataType dtype);
 
 at::MemoryFormat getMemoryFormat(int optional_memory_format);
 
-template <typename T>
-torch::jit::IValue tupleToIValue(std::tuple<T, T> tuple)
-{
-    return torch::jit::IValue(tuple);
-}
 torch::jit::IValue intToIValue(const int64_t& value);
 
 torch::jit::IValue listToIValue(const c10::List<at::IValue>& value);
@@ -54,5 +49,8 @@ at::ArrayRef<T> parseIValueArrayRef(const at::ArrayRef<at::IValue>& ivalue_array
     at::ArrayRef<T> array_ref(vec);
     return array_ref;
 }
+
+template <typename ...T>
+torch::jit::IValue tupleToIValue(std::tuple<T...> tuple) { return torch::jit::IValue(tuple); }
 
 }  // namespace nnrt
