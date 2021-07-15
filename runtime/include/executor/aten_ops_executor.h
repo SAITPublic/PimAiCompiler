@@ -21,8 +21,15 @@ void executorAtenCeil(const nncir::Node& op_node, StreamExecutor& stream_executo
 void executorAtenDim(const nncir::Node& op_node, StreamExecutor& stream_executor);
 void executorAtenDiv(const nncir::Node& op_node, StreamExecutor& stream_executor);
 void executorAtenEq(const nncir::Node& op_node, StreamExecutor& stream_executor);
+void executorAtenDropout(const nncir::Node& op_node, StreamExecutor& stream_executor);
+void executorAtenEmbedding(const nncir::Node& op_node, StreamExecutor& stream_executor);
 void executorAtenGt(const nncir::Node& op_node, StreamExecutor& stream_executor);
 void executorAtenInt(const nncir::Node& op_node, StreamExecutor& stream_executor);
+void executorAtenItem(const nncir::Node& op_node, StreamExecutor& stream_executor);
+void executorAtenLen(const nncir::Node& op_node, StreamExecutor& stream_executor);
+void executorAtenList(const nncir::Node& op_node, StreamExecutor& stream_executor);
+void executorAtenLt(const nncir::Node& op_node, StreamExecutor& stream_executor);
+void executorAtenMatmul(const nncir::Node& op_node, StreamExecutor& stream_executor);
 void executorAtenMax(const nncir::Node& op_node, StreamExecutor& stream_executor);
 void executorAtenNe(const nncir::Node& op_node, StreamExecutor& stream_executor);
 void executorAtenNeg(const nncir::Node& op_node, StreamExecutor& stream_executor);
