@@ -941,7 +941,42 @@ void executorAtenSlice(const nncir::Node& op_node, StreamExecutor& stream_execut
 void executorAtenSub(const nncir::Node& op_node, StreamExecutor& stream_executor)
 {
     DLOG(INFO) << "execute Aten Sub node";
-    // TODO need new changes from npu_ir repo
+
+    auto sub_node = cast<nncir::AtenSubNode>(op_node);
+    int64_t alpha = sub_node.getAlpha();
+
+    auto& input_self = cast<nncir::DataEdge>(sub_node.getInEdge(0));
+    auto& input_other = cast<nncir::DataEdge>(sub_node.getInEdge(1));
+
+    // Get input blob
+    int input_self_blob_id = input_self.getBlobId();
+    int input_other_blob_id = input_other.getBlobId();
+
+    // Find the input blob
+    torch::jit::IValue iv_self = stream_executor.findBlob(input_self_blob_id).second;
+    torch::jit::IValue iv_other = stream_executor.findBlob(input_other_blob_id).second;
+    assert(iv_self.isTensor());
+    at::Tensor self_tensor = iv_self.toTensor();
+    auto dtype = stream_executor.findBlob(input_other_blob_id).first;
+    if (dtype == DataType::TENSOR) {
+        assert(iv_other.isTensor());
+        at::Tensor other_tensor = iv_other.toTensor();
+        auto output = nnrt::atenSub(self_tensor, other_tensor, alpha);
+        // update output
+        auto& out_edge = cast<nncir::DataEdge>(sub_node.getFirstOutEdge());
+        stream_executor.updateBlob(out_edge.getBlobId(), DataType::TENSOR, tensorToIValue(output));
+    } else if (dtype == DataType::INT8 || dtype == DataType::UINT8 || dtype == DataType::INT16 ||
+               dtype == DataType::UINT16 || dtype == DataType::INT32 || dtype == DataType::INT64 ||
+               dtype == DataType::FLOAT32 || dtype == DataType::FLOAT64 || dtype == DataType::BOOL) {
+        assert(iv_other.isScalar());
+        at::Scalar other_scalar = iv_other.toScalar();
+        auto output = nnrt::atenSub(self_tensor, other_scalar, alpha);
+        // update output
+        auto& out_edge = cast<nncir::DataEdge>(sub_node.getFirstOutEdge());
+        stream_executor.updateBlob(out_edge.getBlobId(), DataType::TENSOR, tensorToIValue(output));
+    } else {
+        DLOG(ERROR) << "Unsupported input type for aten::sub";
+    }
 }
 
 void executorAtenTensor(const nncir::Node& op_node, StreamExecutor& stream_executor) {

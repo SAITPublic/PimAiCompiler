@@ -207,7 +207,9 @@ at::Tensor atenSlice(const at::Tensor &self, int64_t dim, int64_t start, int64_t
     return at::slice(self, dim, start, end, step);
 }
 
-at::Tensor atenSub(const at::Tensor &self, const at::Tensor &other, const at::Scalar &alpha)
+at::Tensor atenSub(const at::Tensor &self, at::Scalar other, at::Scalar alpha) { return at::sub(self, other, alpha); }
+
+at::Tensor atenSub(const at::Tensor &self, const at::Tensor &other, at::Scalar alpha)
 {
     return at::sub(self, other, alpha);
 }

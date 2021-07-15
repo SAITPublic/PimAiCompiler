@@ -157,7 +157,9 @@ int64_t atenSize(const at::Tensor &tensor, int64_t dim);
 at::Tensor atenSlice(const at::Tensor &self, int64_t dim = 0, int64_t start = 0, int64_t end = 9223372036854775807,
                      int64_t step = 1);
 
-at::Tensor atenSub(const at::Tensor &self, const at::Tensor &other, const at::Scalar &alpha = 1);
+at::Tensor atenSub(const at::Tensor &self, at::Scalar other, at::Scalar alpha = 1);
+
+at::Tensor atenSub(const at::Tensor &self, const at::Tensor &other, at::Scalar alpha = 1);
 
 at::Tensor atenTensor(int64_t value);
 
