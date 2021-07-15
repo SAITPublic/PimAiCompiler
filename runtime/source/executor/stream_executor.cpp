@@ -20,7 +20,7 @@ RetVal StreamExecutor::inferenceModel(const std::shared_ptr<nncir::NNIR> graph,
 {
     // Set Input Tensors
     for (auto& in : input_tensors) {
-        LOG(INFO) << "Input Tensor:" << in.sizes() << " data:" << in;
+        DLOG(INFO) << "Input Tensor:" << in.sizes() << " data:" << in;
     }
     this->setInputTensors(input_tensors);
 
@@ -31,15 +31,16 @@ RetVal StreamExecutor::inferenceModel(const std::shared_ptr<nncir::NNIR> graph,
 
     // control_op will move cursor by itself
     auto is_control_op = [](nncir::NodeType type) {
-        return (type == nncir::NodeType::PRIMIF || type == nncir::NodeType::PRIMENDIF);
+        return (type == nncir::NodeType::PRIMIF || type == nncir::NodeType::PRIMENDIF ||
+                type == nncir::NodeType::PRIMLOOP || type == nncir::NodeType::PRIMENDLOOP ||
+                type == nncir::NodeType::PRIMBLOCK);
     };
 
     // Execute Graph
     for (cursor_ = cursor_begin; cursor_ < cursor_end;) {
         nncir::Node* node = graph->getNode(cursor_);
-        LOG(INFO) << "Node id:" << node->getId() << " name:" << node->getName() << " type:" << node->getNodeType();
+        DLOG(INFO) << "Node id:" << node->getId() << " name:" << node->getName() << " type:" << node->getNodeType();
         auto node_type = node->getNodeType();
-
         auto op_executor = this->findOpExecutor(node_type);
         op_executor(*node, *this);
 
@@ -51,11 +52,12 @@ RetVal StreamExecutor::inferenceModel(const std::shared_ptr<nncir::NNIR> graph,
     // Read Output Tensors
     this->getOutputTensors(output_tensors);
     for (auto& out : output_tensors) {
-        LOG(INFO) << "Output Tensor:" << out.sizes() << " data:" << out;
+        DLOG(INFO) << "Output Tensor:" << out.sizes() << " data:" << out;
     }
 
     // for debug
-    this->showBlobs();
+    // for debug
+    this->showAllBlobs();
     return RetVal::SUCCESS;
 }
 
@@ -129,6 +131,7 @@ void StreamExecutor::registerOp()
     this->global_op_register_.insert({nncir::NodeType::ATENZEROS, executorAtenZeros});
     this->global_op_register_.insert({nncir::NodeType::ATENZEROSLIKE, executorAtenZerosLike});
 
+    this->global_op_register_.insert({nncir::NodeType::PRIMBLOCK, executePrimBlock});
     this->global_op_register_.insert({nncir::NodeType::PRIMCONSTANT, executePrimConstant});
     this->global_op_register_.insert({nncir::NodeType::PRIMDATA, executePrimData});
     this->global_op_register_.insert({nncir::NodeType::PRIMDEVICE, executePrimDevice});
@@ -136,6 +139,8 @@ void StreamExecutor::registerOp()
     this->global_op_register_.insert({nncir::NodeType::PRIMENDLOOP, executePrimEndLoop});
     this->global_op_register_.insert({nncir::NodeType::PRIMIF, executePrimIf});
     this->global_op_register_.insert({nncir::NodeType::PRIMENDIF, executePrimEndIf});
+    this->global_op_register_.insert({nncir::NodeType::PRIMLOOP, executePrimLoop});
+    this->global_op_register_.insert({nncir::NodeType::PRIMLOOPINDEX, executePrimLoopIndex});
     this->global_op_register_.insert({nncir::NodeType::PRIMLISTCONSTRUCT, executePrimListConstruct});
     this->global_op_register_.insert({nncir::NodeType::PRIMLISTUNPACK, executePrimListUnpack});
     this->global_op_register_.insert({nncir::NodeType::PRIMRAISEEXCEPTION, executePrimRaiseException});

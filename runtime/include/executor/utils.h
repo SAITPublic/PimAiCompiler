@@ -59,7 +59,11 @@ bool isScalarType(DataType dtype);
 
 std::vector<int64_t> getOutBlobIds(const nn_compiler::nn_ir::Node& node);
 
-std::vector<int64_t> getInBlobIds(const nn_compiler::nn_ir::Node& node);
+std::vector<int64_t> getInBlobIds(const nncir::Node& node);
 
 std::string getDataTypeStr(DataType dtype);
+
+std::string showOpNodeInfo(const nncir::Node& node, bool show_in_blobs, bool show_out_blobs);
+#define SHOW_OP_INFO(op_node)
+// #define SHOW_OP_INFO(op_node) showOpNodeInfo(op_node, true, true)
 }  // namespace nnrt

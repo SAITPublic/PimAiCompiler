@@ -155,25 +155,8 @@ void executePrimDtype(const nncir::Node& op_node, StreamExecutor& stream_executo
     stream_executor.updateBlob(out_edge.getBlobId(), DataType::INT64, scalarToIValue(scalar_type));
 }
 
-void executePrimEndLoop(const nncir::Node& op_node, StreamExecutor& stream_executor)
-{
-    DLOG(INFO) << "execute PrimEndLoop node";
 
-    // cast Node -> PrimEndLoopNode
-    auto end_loop_node = cast<nncir::PrimEndLoopNode>(op_node);
-    auto inedges = end_loop_node.getInEdgeIds();
-    auto outedges = end_loop_node.getOutEdgeIds();
-    std::vector<torch::Tensor> input_tensor;
-    for (uint32_t id = 0; id < inedges.size(); id++) {
-        auto& in_edge = cast<nncir::DataEdge>(end_loop_node.getInEdge(inedges.at(id)));
-        auto input_blob_id = in_edge.getBlobId();
-        auto value_map = stream_executor.findBlob(input_blob_id);
-        torch::jit::IValue iv = value_map.second;
-        auto type = value_map.first;
-        auto& out_edge = cast<nncir::DataEdge>(end_loop_node.getOutEdge(outedges.at(id)));
-        stream_executor.updateBlob(out_edge.getBlobId(), type, iv);
-    }
-}
+
 
 void executePrimListConstruct(const nncir::Node& op_node, StreamExecutor& stream_executor)
 {
@@ -547,6 +530,195 @@ void executePrimEndIf(const nncir::Node& op_node, StreamExecutor& stream_executo
 
     // update the output Blobs
     stream_executor.setCursor(next_node_id);
+}
+
+void executePrimLoopIndex(const nncir::Node& op_node, StreamExecutor& stream_executor) {
+    DLOG(INFO) << "executePrimLoopIndex";
+    SHOW_OP_INFO(op_node);
+    
+    // cast Node
+    auto loop_index_node = cast_if<nncir::PrimLoopIndexNode>(op_node);
+    int64_t loop_index = loop_index_node->getIndex();
+    if(loop_index < 0) {
+        DLOG(INFO) <<"Invalid value for LoopIndex! set default loopIndex = 0!";
+        loop_index = 0;
+    }
+
+    // LoopIndexNode only has one blob
+    int out_blob_id = getOutBlobIds(*loop_index_node)[0];
+    stream_executor.updateBlob(out_blob_id, DataType::INT64, scalarToIValue<int64_t>(loop_index));
+
+}
+
+
+std::unordered_map<std::string, int64_t> getMatchedLoopInfo(int64_t loop_block_id, StreamExecutor& stream_executor) {
+    // Get LoopNode
+    int64_t loop_id = loop_block_id - 2;
+    assert(loop_id >=0 );
+    auto graph = stream_executor.getGraph();
+    auto loop_node = cast_if<nncir::PrimLoopNode>(*graph->getNode(loop_id));
+
+    // max_cnt & cond
+    int64_t max_trip_cnt = loop_node->getTripCount();
+    int64_t cond = loop_node->getCond();
+    
+    // get LoopIndex
+    int64_t loop_index_id = loop_block_id -1;
+    int blob_id = getOutBlobIds(*graph->getNode(loop_index_id))[0];
+    auto blob = stream_executor.findBlob(blob_id);
+    assert(blob.first == DataType::INT64);
+    int64_t loop_index = blob.second.toInt();
+
+    // get loopEndNode.id + 1
+    int end_loop_next_id = loop_node->getGotoNode();
+
+    std::unordered_map<std::string, int64_t> umap;
+    umap.insert({{"max_trip_cnt", max_trip_cnt}, {"cond", cond}, {"loop_index", loop_index}, {"end_loop_next_id", end_loop_next_id}});
+    return umap;
+}
+
+
+void executePrimBlock(const nncir::Node& op_node, StreamExecutor& stream_executor)
+{
+    DLOG(INFO) << "executePrimBlock";    
+
+    // Prim Blcok only transfer input -- block --> outputs
+    // Block( loopIndex: int,  x1, x2.....xr : IValue)
+    auto block_node = cast_if<nncir::PrimBlockNode>(op_node);
+    auto in_blob_ids = getInBlobIds(*block_node);
+    auto out_blob_ids = getOutBlobIds(*block_node);
+
+    auto umap = getMatchedLoopInfo(block_node->getId(), stream_executor);
+    int64_t max_trip_cnt = umap["max_trip_cnt"];
+    int64_t cond = umap["cond"];
+    int64_t loop_index = umap["loop_index"];
+    int64_t end_loop_next_id = umap["end_loop_next_id"];
+
+    if(loop_index >= max_trip_cnt || cond == 0) {
+        // Get EndLoop's input
+        // transfer EndLoop's input --> output
+        auto end_loop_node = stream_executor.getGraph()->getNode(end_loop_next_id - 1);
+        auto end_loop_in_blobs = getInBlobIds(*end_loop_node);
+        auto end_loop_out_blobs = getOutBlobIds(*end_loop_node);
+
+        /**
+         * %4 : bool = prim::Constant[value=1]()
+         * block0(%i.1 : int, %y1.10 : Tensor):
+         * %y1.2 : Tensor = aten::add(%y1.10, %x2.1, %3) 
+         * %y1.5 : Tensor = aten::add(%y1.2, %i.1, %3) 
+         * -> (%4, %y1.5) --> PrimEndLoop
+         * 
+         * Here is an example of PrimEndLoop, actually the output is %y1.5, exclude %4  in GraphIR
+         * 
+         */
+    
+        assert(end_loop_in_blobs.size() == end_loop_out_blobs.size() + 1);
+        for(int i=0;i<end_loop_out_blobs.size();i++){
+            auto in_blob = stream_executor.findBlob(end_loop_in_blobs.at(i + 1));
+             stream_executor.updateBlob(end_loop_out_blobs.at(i), in_blob.first, in_blob.second);
+        }
+
+        // Jump to End Loop'next
+        stream_executor.setCursor(end_loop_next_id);
+    } else {
+        // currently, only assume in_blob_ids.size == out_blob_ids.size
+        assert(in_blob_ids.size() == out_blob_ids.size());
+        for(int i = 0; i<in_blob_ids.size();i++) {
+            auto in_blob = stream_executor.findBlob(in_blob_ids.at(i));
+            stream_executor.updateBlob(out_blob_ids.at(i), in_blob.first, in_blob.second);
+        }
+        stream_executor.setCursor(block_node->getId() + 1);
+    }
+}
+
+void executePrimLoop(const nncir::Node& op_node, StreamExecutor& stream_executor)
+{
+    DLOG(INFO) << "executePrimLoop";
+    SHOW_OP_INFO(op_node);
+
+    auto loop_node = cast_if<nncir::PrimLoopNode>(op_node);
+    int64_t loop_node_id = loop_node->getId();
+    
+    int64_t loop_cond = loop_node->getCond();
+    int64_t max_trip_cnt = loop_node->getTripCount();
+
+    // loop_node.id + 1 ---> loopIndex_node
+    // loop_node.id + 2 ---> PrimBlockNode
+
+    // Get LoopIndex
+    auto loop_index_node = stream_executor.getGraph()->getNode(loop_node_id + 1);
+    int64_t loop_index_blob_id = getOutBlobIds(*loop_index_node)[0];
+    // 
+    executePrimLoopIndex(*loop_index_node, stream_executor);   // BUG: this will reset loop_index
+
+    DLOG(INFO) <<"loop_index_blob_id: " << loop_index_blob_id;
+    int64_t loop_index = stream_executor.findBlob(getOutBlobIds(*loop_index_node)[0]).second.toInt();
+
+    // Get LoopBlockNode.id
+    int loop_block_id = loop_node_id + 2;
+    auto loop_block_node = stream_executor.getGraph()->getNode(loop_block_id);
+
+    // Passed the Input Tensors to PrimBlock
+    auto in_blob_ids = getInBlobIds(op_node);
+    auto out_blob_ids = getOutBlobIds(op_node);
+
+    assert(in_blob_ids.size() == out_blob_ids.size() + 1);
+    for(int i=0;i<out_blob_ids.size();i++) {
+        int64_t in_id = in_blob_ids.at(i+1);
+        int64_t out_id = out_blob_ids.at(i);
+        auto in_blob = stream_executor.findBlob(in_id);
+        stream_executor.updateBlob(out_id, in_blob.first, in_blob.second);
+    }
+
+    executePrimBlock(*loop_block_node, stream_executor);
+    DLOG(INFO) <<"PrimLoop: loop_index = "<< loop_index;
+
+    if(loop_index < max_trip_cnt && loop_cond == 1) {
+        // Set to Block's next node
+        stream_executor.setCursor(loop_block_id + 1);
+    } else {
+        // jump to matched EndLoop
+    }
+}
+
+void executePrimEndLoop(const nncir::Node& op_node, StreamExecutor& stream_executor)
+{
+    DLOG(INFO) << "executePrimEndLoop";
+    SHOW_OP_INFO(op_node);
+
+    auto end_loop_node = cast_if<nncir::PrimEndLoopNode>(op_node);
+
+    // get the matched StartLoopNode
+    int64_t loop_start_node_id =  end_loop_node->getGotoNode();
+    auto loop_index_node = stream_executor.getGraph()->getNode(loop_start_node_id + 1);
+
+    // Get newset LoopIndex
+    int loop_index_blob_id = getOutBlobIds(*loop_index_node)[0];
+    DLOG(INFO) <<"LoopIndexBlobId:" << loop_index_blob_id;
+    int64_t loop_index = stream_executor.findBlob(loop_index_blob_id).second.toInt();
+
+    // loop_index ++
+    loop_index++;
+
+    // update loop_index blob
+    stream_executor.updateBlob(loop_index_blob_id, DataType::INT64, scalarToIValue<int64_t>(loop_index));
+
+    DLOG(INFO) <<"PrimEndLoop: loop_index="<<loop_index;
+
+    // jump to loopStart
+    // LoopBlock
+    stream_executor.setCursor(loop_start_node_id + 2);
+
+    // update EndLoop's input Blobs --> PrimBlock's input
+    auto end_loop_input_blob_ids = getInBlobIds(op_node);
+    auto prim_block_input_blob_ids = getInBlobIds(*stream_executor.getGraph()->getNode(loop_start_node_id + 2));
+
+    assert(end_loop_input_blob_ids.size() == prim_block_input_blob_ids.size());
+    // skip 0 element
+    for(int i=1; i<end_loop_input_blob_ids.size(); i++) {
+        auto end_loop_input_blob = stream_executor.findBlob(end_loop_input_blob_ids.at(i));
+        stream_executor.updateBlob(prim_block_input_blob_ids.at(i), end_loop_input_blob.first, end_loop_input_blob.second);
+    }
 }
 
 }  // namespace nnrt

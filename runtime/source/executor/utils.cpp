@@ -1,18 +1,15 @@
+#include "executor/utils.h"
 #include <torch/script.h>
-#include <string>
+#include <ostream>
 #include <string>
 #include <vector>
-#include <torch/script.h>
 #include "ir/include/data_edge.hpp"
 #include "ir/include/edge.hpp"
 #include "ir/include/nn_ir.hpp"
 #include "nnrt_types.h"
 
-#include "executor/utils.h"
-
 namespace nnrt
 {
-  
 namespace nncir = nn_compiler::nn_ir;
 
 torch::jit::IValue tensorToIValue(const torch::Tensor& tensor) { return torch::jit::IValue(tensor); }
@@ -109,4 +106,36 @@ static std::unordered_map<DataType, std::string> dtype_to_str_map = {
     {DataType::NONE, "NONE"},           {DataType::LIST, "LIST"}};
 
 std::string getDataTypeStr(DataType dtype) { return dtype_to_str_map[dtype]; }
+
+template <typename T>
+std::ostream& operator<<(std::ostream& o, std::vector<T>& x)
+{
+    std::string ch = "";
+    if (typeid(T) == typeid(std::string)) ch = '\"';
+    if (typeid(T) == typeid(char)) ch = '\'';
+    o << "[";
+    for (int i = 0; i < x.size(); ++i) {
+        o << ((i == 0) ? "" : ", ") << ch << x[i] << ch;
+    }
+    o << "]";
+    return o;
+}
+
+std::string showOpNodeInfo(const nncir::Node& node, bool show_in_blobs, bool show_out_blobs)
+{
+    auto node_info = node.getNodeInfo();
+    std::stringstream ss;
+
+    ss << std::endl
+       << "node_id: " << node_info.id << std::endl
+       << "node_name:" << node_info.name << std::endl
+       << "in_blob_ids: " << getInBlobIds(node) << std::endl
+       << "out_blob_ids: " << getOutBlobIds(node) << std::endl;
+
+    // remark: node_info.in_edge_ids & node_info.in_edge_ids maybe not correct
+    //    <<"in_edge_ids: "<<node_info.in_edge_ids <<std::endl
+    //    <<"out_edge_ids: "<<node_info.in_edge_ids <<std::endl
+    return ss.str();
+}
+
 }  // namespace nnrt

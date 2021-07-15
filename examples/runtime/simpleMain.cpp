@@ -34,10 +34,8 @@ int main(int argc, const char* argv[]) {
     
     std::vector<torch::Tensor> input_tensors;
     // Set test inputs
-    input_tensors.push_back(torch::tensor({{1, 3, 5}, {9, 7, 5}}));
-    input_tensors.push_back(torch::tensor({{10, 30, 50}, {90, -20, 10}}));
-    input_tensors.push_back(torch::tensor({18}));
-    input_tensors.push_back(torch::tensor({7}));
+    input_tensors.push_back(torch::tensor({{1, 2, 3}, {4, 5, 6}}));
+    input_tensors.push_back(torch::tensor({{20, 2, 30}, {-4, 50, 70}}));
 
     // Inference
     auto output_tensors = runtime.inferenceModel(input_tensors);

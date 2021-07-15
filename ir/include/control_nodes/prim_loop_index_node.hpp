@@ -18,7 +18,7 @@ class PrimLoopIndexNode : public NodeMixin<PrimLoopIndexNode, CONTROLNode> {
 
     void setIndex(int64_t index) { index_ = index; }
 
-    int64_t getIndex() { return index_; }
+    int64_t getIndex() const { return index_; }
 
  private:
     int64_t index_ = 0;

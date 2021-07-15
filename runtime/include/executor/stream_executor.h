@@ -74,9 +74,21 @@ class StreamExecutor
         cursor_ = cursor;
     }
 
-    void showBlobs() {
+    void showAllBlobs() {
         for(auto& item : this->global_blobs_) {
             DLOG(INFO) <<"blob_id: "<<item.first <<" dtype: "<< getDataTypeStr(item.second.first);
+        }
+    }
+
+
+    RetVal showBlob(int64_t blob_id) {
+        auto it = this->global_blobs_.find(blob_id);
+        if(it == this->global_blobs_.end()) {
+            DLOG(INFO) <<"Blob not found!";
+            return RetVal::FAILURE;
+        }else {
+            DLOG(INFO) << "blob_id: " << blob_id <<" type:" << getDataTypeStr(it->second.first) <<" value: " <<it->second;
+            return RetVal::SUCCESS;
         }
     }
 
@@ -85,12 +97,9 @@ class StreamExecutor
     std::unordered_map<int64_t, std::pair<DataType, torch::jit::IValue>> global_blobs_;
     // Op Register
     std::unordered_map<nncir::NodeType, OpExecutorFn> global_op_register_;
-
     std::vector<int64_t> input_blob_ids_;
     std::vector<int64_t> output_blob_ids_;
-
     std::shared_ptr<nncir::NNIR> ir_graph_;
-
     int64_t cursor_ = 0;  // like the program counter
 };
 
