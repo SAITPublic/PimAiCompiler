@@ -204,6 +204,28 @@ void executorAtenDeriveIndex(const nncir::Node& op_node, StreamExecutor& stream_
     stream_executor.updateBlob(out_edge.getBlobId(), DataType::INT64, scalarToIValue(output));
 }
 
+
+void executorAtenCopy(const nncir::Node& op_node, StreamExecutor& stream_executor) {
+    DLOG(INFO) << "execute Aten Copy node";
+    auto copy_node = cast<nncir::AtenCopyNode>(op_node);
+    assert(copy_node.getNumInputs() == 2);
+
+    auto &input_self = cast<nncir::DataEdge>(copy_node.getInEdge(0));
+    auto &input_src = cast<nncir::DataEdge>(copy_node.getInEdge(1));
+    int input_self_blob_id = input_self.getBlobId();
+    int input_src_blob_id = input_src.getBlobId();
+
+    torch::jit::IValue iv_self = stream_executor.findBlob(input_self_blob_id).second;
+    torch::jit::IValue iv_src = stream_executor.findBlob(input_src_blob_id).second;
+    at::Tensor self_tensor = iv_self.toTensor();
+    at::Tensor src_tensor = iv_self.toTensor();
+    bool non_blocking = copy_node.getNonBlocking();
+    auto output = nnrt::atenCopy_(self_tensor, src_tensor, non_blocking);
+    // update output
+    auto &out_edge = cast<nncir::DataEdge>(copy_node.getFirstOutEdge());
+    stream_executor.updateBlob(out_edge.getBlobId(), DataType::TENSOR, torch::jit::IValue(output));
+}
+
 void executorAtenDim(const nncir::Node& op_node, StreamExecutor& stream_executor)
 {
     DLOG(INFO) << "execute Aten Dim node";
@@ -413,6 +435,12 @@ void executorAtenFormat(const nncir::Node& op_node, StreamExecutor& stream_execu
     } else {
         DLOG(ERROR) << "Unsupported input type for aten::format";
     }
+}
+
+void executorAtenExpand(const nncir::Node& op_node, StreamExecutor& stream_executor)
+{
+    DLOG(INFO) << "execute Aten Expand node";
+    // TODO need getImpilicit() method from atenExpand node.
 }
 
 void executorAtenGt(const nncir::Node& op_node, StreamExecutor& stream_executor)
@@ -1137,6 +1165,42 @@ void executorAtenZeros(const nncir::Node& op_node, StreamExecutor& stream_execut
 
 void executorAtenZerosLike(const nncir::Node& op_node, StreamExecutor& stream_executor)
 {
-    // TODO to be implemented after fixing converting from at::IValue to TensorOption
+    DLOG(INFO) << "execute Aten ZerosLike node";
+    auto zeros_like_node = cast<nncir::AtenZerosLikeNode>(op_node);
+    assert(zeros_like_node.getNumInputs() == 6);
+
+    auto& input_tensor = cast<nncir::DataEdge>(zeros_like_node.getInEdge(0));
+    int input_tensor_blob_id = input_tensor.getBlobId();
+    torch::jit::IValue iv_tensor = stream_executor.findBlob(input_tensor_blob_id).second;
+    at::Tensor tensor = iv_tensor.toTensor();
+
+    at::TensorOptions options;
+    auto& edge_dtype      = cast<nncir::DataEdge>(zeros_like_node.getInEdge(1));
+    auto& edge_layout     = cast<nncir::DataEdge>(zeros_like_node.getInEdge(2));
+    auto& edge_device     = cast<nncir::DataEdge>(zeros_like_node.getInEdge(3));
+    auto& edge_pin_memory = cast<nncir::DataEdge>(zeros_like_node.getInEdge(4));
+    auto dtype_id      = edge_dtype.getBlobId();
+    auto layout_id     = edge_layout.getBlobId();
+    auto device_id     = edge_device.getBlobId();
+    auto pin_memory_id = edge_pin_memory.getBlobId();
+    auto iv_dtype      = stream_executor.findBlob(dtype_id).second;
+    auto iv_layout     = stream_executor.findBlob(layout_id).second;
+    auto iv_device     = stream_executor.findBlob(device_id).second;
+    auto iv_pin_memory = stream_executor.findBlob(pin_memory_id).second;
+    options = options.dtype(iv_dtype.toScalarType());
+    options = options.layout(iv_layout.toLayout());
+    options = options.device(iv_device.toDevice());
+    options = options.pinned_memory(iv_pin_memory.toBool());
+
+    auto& input_memory_format = cast<nncir::DataEdge>(zeros_like_node.getInEdge(5));
+    auto memory_format_id  = input_memory_format.getBlobId();
+    auto iv_memory_format = stream_executor.findBlob(memory_format_id).second;
+    auto memory_format = iv_memory_format.toMemoryFormat();
+
+    auto output = nnrt::atenZeroslike(tensor, options, memory_format);
+    // update output
+    auto& out_edge = cast<nncir::DataEdge>(zeros_like_node.getFirstOutEdge());
+    stream_executor.updateBlob(out_edge.getBlobId(), DataType::TENSOR, tensorToIValue(output));
+
 }
 }  // namespace nnrt

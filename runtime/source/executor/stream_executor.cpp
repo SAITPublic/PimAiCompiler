@@ -85,12 +85,14 @@ void StreamExecutor::registerOp()
     this->global_op_register_.insert({nncir::NodeType::ATENAPPEND, executorAtenAppend});
     this->global_op_register_.insert({nncir::NodeType::ATENCAT, executorAtenCat});
     this->global_op_register_.insert({nncir::NodeType::ATENCEIL, executorAtenCeil});
+    this->global_op_register_.insert({nncir::NodeType::ATENCOPY, executorAtenCopy});
     this->global_op_register_.insert({nncir::NodeType::ATENDERIVEINDEX, executorAtenDeriveIndex});
     this->global_op_register_.insert({nncir::NodeType::ATENDIM, executorAtenDim});
     this->global_op_register_.insert({nncir::NodeType::ATENDIV, executorAtenDiv});
     this->global_op_register_.insert({nncir::NodeType::ATENDROPOUT, executorAtenDropout});
     this->global_op_register_.insert({nncir::NodeType::ATENEMBEDDING, executorAtenEmbedding});
     this->global_op_register_.insert({nncir::NodeType::ATENEQ, executorAtenEq});
+    this->global_op_register_.insert({nncir::NodeType::ATENEXPAND, executorAtenExpand});
     this->global_op_register_.insert({nncir::NodeType::ATENFORMAT, executorAtenFormat});
     this->global_op_register_.insert({nncir::NodeType::ATENGETITEM, executorAtenGetItem});
     this->global_op_register_.insert({nncir::NodeType::ATENINT, executorAtenInt});

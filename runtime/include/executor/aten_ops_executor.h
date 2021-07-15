@@ -18,12 +18,14 @@ void executorAtenAppend(const nncir::Node& op_node, StreamExecutor& stream_execu
 void executorAtenAddmm(const nncir::Node& op_node, StreamExecutor& stream_executor);
 void executorAtenCat(const nncir::Node& op_node, StreamExecutor& stream_executor);
 void executorAtenCeil(const nncir::Node& op_node, StreamExecutor& stream_executor);
+void executorAtenCopy(const nncir::Node& op_node, StreamExecutor& stream_executor);
 void executorAtenDeriveIndex(const nncir::Node& op_node, StreamExecutor& stream_executor);
 void executorAtenDim(const nncir::Node& op_node, StreamExecutor& stream_executor);
 void executorAtenDiv(const nncir::Node& op_node, StreamExecutor& stream_executor);
 void executorAtenDropout(const nncir::Node& op_node, StreamExecutor& stream_executor);
 void executorAtenEmbedding(const nncir::Node& op_node, StreamExecutor& stream_executor);
 void executorAtenEq(const nncir::Node& op_node, StreamExecutor& stream_executor);
+void executorAtenExpand(const nncir::Node& op_node, StreamExecutor& stream_executor);
 void executorAtenFormat(const nncir::Node& op_node, StreamExecutor& stream_executor);
 void executorAtenGt(const nncir::Node& op_node, StreamExecutor& stream_executor);
 void executorAtenGetItem(const nncir::Node& op_node, StreamExecutor& stream_executor);
