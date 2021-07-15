@@ -24,37 +24,6 @@
 
 namespace nnrt
 {
-bool isScalarType(DataType dtype)
-{
-    return dtype == DataType::INT8 || dtype == DataType::UINT8 || dtype == DataType::INT16 ||
-           dtype == DataType::UINT16 || dtype == DataType::INT32 || dtype == DataType::INT64 ||
-           dtype == DataType::FLOAT32 || dtype == DataType::FLOAT64 || dtype == DataType::BOOL;
-}
-
-void executorAtenIs(const nncir::Node& op_node, StreamExecutor& stream_executor)
-{
-    DLOG(INFO) << "execute Aten Is node";
-
-    auto node = cast<nncir::AtenIsNode>(op_node);
-    assert(node.getNumInputs() == 2);
-
-    auto& input_self = cast<nncir::DataEdge>(node.getInEdge(0));
-    auto& input_other = cast<nncir::DataEdge>(node.getInEdge(1));
-
-    // Get input blob
-    int input_self_blob_id = input_self.getBlobId();
-    int input_other_blob_id = input_other.getBlobId();
-
-    // Find the input blob
-    torch::jit::IValue iv_self = stream_executor.findBlob(input_self_blob_id).second;
-    torch::jit::IValue iv_other = stream_executor.findBlob(input_other_blob_id).second;
-
-    auto output = nnrt::atenIs(iv_self, iv_other);
-    // update output
-    auto& out_edge = cast<nncir::DataEdge>(node.getFirstOutEdge());
-    stream_executor.updateBlob(out_edge.getBlobId(), DataType::BOOL, boolToIValue(output));
-}
-
 void executorAtenAdd(const nncir::Node& op_node, StreamExecutor& stream_executor)
 {
     DLOG(INFO) << "execute Aten Add node";
@@ -165,7 +134,6 @@ void executorAtenCat(const nncir::Node& op_node, StreamExecutor& stream_executor
     auto& input_list_edge = cast<nncir::DataEdge>(cat_node.getInEdge(0));
     auto input_blob_id = input_list_edge.getBlobId();
 
-    auto dtype = stream_executor.findBlob(input_blob_id).first;
     auto ivalue = stream_executor.findBlob(input_blob_id).second;
     assert(ivalue.isTensorList());
 
@@ -285,9 +253,7 @@ void executorAtenDiv(const nncir::Node& op_node, StreamExecutor& stream_executor
         // update output
         auto& out_edge = cast<nncir::DataEdge>(div_node.getFirstOutEdge());
         stream_executor.updateBlob(out_edge.getBlobId(), DataType::TENSOR, tensorToIValue(output));
-    } else if (dtype == DataType::INT8 || dtype == DataType::UINT8 || dtype == DataType::INT16 ||
-               dtype == DataType::UINT16 || dtype == DataType::INT32 || dtype == DataType::INT64 ||
-               dtype == DataType::FLOAT32 || dtype == DataType::FLOAT64 || dtype == DataType::BOOL) {
+    } else if (isScalarType(dtype)) {
         assert(iv_other.isScalar());
         at::Scalar other_scalar = iv_other.toScalar();
         auto output = nnrt::atenDiv(self_tensor, other_scalar);
@@ -344,7 +310,8 @@ void executorAtenEmbedding(const nncir::Node& op_node, StreamExecutor& stream_ex
     int64_t padding_idx = node.getPaddingIdx();
     bool scale_grad_by_freq = node.getScaleGradByFreq();
     bool sparse = node.getSparse();
-    auto output = nnrt::atenEmbedding(iv_weights.toTensor(), iv_indices.toTensor(), padding_idx, scale_grad_by_freq, sparse);
+    auto output = nnrt::atenEmbedding(iv_weights.toTensor(), iv_indices.toTensor(),
+                                      padding_idx, scale_grad_by_freq, sparse);
 
     auto& out_edge = cast<nncir::DataEdge>(node.getFirstOutEdge());
     stream_executor.updateBlob(out_edge.getBlobId(), DataType::TENSOR, tensorToIValue(output));
@@ -494,7 +461,6 @@ void executorAtenGetItem(const nncir::Node& op_node, StreamExecutor& stream_exec
     auto& input_self = cast<nncir::DataEdge>(get_item_node.getInEdge(0));
     int input_self_blob_id = input_self.getBlobId();
 
-    auto dtype = stream_executor.findBlob(input_self_blob_id).first;
     torch::jit::IValue iv_self = stream_executor.findBlob(input_self_blob_id).second;
     assert(iv_self.isList());
     auto self_list = iv_self.toList();
@@ -515,7 +481,6 @@ void executorAtenInt(const nncir::Node& op_node, StreamExecutor& stream_executor
     auto& input_self = cast<nncir::DataEdge>(int_node.getInEdge(0));
     int input_self_blob_id = input_self.getBlobId();
 
-    auto dtype = stream_executor.findBlob(input_self_blob_id).first;
     torch::jit::IValue iv_self = stream_executor.findBlob(input_self_blob_id).second;
     assert(iv_self.isScalar());
     auto self_scalar = iv_self.toScalar();
@@ -524,6 +489,30 @@ void executorAtenInt(const nncir::Node& op_node, StreamExecutor& stream_executor
     // update output
     auto& out_edge = cast<nncir::DataEdge>(int_node.getFirstOutEdge());
     stream_executor.updateBlob(out_edge.getBlobId(), DataType::INT64, scalarToIValue(output));
+}
+
+void executorAtenIs(const nncir::Node& op_node, StreamExecutor& stream_executor)
+{
+    DLOG(INFO) << "execute Aten Is node";
+
+    auto node = cast<nncir::AtenIsNode>(op_node);
+    assert(node.getNumInputs() == 2);
+
+    auto& input_self = cast<nncir::DataEdge>(node.getInEdge(0));
+    auto& input_other = cast<nncir::DataEdge>(node.getInEdge(1));
+
+    // Get input blob
+    int input_self_blob_id = input_self.getBlobId();
+    int input_other_blob_id = input_other.getBlobId();
+
+    // Find the input blob
+    torch::jit::IValue iv_self = stream_executor.findBlob(input_self_blob_id).second;
+    torch::jit::IValue iv_other = stream_executor.findBlob(input_other_blob_id).second;
+
+    auto output = nnrt::atenIs(iv_self, iv_other);
+    // update output
+    auto& out_edge = cast<nncir::DataEdge>(node.getFirstOutEdge());
+    stream_executor.updateBlob(out_edge.getBlobId(), DataType::BOOL, boolToIValue(output));
 }
 
 void executorAtenItem(const nncir::Node& op_node, StreamExecutor& stream_executor)
@@ -814,9 +803,7 @@ void executorAtenMax(const nncir::Node& op_node, StreamExecutor& stream_executor
         // update output
         auto& out_edge = cast<nncir::DataEdge>(max_node.getFirstOutEdge());
         stream_executor.updateBlob(out_edge.getBlobId(), DataType::TENSOR, tensorToIValue(output));
-    } else if (dtype == DataType::INT8 || dtype == DataType::UINT8 || dtype == DataType::INT16 ||
-               dtype == DataType::UINT16 || dtype == DataType::INT32 || dtype == DataType::INT64 ||
-               dtype == DataType::FLOAT32 || dtype == DataType::FLOAT64 || dtype == DataType::BOOL) {
+    } else if (isScalarType(dtype)) {
         // aten::max(Tensor, dim, keepdim)
         auto dim = max_node.getDim();
         auto keep_dim = max_node.getKeepDim();
@@ -914,7 +901,6 @@ void executorAtenSelect(const nncir::Node& op_node, StreamExecutor& stream_execu
     auto& input_self = cast<nncir::DataEdge>(select_node.getInEdge(0));
     int input_self_blob_id = input_self.getBlobId();
 
-    auto dtype = stream_executor.findBlob(input_self_blob_id).first;
     torch::jit::IValue iv_self = stream_executor.findBlob(input_self_blob_id).second;
     assert(iv_self.isTensor());
     at::Tensor self_tensor = iv_self.toTensor();
@@ -988,9 +974,7 @@ void executorAtenSub(const nncir::Node& op_node, StreamExecutor& stream_executor
         // update output
         auto& out_edge = cast<nncir::DataEdge>(sub_node.getFirstOutEdge());
         stream_executor.updateBlob(out_edge.getBlobId(), DataType::TENSOR, tensorToIValue(output));
-    } else if (dtype == DataType::INT8 || dtype == DataType::UINT8 || dtype == DataType::INT16 ||
-               dtype == DataType::UINT16 || dtype == DataType::INT32 || dtype == DataType::INT64 ||
-               dtype == DataType::FLOAT32 || dtype == DataType::FLOAT64 || dtype == DataType::BOOL) {
+    } else if (isScalarType(dtype)) {
         assert(iv_other.isScalar());
         at::Scalar other_scalar = iv_other.toScalar();
         auto output = nnrt::atenSub(self_tensor, other_scalar, alpha);
@@ -1088,7 +1072,6 @@ void executorAtenTranspose(const nncir::Node& op_node, StreamExecutor& stream_ex
 
     auto& input_self = cast<nncir::DataEdge>(transpose_node.getInEdge(0));
     int input_self_blob_id = input_self.getBlobId();
-    auto dtype = stream_executor.findBlob(input_self_blob_id).first;
     torch::jit::IValue iv_self = stream_executor.findBlob(input_self_blob_id).second;
     assert(iv_self.isTensor());
     at::Tensor self_tensor = iv_self.toTensor();

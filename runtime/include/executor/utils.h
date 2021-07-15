@@ -3,6 +3,7 @@
 #include <torch/script.h>
 
 #include "ir/include/nn_ir.hpp"
+#include "nnrt_types.h"
 
 namespace nncir = nn_compiler::nn_ir;
 
@@ -52,5 +53,7 @@ at::ArrayRef<T> parseIValueArrayRef(const at::ArrayRef<at::IValue>& ivalue_array
 
 template <typename ...T>
 torch::jit::IValue tupleToIValue(std::tuple<T...> tuple) { return torch::jit::IValue(tuple); }
+
+bool isScalarType(DataType dtype);
 
 }  // namespace nnrt
