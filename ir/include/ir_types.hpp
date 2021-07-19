@@ -221,10 +221,15 @@ class AtenIndexSelectNode;
 class AtenIntNode;
 class AtenIsNode;
 class AtenItemNode;
+class AtenLeakyReluNode;
 class AtenLenNode;
+class AtenLinearNode;
 class AtenListNode;
+class AtenLogNode;
+class AtenLogSoftmaxNode;
 class AtenLSTMNode;
 class AtenLtNode;
+class AtenMaskedFillNode;
 class AtenMaskedSelectNode;
 class AtenMatmulNode;
 class AtenMaxNode;
@@ -381,10 +386,15 @@ enum class NodeType {
     ATENINT,
     ATENIS,
     ATENITEM,
+    ATENLEAKYRELU,
     ATENLEN,
+    ATENLINEAR,
     ATENLIST,
+    ATENLOG,
+    ATENLOGSOFTMAX,
     ATENLSTM,
     ATENLT,
+    ATENMASKEDFILL,
     ATENMASKEDSELECT,
     ATENMATMUL,
     ATENMAX,
@@ -501,10 +511,15 @@ inline std::ostream& operator<<(std::ostream& s, nn_ir::NodeType type) {
         ENUM_STR(ATENINT)
         ENUM_STR(ATENIS)
         ENUM_STR(ATENITEM)
+        ENUM_STR(ATENLEAKYRELU)
         ENUM_STR(ATENLEN)
+        ENUM_STR(ATENLINEAR)
         ENUM_STR(ATENLIST)
+        ENUM_STR(ATENLOG)
+        ENUM_STR(ATENLOGSOFTMAX)
         ENUM_STR(ATENLSTM)
         ENUM_STR(ATENLT)
+        ENUM_STR(ATENMASKEDFILL)
         ENUM_STR(ATENMASKEDSELECT)
         ENUM_STR(ATENMATMUL)
         ENUM_STR(ATENMAX)

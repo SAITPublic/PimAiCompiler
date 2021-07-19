@@ -761,6 +761,16 @@ IRNNNodeParser::parseNNNode<IR::NNNode::AnyType_AtenItemNode>(const IR::NnNode* 
     return std::make_unique<nn_ir::AtenItemNode>(node_info);
 }
 
+template <>
+std::unique_ptr<nn_ir::NNNode> IRNNNodeParser::parseNNNode<IR::NNNode::AnyType_AtenLeakyReluNode>(
+    const IR::NnNode* ir_node, const nn_ir::NodeInfo& node_info)
+{
+    auto aten_leaky_relu_node = ir_node->nn_node_as_AtenLeakyReluNode();
+    Log::IR::E_IF(aten_leaky_relu_node == nullptr)
+        << "IRNNNodeParser::parseNNNode<NN::AtenLeakyReluNode>() => wrong node type!";
+    auto scalar = aten_leaky_relu_node->scalar();
+    return std::make_unique<nn_ir::AtenLeakyReluNode>(node_info, scalar);
+}
 
 template <>
 std::unique_ptr<nn_ir::NNNode>
@@ -773,6 +783,18 @@ IRNNNodeParser::parseNNNode<IR::NNNode::AnyType_AtenLenNode>(const IR::NnNode*  
 }
 
 template <>
+std::unique_ptr<nn_ir::NNNode> IRNNNodeParser::parseNNNode<IR::NNNode::AnyType_AtenLinearNode>(
+    const IR::NnNode* ir_node, const nn_ir::NodeInfo& node_info)
+{
+    auto aten_linear_node = ir_node->nn_node_as_AtenLinearNode();
+    Log::IR::E_IF(aten_linear_node == nullptr)
+        << "IRNNNodeParser::parseNNNode<NN::AtenLinearNode>() => wrong node type!";
+    auto weight_blob_ids = makeDataArrFromVector<int64_t>(aten_linear_node->weight_blob_ids());
+    auto bias_blob_ids = makeDataArrFromVector<int64_t>(aten_linear_node->bias_blob_ids());
+    return std::make_unique<nn_ir::AtenLinearNode>(node_info, weight_blob_ids, bias_blob_ids);
+}
+
+template <>
 std::unique_ptr<nn_ir::NNNode>
 IRNNNodeParser::parseNNNode<IR::NNNode::AnyType_AtenListNode>(const IR::NnNode*      ir_node,
                                                               const nn_ir::NodeInfo& node_info) {
@@ -780,6 +802,28 @@ IRNNNodeParser::parseNNNode<IR::NNNode::AnyType_AtenListNode>(const IR::NnNode* 
     Log::IR::E_IF(aten_list_node == nullptr) << "IRNNNodeParser::parseNNNode<NN::AtenListNode>() => wrong node type!";
 
     return std::make_unique<nn_ir::AtenListNode>(node_info);
+}
+
+template <>
+std::unique_ptr<nn_ir::NNNode> IRNNNodeParser::parseNNNode<IR::NNNode::AnyType_AtenLogNode>(
+    const IR::NnNode* ir_node, const nn_ir::NodeInfo& node_info)
+{
+    auto aten_log_node = ir_node->nn_node_as_AtenLogNode();
+    Log::IR::E_IF(aten_log_node == nullptr) << "IRNNNodeParser::parseNNNode<NN::AtenLogNode>() => wrong node type!";
+    return std::make_unique<nn_ir::AtenLogNode>(node_info);
+}
+
+template <>
+std::unique_ptr<nn_ir::NNNode> IRNNNodeParser::parseNNNode<IR::NNNode::AnyType_AtenLogSoftmaxNode>(
+    const IR::NnNode* ir_node, const nn_ir::NodeInfo& node_info)
+{
+    auto aten_log_softmax_node = ir_node->nn_node_as_AtenLogSoftmaxNode();
+    Log::IR::E_IF(aten_log_softmax_node == nullptr)
+        << "IRNNNodeParser::parseNNNode<NN::AtenLogSoftmaxNode>() => wrong node type!";
+
+    auto dim = aten_log_softmax_node->dim();
+    auto dtype = aten_log_softmax_node->dtype();
+    return std::make_unique<nn_ir::AtenLogSoftmaxNode>(node_info, dim, dtype);
 }
 
 template <>
@@ -811,6 +855,17 @@ IRNNNodeParser::parseNNNode<IR::NNNode::AnyType_AtenLtNode>(const IR::NnNode*   
     Log::IR::E_IF(aten_lt_node == nullptr) << "IRNNNodeParser::parseNNNode<NN::AtenLtNode>() => wrong node type!";
 
     return std::make_unique<nn_ir::AtenLtNode>(node_info);
+}
+
+template <>
+std::unique_ptr<nn_ir::NNNode> IRNNNodeParser::parseNNNode<IR::NNNode::AnyType_AtenMaskedFillNode>(
+    const IR::NnNode* ir_node, const nn_ir::NodeInfo& node_info)
+{
+    auto aten_masked_fill_node = ir_node->nn_node_as_AtenMaskedFillNode();
+    Log::IR::E_IF(aten_masked_fill_node == nullptr)
+        << "IRNNNodeParser::parseNNNode<NN::AtenMaskedFillNode>() => wrong node type!";
+    auto value = aten_masked_fill_node->value();
+    return std::make_unique<nn_ir::AtenMaskedFillNode>(node_info, value);
 }
 
 template <>
