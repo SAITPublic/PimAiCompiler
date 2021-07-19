@@ -117,7 +117,19 @@ void StreamExecutor::registerOp()
     this->global_op_register_.insert({nncir::NodeType::ATENZEROSLIKE, executorAtenZerosLike});
 
     this->global_op_register_.insert({nncir::NodeType::PRIMCONSTANT, executePrimConstant});
+    this->global_op_register_.insert({nncir::NodeType::PRIMDATA, executePrimData});
+    this->global_op_register_.insert({nncir::NodeType::PRIMDEVICE, executePrimDevice});
     this->global_op_register_.insert({nncir::NodeType::PRIMDTYPE, executePrimDtype});
+    this->global_op_register_.insert({nncir::NodeType::PRIMENDLOOP, executePrimEndLoop});
+    this->global_op_register_.insert({nncir::NodeType::PRIMLISTCONSTRUCT, executePrimListConstruct});
+    this->global_op_register_.insert({nncir::NodeType::PRIMLISTUNPACK, executePrimListUnpack});
+    this->global_op_register_.insert({nncir::NodeType::PRIMRAISEEXCEPTION, executePrimRaiseException});
+    this->global_op_register_.insert({nncir::NodeType::PRIMTUPLECONSTRUCT, executePrimTupleConstruct});
+    this->global_op_register_.insert({nncir::NodeType::PRIMTUPLEINDEX, executePrimTupleIndex});
+    this->global_op_register_.insert({nncir::NodeType::PRIMTUPLEUNPACK, executePrimTupleUnpack});
+    this->global_op_register_.insert({nncir::NodeType::PRIMUNCHECKEDCAST, executePrimUncheckedCast});
+    this->global_op_register_.insert({nncir::NodeType::PRIMUNINITIALIZED, executePrimUninitialized});
+    this->global_op_register_.insert({nncir::NodeType::PRIMVARIABLE, executePrimVariable});
 }
 
 void StreamExecutor::setInputTensors(const std::vector<torch::Tensor>& input_tensors)

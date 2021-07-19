@@ -14,7 +14,7 @@ namespace nnrt
 {
 void executePrimConstant(const nncir::Node& op_node, StreamExecutor& stream_executor)
 {
-    DLOG(INFO) << "executePrimConstant";
+    DLOG(INFO) << "execute PrimConstant node";
 
     auto constant_node = cast<nncir::PrimConstantNode>(op_node);
     assert(constant_node.getNumInputs() == 0);  // Constant Op
@@ -92,7 +92,7 @@ void executePrimConstant(const nncir::Node& op_node, StreamExecutor& stream_exec
 
 void executePrimData(const nncir::Node& op_node, StreamExecutor& stream_executor)
 {
-    DLOG(INFO) << "executePrimData";
+    DLOG(INFO) << "execute PrimData node";
 
     // cast Node -> PrimDataNode
     auto data_node = cast<nncir::PrimDataNode>(op_node);
@@ -112,7 +112,7 @@ void executePrimData(const nncir::Node& op_node, StreamExecutor& stream_executor
 
 void executePrimDevice(const nncir::Node& op_node, StreamExecutor& stream_executor)
 {
-    DLOG(INFO) << "executePrimDevice";
+    DLOG(INFO) << "execute PrimDevice node";
 
     // cast Node -> PrimDeviceNode
     auto device_node = cast<nncir::PrimDeviceNode>(op_node);
@@ -132,7 +132,7 @@ void executePrimDevice(const nncir::Node& op_node, StreamExecutor& stream_execut
 
 void executePrimDtype(const nncir::Node& op_node, StreamExecutor& stream_executor)
 {
-    DLOG(INFO) << "executePrimDtype";
+    DLOG(INFO) << "execute PrimDtype node";
 
     // cast Node -> PrimDtypeNode
     auto dtype_node = cast<nncir::PrimDtypeNode>(op_node);
@@ -157,7 +157,7 @@ void executePrimDtype(const nncir::Node& op_node, StreamExecutor& stream_executo
 
 void executePrimEndLoop(const nncir::Node& op_node, StreamExecutor& stream_executor)
 {
-    DLOG(INFO) << "executePrimEndLoop";
+    DLOG(INFO) << "execute PrimEndLoop node";
 
     // cast Node -> PrimEndLoopNode
     auto end_loop_node = cast<nncir::PrimEndLoopNode>(op_node);
@@ -177,7 +177,7 @@ void executePrimEndLoop(const nncir::Node& op_node, StreamExecutor& stream_execu
 
 void executePrimListConstruct(const nncir::Node& op_node, StreamExecutor& stream_executor)
 {
-    DLOG(INFO) << "executePrimListConstruct";
+    DLOG(INFO) << "execute PrimListConstruct node";
 
     // cast Node -> PrimListConstructNode
     auto list_construct_node = cast<nncir::PrimListConstructNode>(op_node);
@@ -204,7 +204,7 @@ void executePrimListConstruct(const nncir::Node& op_node, StreamExecutor& stream
 
 void executePrimListUnpack(const nncir::Node& op_node, StreamExecutor& stream_executor)
 {
-    DLOG(INFO) << "executePrimListUnpack";
+    DLOG(INFO) << "execute PrimListUnpack node";
 
     // cast Node -> PrimListUnpackNode
     auto list_unpack_node = cast<nncir::PrimListUnpackNode>(op_node);
@@ -229,7 +229,7 @@ void executePrimListUnpack(const nncir::Node& op_node, StreamExecutor& stream_ex
 
 void executePrimRaiseException(const nncir::Node& op_node, StreamExecutor& stream_executor)
 {
-    DLOG(INFO) << "executePrimRaiseException";
+    DLOG(INFO) << "execute PrimRaiseException node";
 
     // cast Node -> PrimRaiseExceptionNode
     auto raise_exception_node = cast<nncir::PrimRaiseExceptionNode>(op_node);
@@ -243,7 +243,7 @@ void executePrimRaiseException(const nncir::Node& op_node, StreamExecutor& strea
 
 void executePrimTupleConstruct(const nncir::Node& op_node, StreamExecutor& stream_executor)
 {
-    DLOG(INFO) << "executePrimTupleConstruct";
+    DLOG(INFO) << "execute PrimTupleConstruct node";
 
     // cast Node -> PrimTupleConstructNode
     auto tuple_construct_node = cast<nncir::PrimTupleConstructNode>(op_node);
@@ -267,7 +267,7 @@ void executePrimTupleConstruct(const nncir::Node& op_node, StreamExecutor& strea
 
 void executePrimTupleIndex(const nncir::Node& op_node, StreamExecutor& stream_executor)
 {
-    DLOG(INFO) << "executePrimTupleIndex";
+    DLOG(INFO) << "execute PrimTupleIndex node";
 
     // cast Node -> PrimTupleIndexNode
     auto tuple_index_node = cast<nncir::PrimTupleIndexNode>(op_node);
@@ -297,7 +297,7 @@ void executePrimTupleIndex(const nncir::Node& op_node, StreamExecutor& stream_ex
 
 void executePrimTupleUnpack(const nncir::Node& op_node, StreamExecutor& stream_executor)
 {
-    DLOG(INFO) << "executePrimTupleUnpack";
+    DLOG(INFO) << "execute PrimTupleUnpack node";
 
     // cast Node -> PrimTupleUnpackNode
     auto tuple_unpack_node = cast<nncir::PrimTupleUnpackNode>(op_node);
@@ -319,7 +319,7 @@ void executePrimTupleUnpack(const nncir::Node& op_node, StreamExecutor& stream_e
 
 void executePrimUncheckedCast(const nncir::Node& op_node, StreamExecutor& stream_executor)
 {
-    DLOG(INFO) << "executeprimUncheckedCast";
+    DLOG(INFO) << "execute PrimUncheckedCast node";
 
     // cast Node -> PrimUncheckedCastNode
     auto unchecked_cast_node = cast<nncir::PrimUncheckedCastNode>(op_node);
@@ -338,7 +338,7 @@ void executePrimUncheckedCast(const nncir::Node& op_node, StreamExecutor& stream
 
 void executePrimUninitialized(const nncir::Node& op_node, StreamExecutor& stream_executor)
 {
-    DLOG(INFO) << "executePrimUninitialized";
+    DLOG(INFO) << "execute PrimUninitialized node";
 
     // cast Node -> PrimUninitializedNode
     auto uninitialized_node = cast<nncir::PrimUninitializedNode>(op_node);
@@ -352,7 +352,7 @@ void executePrimUninitialized(const nncir::Node& op_node, StreamExecutor& stream
 
 void executePrimVariable(const nncir::Node& op_node, StreamExecutor& stream_executor)
 {
-    DLOG(INFO) << "executePrimVariable";
+    DLOG(INFO) << "execute PrimVariable node";
 
     // cast Node -> PrimVariableNode
     auto variable_node = cast<nncir::PrimVariableNode>(op_node);
