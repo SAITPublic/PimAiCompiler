@@ -8,7 +8,11 @@ bool OpBasicUtil::isAtenOp(const nn_ir::Node& node) const {
     if (auto nn_node = cast_if<nn_ir::NNNode>(node)) {
         if (is_any_of<nn_ir::AtenAddNode,
                 nn_ir::AtenAddmmNode,
+                nn_ir::AtenAndNode,
+                nn_ir::AtenAnyNode,
                 nn_ir::AtenAppendNode,
+                nn_ir::AtenArangeNode,
+                nn_ir::AtenAsTensorNode,
                 nn_ir::AtenCatNode,
                 nn_ir::AtenCeilNode,
                 nn_ir::AtenCopyNode,

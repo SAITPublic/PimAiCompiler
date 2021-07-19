@@ -441,17 +441,6 @@ IRNNNodeParser::parseNNNode<IR::NNNode::AnyType_CopyNode>(const IR::NnNode* ir_n
 
 template <>
 std::unique_ptr<nn_ir::NNNode>
-IRNNNodeParser::parseNNNode<IR::NNNode::AnyType_AtenAppendNode>(const IR::NnNode*      ir_node,
-                                                                const nn_ir::NodeInfo& node_info) {
-    auto aten_append_node = ir_node->nn_node_as_AtenAppendNode();
-    Log::IR::E_IF(aten_append_node == nullptr)
-        << "IRNNNodeParser::parseNNNode<NN::AtenAppendNode>() => wrong node type!";
-
-    return std::make_unique<nn_ir::AtenAppendNode>(node_info);
-}
-
-template <>
-std::unique_ptr<nn_ir::NNNode>
 IRNNNodeParser::parseNNNode<IR::NNNode::AnyType_AtenAddNode>(const IR::NnNode*      ir_node,
                                                              const nn_ir::NodeInfo& node_info) {
     auto aten_add_node = ir_node->nn_node_as_AtenAddNode();
@@ -470,6 +459,70 @@ IRNNNodeParser::parseNNNode<IR::NNNode::AnyType_AtenAddmmNode>(const IR::NnNode*
     Log::IR::E_IF(aten_addmm_node == nullptr)
         << "IRNNNodeParser::parseNNNode<NN::AtenAddmmNode>() => wrong node type!";
     return std::make_unique<nn_ir::AtenAddmmNode>(node_info);
+}
+
+template <>
+std::unique_ptr<nn_ir::NNNode>
+IRNNNodeParser::parseNNNode<IR::NNNode::AnyType_AtenAndNode>(const IR::NnNode*      ir_node,
+                                                             const nn_ir::NodeInfo& node_info) {
+    auto aten_and_node = ir_node->nn_node_as_AtenAndNode();
+    Log::IR::E_IF(aten_and_node == nullptr)
+            << "IRNNNodeParser::parseNNNode<NN::AtenAndNode>() => wrong node type!";
+
+    return std::make_unique<nn_ir::AtenAndNode>(node_info);
+}
+
+template <>
+std::unique_ptr<nn_ir::NNNode>
+IRNNNodeParser::parseNNNode<IR::NNNode::AnyType_AtenAnyNode>(const IR::NnNode*      ir_node,
+                                                             const nn_ir::NodeInfo& node_info) {
+    auto aten_any_node = ir_node->nn_node_as_AtenAnyNode();
+    Log::IR::E_IF(aten_any_node == nullptr)
+            << "IRNNNodeParser::parseNNNode<NN::AtenAnyNode>() => wrong node type!";
+
+    return std::make_unique<nn_ir::AtenAnyNode>(node_info);
+}
+
+template <>
+std::unique_ptr<nn_ir::NNNode>
+IRNNNodeParser::parseNNNode<IR::NNNode::AnyType_AtenAppendNode>(const IR::NnNode*      ir_node,
+                                                                const nn_ir::NodeInfo& node_info) {
+    auto aten_append_node = ir_node->nn_node_as_AtenAppendNode();
+    Log::IR::E_IF(aten_append_node == nullptr)
+            << "IRNNNodeParser::parseNNNode<NN::AtenAppendNode>() => wrong node type!";
+
+    return std::make_unique<nn_ir::AtenAppendNode>(node_info);
+}
+
+template <>
+std::unique_ptr<nn_ir::NNNode>
+IRNNNodeParser::parseNNNode<IR::NNNode::AnyType_AtenArangeNode>(const IR::NnNode*      ir_node,
+                                                                const nn_ir::NodeInfo& node_info) {
+    auto aten_arange_node = ir_node->nn_node_as_AtenArangeNode();
+    Log::IR::E_IF(aten_arange_node == nullptr)
+            << "IRNNNodeParser::parseNNNode<NN::AtenArangeNode>() => wrong node type!";
+
+    auto start = aten_arange_node->start();
+    auto step = aten_arange_node->step();
+    auto dtype = aten_arange_node->dtype();
+    auto layout = aten_arange_node->layout();
+    auto pim_memory = aten_arange_node->pin_memory();
+
+    return std::make_unique<nn_ir::AtenArangeNode>(node_info, start, step, dtype, layout, pim_memory);
+}
+
+template <>
+std::unique_ptr<nn_ir::NNNode>
+IRNNNodeParser::parseNNNode<IR::NNNode::AnyType_AtenAsTensorNode>(const IR::NnNode*      ir_node,
+                                                                  const nn_ir::NodeInfo& node_info) {
+    auto aten_as_tensor_node = ir_node->nn_node_as_AtenAsTensorNode();
+    Log::IR::E_IF(aten_as_tensor_node == nullptr)
+            << "IRNNNodeParser::parseNNNode<NN::AtenAsTensorNode>() => wrong node type!";
+
+    auto dtype = aten_as_tensor_node->dtype();
+    auto device = aten_as_tensor_node->device();
+
+    return std::make_unique<nn_ir::AtenAsTensorNode>(node_info, dtype, device);
 }
 
 template <>
