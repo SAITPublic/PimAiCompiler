@@ -220,10 +220,15 @@ class AtenMatmulNode;
 class AtenMaxNode;
 class AtenNeNode;
 class AtenNegNode;
+class AtenPackPaddedSequenceNode;
+class AtenPadPackedSequenceNode;
+class AtenPowNode;
 class AtenReluNode;
 class AtenSelectNode;
+class AtenSetItemNode;
 class AtenSizeNode;
 class AtenSliceNode;
+class AtenSoftmaxNode;
 class AtenSubNode;
 class AtenTensorNode;
 class AtenToNode;
@@ -363,10 +368,15 @@ enum class NodeType {
     ATENMAX,
     ATENNE,
     ATENNEG,
+    ATENPACKPADDEDSEQUENCE,
+    ATENPADPACKEDSEQUENCE,
+    ATENPOW,
     ATENRELU,
     ATENSELECT,
+    ATENSETITEM,
     ATENSIZE,
     ATENSLICE,
+    ATENSOFTMAX,
     ATENSUB,
     ATENTENSOR,
     ATENTO,
@@ -466,10 +476,15 @@ inline std::ostream& operator<<(std::ostream& s, nn_ir::NodeType type) {
         ENUM_STR(ATENMAX)
         ENUM_STR(ATENNE)
         ENUM_STR(ATENNEG)
+        ENUM_STR(ATENPACKPADDEDSEQUENCE)
+        ENUM_STR(ATENPADPACKEDSEQUENCE)
+        ENUM_STR(ATENPOW)
         ENUM_STR(ATENRELU)
         ENUM_STR(ATENSELECT)
+        ENUM_STR(ATENSETITEM)
         ENUM_STR(ATENSIZE)
         ENUM_STR(ATENSLICE)
+        ENUM_STR(ATENSOFTMAX)
         ENUM_STR(ATENSUB)
         ENUM_STR(ATENTENSOR)
         ENUM_STR(ATENTO)
