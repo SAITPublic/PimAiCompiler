@@ -584,7 +584,8 @@ IRNNNodeParser::parseNNNode<IR::NNNode::AnyType_AtenExpandNode>(const IR::NnNode
     Log::IR::E_IF(aten_expand_node == nullptr)
         << "IRNNNodeParser::parseNNNode<NN::AtenExpandNode>() => wrong node type!";
 
-    return std::make_unique<nn_ir::AtenExpandNode>(node_info);
+    int implicit = aten_expand_node->implicit();
+    return std::make_unique<nn_ir::AtenExpandNode>(node_info, implicit);
 }
 
 template <>

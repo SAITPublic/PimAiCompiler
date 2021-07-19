@@ -21,9 +21,17 @@ namespace nn_ir {
 
 class AtenExpandNode : public NodeMixin<AtenExpandNode, NNNode> {
  public:
-    explicit AtenExpandNode(const NodeInfo& node_info): NodeMixin(node_info, NodeType::ATENEXPAND) {}
+    explicit AtenExpandNode(const NodeInfo& node_info, int implicit):
+            NodeMixin(node_info, NodeType::ATENEXPAND), implicit_(implicit) {}
 
     std::string getNodeTypeAsString(void) const override { return "AtenExpand"; }
+
+    void setImplicit(int implicit) { implicit_ = implicit; }
+
+    int getImplicit() { return implicit_; }
+
+private:
+    int implicit_;
 }; // class AtenExpandNode
 
 } // namespace nn_ir

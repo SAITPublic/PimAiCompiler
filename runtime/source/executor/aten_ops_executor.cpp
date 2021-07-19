@@ -186,14 +186,14 @@ void executorAtenDeriveIndex(const nncir::Node& op_node, StreamExecutor& stream_
 
     if (nn_compiler::nn_ir::isDefaultValue<int64_t>(index)) {
         auto& index_data_edge = cast<nncir::DataEdge>(derive_index_node.getInEdge(edge_id));
-        input_blob_id    = index_data_edge.getBlobId();
+        input_blob_id = index_data_edge.getBlobId();
         iv = stream_executor.findBlob(input_blob_id).second;
         index = iv.toInt();
         edge_id++;
     }
     if (nn_compiler::nn_ir::isDefaultValue<int64_t>(step)) {
         auto& step_data_edge = cast<nncir::DataEdge>(derive_index_node.getInEdge(edge_id));
-        input_blob_id    = step_data_edge.getBlobId();
+        input_blob_id = step_data_edge.getBlobId();
         iv = stream_executor.findBlob(input_blob_id).second;
         step = iv.toInt();
         edge_id++;
@@ -378,6 +378,36 @@ void executorAtenEq(const nncir::Node& op_node, StreamExecutor& stream_executor)
     }
 }
 
+void executorAtenExpand(const nncir::Node& op_node, StreamExecutor& stream_executor)
+{
+    DLOG(INFO) << "execute Aten Expand node";
+
+    auto expand_node = cast<nncir::AtenExpandNode>(op_node);
+
+    auto& input_self = cast<nncir::DataEdge>(expand_node.getInEdge(0));
+    auto& input_size = cast<nncir::DataEdge>(expand_node.getInEdge(1));
+
+    // Get input blob
+    int input_self_blob_id = input_self.getBlobId();
+    int input_size_blob_id = input_size.getBlobId();
+
+    // Find the input blob
+    torch::jit::IValue iv_self = stream_executor.findBlob(input_self_blob_id).second;
+    torch::jit::IValue iv_size = stream_executor.findBlob(input_size_blob_id).second;
+    assert(iv_self.isTensor());
+    assert(iv_size.isList());
+
+    auto self_tensor = iv_self.toTensor();
+    auto size_ivalue_list = iv_size.toListRef();
+    auto size_list = parseIValueArrayRef<int64_t>(size_ivalue_list);
+    auto implicit = expand_node.getImplicit();
+
+    auto output = nnrt::atenExpand(self_tensor, size_list, implicit);
+    // update output
+    auto& out_edge = cast<nncir::DataEdge>(expand_node.getFirstOutEdge());
+    stream_executor.updateBlob(out_edge.getBlobId(), DataType::TENSOR, tensorToIValue(output));
+}
+
 void executorAtenFormat(const nncir::Node& op_node, StreamExecutor& stream_executor) {
     DLOG(INFO) << "execute Aten Format node";
 
@@ -435,12 +465,6 @@ void executorAtenFormat(const nncir::Node& op_node, StreamExecutor& stream_execu
     } else {
         DLOG(ERROR) << "Unsupported input type for aten::format";
     }
-}
-
-void executorAtenExpand(const nncir::Node& op_node, StreamExecutor& stream_executor)
-{
-    DLOG(INFO) << "execute Aten Expand node";
-    // TODO need getImpilicit() method from atenExpand node.
 }
 
 void executorAtenGt(const nncir::Node& op_node, StreamExecutor& stream_executor)
