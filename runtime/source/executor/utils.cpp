@@ -45,32 +45,6 @@ at::ScalarType convertDTypeToATScalarType(nncir::DataType dtype)
     }
 }
 
-at::ScalarType convertIntToATScalarType(const int64_t& dtype) {
-    // according to: pytorch/c10/core/ScalarType.h
-    switch (dtype) {
-        case 0:
-            return at::ScalarType::Byte;
-        case 1:
-            return at::ScalarType::Char;
-        case 2:
-            return at::ScalarType::Short;
-        case 3:
-            return at::ScalarType::Int;
-        case 4:
-            return at::ScalarType::Long;
-        case 5:
-            return at::ScalarType::Half;
-        case 6:
-            return at::ScalarType::Float;
-        case 7:
-            return at::ScalarType::Double;
-        case 11:
-            return at::ScalarType::Bool;
-        default:
-            DLOG(ERROR) << "Complex type has not been supported.";
-    }
-}
-
 at::MemoryFormat getMemoryFormat(int optional_memory_format)
 {
     // according to: pytorch/c10/core/MemoryFormat.h
