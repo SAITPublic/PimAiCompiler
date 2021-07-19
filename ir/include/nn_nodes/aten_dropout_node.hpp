@@ -24,22 +24,20 @@ namespace nn_ir {
 
 class AtenDropoutNode : public NodeMixin<AtenDropoutNode, NNNode> {
  public:
-    explicit AtenDropoutNode(const NodeInfo&        node_info,
-                             float                 proportion,
-                             bool                      train)
+    explicit AtenDropoutNode(const NodeInfo& node_info, float proportion, int train)
     : NodeMixin(node_info, NodeType::ATENDROPOUT), proportion_(proportion), train_(train) {}
 
     std::string getNodeTypeAsString() const override { return "AtenDropout"; }
 
     void setProportion(float proportion) { proportion_ = proportion; }
-    void setTrain(bool train) { train_ = train; }
+    void setTrain(int train) { train_ = train; }
 
     float getProportion() { return proportion_; }
-    bool getTrain() { return train_; }
+    int getTrain() { return train_; }
 
  private:
     float proportion_;
-    bool       train_;
+    int train_;
 }; // class AtenDropoutNode
 
 } // namespace nn_ir

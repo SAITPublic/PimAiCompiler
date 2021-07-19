@@ -22,35 +22,35 @@ namespace nn_ir {
 class AtenToNode : public NodeMixin<AtenToNode, NNNode> {
  public:
     explicit AtenToNode(const NodeInfo&     node_info,
-                        DataType            dtype,
-                        bool                non_blocking,
-                        bool                copy,
+                        int64_t             dtype,
+                        int                 non_blocking,
+                        int                 copy,
                         int                 optional_memory_format)
         : NodeMixin(node_info, NodeType::ATENTO), dtype_(dtype), non_blocking_(non_blocking),
           copy_(copy), optional_memory_format_(optional_memory_format) {}
 
     std::string getNodeTypeAsString(void) const override { return "AtenTo"; }
 
-    void setDType(DataType dtype) { dtype_ = dtype; }
+    void setDType(int64_t dtype) { dtype_ = dtype; }
 
-    DataType getDType() { return dtype_; }
+    int64_t getDType() { return dtype_; }
 
-    void setNonBlocking(bool non_blocking) { non_blocking_ = non_blocking; }
+    void setNonBlocking(int non_blocking) { non_blocking_ = non_blocking; }
 
-    bool getNonBlocking() { return non_blocking_; }
+    int getNonBlocking() { return non_blocking_; }
 
-    void setCopy(bool copy) { copy_ = copy; }
+    void setCopy(int copy) { copy_ = copy; }
 
-    bool getCopy() { return copy_; }
+    int getCopy() { return copy_; }
 
     void setOptionalMemoryFormat(int optional_memory_format) { optional_memory_format_ = optional_memory_format; }
 
     int getOptionalMemoryFormat() { return optional_memory_format_; }
 
  private:
-    DataType dtype_ = DataType::NONE;
-    bool non_blocking_ = false;
-    bool copy_ = false;
+    int64_t dtype_;
+    int non_blocking_;
+    int copy_;
     int optional_memory_format_ = -1;
 }; // class AtenToNode
 

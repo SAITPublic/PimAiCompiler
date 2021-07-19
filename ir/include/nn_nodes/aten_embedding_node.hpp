@@ -22,24 +22,24 @@ namespace nn_ir {
 class AtenEmbeddingNode : public NodeMixin<AtenEmbeddingNode, NNNode> {
  public:
     explicit AtenEmbeddingNode(const NodeInfo& node_info, int64_t padding_idx,
-                                bool scale_grad_by_freq, bool sparse)
+                                int scale_grad_by_freq, int sparse)
                                 : NodeMixin(node_info, NodeType::ATENEMBEDDING), padding_idx_(padding_idx), 
                                 scale_grad_by_freq_(scale_grad_by_freq), sparse_(sparse) {}
 
     std::string getNodeTypeAsString(void) const override { return "AtenEmbedding"; }
 
     void setPaddingIdx(int64_t padding_idx) { padding_idx_ = padding_idx;}
-    void setScaleGradByFreq(bool scale_grad_by_freq) { scale_grad_by_freq_ = scale_grad_by_freq; }
-    void setSparse(bool sparse) { sparse_ = sparse; }
+    void setScaleGradByFreq(int scale_grad_by_freq) { scale_grad_by_freq_ = scale_grad_by_freq; }
+    void setSparse(int sparse) { sparse_ = sparse; }
 
     int64_t  getPaddingIdx() { return padding_idx_; }
-    bool getScaleGradByFreq() { return scale_grad_by_freq_; }
-    bool getSparse() { return sparse_; }
+    int getScaleGradByFreq() { return scale_grad_by_freq_; }
+    int getSparse() { return sparse_; }
 
  private:
     int64_t padding_idx_;
-    bool scale_grad_by_freq_;
-    bool sparse_;
+    int scale_grad_by_freq_;
+    int sparse_;
 }; // class AtenEmbeddingNode
 
 } // namespace nn_ir

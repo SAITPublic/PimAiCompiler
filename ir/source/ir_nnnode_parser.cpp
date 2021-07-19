@@ -501,7 +501,7 @@ IRNNNodeParser::parseNNNode<IR::NNNode::AnyType_AtenCopyNode>(const IR::NnNode* 
     Log::IR::E_IF(aten_copy_node == nullptr)
         << "IRNNNodeParser::parseNNNode<NN::AtenCopyNode>() => wrong node type!";
 
-    bool non_blocking = aten_copy_node->non_blocking();
+    int non_blocking = aten_copy_node->non_blocking();
 
     return std::make_unique<nn_ir::AtenCopyNode>(node_info, non_blocking);
 }
@@ -547,7 +547,7 @@ IRNNNodeParser::parseNNNode<IR::NNNode::AnyType_AtenDropoutNode>(const IR::NnNod
         << "IRNNNodeParser::parseNNNode<NN::AtenDropoutNode>() => wrong node type!";
 
     float proportion = aten_dropout_node->proportion();
-    bool  train      = aten_dropout_node->train();
+    int  train = aten_dropout_node->train();
     return std::make_unique<nn_ir::AtenDropoutNode>(node_info, proportion, train);
 }
 
@@ -560,8 +560,8 @@ IRNNNodeParser::parseNNNode<IR::NNNode::AnyType_AtenEmbeddingNode>(const IR::NnN
         << "IRNNNodeParser::parseNNNode<NN::AtenEmbeddingNode>() => wrong node type!";
 
     int64_t padding_idx = aten_embedding_node->padding_idx();
-    bool    scale_grad_by_freq = aten_embedding_node->scale_grad_by_freq();
-    bool    sparse = aten_embedding_node->sparse();
+    int scale_grad_by_freq = aten_embedding_node->scale_grad_by_freq();
+    int sparse = aten_embedding_node->sparse();
 
     return std::make_unique<nn_ir::AtenEmbeddingNode>(node_info, padding_idx, scale_grad_by_freq, sparse);
 }
@@ -739,9 +739,9 @@ IRNNNodeParser::parseNNNode<IR::NNNode::AnyType_AtenLSTMNode>(const IR::NnNode* 
     float   has_biases     = aten_lstm_node->has_biases();
     int64_t num_layer      = aten_lstm_node->num_layers();
     double  dropout        = aten_lstm_node->dropout();
-    bool    train          = aten_lstm_node->train();
-    bool    bidirectional  = aten_lstm_node->bidirectional();
-    bool    batch_first    = aten_lstm_node->batch_first();
+    int train          = aten_lstm_node->train();
+    int bidirectional  = aten_lstm_node->bidirectional();
+    int batch_first    = aten_lstm_node->batch_first();
 
     auto weight_blob_id = makeDataArrFromVector<int64_t>(aten_lstm_node->weight_blob_ids());
     auto bias_blob_id   = makeDataArrFromVector<int64_t>(aten_lstm_node->bias_blob_ids());
@@ -985,10 +985,9 @@ IRNNNodeParser::parseNNNode<IR::NNNode::AnyType_AtenToNode>(const IR::NnNode*   
     auto aten_to_node = ir_node->nn_node_as_AtenToNode();
     Log::IR::E_IF(aten_to_node == nullptr) << "IRNNNodeParser::parseNNNode<NN::AtenToNode>() => wrong node type!";
 
-    // Fixme(SRCX): Cast should be done in GraphGen ir builder?
-    nn_ir::DataType dtype = convertIrTypeToNNIr(static_cast<IR::Type::DataType>(aten_to_node->dtype()));
-    bool non_blocking = aten_to_node->non_blocking();
-    bool copy = aten_to_node->copy();
+    int64_t dtype = aten_to_node->dtype();
+    int non_blocking = aten_to_node->non_blocking();
+    int copy = aten_to_node->copy();
     int optional_memory_format = aten_to_node->optional_memory_format();
 
     return std::make_unique<nn_ir::AtenToNode>(node_info, dtype, non_blocking, copy, optional_memory_format);

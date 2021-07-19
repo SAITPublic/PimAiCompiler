@@ -21,15 +21,15 @@ namespace nn_ir {
 
 class AtenCopyNode : public NodeMixin<AtenCopyNode, NNNode> {
  public:
-    explicit AtenCopyNode(const NodeInfo& node_info, bool non_blocking)
+    explicit AtenCopyNode(const NodeInfo& node_info, int non_blocking)
         : NodeMixin(node_info, NodeType::ATENCOPY), non_blocking_(non_blocking) {}
 
     std::string getNodeTypeAsString() const override { return "AtenCopy"; }
 
-    bool getNonBlocking() const { return non_blocking_; }
+    int getNonBlocking() const { return non_blocking_; }
 
  private:
-    bool non_blocking_;
+    int non_blocking_;
 }; // class AtenCopyNode
 
 } // namespace nn_ir

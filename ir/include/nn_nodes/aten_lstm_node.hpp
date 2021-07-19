@@ -25,12 +25,12 @@ namespace nn_ir {
 class AtenLSTMNode : public NodeMixin<AtenLSTMNode, NNNode> {
  public:
     explicit AtenLSTMNode(const NodeInfo&                 node_info,
-                             bool                        has_biases,
+                             int                         has_biases,
                              int64_t                      num_layer,
                              double                         dropout,
-                             bool                             train,
-                             bool                     bidirectional,
-                             bool                       batch_first,
+                             int                              train,
+                             int                      bidirectional,
+                             int                        batch_first,
                              std::vector<int64_t>              weight_blob_ids,
                              std::vector<int64_t>                bias_blob_ids)
      : NodeMixin(node_info, NodeType::ATENLSTM), has_biases_(has_biases), num_layers_(num_layer),
@@ -64,19 +64,19 @@ class AtenLSTMNode : public NodeMixin<AtenLSTMNode, NNNode> {
        return bias_blobs;
     }
 
-    void setHasBiases(bool has_biases) { has_biases_ = has_biases; }
+    void setHasBiases(int has_biases) { has_biases_ = has_biases; }
     void setNumLayers(int64_t num_layers) { num_layers_ = num_layers;}
     void setDropout(double dropout) { dropout_ = dropout; }
-    void setTrain(bool train) { train_ = train; }
-    void setBidirectional(bool bidirectional) { bidirectional_ = bidirectional; }
-    void setBatchFirst(bool batch_first) { batch_first_ = batch_first; }
+    void setTrain(int train) { train_ = train; }
+    void setBidirectional(int bidirectional) { bidirectional_ = bidirectional; }
+    void setBatchFirst(int batch_first) { batch_first_ = batch_first; }
 
-    bool     getHasBiases() { return has_biases_; }
+    int     getHasBiases() { return has_biases_; }
     int64_t  getNumLayers() { return num_layers_; }
     double   getDropout() { return dropout_; }
-    bool     getTrain() { return train_; }
-    bool     getBidirectional() { return bidirectional_; }
-    bool     getBatchFirst() { return batch_first_; }
+    int     getTrain() { return train_; }
+    int     getBidirectional() { return bidirectional_; }
+    int     getBatchFirst() { return batch_first_; }
 
     std::vector<Shape4D> getPreprocessedWeightBlobDim() const override {
        std::vector<Shape4D> weight_blob_shapes;
@@ -88,12 +88,12 @@ class AtenLSTMNode : public NodeMixin<AtenLSTMNode, NNNode> {
     }
 
  private:
-    bool            has_biases_;
+    int             has_biases_;
     int64_t         num_layers_;
     double             dropout_;
-    bool                 train_;
-    bool         bidirectional_;
-    bool           batch_first_;
+    int                  train_;
+    int          bidirectional_;
+    int            batch_first_;
 
     std::vector<int64_t>       weight_blob_ids_;
     std::vector<int64_t>         bias_blob_ids_;
