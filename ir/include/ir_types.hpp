@@ -207,8 +207,13 @@ class AtenEmbeddingNode;
 class AtenEqNode;
 class AtenExpandNode;
 class AtenFormatNode;
+class AtenGatherNode;
+class AtenGeNode;
 class AtenGetItemNode;
 class AtenGtNode;
+class AtenIndexNode;
+class AtenIndexPutNode;
+class AtenIndexSelectNode;
 class AtenIntNode;
 class AtenIsNode;
 class AtenItemNode;
@@ -355,8 +360,13 @@ enum class NodeType {
     ATENEQ,
     ATENEXPAND,
     ATENFORMAT,
+    ATENGATHER,
+    ATENGE,
     ATENGETITEM,
     ATENGT,
+    ATENINDEX,
+    ATENINDEXPUT,
+    ATENINDEXSELECT,
     ATENINT,
     ATENIS,
     ATENITEM,
@@ -463,8 +473,13 @@ inline std::ostream& operator<<(std::ostream& s, nn_ir::NodeType type) {
         ENUM_STR(ATENEQ)
         ENUM_STR(ATENEXPAND)
         ENUM_STR(ATENFORMAT)
+        ENUM_STR(ATENGATHER)
+        ENUM_STR(ATENGE)
         ENUM_STR(ATENGETITEM)
         ENUM_STR(ATENGT)
+        ENUM_STR(ATENINDEX)
+        ENUM_STR(ATENINDEXPUT)
+        ENUM_STR(ATENINDEXSELECT)
         ENUM_STR(ATENINT)
         ENUM_STR(ATENIS)
         ENUM_STR(ATENITEM)
