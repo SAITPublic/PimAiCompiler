@@ -37,6 +37,7 @@ The NNRuntime Python extension is installed in `/opt/rocm/lib/`, named `Nnrt.cpy
 ```
 export PYTHONPATH=$PYTHONPATH:/opt/rocm/lib/
 python3 simpleMain.py
+
 ```
 
 

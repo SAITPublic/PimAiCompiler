@@ -156,8 +156,6 @@ void executePrimDtype(const nncir::Node& op_node, StreamExecutor& stream_executo
 }
 
 
-
-
 void executePrimListConstruct(const nncir::Node& op_node, StreamExecutor& stream_executor)
 {
     DLOG(INFO) << "execute PrimListConstruct node";
