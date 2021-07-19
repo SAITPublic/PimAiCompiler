@@ -59,11 +59,17 @@ bool OpBasicUtil::isAtenOp(const nn_ir::Node& node) const {
                 nn_ir::AtenSizeNode,
                 nn_ir::AtenSliceNode,
                 nn_ir::AtenSoftmaxNode,
+                nn_ir::AtenSqueezeNode,
                 nn_ir::AtenSubNode,
+                nn_ir::AtenSumNode,
+                nn_ir::AtenTanhNode,
                 nn_ir::AtenTensorNode,
                 nn_ir::AtenTransposeNode,
                 nn_ir::AtenToNode,
+                nn_ir::AtenTopkNode,
                 nn_ir::AtenUnsqueezeNode,
+                nn_ir::AtenViewNode,
+                nn_ir::AtenWarnNode,
                 nn_ir::AtenZerosLikeNode,
                 nn_ir::AtenZerosNode>(nn_node)) {
             return true;

@@ -246,11 +246,17 @@ class AtenSetItemNode;
 class AtenSizeNode;
 class AtenSliceNode;
 class AtenSoftmaxNode;
+class AtenSqueezeNode;
 class AtenSubNode;
+class AtenSumNode;
+class AtenTanhNode;
 class AtenTensorNode;
 class AtenToNode;
+class AtenTopkNode;
 class AtenTransposeNode;
 class AtenUnsqueezeNode;
+class AtenViewNode;
+class AtenWarnNode;
 class AtenZerosLikeNode;
 class AtenZerosNode;
 
@@ -411,11 +417,17 @@ enum class NodeType {
     ATENSIZE,
     ATENSLICE,
     ATENSOFTMAX,
+    ATENSQUEEZE,
     ATENSUB,
+    ATENSUM,
+    ATENTANH,
     ATENTENSOR,
     ATENTO,
+    ATENTOPK,
     ATENTRANSPOSE,
     ATENUNSQUEEZE,
+    ATENVIEW,
+    ATENWARN,
     ATENZEROS,
     ATENZEROSLIKE,
     LastNNNode, // end describing nn nodes
@@ -536,11 +548,17 @@ inline std::ostream& operator<<(std::ostream& s, nn_ir::NodeType type) {
         ENUM_STR(ATENSIZE)
         ENUM_STR(ATENSLICE)
         ENUM_STR(ATENSOFTMAX)
+        ENUM_STR(ATENSQUEEZE)
         ENUM_STR(ATENSUB)
+        ENUM_STR(ATENSUM)
+        ENUM_STR(ATENTANH)
         ENUM_STR(ATENTENSOR)
         ENUM_STR(ATENTO)
+        ENUM_STR(ATENTOPK)
         ENUM_STR(ATENTRANSPOSE)
         ENUM_STR(ATENUNSQUEEZE)
+        ENUM_STR(ATENVIEW)
+        ENUM_STR(ATENWARN)
         ENUM_STR(ATENZEROS)
         ENUM_STR(ATENZEROSLIKE)
 
