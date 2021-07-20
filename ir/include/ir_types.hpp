@@ -207,6 +207,9 @@ class AtenCatNode;
 class AtenCeilNode;
 class AtenChunkNode;
 class AtenClampNode;
+class AtenClearNode;
+class AtenContiguousNode;
+class AtenConv2dNode;
 class AtenCopyNode;
 class AtenCpuNode;
 class AtenCudaNode;
@@ -391,6 +394,9 @@ enum class NodeType {
     ATENCEIL,
     ATENCHUNK,
     ATENCLAMP,
+    ATENCLEAR,
+    ATENCONTIGUOUS,
+    ATENCONV2D,
     ATENCOPY,
     ATENCPU,
     ATENCUDA,
@@ -535,6 +541,9 @@ inline std::ostream& operator<<(std::ostream& s, nn_ir::NodeType type) {
         ENUM_STR(ATENCEIL)
         ENUM_STR(ATENCHUNK)
         ENUM_STR(ATENCLAMP)
+        ENUM_STR(ATENCLEAR)
+        ENUM_STR(ATENCONTIGUOUS)
+        ENUM_STR(ATENCONV2D)
         ENUM_STR(ATENCOPY)
         ENUM_STR(ATENCPU)
         ENUM_STR(ATENCUDA)

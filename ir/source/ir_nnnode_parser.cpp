@@ -605,6 +605,49 @@ IRNNNodeParser::parseNNNode<IR::NNNode::AnyType_AtenClampNode>(const IR::NnNode*
 
 template <>
 std::unique_ptr<nn_ir::NNNode>
+IRNNNodeParser::parseNNNode<IR::NNNode::AnyType_AtenClearNode>(const IR::NnNode*      ir_node,
+                                                               const nn_ir::NodeInfo& node_info) {
+    auto aten_clear_node = ir_node->nn_node_as_AtenClearNode();
+    Log::IR::E_IF(aten_clear_node == nullptr)
+            << "IRNNNodeParser::parseNNNode<NN::AtenClearNode>() => wrong node type!";
+
+    return std::make_unique<nn_ir::AtenClearNode>(node_info);
+}
+
+template <>
+std::unique_ptr<nn_ir::NNNode>
+IRNNNodeParser::parseNNNode<IR::NNNode::AnyType_AtenContiguousNode>(const IR::NnNode*      ir_node,
+                                                                    const nn_ir::NodeInfo& node_info) {
+    auto aten_contiguous_node = ir_node->nn_node_as_AtenContiguousNode();
+    Log::IR::E_IF(aten_contiguous_node == nullptr)
+            << "IRNNNodeParser::parseNNNode<NN::AtenContiguousNode>() => wrong node type!";
+
+    auto memory_format = aten_contiguous_node->memory_format();
+    return std::make_unique<nn_ir::AtenContiguousNode>(node_info, memory_format);
+}
+
+template <>
+std::unique_ptr<nn_ir::NNNode>
+IRNNNodeParser::parseNNNode<IR::NNNode::AnyType_AtenConv2dNode>(const IR::NnNode*      ir_node,
+                                                                const nn_ir::NodeInfo& node_info) {
+    auto aten_conv2d_node = ir_node->nn_node_as_AtenConv2dNode();
+    Log::IR::E_IF(aten_conv2d_node == nullptr)
+            << "IRNNNodeParser::parseNNNode<NN::AtenConv2dNode>() => wrong node type!";
+
+    auto weight_blob_id = makeDataArrFromVector<int64_t>(aten_conv2d_node->weight_blob_ids());
+    auto bias_blob_id   = makeDataArrFromVector<int64_t>(aten_conv2d_node->bias_blob_ids());
+
+    nn_ir::Shape2D stride   = std::get<nn_ir::Shape2D>(nn_ir::parseParam(aten_conv2d_node->stride()));
+    nn_ir::Shape2D dilation = std::get<nn_ir::Shape2D>(nn_ir::parseParam(aten_conv2d_node->dilation()));
+    nn_ir::Pad4    padding  = std::get<nn_ir::Pad4>(nn_ir::parseParam(aten_conv2d_node->padding()));
+    int64_t groups = aten_conv2d_node->groups();
+
+    return std::make_unique<nn_ir::AtenConv2dNode>(node_info, weight_blob_id, bias_blob_id,
+                                                   stride, padding, dilation, groups);
+}
+
+template <>
+std::unique_ptr<nn_ir::NNNode>
 IRNNNodeParser::parseNNNode<IR::NNNode::AnyType_AtenCopyNode>(const IR::NnNode*      ir_node,
                                                               const nn_ir::NodeInfo& node_info) {
     auto aten_copy_node = ir_node->nn_node_as_AtenCopyNode();
