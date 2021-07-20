@@ -200,8 +200,13 @@ class AtenAnyNode;
 class AtenAppendNode;
 class AtenArangeNode;
 class AtenAsTensorNode;
+class AtenBitwiseNotNode;
+class AtenBmmNode;
+class AtenBoolNode;
 class AtenCatNode;
 class AtenCeilNode;
+class AtenChunkNode;
+class AtenClampNode;
 class AtenCopyNode;
 class AtenDeriveIndexNode;
 class AtenDimNode;
@@ -371,8 +376,13 @@ enum class NodeType {
     ATENAPPEND,
     ATENARANGE,
     ATENASTENSOR,
+    ATENBITWISENOT,
+    ATENBMM,
+    ATENBOOL,
     ATENCAT,
     ATENCEIL,
+    ATENCHUNK,
+    ATENCLAMP,
     ATENCOPY,
     ATENDERIVEINDEX,
     ATENDIM,
@@ -502,8 +512,13 @@ inline std::ostream& operator<<(std::ostream& s, nn_ir::NodeType type) {
         ENUM_STR(ATENAPPEND)
         ENUM_STR(ATENARANGE)
         ENUM_STR(ATENASTENSOR)
+        ENUM_STR(ATENBITWISENOT)
+        ENUM_STR(ATENBMM)
+        ENUM_STR(ATENBOOL)
         ENUM_STR(ATENCAT)
         ENUM_STR(ATENCEIL)
+        ENUM_STR(ATENCHUNK)
+        ENUM_STR(ATENCLAMP)
         ENUM_STR(ATENCOPY)
         ENUM_STR(ATENDERIVEINDEX)
         ENUM_STR(ATENDIM)
