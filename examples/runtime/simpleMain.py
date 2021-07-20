@@ -56,7 +56,5 @@ if __name__ == '__main__':
     if_ir_file = os.path.join(current_dir, 'ir_files/simple_if_net/if_frontend_3.ir')
 
     # inference & compare result
-    # test_simple_add_net(add_ir_file)
+    test_simple_add_net(add_ir_file)
     test_simple_loop_net(loop_ir_files)
-
-    # test_simple_if_net(if_ir_file)

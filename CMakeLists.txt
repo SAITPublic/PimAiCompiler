@@ -21,6 +21,9 @@ endif()
 add_definitions(-DC10_USE_GLOG)
 add_definitions(-D_GLIBCXX_USE_CXX11_ABI=1)
 
+# for debug, don't optimize variables
+add_definitions(-O0 -g -w)   # close warning
+
 #include(Torch.cmake)
 include_directories("${PROJECT_SOURCE_DIR}"
                     "${PROJECT_SOURCE_DIR}/runtime/include"

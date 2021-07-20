@@ -9,6 +9,7 @@
 #include "ir/include/data_edge.hpp"
 #include "ir/include/edge.hpp"
 #include "ir/include/nn_ir.hpp"
+#include "ir/include/common/utils.hpp"
 
 namespace nnrt
 {
@@ -542,6 +543,11 @@ void executePrimLoopIndex(const nncir::Node& op_node, StreamExecutor& stream_exe
         loop_index = 0;
     }
 
+    // check LoopIndex != INT64_MAX,  INT64_MAX is a default value, so LoopIndex need to be re-initialize
+    if (nncir::isDefaultValue<int64_t>(loop_index)){
+        loop_index = 0;
+    }
+
     // LoopIndexNode only has one blob
     int out_blob_id = getOutBlobIds(*loop_index_node)[0];
     stream_executor.updateBlob(out_blob_id, DataType::INT64, scalarToIValue<int64_t>(loop_index));
@@ -637,8 +643,19 @@ void executePrimLoop(const nncir::Node& op_node, StreamExecutor& stream_executor
     auto loop_node = cast_if<nncir::PrimLoopNode>(op_node);
     int64_t loop_node_id = loop_node->getId();
     
+    // ref: torch_jit Loop: https://github.com/pytorch/pytorch/blob/master/torch/csrc/jit/OVERVIEW.md#loops
     int64_t loop_cond = loop_node->getCond();
     int64_t max_trip_cnt = loop_node->getTripCount();
+
+    // check default
+    if (nncir::isDefaultValue<int64_t>(max_trip_cnt)) {
+        // Get from loop's input[0]
+        max_trip_cnt = stream_executor.findBlob(getInBlobIds(op_node)[0]).second.toInt();
+    }
+    if (nncir::isDefaultValue<int64_t>(loop_cond)) {
+        // Get from loop's input[1]
+        loop_cond = stream_executor.findBlob(getInBlobIds(op_node)[1]).second.toInt();
+    }
 
     // loop_node.id + 1 ---> loopIndex_node
     // loop_node.id + 2 ---> PrimBlockNode
