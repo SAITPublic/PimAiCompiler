@@ -761,6 +761,16 @@ IRNNNodeParser::parseNNNode<IR::NNNode::AnyType_AtenLtNode>(const IR::NnNode*   
 }
 
 template <>
+std::unique_ptr<nn_ir::NNNode> IRNNNodeParser::parseNNNode<IR::NNNode::AnyType_AtenMaskedSelectNode>(
+    const IR::NnNode* ir_node, const nn_ir::NodeInfo& node_info)
+{
+    auto aten_masked_select_node = ir_node->nn_node_as_AtenMaskedSelectNode();
+    Log::IR::E_IF(aten_masked_select_node == nullptr)
+        << "IRNNNodeParser::parseNNNode<NN::AtenMaskedSelectNode>() => wrong node type!";
+    return std::make_unique<nn_ir::AtenMaskedSelectNode>(node_info);
+}
+
+template <>
 std::unique_ptr<nn_ir::NNNode>
 IRNNNodeParser::parseNNNode<IR::NNNode::AnyType_AtenMatmulNode>(const IR::NnNode*      ir_node,
                                                                 const nn_ir::NodeInfo& node_info) {
@@ -781,6 +791,40 @@ IRNNNodeParser::parseNNNode<IR::NNNode::AnyType_AtenMaxNode>(const IR::NnNode*  
     auto keep_dim = aten_max_node->keep_dim();
 
     return std::make_unique<nn_ir::AtenMaxNode>(node_info, dim, keep_dim);
+}
+
+template <>
+std::unique_ptr<nn_ir::NNNode> IRNNNodeParser::parseNNNode<IR::NNNode::AnyType_AtenMaxPool2dNode>(
+    const IR::NnNode* ir_node, const nn_ir::NodeInfo& node_info)
+{
+    auto aten_max_pool2d_node = ir_node->nn_node_as_AtenMaxPool2dNode();
+    Log::IR::E_IF(aten_max_pool2d_node == nullptr)
+        << "IRNNNodeParser::parseNNNode<NN::AtenMaxPool2dNode>() => wrong node type!";
+
+    auto ir_kernel_size = aten_max_pool2d_node->kernel_size();
+    auto ir_pad = aten_max_pool2d_node->pad();
+    auto ir_stride = aten_max_pool2d_node->stride();
+    auto ir_dilation = aten_max_pool2d_node->dilation();
+    auto return_indices = aten_max_pool2d_node->return_indices();
+
+    auto kernel_size = std::get<nn_ir::Shape2D>(nn_ir::parseParam(ir_kernel_size));
+    auto pad = std::get<nn_ir::Pad4>(nn_ir::parseParam(ir_pad));
+    auto stride = std::get<nn_ir::Shape2D>(nn_ir::parseParam(ir_stride));
+    auto dilation = std::get<nn_ir::Shape2D>(nn_ir::parseParam(ir_dilation));
+
+    return std::make_unique<nn_ir::AtenMaxPool2dNode>(node_info, kernel_size, pad, stride, dilation, return_indices);
+}
+
+template <>
+std::unique_ptr<nn_ir::NNNode> IRNNNodeParser::parseNNNode<IR::NNNode::AnyType_AtenMinNode>(
+    const IR::NnNode* ir_node, const nn_ir::NodeInfo& node_info)
+{
+    auto aten_min_node = ir_node->nn_node_as_AtenMinNode();
+    Log::IR::E_IF(aten_min_node == nullptr) << "IRNNNodeParser::parseNNNode<NN::AtenMinNode>() => wrong node type!";
+    auto dim_or_y = aten_min_node->dim_or_y();
+    auto keep_dim = aten_min_node->keep_dim();
+
+    return std::make_unique<nn_ir::AtenMinNode>(node_info, dim_or_y, keep_dim);
 }
 
 template <>
