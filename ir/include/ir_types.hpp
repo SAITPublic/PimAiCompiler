@@ -240,8 +240,11 @@ class AtenMatmulNode;
 class AtenMaxNode;
 class AtenMaxPool2dNode;
 class AtenMinNode;
+class AtenMulNode;
 class AtenNeNode;
 class AtenNegNode;
+class AtenNotNode;
+class AtenOnesNode;
 class AtenPackPaddedSequenceNode;
 class AtenPadPackedSequenceNode;
 class AtenPowNode;
@@ -416,8 +419,11 @@ enum class NodeType {
     ATENMAX,
     ATENMAXPOOL2D,
     ATENMIN,
+    ATENMUL,
     ATENNE,
     ATENNEG,
+    ATENNOT,
+    ATENONES,
     ATENPACKPADDEDSEQUENCE,
     ATENPADPACKEDSEQUENCE,
     ATENPOW,
@@ -552,8 +558,11 @@ inline std::ostream& operator<<(std::ostream& s, nn_ir::NodeType type) {
         ENUM_STR(ATENMAX)
         ENUM_STR(ATENMAXPOOL2D)
         ENUM_STR(ATENMIN)
+        ENUM_STR(ATENMUL)
         ENUM_STR(ATENNE)
         ENUM_STR(ATENNEG)
+        ENUM_STR(ATENNOT)
+        ENUM_STR(ATENONES)
         ENUM_STR(ATENPACKPADDEDSEQUENCE)
         ENUM_STR(ATENPADPACKEDSEQUENCE)
         ENUM_STR(ATENPOW)

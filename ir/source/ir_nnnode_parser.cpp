@@ -991,6 +991,17 @@ std::unique_ptr<nn_ir::NNNode> IRNNNodeParser::parseNNNode<IR::NNNode::AnyType_A
 
     return std::make_unique<nn_ir::AtenMinNode>(node_info, dim_or_y, keep_dim);
 }
+template <>
+std::unique_ptr<nn_ir::NNNode> IRNNNodeParser::parseNNNode<IR::NNNode::AnyType_AtenMulNode>(
+    const IR::NnNode* ir_node, const nn_ir::NodeInfo& node_info)
+{
+    auto aten_mul_node = ir_node->nn_node_as_AtenMulNode();
+    Log::IR::E_IF(aten_mul_node == nullptr) << "IRNNNodeParser::parseNNNode<NN::AtenMulNode>() => wrong node type!";
+
+    auto other = aten_mul_node->other();
+
+    return std::make_unique<nn_ir::AtenMulNode>(node_info, other);
+}
 
 template <>
 std::unique_ptr<nn_ir::NNNode>
@@ -1011,6 +1022,30 @@ IRNNNodeParser::parseNNNode<IR::NNNode::AnyType_AtenNegNode>(const IR::NnNode*  
         << "IRNNNodeParser::parseNNNode<NN::AtenNegNode>() => wrong node type!";
 
     return std::make_unique<nn_ir::AtenNegNode>(node_info);
+}
+
+template <>
+std::unique_ptr<nn_ir::NNNode> IRNNNodeParser::parseNNNode<IR::NNNode::AnyType_AtenNotNode>(
+    const IR::NnNode* ir_node, const nn_ir::NodeInfo& node_info)
+{
+    auto aten_not_node = ir_node->nn_node_as_AtenNotNode();
+    Log::IR::E_IF(aten_not_node == nullptr) << "IRNNNodeParser::parseNNNode<NN::AtenNotNode>() => wrong node type!";
+
+    return std::make_unique<nn_ir::AtenNotNode>(node_info);
+}
+
+template <>
+std::unique_ptr<nn_ir::NNNode> IRNNNodeParser::parseNNNode<IR::NNNode::AnyType_AtenOnesNode>(
+    const IR::NnNode* ir_node, const nn_ir::NodeInfo& node_info)
+{
+    auto aten_ones_node = ir_node->nn_node_as_AtenOnesNode();
+    Log::IR::E_IF(aten_ones_node == nullptr) << "IRNNNodeParser::parseNNNode<NN::AtenOnesNode>() => wrong node type!";
+    auto size = aten_ones_node->size();
+    auto dtype = aten_ones_node->dtype();
+    auto layout = aten_ones_node->layout();
+    auto device = aten_ones_node->device();
+
+    return std::make_unique<nn_ir::AtenOnesNode>(node_info, size, dtype, layout, device);
 }
 
 template <>
