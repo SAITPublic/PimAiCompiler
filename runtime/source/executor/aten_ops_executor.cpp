@@ -690,10 +690,12 @@ void executorAtenItem(const nncir::Node& op_node, StreamExecutor& stream_executo
     torch::jit::IValue iv_self = stream_executor.findBlob(input_self_blob_id).second;
     assert(iv_self.isTensor());
     at::Tensor self_tensor = iv_self.toTensor();
-    auto output = nnrt::atenItem(self_tensor);
+    c10::Scalar output = nnrt::atenItem(self_tensor);
+    auto output_dtype = convertATScalarTypeToDType(output.type());
+    
     // update output
     auto& out_edge = cast<nncir::DataEdge>(node.getFirstOutEdge());
-    stream_executor.updateBlob(out_edge.getBlobId(), DataType::UNDEFINED, torch::jit::IValue(output));
+    stream_executor.updateBlob(out_edge.getBlobId(), output_dtype, torch::jit::IValue(output));
 }
 
 void executorAtenLen(const nncir::Node& op_node, StreamExecutor& stream_executor)

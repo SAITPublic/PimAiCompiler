@@ -25,6 +25,8 @@ torch::jit::IValue strToIValue(std::string str);
 
 at::ScalarType convertDTypeToATScalarType(nncir::DataType dtype);
 
+nnrt::DataType convertATScalarTypeToDType(at::ScalarType dtype);
+
 at::MemoryFormat getMemoryFormat(int optional_memory_format);
 
 torch::jit::IValue intToIValue(const int64_t& value);
