@@ -167,8 +167,8 @@ void executePrimListConstruct(const nncir::Node& op_node, StreamExecutor& stream
 
     std::vector<torch::IValue> inputs;
     DataType type = DataType::NONE;
-    for (auto edge_id : inedges) {
-        auto& data_edge = cast<nncir::DataEdge>(list_construct_node.getInEdge(edge_id));
+    for (unsigned int i = 0; i < inedges.size(); i++) {
+        auto& data_edge = cast<nncir::DataEdge>(list_construct_node.getInEdge(i));
         int input_blob_id = data_edge.getBlobId();
         // Find the input blob
         auto value_map = stream_executor.findBlob(input_blob_id);
