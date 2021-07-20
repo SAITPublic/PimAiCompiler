@@ -22,7 +22,7 @@ void drop(std::vector<torch::jit::IValue>& stack, size_t n) { stack.erase(stack.
  * @param dtype
  * @return torch::Tensor
  */
-torch::Tensor createPtTensor(void* data_ptr, std::vector<int64_t>& shape, DataType dtype) {
+torch::Tensor createPtTensor(void* data_ptr, const std::vector<int64_t>& shape, DataType dtype) {
     c10::ScalarType scalar_type;
 
     if (dtype == DataType::FLOAT32) {
@@ -31,10 +31,12 @@ torch::Tensor createPtTensor(void* data_ptr, std::vector<int64_t>& shape, DataTy
         scalar_type = c10::ScalarType::Half;
     } else if (dtype == DataType::INT32) {
         scalar_type = c10::ScalarType::Int;
-    } else {
+    } else if(dtype == DataType::INT64) {
+        scalar_type = c10::ScalarType::Long;
+    }
+    else {
         DLOG(ERROR) << "Unsupport dtype when create Tensor";
     }
-
     auto sizes = c10::IntArrayRef(shape);
     return torch::from_blob(data_ptr, sizes, c10::TensorOptions().dtype(scalar_type));
 }

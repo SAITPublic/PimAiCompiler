@@ -33,7 +33,7 @@ void push(std::vector<torch::jit::IValue>& stack, Types&&... args)
     (void)std::initializer_list<int>{(push_one(stack, std::forward<Types>(args)), 0)...};
 }
 
-torch::Tensor createPtTensor(void* data_ptr, std::vector<int64_t>& shape, DataType dtype);
+torch::Tensor createPtTensor(void* data_ptr, const std::vector<int64_t>& shape, DataType dtype);
 
 DataType inferDataType(torch::jit::IValue ival);
 
