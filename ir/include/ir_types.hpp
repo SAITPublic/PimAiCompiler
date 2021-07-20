@@ -208,13 +208,18 @@ class AtenCeilNode;
 class AtenChunkNode;
 class AtenClampNode;
 class AtenCopyNode;
+class AtenCpuNode;
+class AtenCudaNode;
 class AtenDeriveIndexNode;
 class AtenDimNode;
 class AtenDivNode;
 class AtenDropoutNode;
 class AtenEmbeddingNode;
 class AtenEqNode;
+class AtenEqualNode;
 class AtenExpandNode;
+class AtenFillNode;
+class AtenFloorDivideNode;
 class AtenFormatNode;
 class AtenGatherNode;
 class AtenGeNode;
@@ -387,13 +392,18 @@ enum class NodeType {
     ATENCHUNK,
     ATENCLAMP,
     ATENCOPY,
+    ATENCPU,
+    ATENCUDA,
     ATENDERIVEINDEX,
     ATENDIM,
     ATENDIV,
     ATENDROPOUT,
     ATENEMBEDDING,
     ATENEQ,
+    ATENEQUAL,
     ATENEXPAND,
+    ATENFILL,
+    ATENFLOORDIVIDE,
     ATENFORMAT,
     ATENGATHER,
     ATENGE,
@@ -526,13 +536,18 @@ inline std::ostream& operator<<(std::ostream& s, nn_ir::NodeType type) {
         ENUM_STR(ATENCHUNK)
         ENUM_STR(ATENCLAMP)
         ENUM_STR(ATENCOPY)
+        ENUM_STR(ATENCPU)
+        ENUM_STR(ATENCUDA)
         ENUM_STR(ATENDERIVEINDEX)
         ENUM_STR(ATENDIM)
         ENUM_STR(ATENDIV)
         ENUM_STR(ATENDROPOUT)
         ENUM_STR(ATENEMBEDDING)
         ENUM_STR(ATENEQ)
+        ENUM_STR(ATENEQUAL)
         ENUM_STR(ATENEXPAND)
+        ENUM_STR(ATENFILL)
+        ENUM_STR(ATENFLOORDIVIDE)
         ENUM_STR(ATENFORMAT)
         ENUM_STR(ATENGATHER)
         ENUM_STR(ATENGE)

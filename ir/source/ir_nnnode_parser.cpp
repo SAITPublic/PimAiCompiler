@@ -618,6 +618,28 @@ IRNNNodeParser::parseNNNode<IR::NNNode::AnyType_AtenCopyNode>(const IR::NnNode* 
 
 template <>
 std::unique_ptr<nn_ir::NNNode>
+IRNNNodeParser::parseNNNode<IR::NNNode::AnyType_AtenCpuNode>(const IR::NnNode*      ir_node,
+                                                             const nn_ir::NodeInfo& node_info) {
+    auto aten_cpu_node = ir_node->nn_node_as_AtenCpuNode();
+    Log::IR::E_IF(aten_cpu_node == nullptr)
+            << "IRNNNodeParser::parseNNNode<NN::AtenCpuNode>() => wrong node type!";
+
+    return std::make_unique<nn_ir::AtenCpuNode>(node_info);
+}
+
+template <>
+std::unique_ptr<nn_ir::NNNode>
+IRNNNodeParser::parseNNNode<IR::NNNode::AnyType_AtenCudaNode>(const IR::NnNode*      ir_node,
+                                                              const nn_ir::NodeInfo& node_info) {
+    auto aten_cuda_node = ir_node->nn_node_as_AtenCudaNode();
+    Log::IR::E_IF(aten_cuda_node == nullptr)
+            << "IRNNNodeParser::parseNNNode<NN::AtenCudaNode>() => wrong node type!";
+
+    return std::make_unique<nn_ir::AtenCudaNode>(node_info);
+}
+
+template <>
+std::unique_ptr<nn_ir::NNNode>
 IRNNNodeParser::parseNNNode<IR::NNNode::AnyType_AtenDeriveIndexNode>(const IR::NnNode*      ir_node,
                                                                      const nn_ir::NodeInfo& node_info) {
     auto aten_derive_index_node = ir_node->nn_node_as_AtenDeriveIndexNode();
@@ -688,6 +710,16 @@ IRNNNodeParser::parseNNNode<IR::NNNode::AnyType_AtenEqNode>(const IR::NnNode*   
 
 template <>
 std::unique_ptr<nn_ir::NNNode>
+IRNNNodeParser::parseNNNode<IR::NNNode::AnyType_AtenEqualNode>(const IR::NnNode*      ir_node,
+                                                               const nn_ir::NodeInfo& node_info) {
+    auto aten_equal_node = ir_node->nn_node_as_AtenEqualNode();
+    Log::IR::E_IF(aten_equal_node == nullptr) << "IRNNNodeParser::parseNNNode<NN::AtenEqualNode>() => wrong node type!";
+
+    return std::make_unique<nn_ir::AtenEqualNode>(node_info);
+}
+
+template <>
+std::unique_ptr<nn_ir::NNNode>
 IRNNNodeParser::parseNNNode<IR::NNNode::AnyType_AtenExpandNode>(const IR::NnNode*      ir_node,
                                                                 const nn_ir::NodeInfo& node_info) {
     auto aten_expand_node = ir_node->nn_node_as_AtenExpandNode();
@@ -696,6 +728,27 @@ IRNNNodeParser::parseNNNode<IR::NNNode::AnyType_AtenExpandNode>(const IR::NnNode
 
     int implicit = aten_expand_node->implicit();
     return std::make_unique<nn_ir::AtenExpandNode>(node_info, implicit);
+}
+
+template <>
+std::unique_ptr<nn_ir::NNNode>
+IRNNNodeParser::parseNNNode<IR::NNNode::AnyType_AtenFillNode>(const IR::NnNode*      ir_node,
+                                                              const nn_ir::NodeInfo& node_info) {
+    auto aten_fill_node = ir_node->nn_node_as_AtenFillNode();
+    Log::IR::E_IF(aten_fill_node == nullptr) << "IRNNNodeParser::parseNNNode<NN::AtenFillNode>() => wrong node type!";
+
+    return std::make_unique<nn_ir::AtenFillNode>(node_info);
+}
+
+template <>
+std::unique_ptr<nn_ir::NNNode>
+IRNNNodeParser::parseNNNode<IR::NNNode::AnyType_AtenFloorDivideNode>(const IR::NnNode*      ir_node,
+                                                                     const nn_ir::NodeInfo& node_info) {
+    auto aten_floor_divide_node = ir_node->nn_node_as_AtenFloorDivideNode();
+    Log::IR::E_IF(aten_floor_divide_node == nullptr)
+            << "IRNNNodeParser::parseNNNode<NN::AtenFloorDivideNode>() => wrong node type!";
+
+    return std::make_unique<nn_ir::AtenFloorDivideNode>(node_info);
 }
 
 template <>
