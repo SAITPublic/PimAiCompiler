@@ -276,6 +276,9 @@ IRParser::IRParser() {
         {IR::CONTROLNode::AnyType_PrimEndLoopNode,
         &IRCONTROLNodeParser::parseControlNode<IR::CONTROLNode::AnyType_PrimEndLoopNode>},
 
+        {IR::CONTROLNode::AnyType_PrimGetAttrNode,
+        &IRCONTROLNodeParser::parseControlNode<IR::CONTROLNode::AnyType_PrimGetAttrNode>},
+
         {IR::CONTROLNode::AnyType_PrimInputNode,
         &IRCONTROLNodeParser::parseControlNode<IR::CONTROLNode::AnyType_PrimInputNode>},
 
@@ -300,6 +303,9 @@ IRParser::IRParser() {
         {IR::CONTROLNode::AnyType_PrimRaiseExceptionNode,
         &IRCONTROLNodeParser::parseControlNode<IR::CONTROLNode::AnyType_PrimRaiseExceptionNode>},
 
+        {IR::CONTROLNode::AnyType_PrimSetAttrNode,
+        &IRCONTROLNodeParser::parseControlNode<IR::CONTROLNode::AnyType_PrimSetAttrNode>},
+
         {IR::CONTROLNode::AnyType_PrimTupleConstructNode,
         &IRCONTROLNodeParser::parseControlNode<IR::CONTROLNode::AnyType_PrimTupleConstructNode>},
 
@@ -308,6 +314,9 @@ IRParser::IRParser() {
 
         {IR::CONTROLNode::AnyType_PrimTupleUnpackNode,
         &IRCONTROLNodeParser::parseControlNode<IR::CONTROLNode::AnyType_PrimTupleUnpackNode>},
+
+        {IR::CONTROLNode::AnyType_PrimTypeNode,
+        &IRCONTROLNodeParser::parseControlNode<IR::CONTROLNode::AnyType_PrimTypeNode>},
 
         {IR::CONTROLNode::AnyType_PrimUncheckedCastNode,
         &IRCONTROLNodeParser::parseControlNode<IR::CONTROLNode::AnyType_PrimUncheckedCastNode>},

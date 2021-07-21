@@ -316,6 +316,7 @@ class PrimDeviceNode;
 class PrimDtypeNode;
 class PrimEndIfNode;
 class PrimEndLoopNode;
+class PrimGetAttrNode;
 class PrimIfNode;
 class PrimInputNode;
 class PrimListConstructNode;
@@ -324,9 +325,11 @@ class PrimLoopIndexNode;
 class PrimLoopNode;
 class PrimOutputNode;
 class PrimRaiseExceptionNode;
+class PrimSetAttrNode;
 class PrimTupleConstructNode;
 class PrimTupleIndexNode;
 class PrimTupleUnpackNode;
+class PrimTypeNode;
 class PrimUncheckedCastNode;
 class PrimUninitializedNode;
 class PrimVariableNode;
@@ -340,6 +343,7 @@ enum class NodeType {
     PRIMDTYPE,
     PRIMENDIF,
     PRIMENDLOOP,
+    PRIMGETATTR,
     PRIMIF,
     PRIMINPUT,
     PRIMLISTCONSTRUCT,
@@ -348,9 +352,11 @@ enum class NodeType {
     PRIMLOOP,
     PRIMOUTPUT,
     PRIMRAISEEXCEPTION,
+    PRIMSETATTR,
     PRIMTUPLECONSTRUCT,
     PRIMTUPLEINDEX,
     PRIMTUPLEUNPACK,
+    PRIMTYPE,
     PRIMUNCHECKEDCAST,
     PRIMUNINITIALIZED,
     PRIMVARIABLE,
@@ -617,6 +623,7 @@ inline std::ostream& operator<<(std::ostream& s, nn_ir::NodeType type) {
         ENUM_STR(PRIMDTYPE)
         ENUM_STR(PRIMENDIF)
         ENUM_STR(PRIMENDLOOP)
+        ENUM_STR(PRIMGETATTR)
         ENUM_STR(PRIMIF)
         ENUM_STR(PRIMINPUT)
         ENUM_STR(PRIMLISTCONSTRUCT)
@@ -625,9 +632,11 @@ inline std::ostream& operator<<(std::ostream& s, nn_ir::NodeType type) {
         ENUM_STR(PRIMLOOP)
         ENUM_STR(PRIMOUTPUT)
         ENUM_STR(PRIMRAISEEXCEPTION)
+        ENUM_STR(PRIMSETATTR)
         ENUM_STR(PRIMTUPLECONSTRUCT)
         ENUM_STR(PRIMTUPLEINDEX)
         ENUM_STR(PRIMTUPLEUNPACK)
+        ENUM_STR(PRIMTYPE)
         ENUM_STR(PRIMUNCHECKEDCAST)
         ENUM_STR(PRIMUNINITIALIZED)
         ENUM_STR(PRIMVARIABLE)

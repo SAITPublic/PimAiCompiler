@@ -95,6 +95,17 @@ IRCONTROLNodeParser::parseControlNode<IR::CONTROLNode::AnyType_PrimEndLoopNode>(
 
 template <>
 std::unique_ptr<nn_ir::CONTROLNode>
+IRCONTROLNodeParser::parseControlNode<IR::CONTROLNode::AnyType_PrimGetAttrNode>(const IR::ControlNode* ir_node,
+                                                                                const nn_ir::NodeInfo& node_info) {
+    auto prim_get_attr_node = ir_node->control_node_as_PrimGetAttrNode();
+    Log::IR::E_IF(prim_get_attr_node == nullptr)
+            << "IRCONTROLNodeParser::parseControlNode<Control::PrimGetAttrNode>() => wrong node type!";
+
+    return std::make_unique<nn_ir::PrimGetAttrNode>(node_info);
+}
+
+template <>
+std::unique_ptr<nn_ir::CONTROLNode>
 IRCONTROLNodeParser::parseControlNode<IR::CONTROLNode::AnyType_PrimIfNode>(const IR::ControlNode* ir_node,
                                                                            const nn_ir::NodeInfo& node_info) {
     auto prim_if_node = ir_node->control_node_as_PrimIfNode();
@@ -190,6 +201,17 @@ IRCONTROLNodeParser::parseControlNode<IR::CONTROLNode::AnyType_PrimRaiseExceptio
 
 template <>
 std::unique_ptr<nn_ir::CONTROLNode>
+IRCONTROLNodeParser::parseControlNode<IR::CONTROLNode::AnyType_PrimSetAttrNode>(const IR::ControlNode* ir_node,
+                                                                                const nn_ir::NodeInfo& node_info) {
+    auto prim_set_attr_node = ir_node->control_node_as_PrimSetAttrNode();
+    Log::IR::E_IF(prim_set_attr_node == nullptr)
+            << "IRCONTROLNodeParser::parseControlNode<Control::PrimSetAttrNode>() => wrong node type!";
+
+    return std::make_unique<nn_ir::PrimSetAttrNode>(node_info);
+}
+
+template <>
+std::unique_ptr<nn_ir::CONTROLNode>
 IRCONTROLNodeParser::parseControlNode<IR::CONTROLNode::AnyType_PrimTupleConstructNode>
                                     (const IR::ControlNode* ir_node,
                                      const nn_ir::NodeInfo& node_info) {
@@ -221,6 +243,17 @@ IRCONTROLNodeParser::parseControlNode<IR::CONTROLNode::AnyType_PrimTupleUnpackNo
         << "IRCONTROLNodeParser::parseControlNode<Control::PrimTupleUnpackNode>() => wrong node type!";
 
     return std::make_unique<nn_ir::PrimTupleUnpackNode>(node_info);
+}
+
+template <>
+std::unique_ptr<nn_ir::CONTROLNode>
+IRCONTROLNodeParser::parseControlNode<IR::CONTROLNode::AnyType_PrimTypeNode>(const IR::ControlNode* ir_node,
+                                                                             const nn_ir::NodeInfo& node_info) {
+    auto prim_type_node = ir_node->control_node_as_PrimTypeNode();
+    Log::IR::E_IF(prim_type_node == nullptr)
+            << "IRCONTROLNodeParser::parseControlNode<Control::PrimTypeNode>() => wrong node type!";
+
+    return std::make_unique<nn_ir::PrimTypeNode>(node_info);
 }
 
 template <>
