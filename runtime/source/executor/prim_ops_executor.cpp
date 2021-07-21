@@ -181,7 +181,8 @@ void executePrimListConstruct(const nncir::Node& op_node, StreamExecutor& stream
 
     // update output
     auto& out_edge = cast<nncir::DataEdge>(list_construct_node.getFirstOutEdge());
-    stream_executor.updateBlob(out_edge.getBlobId(), DataType::LIST, scalarToIValue(inputs.at(0)));
+
+    stream_executor.updateBlob(out_edge.getBlobId(), DataType::LIST, inputs.at(0));
 }
 
 void executePrimListUnpack(const nncir::Node& op_node, StreamExecutor& stream_executor)

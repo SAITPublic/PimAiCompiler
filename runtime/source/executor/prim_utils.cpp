@@ -87,6 +87,9 @@ at::ListTypePtr inferTypeFromDataType(DataType type) {
     case DataType::STRING:
     list_type = at::ListType::ofStrings();
         break;
+    case DataType::TENSOR:
+        list_type = at::ListType::ofTensors();
+        break;
     default:
         DLOG(INFO) << "DataType do not support! ";
         break;
