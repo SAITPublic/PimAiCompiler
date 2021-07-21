@@ -1126,12 +1126,12 @@ void executorAtenSize(const nncir::Node& op_node, StreamExecutor& stream_executo
     at::Tensor tensor = iv_tensor.toTensor();
 
     int inedges_cnt = size_node.getInEdgeIds().size();
-    if (inedges_cnt == 1) {
+    auto dim = size_node.getDim();
+    if (inedges_cnt == 1 && nncir::isDefaultValue<int64_t>(dim)) {
         auto output = nnrt::atenSize(tensor);
         auto& out_edge = cast<nncir::DataEdge>(size_node.getFirstOutEdge());
         stream_executor.updateBlob(out_edge.getBlobId(), DataType::LIST, torch::jit::IValue(output));
     } else {
-        auto dim = size_node.getDim();
         if (nncir::isDefaultValue<int64_t>(dim)) {
             auto& dim_edge = cast<nncir::DataEdge>(size_node.getInEdge(1));
             int dim_blob_id = dim_edge.getBlobId();

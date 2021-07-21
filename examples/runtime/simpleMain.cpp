@@ -34,8 +34,12 @@ int main(int argc, const char* argv[]) {
     
     std::vector<torch::Tensor> input_tensors;
     // Set test inputs
-    input_tensors.push_back(torch::tensor({{1, 2, 3}, {4, 5, 6}}));
-    input_tensors.push_back(torch::tensor({{20, 2, 30}, {-4, 50, 70}}));
+    // input_tensors.push_back(torch::tensor({{1, 2, 3}, {4, 5, 6}}));
+    // input_tensors.push_back(torch::tensor({{20, 2, 30}, {-4, 50, 70}}));
+
+    // For test RNNT with one sample
+    input_tensors.push_back(torch::ones({341, 1, 240}, torch::kHalf));
+    input_tensors.push_back(torch::tensor({341}, torch::kInt64));
 
     // Inference
     auto output_tensors = runtime.inferenceModel(input_tensors);
