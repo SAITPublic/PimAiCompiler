@@ -1014,7 +1014,14 @@ void executorAtenNe(const nncir::Node& op_node, StreamExecutor& stream_executor)
     torch::jit::IValue iv_self = stream_executor.findBlob(input_self_blob_id).second;
     torch::jit::IValue iv_other = stream_executor.findBlob(input_other_blob_id).second;
 
-    if (iv_self.isTensor()) {
+    if (iv_self.isIntList() && iv_other.isIntList()){
+        c10::List<int64_t> la = iv_self.toIntList();
+        c10::List<int64_t> lb = iv_other.toIntList();
+        auto output = nnrt::atenNe(la, lb);
+        // update output
+        auto& out_edge = cast<nncir::DataEdge>(ne_node.getFirstOutEdge());
+        stream_executor.updateBlob(out_edge.getBlobId(), DataType::BOOL, boolToIValue(output));
+    } else if (iv_self.isTensor()) {
         assert(iv_other.isTensor());
         at::Tensor self_tensor = iv_self.toTensor();
         at::Tensor other_tensor = iv_other.toTensor();

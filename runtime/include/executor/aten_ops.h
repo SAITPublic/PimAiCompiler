@@ -142,6 +142,9 @@ at::Tensor atenNe(const at::Tensor &self, const at::Tensor &other);
 
 at::Tensor atenNe(const at::Tensor &self, const at::Scalar &other);
 
+template <typename  T>
+bool atenNe(const c10::List<T> &a, const c10::List<T> &b){ return a != b;}
+
 bool atenNe(const at::Scalar &self, const at::Scalar &other);
 
 at::Tensor atenNeg(const at::Tensor &self);
