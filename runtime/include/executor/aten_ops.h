@@ -152,7 +152,11 @@ at::Tensor atenSelect(const at::Tensor &self, at::Dimname dim, int64_t index);
 
 at::Tensor atenSelect(const at::Tensor &self, int64_t dim, int64_t index);
 
+std::vector<int64_t> atenSize(const at::Tensor &tensor);
+
 int64_t atenSize(const at::Tensor &tensor, int64_t dim);
+
+int64_t atenSize(const at::Tensor &self, at::Dimname dim);
 
 at::Tensor atenSlice(const at::Tensor &self, int64_t dim = 0, int64_t start = 0, int64_t end = 9223372036854775807,
                      int64_t step = 1);

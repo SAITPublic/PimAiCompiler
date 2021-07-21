@@ -34,6 +34,9 @@ torch::jit::IValue intToIValue(const int64_t& value);
 torch::jit::IValue listToIValue(const c10::List<at::IValue>& value);
 
 template <typename T>
+torch::jit::IValue vectorToIValue(const std::vector<T>& value);
+
+template <typename T>
 at::ArrayRef<T> parseIValueArrayRef(const at::ArrayRef<at::IValue>& ivalue_array) {
     assert(ivalue_array.size() > 0);
     std::vector<T> vec;

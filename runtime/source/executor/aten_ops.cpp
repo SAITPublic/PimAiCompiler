@@ -198,6 +198,8 @@ at::Tensor atenSelect(const at::Tensor &self, at::Dimname dim, int64_t index) { 
 
 at::Tensor atenSelect(const at::Tensor &self, int64_t dim, int64_t index) { return at::select(self, dim, index); }
 
+std::vector<int64_t> atenSize(const at::Tensor &tensor) { return tensor.sizes().vec(); }
+
 int64_t atenSize(const at::Tensor &tensor, int64_t dim) { return at::size(tensor, dim); }
 
 int64_t atenSize(const at::Tensor &self, at::Dimname dim) { return at::size(self, dim); }
