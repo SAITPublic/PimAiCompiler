@@ -232,8 +232,8 @@ void executePrimTupleConstruct(const nncir::Node& op_node, StreamExecutor& strea
     auto inedges = tuple_construct_node.getInEdgeIds();
 
     std::vector<torch::IValue> inputs;
-    for (auto edge_id : inedges) {
-        auto& data_edge = cast<nncir::DataEdge>(tuple_construct_node.getInEdge(edge_id));
+    for (unsigned int i = 0; i < inedges.size(); i++) {
+        auto& data_edge = cast<nncir::DataEdge>(tuple_construct_node.getInEdge(i));
         int input_blob_id = data_edge.getBlobId();
         // Find the input blob
         torch::jit::IValue iv = stream_executor.findBlob(input_blob_id).second;
@@ -430,8 +430,14 @@ void executePrimIf(const nncir::Node& op_node, StreamExecutor& stream_executor)
     int input_blob_id = data_edge.getBlobId();
     // Find the input blob, named condition, it is a int64/bool value
     torch::jit::IValue iv = stream_executor.findBlob(input_blob_id).second;
-    assert(iv.isInt());
-    int64_t condiction = iv.toInt();
+    int64_t condiction;
+    if (iv.isInt()) {
+        condiction = iv.toInt();
+    } else if (iv.isBool()) {
+        condiction = iv.toBool();
+    } else {
+        DLOG(ERROR) << "PrimIf Error, unsupport data type!";
+    }
     assert(condiction == 0 || condiction == 1);
 
     int64_t next_node_id = -1;

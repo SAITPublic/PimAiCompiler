@@ -54,6 +54,24 @@ at::ArrayRef<T> parseIValueArrayRef(const at::ArrayRef<at::IValue>& ivalue_array
     return array_ref;
 }
 
+template <typename T>
+std::vector<T> parseIValueVector(const at::ArrayRef<at::IValue>& ivalue_array) {
+    assert(ivalue_array.size() > 0);
+    std::vector<T> vec;
+
+    if (ivalue_array[0].isInt()) {
+        for (auto item : ivalue_array) {
+            vec.push_back(item.toInt());
+        }
+    } else if (ivalue_array[0].isDouble()) {
+        for (auto item : ivalue_array) {
+            vec.push_back(item.toDouble());
+        }
+    } else {
+        DLOG(ERROR) << "Unsupported data type occurs in parseIValueInArrayRef().";
+    }
+    return vec;
+}
 template <typename ...T>
 torch::jit::IValue tupleToIValue(std::tuple<T...> tuple) { return torch::jit::IValue(tuple); }
 

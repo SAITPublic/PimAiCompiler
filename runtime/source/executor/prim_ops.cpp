@@ -30,8 +30,11 @@ torch::IValue primUninitialized() {
     return ret;
 }
 
-
-void primRaiseException(std::string msg) { throw nnrt::NNRuntimeException(msg); }
+void primRaiseException(std::string msg) {
+     nnrt::NNRuntimeException exception(msg);
+     DLOG(INFO) << exception.what();
+     throw exception;
+}
 
 torch::Tensor primTupleIndex(const std::vector<torch::Tensor>& inputs, int64_t index) {
     // Convert an python index (which may be negative) into an index usable for a
