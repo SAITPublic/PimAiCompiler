@@ -5,7 +5,7 @@
 #include <vector>
 #include <string>
 #include "ir/include/nn_ir.hpp"
-#include "model_builder.h"
+#include "builder/model_builder.h"
 #include "nnrt_types.h"
 #include "ir/include/data_edge.hpp"
 #include "ir/include/edge.hpp"

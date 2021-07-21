@@ -1,4 +1,4 @@
-#include "model_builder.h"
+#include "builder/model_builder.h"
 #include "compiler/include/nn_compiler.hpp"
 #include "ir/include/nn_ir.hpp"
 

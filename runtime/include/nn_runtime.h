@@ -4,7 +4,7 @@
 #include <tuple>
 #include <vector>
 #include "executor/stream_executor.h"
-#include "model_builder.h"
+#include "builder/model_builder.h"
 #include "nnrt_types.h"
 
 namespace nnrt
