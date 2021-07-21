@@ -24,32 +24,9 @@ using OpExecutorFn = std::function<void(const nncir::Node&, StreamExecutor& stre
 class StreamExecutor
 {
    public:
-    StreamExecutor(const std::shared_ptr<nncir::NNIR> ir_graph_)
-    {
-        registerOp();
+    StreamExecutor(const std::shared_ptr<nncir::NNIR> ir_graph_);
 
-        // Get the output & input node from ir_graph at once
-        this->input_blob_ids_.clear();
-        this->output_blob_ids_.clear();
-        for (auto& op_node : ir_graph_->getNodes()) {
-            if (op_node.getNodeType() == nncir::NodeType::PRIMINPUT) {
-                auto& data_edge = cast<nncir::DataEdge>(op_node.getOutEdge(0));
-                this->input_blob_ids_.push_back(data_edge.getBlobId());
-            } else if (op_node.getNodeType() == nncir::NodeType::PRIMOUTPUT) {
-                auto& data_edge = cast<nncir::DataEdge>(op_node.getInEdge(0));
-                this->output_blob_ids_.push_back(data_edge.getBlobId());
-            }
-        }
-
-        DLOG(INFO) << "Num inputs of Graph:" << this->input_blob_ids_.size();
-        DLOG(INFO) << "Num outputs of Graph:" << this->output_blob_ids_.size();
-
-        if (this->input_blob_ids_.size() == 0 || this->output_blob_ids_.size() == 0) {
-            DLOG(ERROR) << "The Graph must have >= 1 inputs and outputs!";
-        }
-
-        this->ir_graph_ = ir_graph_;
-    }
+    void loadWeightAndBias(nncir::Blob* blob, const std::string& kind, const std::string& device_type);
 
     RetVal inferenceModel(const std::shared_ptr<nncir::NNIR> runnable_ir,
                           const std::vector<torch::Tensor>& input_tensors, std::vector<torch::Tensor>& output_tensors);

@@ -1,3 +1,5 @@
+#include<algorithm>
+#include<vector>
 #include "common/include/cast.hpp"
 #include "executor/aten_ops.h"
 #include "executor/stream_executor.h"
@@ -859,9 +861,19 @@ void executorAtenLSTM(const nncir::Node& op_node, StreamExecutor& stream_executo
     auto output =
         nnrt::atenLstm(input, hx, params, static_cast<bool>(has_biases), num_layers, dropout, static_cast<bool>(train),
                        static_cast<bool>(bidirectional), static_cast<bool>(batch_first));
-    // update output
-    auto& out_edge = cast<nncir::DataEdge>(lstm_node.getFirstOutEdge());
-    stream_executor.updateBlob(out_edge.getBlobId(), DataType::TUPLE, tupleToIValue(output));
+
+    auto out_blob_ids = getOutBlobIds(op_node);
+    auto pos = std::unique(out_blob_ids.begin(), out_blob_ids.end());
+    out_blob_ids.erase(pos, out_blob_ids.end());
+    assert(out_blob_ids.size() == 3);
+    stream_executor.updateBlob(out_blob_ids[0], DataType::TENSOR, tensorToIValue(std::get<0>(output)));
+    stream_executor.updateBlob(out_blob_ids[1], DataType::TENSOR, tensorToIValue(std::get<1>(output)));
+    stream_executor.updateBlob(out_blob_ids[2], DataType::TENSOR, tensorToIValue(std::get<2>(output)));
+
+    
+    // // update output
+    // auto& out_edge = cast<nncir::DataEdge>(lstm_node.getFirstOutEdge());
+    // stream_executor.updateBlob(out_edge.getBlobId(), DataType::TUPLE, tupleToIValue(output));
 }
 
 void executorAtenLt(const nncir::Node& op_node, StreamExecutor& stream_executor)

@@ -14,6 +14,71 @@ namespace nncir = nn_compiler::nn_ir;
 
 namespace nnrt
 {
+
+void StreamExecutor::loadWeightAndBias(nncir::Blob* blob, const std::string& kind, const std::string& device_type) {
+    nncir::Shape4D shape = blob->getShape();
+    int64_t blob_id = blob->getId();
+    // c10::TensorOptions option;
+    
+    // if(device_type == "gpu" || device_type == "cuda") {
+    //     option.device(torch::kCUDA);
+    // } else {
+    //     option.device(torch::kCPU);
+    // }
+    
+    // currently, we set randn data as weight/bias, we'll future read correct data from IR.blob
+    if(kind == "weight") {
+        auto weight = torch::ones({shape.h, shape.w}, torch::kHalf).cuda();
+        this->global_blobs_.insert({blob_id, {DataType::TENSOR, tensorToIValue(weight)}});
+
+    } else if(kind == "bias") {
+        auto bias = torch::ones({shape.w}, torch::kHalf).cuda();
+        this->global_blobs_.insert({blob_id, {DataType::TENSOR, tensorToIValue(bias)}});
+    }
+}
+
+StreamExecutor::StreamExecutor(const std::shared_ptr<nncir::NNIR> ir_graph_)
+{
+    this->ir_graph_ = ir_graph_;
+    this->registerOp();
+
+    // Get the output & input node from ir_graph at once
+    this->input_blob_ids_.clear();
+    this->output_blob_ids_.clear();
+    for (auto& op_node : ir_graph_->getNodes()) {
+        if (op_node.getNodeType() == nncir::NodeType::PRIMINPUT) {
+            auto& data_edge = cast<nncir::DataEdge>(op_node.getOutEdge(0));
+            this->input_blob_ids_.push_back(data_edge.getBlobId());
+        } else if (op_node.getNodeType() == nncir::NodeType::PRIMOUTPUT) {
+            auto& data_edge = cast<nncir::DataEdge>(op_node.getInEdge(0));
+            this->output_blob_ids_.push_back(data_edge.getBlobId());
+        } else if (op_node.getNodeType() == nncir::NodeType::ATENLSTM) {
+            // For Ops' with weight/bias, firstly save to global_blobs_ once
+            auto lstm_node = cast<nncir::AtenLSTMNode>(op_node);
+            auto weight_blobs = lstm_node.getWeightBlob();
+            auto bias_blobs = lstm_node.getBiasBlob();
+
+            for(auto blob : weight_blobs) {
+                this->loadWeightAndBias(blob, "weight", "gpu");
+            }
+
+            for(auto blob : bias_blobs) {
+                this->loadWeightAndBias(blob, "bias", "gpu");
+            }
+        }
+    }
+
+    DLOG(INFO) << "Num inputs of Graph:" << this->input_blob_ids_.size();
+    DLOG(INFO) << "Num outputs of Graph:" << this->output_blob_ids_.size();
+
+    if (this->input_blob_ids_.size() == 0 || this->output_blob_ids_.size() == 0) {
+        DLOG(ERROR) << "The Graph must have >= 1 inputs and outputs!";
+    }
+
+    
+}
+
+
 RetVal StreamExecutor::inferenceModel(const std::shared_ptr<nncir::NNIR> graph,
                                       const std::vector<torch::Tensor>& input_tensors,
                                       std::vector<torch::Tensor>& output_tensors)

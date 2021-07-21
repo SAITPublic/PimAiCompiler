@@ -93,7 +93,7 @@ int main(int argc, const char* argv[]) {
 
     // Set test inputs
     // For test RNNT with one sample
-    input_tensors.push_back(torch::ones({341, 1, 240}, torch::kHalf));
+    input_tensors.push_back(torch::ones({341, 1, 240}, torch::kHalf).cuda());
     input_tensors.push_back(torch::tensor({341}, torch::kInt64));
 
     // Inference
