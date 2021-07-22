@@ -33,6 +33,7 @@ RetVal MiddlendDriver::initialize(const std::string& in_ir_file_path) {
 }
 
 RetVal MiddlendDriver::initialize(const std::vector<std::shared_ptr<nn_compiler::nn_ir::NNIR>>& NNIR_graphs) {
+    graphs_.clear();
     for(auto iter = NNIR_graphs.begin(); iter != NNIR_graphs.end(); iter++) {
         graphs_.push_back(*iter);
     }

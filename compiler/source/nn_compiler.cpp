@@ -8,8 +8,8 @@ RetVal NNCompiler::initialize(const int& compile_level, const std::string& file_
     compile_level_ = compile_level;
     input_file_path_ = file_path;
 
-    //TODO: frontend initialize
-
+    // frontend initialize
+    frontend_driver_ = std::make_unique<frontend::FrontendDriver>();
     // middlend initialize
     middlend_driver_ = std::make_unique<middlend::MiddlendDriver>();
 
@@ -75,6 +75,11 @@ RetVal NNCompiler::finalize() {
 
 RetVal NNCompiler::frontend(const std::string& file_path) {
     Log::NC::I() << "NNCompiler::frontend(file_path) is called";
+
+    frontend_driver_->initialize(file_path);
+    frontend_driver_->run();
+    frontend_driver_->wrapup(NNIR_graphs_);
+    frontend_driver_->finalize();
 
     return RetVal::SUCCESS;
 }

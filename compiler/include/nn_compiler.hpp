@@ -11,6 +11,7 @@
 #pragma once
 
 #include "common/include/log.hpp"
+#include "compiler/include/frontend/frontend_driver.hpp"
 #include "compiler/include/middlend/middlend_driver.hpp"
 
 namespace nn_compiler {
@@ -110,8 +111,9 @@ class NNCompiler {
 
     std::string input_file_path_  = "";
 
-    // TODO: Add members of frontend & backend drivers
+    std::unique_ptr<frontend::FrontendDriver> frontend_driver_ = nullptr;
     std::unique_ptr<middlend::MiddlendDriver> middlend_driver_ = nullptr;
+    // TODO: Add members of backend drivers
 
     std::vector<std::shared_ptr<nn_compiler::nn_ir::NNIR>> NNIR_graphs_;
 
