@@ -25,7 +25,7 @@ class PrimLoopNode : public NodeMixin<PrimLoopNode, CONTROLNode> {
     int64_t getGotoNode() const { return goto_node_; }
 
  private:
-    int64_t trip_count_ = INT64_MAX;
+    int64_t trip_count_;
     bool cond_ = true;
     int64_t goto_node_;
 }; // class PrimLoopNode

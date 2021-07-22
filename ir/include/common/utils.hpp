@@ -18,7 +18,7 @@ bool isDefaultValue(T& input) {
     double d;
     if (typeid(input).name() == typeid(a).name() && input == INT32_MAX) {
         return true;
-    } else if (typeid(input).name() == typeid(b).name() && input == INT64_MAX) {
+    } else if (typeid(input).name() == typeid(b).name() && input == INT64_MIN) {
         return true;
     } else if (typeid(input).name() == typeid(c).name() && (fabs(input - FLT_MAX) <= FLT_EPSILON)) {
         return true;
