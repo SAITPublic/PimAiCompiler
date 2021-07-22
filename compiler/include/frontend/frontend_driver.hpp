@@ -19,10 +19,10 @@ class FrontendDriver {
     /**
      * @brief     initialize a frontend pipeline
      * @details   This function initialize a frontend pipeline
-     * @inputs    std::string& in_ir_file_path
+     * @inputs    std::string& in_file_path
      * @returns   return code
      */
-    RetVal initialize(const std::string& in_ir_file_path);
+    RetVal initialize(const std::string& in_file_path);
 
     /**
      * @brief   Call and run frontend
@@ -32,9 +32,10 @@ class FrontendDriver {
     RetVal run();
 
     /**
-     * @brief   Do post-compile actions
-     * @details This function reads in the result IR geneated by frontend
-     * @returns return code
+     * @brief    Do post-compile actions
+     * @details  This function reads in the result IR geneated by frontend
+     * @inputs   A vector of NNIR graphs
+     * @returns  return code
      */
     RetVal wrapup(std::vector<std::shared_ptr<nn_compiler::nn_ir::NNIR>>& NNIR_graphs);
 

@@ -60,15 +60,24 @@ $ ./scripts/build.sh all -o .
 ./build/compiler/compiler -h [--help]
 
 General Options:
-  -h [ --help ]             help info
-  -i, --input <file>        Input file path
-  -l <compile level>        compile level. Possible values (default: 0):
+  -h [ --help ]            Help info
+  -i, <input file>         Input file path
+  -l, <compile level>      Compile level. Possible values (default: 0):
                                                     0 (frontend->middlend->backend);
                                                     1 (middlend->backend);
                                                     2 (backend)
-  -v <level>                [middlend] verification level. Possible values: 0, 1, 2 (default: 0)
-  -c <configuration file>   [middlend] passes configuration file path. default: compiler/include/middlend/passes/pass_config.json
+  -g, <graphgen_path>      GraphGen real path
+  -c, <configuration file> [middlend] passes configuration file path. default: compiler/include/middlend/passes/pass_config.json
 ```
+### Note:
+When running with compile level 0 (frontend->middlend->backend) in __docker__, please update docker with:
+```
+sudo apt-get update
+sudo apt-get install libprotobuf-dev protobuf-compiler --fix-missing
+```
+
+And then __rebuild GraphGen in docker__.
+
 # How to test
 
 [unit test]
