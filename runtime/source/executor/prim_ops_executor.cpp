@@ -560,6 +560,34 @@ void executePrimLoopIndex(const nncir::Node& op_node, StreamExecutor& stream_exe
 
 }
 
+/**
+ * @brief check Loop has (x1, x2, ...xr) inputs
+ * according to torch::loop, %y_1, ..., %y_r = prim::Loop(%max_trip_count, %initial_condition, %x_1, ..., %x_r)
+ * https://github.com/pytorch/pytorch/blob/master/torch/csrc/jit/OVERVIEW.md#loops
+ * @param loop_node 
+ * @return true 
+ * @return false 
+ */
+static bool loopHasExtraInputs(const nncir::PrimLoopNode* loop_node) {
+    int64_t loop_cond = loop_node->getCond();
+    int64_t max_trip_cnt = loop_node->getTripCount();
+    bool trip_cnt_invalid = nncir::isDefaultValue<int64_t>(max_trip_cnt);
+    bool loop_cond_invalid = nncir::isDefaultValue<int64_t>(loop_cond);
+
+    int64_t num_inputs = loop_node->getNumInputs();
+
+    if(trip_cnt_invalid && loop_cond_invalid) {
+        if(num_inputs == 2) return false;
+    } else if(!trip_cnt_invalid && loop_cond_invalid) {
+        if(num_inputs == 1) return false;
+    } else if(trip_cnt_invalid && !loop_cond_invalid) {
+        if(num_inputs == 1) return false;
+    } else if(!trip_cnt_invalid && !loop_cond_invalid) {
+        if(num_inputs == 0) return false;
+    }
+
+    return true;
+}
 
 std::unordered_map<std::string, int64_t> getMatchedLoopInfo(int64_t loop_block_id, StreamExecutor& stream_executor) {
     // Get LoopNode
@@ -584,6 +612,7 @@ std::unordered_map<std::string, int64_t> getMatchedLoopInfo(int64_t loop_block_i
 
     std::unordered_map<std::string, int64_t> umap;
     umap.insert({{"max_trip_cnt", max_trip_cnt}, {"cond", cond}, {"loop_index", loop_index}, {"end_loop_next_id", end_loop_next_id}});
+    umap.insert({"loop_id", loop_node->getId()});
     return umap;
 }
 
@@ -603,6 +632,7 @@ void executePrimBlock(const nncir::Node& op_node, StreamExecutor& stream_executo
     int64_t cond = umap["cond"];
     int64_t loop_index = umap["loop_index"];
     int64_t end_loop_next_id = umap["end_loop_next_id"];
+    int64_t loop_node_id = umap["loop_id"];
 
     if(loop_index >= max_trip_cnt || cond == 0) {
         // Get EndLoop's input
@@ -627,15 +657,23 @@ void executePrimBlock(const nncir::Node& op_node, StreamExecutor& stream_executo
             auto in_blob = stream_executor.findBlob(end_loop_in_blobs.at(i + 1));
              stream_executor.updateBlob(end_loop_out_blobs.at(i), in_blob.first, in_blob.second);
         }
-
         // Jump to End Loop'next
         stream_executor.setCursor(end_loop_next_id);
     } else {
-        // currently, only assume in_blob_ids.size == out_blob_ids.size
-        assert(in_blob_ids.size() == out_blob_ids.size());
-        for(int i = 0; i<in_blob_ids.size();i++) {
-            auto in_blob = stream_executor.findBlob(in_blob_ids.at(i));
-            stream_executor.updateBlob(out_blob_ids.at(i), in_blob.first, in_blob.second);
+        auto graph = stream_executor.getGraph();
+        auto loop_node = cast_if<nncir::PrimLoopNode>(*graph->getNode(loop_node_id));
+        if(!loopHasExtraInputs(loop_node)) {
+            // the in_blob_ids[0] is invalid, only is maintain linkage
+            // only need to pass LoopIndex into Block's inner
+            // auto in_blob = stream_executor.findBlob(in_blob_ids.at(1));
+            stream_executor.updateBlob(out_blob_ids.at(0), DataType::INT64, loop_index);
+        } else{
+            // currently, only assume in_blob_ids.size == out_blob_ids.size
+            assert(in_blob_ids.size() == out_blob_ids.size());
+            for(int i = 0; i<in_blob_ids.size();i++) {
+                auto in_blob = stream_executor.findBlob(in_blob_ids.at(i));
+                stream_executor.updateBlob(out_blob_ids.at(i), in_blob.first, in_blob.second);
+            }
         }
         stream_executor.setCursor(block_node->getId() + 1);
     }
@@ -683,12 +721,15 @@ void executePrimLoop(const nncir::Node& op_node, StreamExecutor& stream_executor
     auto in_blob_ids = getInBlobIds(op_node);
     auto out_blob_ids = getOutBlobIds(op_node);
 
-    assert(in_blob_ids.size() == out_blob_ids.size() + 1);
-    for(int i=0;i<out_blob_ids.size();i++) {
-        int64_t in_id = in_blob_ids.at(i+1);
-        int64_t out_id = out_blob_ids.at(i);
-        auto in_blob = stream_executor.findBlob(in_id);
-        stream_executor.updateBlob(out_id, in_blob.first, in_blob.second);
+    // the Loop's input maybe empty
+    if(loopHasExtraInputs(loop_node)) {
+        assert(in_blob_ids.size() == out_blob_ids.size() + 1);
+        for(int i=0;i<out_blob_ids.size();i++) {
+            int64_t in_id = in_blob_ids.at(i+1);
+            int64_t out_id = out_blob_ids.at(i);
+            auto in_blob = stream_executor.findBlob(in_id);
+            stream_executor.updateBlob(out_id, in_blob.first, in_blob.second);
+        }
     }
 
     executePrimBlock(*loop_block_node, stream_executor);

@@ -56,7 +56,6 @@ RetVal StreamExecutor::inferenceModel(const std::shared_ptr<nncir::NNIR> graph,
     }
 
     // for debug
-    // for debug
     this->showAllBlobs();
     return RetVal::SUCCESS;
 }

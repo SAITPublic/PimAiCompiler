@@ -778,7 +778,8 @@ def aten_copy_node_label(aten_copy_node: IR.NNNode.AtenCopyNode.AtenCopyNode) ->
 
 def aten_derive_index_node_label(aten_derive_index_node: IR.NNNode.AtenDeriveIndexNode.AtenDeriveIndexNode) -> str:
     retval = 'AtenDeriveIndex Node<br/>'
-    start = aten_derive_index_node.Start()
+    # start = aten_derive_index_node.Start()
+    start = None
     step = aten_derive_index_node.Step()
     
     if start is not None:
@@ -1230,7 +1231,8 @@ def prim_call_method_node_label(prim_call_method_node: IR.CONTROLNode.PrimCallMe
 
 def prim_variable_node_label(prim_variable_node: IR.CONTROLNode.PrimVariableNode.PrimVariableNode) -> str:
     retval = 'PrimVariable Node<br/>'
-    data_type  = prim_variable_node.DataType()
+    # data_type  = prim_variable_node.DataType()
+    data_type = None
     if data_type  is not None:
         retval += 'DataType : {}<br/>'.format(data_type )
     return list_table([retval])
