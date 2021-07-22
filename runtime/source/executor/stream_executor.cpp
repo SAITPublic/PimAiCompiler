@@ -4,6 +4,7 @@
 #include "executor/aten_ops_executor.h"
 #include "executor/prim_ops_executor.h"
 #include "executor/utils.h"
+#include "ir/include/data_blob.hpp"
 #include "ir/include/data_edge.hpp"
 #include "ir/include/edge.hpp"
 #include "ir/include/ir_types.hpp"
@@ -18,23 +19,31 @@ namespace nnrt
 void StreamExecutor::loadWeightAndBias(nncir::Blob* blob, const std::string& kind, const std::string& device_type) {
     nncir::Shape4D shape = blob->getShape();
     int64_t blob_id = blob->getId();
-    // c10::TensorOptions option;
-    
-    // if(device_type == "gpu" || device_type == "cuda") {
-    //     option.device(torch::kCUDA);
-    // } else {
-    //     option.device(torch::kCPU);
-    // }
-    
-    // currently, we set randn data as weight/bias, we'll future read correct data from IR.blob
-    if(kind == "weight") {
-        auto weight = torch::ones({shape.h, shape.w}, torch::kHalf).cuda();
-        this->global_blobs_.insert({blob_id, {DataType::TENSOR, tensorToIValue(weight)}});
 
-    } else if(kind == "bias") {
-        auto bias = torch::ones({shape.w}, torch::kHalf).cuda();
-        this->global_blobs_.insert({blob_id, {DataType::TENSOR, tensorToIValue(bias)}});
+    auto data_blob = cast_if<nncir::DataBlob>(blob);
+    if (data_blob == nullptr) {
+        DLOG(ERROR) << "The blob is not weight or bias blob!";
     }
+    auto value_vec = data_blob->getBuf<float>();
+    auto bit_width = blob->getBitWidth();
+    at::ScalarType scalar_type;
+    if (bit_width == 16) {
+        scalar_type = torch::kHalf;
+    } else if (bit_width == 32) {
+        scalar_type = torch::kFloat;
+    } else {
+        DLOG(ERROR) << "Weight bit wise Error, unsupport data type when create Tensor!";
+    }
+    torch::Tensor tensor_data;
+    if (kind == "weight") {
+        tensor_data = at::from_blob(value_vec.data(), {shape.h, shape.w}, scalar_type).cuda();
+    } else if (kind == "bias") {
+        tensor_data = at::from_blob(value_vec.data(), {shape.w}, scalar_type).cuda();
+    } else {
+        DLOG(ERROR) << "Kind Error, blob kind is" << kind;
+    }
+    torch::jit::IValue iv = tensorToIValue(tensor_data);
+    this->global_blobs_.insert({blob_id, {DataType::TENSOR, iv}});
 }
 
 StreamExecutor::StreamExecutor(const std::shared_ptr<nncir::NNIR> ir_graph_)
