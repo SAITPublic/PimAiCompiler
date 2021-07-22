@@ -721,7 +721,7 @@ IRNNNodeParser::parseNNNode<IR::NNNode::AnyType_AtenDropoutNode>(const IR::NnNod
     Log::IR::E_IF(aten_dropout_node == nullptr)
         << "IRNNNodeParser::parseNNNode<NN::AtenDropoutNode>() => wrong node type!";
 
-    float proportion = aten_dropout_node->proportion();
+    double proportion = aten_dropout_node->proportion();
     int  train = aten_dropout_node->train();
     return std::make_unique<nn_ir::AtenDropoutNode>(node_info, proportion, train);
 }

@@ -29,14 +29,14 @@ class AtenDropoutNode : public NodeMixin<AtenDropoutNode, NNNode> {
 
     std::string getNodeTypeAsString() const override { return "AtenDropout"; }
 
-    void setProportion(float proportion) { proportion_ = proportion; }
+    void setProportion(double proportion) { proportion_ = proportion; }
     void setTrain(int train) { train_ = train; }
 
-    float getProportion() { return proportion_; }
+    double getProportion() { return proportion_; }
     int getTrain() { return train_; }
 
  private:
-    float proportion_;
+    double proportion_;
     int train_;
 }; // class AtenDropoutNode
 
