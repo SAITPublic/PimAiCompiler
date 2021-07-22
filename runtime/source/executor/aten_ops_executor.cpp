@@ -1444,8 +1444,9 @@ void executorAtenZeros(const nncir::Node& op_node, StreamExecutor& stream_execut
     auto iv_device     = stream_executor.findBlob(device_id).second;
     auto iv_pin_memory = stream_executor.findBlob(pin_memory_id).second;
 
-    options = options.dtype(iv_dtype.toScalarType());
-
+    if (!iv_dtype.isNone()) {
+        options = options.dtype(iv_dtype.toScalarType());
+    }
     if (!iv_layout.isNone()) {
         options = options.layout(iv_layout.toLayout());
     }
@@ -1487,17 +1488,33 @@ void executorAtenZerosLike(const nncir::Node& op_node, StreamExecutor& stream_ex
     auto iv_layout     = stream_executor.findBlob(layout_id).second;
     auto iv_device     = stream_executor.findBlob(device_id).second;
     auto iv_pin_memory = stream_executor.findBlob(pin_memory_id).second;
-    options = options.dtype(iv_dtype.toScalarType());
-    options = options.layout(iv_layout.toLayout());
-    options = options.device(iv_device.toDevice());
-    options = options.pinned_memory(iv_pin_memory.toBool());
+
+    if (!iv_dtype.isNone()) {
+        options = options.dtype(iv_dtype.toScalarType());
+    }
+
+    if (!iv_layout.isNone()) {
+        options = options.layout(iv_layout.toLayout());
+    }
+    if (iv_device.isDevice()) {
+        options = options.device(iv_device.toDevice());
+    } else if (iv_device.isString()) {
+        options = options.device(iv_device.toStringRef());
+    }
+    if (!iv_pin_memory.isNone()) {
+        options = options.pinned_memory(iv_pin_memory.toBool());
+    }
 
     auto& input_memory_format = cast<nncir::DataEdge>(zeros_like_node.getInEdge(5));
     auto memory_format_id  = input_memory_format.getBlobId();
     auto iv_memory_format = stream_executor.findBlob(memory_format_id).second;
-    auto memory_format = iv_memory_format.toMemoryFormat();
+    at::Tensor output;
+    if (iv_memory_format.isNone()) {
+        output = nnrt::atenZeroslike(tensor, options);
+    } else {
+        output = nnrt::atenZeroslike(tensor, options, iv_memory_format.toMemoryFormat());
+    }
 
-    auto output = nnrt::atenZeroslike(tensor, options, memory_format);
     // update output
     auto& out_edge = cast<nncir::DataEdge>(zeros_like_node.getFirstOutEdge());
     stream_executor.updateBlob(out_edge.getBlobId(), DataType::TENSOR, tensorToIValue(output));
