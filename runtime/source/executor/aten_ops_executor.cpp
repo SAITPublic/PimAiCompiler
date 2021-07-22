@@ -1264,10 +1264,16 @@ void executorAtenTensor(const nncir::Node& op_node, StreamExecutor& stream_execu
     auto iv_dtype      = stream_executor.findBlob(dtype_id).second;
     auto iv_layout     = stream_executor.findBlob(layout_id).second;
     auto iv_pin_memory = stream_executor.findBlob(pin_memory_id).second;
-    options = options.dtype(iv_dtype.toScalarType());
-    options = options.layout(iv_layout.toLayout());
-    options = options.pinned_memory(iv_pin_memory.toBool());
 
+    if (!iv_dtype.isNone()) {
+        options = options.dtype(iv_dtype.toScalarType());
+    }
+    if (!iv_layout.isNone()) {
+        options = options.layout(iv_layout.toLayout());
+    }
+    if (!iv_pin_memory.isNone()) {
+        options = options.pinned_memory(iv_pin_memory.toBool());
+    }
     auto self_list = iv_self.toListRef();
     assert(self_list.size() > 0);
     at::Tensor output;
