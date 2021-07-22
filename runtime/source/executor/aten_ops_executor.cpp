@@ -10,17 +10,6 @@
 #include "ir/include/nn_ir.hpp"
 #include "ir/include/common/utils.hpp"
 
-#include "ir/include/nn_nodes/aten_add_node.hpp"
-#include "ir/include/nn_nodes/aten_cat_node.hpp"
-#include "ir/include/nn_nodes/aten_div_node.hpp"
-#include "ir/include/nn_nodes/aten_eq_node.hpp"
-#include "ir/include/nn_nodes/aten_int_node.hpp"
-#include "ir/include/nn_nodes/aten_lstm_node.hpp"
-#include "ir/include/nn_nodes/aten_max_node.hpp"
-#include "ir/include/nn_nodes/aten_ne_node.hpp"
-#include "ir/include/nn_nodes/aten_select_node.hpp"
-#include "ir/include/nn_nodes/aten_to_node.hpp"
-#include "ir/include/nn_nodes/aten_transpose_node.hpp"
 
 namespace nnrt
 {
@@ -223,7 +212,7 @@ void executorAtenDeriveIndex(const nncir::Node& op_node, StreamExecutor& stream_
 void executorAtenCopy(const nncir::Node& op_node, StreamExecutor& stream_executor) {
     DLOG(INFO) << "execute Aten Copy node";
     auto copy_node = cast<nncir::AtenCopyNode>(op_node);
-    assert(copy_node.getNumInputs() == 2);
+    // assert(copy_node.getNumInputs() == 2);
 
     auto &input_self = cast<nncir::DataEdge>(copy_node.getInEdge(0));
     auto &input_src = cast<nncir::DataEdge>(copy_node.getInEdge(1));
@@ -1050,13 +1039,27 @@ void executorAtenNeg(const nncir::Node& op_node, StreamExecutor& stream_executor
 
     auto& input_tensor = cast<nncir::DataEdge>(neg_node.getInEdge(0));
     int input_tensor_blob_id = input_tensor.getBlobId();
-    torch::jit::IValue iv_tensor = stream_executor.findBlob(input_tensor_blob_id).second;
-    assert(iv_tensor.isTensor());
-    at::Tensor tensor = iv_tensor.toTensor();
-
-    auto output = nnrt::atenNeg(tensor);
+    torch::jit::IValue iv = stream_executor.findBlob(input_tensor_blob_id).second;
+    auto dtype = stream_executor.findBlob(input_tensor_blob_id).first;
     auto& out_edge = cast<nncir::DataEdge>(neg_node.getFirstOutEdge());
-    stream_executor.updateBlob(out_edge.getBlobId(), DataType::TENSOR, tensorToIValue(output));
+
+    if(isScalarType(dtype)) {
+        if(iv.isInt()) {
+            int out = iv.toInt() * -1;
+            stream_executor.updateBlob(out_edge.getBlobId(), DataType::INT64, scalarToIValue<int>(out));
+        }else if(iv.isDouble()) {
+            double out = iv.toDouble() * -1;
+            stream_executor.updateBlob(out_edge.getBlobId(), DataType::FLOAT64, scalarToIValue<double>(out));
+        }
+    } else if (iv.isTensor()){
+        // assert(iv.isTensor());
+        at::Tensor tensor = iv.toTensor();
+        auto output = nnrt::atenNeg(tensor);
+        stream_executor.updateBlob(out_edge.getBlobId(), DataType::TENSOR, tensorToIValue(output));
+
+    } else {
+        DLOG(ERROR) <<"AtenNeg: unsupported dtype!";
+    }
 }
 
 void executorAtenRelu(const nncir::Node& op_node, StreamExecutor& stream_executor)
@@ -1157,6 +1160,8 @@ void executorAtenSlice(const nncir::Node& op_node, StreamExecutor& stream_execut
     torch::jit::IValue iv_tensor = stream_executor.findBlob(input_tensor_blob_id).second;
     assert(iv_tensor.isTensor());
     edge_id++;
+
+    auto input_cnts = slice_node.getNumInputs();
 
     auto dim = slice_node.getDim();
     if (nncir::isDefaultValue<int64_t>(dim)) {
