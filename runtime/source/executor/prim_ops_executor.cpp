@@ -500,8 +500,14 @@ void executePrimEndIf(const nncir::Node& op_node, StreamExecutor& stream_executo
             int input_blob_id = data_edge.getBlobId();
             // Find the input blob, named condition, it is a int64/bool value
             torch::jit::IValue iv = stream_executor.findBlob(input_blob_id).second;
-            assert(iv.isInt());
-            int64_t condiction = iv.toInt();
+            int64_t condiction;
+            if (iv.isInt()) {
+                condiction = iv.toInt();
+            } else if (iv.isBool()) {
+                condiction = iv.toBool();
+            } else {
+                DLOG(ERROR) << "PrimEndIf Error, unsupport data type!";
+            }
 
             std::vector<int64_t> in_blob_ids;
             assert(end_if_node->getNumInputs() % 2 == 0);
@@ -524,11 +530,19 @@ void executePrimEndIf(const nncir::Node& op_node, StreamExecutor& stream_executo
 
             // Set inputs --> output
             // multi-inputs --> multi-outputs
-            assert(in_blob_ids.size() == end_if_node->getOutEdgeIds().size());
             auto out_blob_ids = getOutBlobIds(op_node);
+            std::vector<int64_t> temp_out_blob_ids(in_blob_ids.size(), -1);
+            int out_id = 0;
+            for (int i = 0; i < out_blob_ids.size(); i++) {
+                if (std::find(temp_out_blob_ids.begin(), temp_out_blob_ids.end(), out_blob_ids.at(i)) ==
+                    temp_out_blob_ids.end()) {
+                    temp_out_blob_ids[out_id++] = out_blob_ids.at(i);
+                }
+            }
+            
             for (int i = 0; i < in_blob_ids.size(); i++) {
                 auto in_data = stream_executor.findBlob(in_blob_ids[i]);
-                stream_executor.updateBlob(out_blob_ids[i], in_data.first, in_data.second);
+                stream_executor.updateBlob(temp_out_blob_ids[i], in_data.first, in_data.second);
             }
         }
     }
@@ -692,10 +706,19 @@ void executePrimBlock(const nncir::Node& op_node, StreamExecutor& stream_executo
             // stream_executor.updateBlob(out_blob_ids.at(0), DataType::INT64, loop_index);
         } else {
             // currently, only assume in_blob_ids.size == out_blob_ids.size
-            assert(in_blob_ids.size() == out_blob_ids.size());
+            // assert(in_blob_ids.size() == out_blob_ids.size());
+            std::vector<int64_t> temp_out_blob_ids(in_blob_ids.size(), -1);
+            int out_id = 0;
+            for (int i = 0; i < out_blob_ids.size(); i++) {
+                if (std::find(temp_out_blob_ids.begin(), temp_out_blob_ids.end(), out_blob_ids.at(i)) ==
+                    temp_out_blob_ids.end()) {
+                    temp_out_blob_ids[out_id++] = out_blob_ids.at(i);
+                }
+            }
+
             for (int i = 0; i < in_blob_ids.size(); i++) {
                 auto in_blob = stream_executor.findBlob(in_blob_ids.at(i));
-                stream_executor.updateBlob(out_blob_ids.at(i), in_blob.first, in_blob.second);
+                stream_executor.updateBlob(temp_out_blob_ids.at(i), in_blob.first, in_blob.second);
             }
         }
         stream_executor.updateBlob(out_blob_ids.at(0), DataType::INT64, loop_index);
