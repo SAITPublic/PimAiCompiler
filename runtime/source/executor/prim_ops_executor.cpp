@@ -738,14 +738,15 @@ void executePrimLoop(const nncir::Node& op_node, StreamExecutor& stream_executor
     int64_t loop_cond = loop_node->getCond();
     int64_t max_trip_cnt = loop_node->getTripCount();
 
+    int edge_id = 0;
     // check default
     if (nncir::isDefaultValue<int64_t>(max_trip_cnt)) {
         // Get from loop's input[0]
-        max_trip_cnt = stream_executor.findBlob(getInBlobIds(op_node)[0]).second.toInt();
+        max_trip_cnt = stream_executor.findBlob(getInBlobIds(op_node)[edge_id++]).second.toInt();
     }
     if (nncir::isDefaultValue<int64_t>(loop_cond)) {
         // Get from loop's input[1]
-        loop_cond = stream_executor.findBlob(getInBlobIds(op_node)[1]).second.toInt();
+        loop_cond = stream_executor.findBlob(getInBlobIds(op_node)[edge_id++]).second.toInt();
     }
 
     // loop_node.id + 1 ---> loopIndex_node
@@ -773,7 +774,7 @@ void executePrimLoop(const nncir::Node& op_node, StreamExecutor& stream_executor
     if (loopHasExtraInputs(loop_node)) {
         // assert(in_blob_ids.size() == out_blob_ids.size() + 1);
         for (int i = 0; i < out_blob_ids.size(); i++) {
-            int64_t in_id = in_blob_ids.at(i);
+            int64_t in_id = in_blob_ids.at(i + edge_id);
             int64_t out_id = out_blob_ids.at(i);
             auto in_blob = stream_executor.findBlob(in_id);
             stream_executor.updateBlob(out_id, in_blob.first, in_blob.second);
@@ -823,9 +824,12 @@ void executePrimEndLoop(const nncir::Node& op_node, StreamExecutor& stream_execu
     auto end_loop_input_blob_ids = getInBlobIds(op_node);
     auto prim_block_input_blob_ids = getInBlobIds(*stream_executor.getGraph()->getNode(loop_start_node_id + 2));
 
-    // assert(end_loop_input_blob_ids.size() == prim_block_input_blob_ids.size());
     // skip 0 element
-    // the o element is condition
+    // the 0 element is condition
+    auto prim_loop_node = stream_executor.getGraph()->getNode(loop_start_node_id);
+    auto prim_loop = cast_if<nncir::PrimLoopNode>(prim_loop_node);
+    prim_loop->setCond(end_loop_input_blob_ids.at(0));
+
     for (int i = 1; i < end_loop_input_blob_ids.size(); i++) {
         auto end_loop_input_blob = stream_executor.findBlob(end_loop_input_blob_ids.at(i));
         stream_executor.updateBlob(prim_block_input_blob_ids.at(i), end_loop_input_blob.first,
