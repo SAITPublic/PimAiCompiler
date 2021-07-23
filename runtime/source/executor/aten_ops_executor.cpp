@@ -151,7 +151,8 @@ void executorAtenCat(const nncir::Node& op_node, StreamExecutor& stream_executor
 
     auto output = nnrt::atenCat(tensor_list, dim);
     auto& out_edge = cast<nncir::DataEdge>(cat_node.getFirstOutEdge());
-    stream_executor.updateBlob(out_edge.getBlobId(), DataType::TENSOR, tensorListToIValue(output));
+    // stream_executor.updateBlob(out_edge.getBlobId(), DataType::TENSOR, tensorListToIValue(output));
+    stream_executor.updateBlob(out_edge.getBlobId(), DataType::TENSOR, tensorToIValue(output));
 }
 
 void executorAtenCeil(const nncir::Node& op_node, StreamExecutor& stream_executor)
@@ -1341,8 +1342,8 @@ void executorAtenTo(const nncir::Node& op_node, StreamExecutor& stream_executor)
         auto& non_blocking_edge = cast<nncir::DataEdge>(to_node.getInEdge(edge_id++));
         int non_blocking_blob_id = non_blocking_edge.getBlobId();
         auto non_blocking_iv = stream_executor.findBlob(non_blocking_blob_id).second;
-        assert(non_blocking_iv.isBool());
-        non_blocking_val = non_blocking_iv.toBool();
+        // assert(non_blocking_iv.isBool());
+        non_blocking_val = non_blocking_iv.toInt();
     }
     bool non_blocking = static_cast<bool>(non_blocking_val);
 
@@ -1420,7 +1421,7 @@ void executorAtenUnsqueeze(const nncir::Node& op_node, StreamExecutor& stream_ex
     DLOG(INFO) << "execute Aten Unsqueeze node";
 
     auto unsqueeze_node = cast<nncir::AtenUnsqueezeNode>(op_node);
-    assert(unsqueeze_node.getNumInputs() == 2);
+    // assert(unsqueeze_node.getNumInputs() == 2);
     auto& input_tensor = cast<nncir::DataEdge>(unsqueeze_node.getInEdge(0));
     int input_tensor_blob_id = input_tensor.getBlobId();
     torch::jit::IValue iv_tensor = stream_executor.findBlob(input_tensor_blob_id).second;

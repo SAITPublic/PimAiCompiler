@@ -590,6 +590,15 @@ static bool loopHasExtraInputs(const nncir::PrimLoopNode* loop_node)
     return true;
 }
 
+// %y_1, ..., %y_r = prim::Loop(%max_trip_count, %initial_condition, %x_1, ..., %x_r)
+// for PrimLoopNode, the first 2 inputs: %max_trip_count and %initial_condition are seem as attribute of PrimLoop Op,
+// if any of these two input's is Constant, it'll be inline to Op's attribute, so need to distinguish the (%x_1, ...,
+// %x_r) of all inputs of PrimLoop
+std::vector<int64_t> getLoopExtraInputs(const nncir::PrimLoopNode* loop_node)
+{
+    // TODO
+}
+
 std::unordered_map<std::string, int64_t> getMatchedLoopInfo(int64_t loop_block_id, StreamExecutor& stream_executor)
 {
     // Get LoopNode
@@ -603,6 +612,7 @@ std::unordered_map<std::string, int64_t> getMatchedLoopInfo(int64_t loop_block_i
     int64_t cond = loop_node->getCond();
 
     // check default
+
     if (nncir::isDefaultValue<int64_t>(max_trip_cnt)) {
         // Get from loop's input[0]
         max_trip_cnt = stream_executor.findBlob(getInBlobIds(*loop_node)[0]).second.toInt();
@@ -612,7 +622,6 @@ std::unordered_map<std::string, int64_t> getMatchedLoopInfo(int64_t loop_block_i
         cond = stream_executor.findBlob(getInBlobIds(*loop_node)[1]).second.toInt();
     }
 
-    // get LoopIndex
     int64_t loop_index_id = loop_block_id - 1;
     int blob_id = getOutBlobIds(*graph->getNode(loop_index_id))[0];
     auto blob = stream_executor.findBlob(blob_id);
