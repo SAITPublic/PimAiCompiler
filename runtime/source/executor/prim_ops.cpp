@@ -5,38 +5,45 @@
 #include <vector>
 #include "executor/prim_ops.h"
 #include "executor/prim_utils.h"
-#include "glog/logging.h"
 #include "executor/stream_executor.h"
+#include "glog/logging.h"
 
-namespace nnrt {
-c10::Device primDevice(const torch::Tensor& input_tensor) {
+namespace nnrt
+{
+c10::Device primDevice(const torch::Tensor& input_tensor)
+{
     // int device_idx = input_tensor.get_device();
     c10::Device device = input_tensor.device();
     return device;
 }
 
-int64_t primDtype(const torch::Tensor& input_tensor) {
+int64_t primDtype(const torch::Tensor& input_tensor)
+{
     int64_t ret = static_cast<int64_t>(input_tensor.scalar_type());
     return ret;
 }
 
-torch::Tensor primData(const torch::Tensor& input_tensor) {
+torch::Tensor primData(const torch::Tensor& input_tensor)
+{
     auto ret = torch::autograd::Variable(input_tensor).variable_data();
     return ret;
 }
 
-torch::IValue primUninitialized() {
+torch::IValue primUninitialized()
+{
     auto ret = torch::IValue::uninitialized();
     return ret;
 }
 
-void primRaiseException(std::string msg) {
-     nnrt::NNRuntimeException exception(msg);
-     DLOG(INFO) << exception.what();
-     throw exception;
+void primRaiseException(std::string msg)
+{
+    nnrt::NNRuntimeException exception(msg);
+    DLOG(INFO) << exception.what();
+    throw exception;
 }
 
-torch::Tensor primTupleIndex(const std::vector<torch::Tensor>& inputs, int64_t index) {
+torch::Tensor primTupleIndex(const std::vector<torch::Tensor>& inputs, int64_t index)
+{
     // Convert an python index (which may be negative) into an index usable for a
     // C++ container
     auto normalizeIndex = [](int64_t idx, int64_t list_size) -> int64_t {
@@ -56,15 +63,16 @@ torch::Tensor primTupleIndex(const std::vector<torch::Tensor>& inputs, int64_t i
 // the unpacked tensors will append to stack
 // torch::jit::Value can convert to tensor/int/bool/float and so-on
 // tuple: c10::ivalue::Tuple
-void primTupleConstruct(std::vector<torch::IValue>& stack, size_t num_inputs) {
+void primTupleConstruct(std::vector<torch::IValue>& stack, size_t num_inputs)
+{
     std::vector<torch::jit::IValue> elems{std::make_move_iterator(stack.end() - num_inputs),
                                           std::make_move_iterator(stack.end())};
     nnrt::drop(stack, num_inputs);
     nnrt::push(stack, c10::ivalue::Tuple::create(std::move(elems)));
 }
 
-
-std::vector<torch::IValue> primTupleUnpack(c10::intrusive_ptr<c10::ivalue::Tuple> tuple) {
+std::vector<torch::IValue> primTupleUnpack(c10::intrusive_ptr<c10::ivalue::Tuple> tuple)
+{
     std::vector<torch::IValue> ret;
     for (auto& item : tuple->elements()) {
         ret.push_back(item);
@@ -73,7 +81,8 @@ std::vector<torch::IValue> primTupleUnpack(c10::intrusive_ptr<c10::ivalue::Tuple
 }
 
 // For Tensor[], list_type=at::ListType::ofTensors()
-void primListConstruct(std::vector<torch::IValue>& stack, size_t num_inputs, at::ListTypePtr type) {
+void primListConstruct(std::vector<torch::IValue>& stack, size_t num_inputs, at::ListTypePtr type)
+{
     c10::List<torch::jit::IValue> vals(type->getElementType());
     vals.reserve(num_inputs);
     for (size_t i = stack.size() - num_inputs; i < stack.size(); ++i) {
@@ -83,7 +92,8 @@ void primListConstruct(std::vector<torch::IValue>& stack, size_t num_inputs, at:
     nnrt::push(stack, std::move(vals));
 }
 
-void primListUnpack(std::vector<torch::IValue>& stack, size_t num_outputs) {
+void primListUnpack(std::vector<torch::IValue>& stack, size_t num_outputs)
+{
     auto list = nnrt::pop(stack).toList();
     assert(list.size() == num_outputs);
     // insert the unpakced data
@@ -126,22 +136,27 @@ bool primIf(bool cond) { return cond; }
 //     return ret;
 // }
 
-
 // STRING, DEVICE
-std::string primStrConstsnt(void* data_ptr) {
+std::string primStrConstsnt(void* data_ptr)
+{
     std::string ret = static_cast<char*>(data_ptr);
     return ret;
 }
 
-torch::Tensor primTensorConstant(void* data_ptr, std::vector<int64_t>& shape, DataType dtype) {
+torch::Tensor primTensorConstant(void* data_ptr, std::vector<int64_t>& shape, DataType dtype)
+{
     return createPtTensor(data_ptr, shape, dtype);
 }
 
 template <typename T>
-std::vector<T>& primEndLoop(const std::vector<T>& inputs) { return inputs; }
+std::vector<T>& primEndLoop(const std::vector<T>& inputs)
+{
+    return inputs;
+}
 
 // blobs is a Global table
-void primLoop(int max_trip_cnt, torch::Tensor& cond, int op_id, std::unordered_map<int, torch::Tensor>& blobs) {
+void primLoop(int max_trip_cnt, torch::Tensor& cond, int op_id, std::unordered_map<int, torch::Tensor>& blobs)
+{
     // In Graphgen, Each PrimLoop Op contains a loop_index
     // example: for(loop_index = 0; loop_index < max_trip_cnt; loop_index++) { }
     OpNodeDescription* loop_index_node = getNextExecutionOp(new OpNodeDescription(op_id, "PrimLoop"));

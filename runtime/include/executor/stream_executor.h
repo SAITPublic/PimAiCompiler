@@ -2,14 +2,13 @@
 
 #include <torch/script.h>
 #include <functional>
-#include <vector>
 #include <string>
-#include "ir/include/nn_ir.hpp"
+#include <vector>
 #include "builder/model_builder.h"
-#include "nnrt_types.h"
 #include "ir/include/data_edge.hpp"
 #include "ir/include/edge.hpp"
 #include "ir/include/nn_ir.hpp"
+#include "nnrt_types.h"
 #include "utils.h"
 
 // #include "prim_ops_executor.h"
@@ -24,7 +23,7 @@ using OpExecutorFn = std::function<void(const nncir::Node&, StreamExecutor& stre
 class StreamExecutor
 {
    public:
-    StreamExecutor(const std::shared_ptr<nncir::NNIR> ir_graph_);
+    StreamExecutor(const std::shared_ptr<nncir::NNIR> ir_graph);
 
     void loadWeightAndBias(nncir::Blob* blob, const std::string& kind, const std::string& device_type);
 
@@ -51,20 +50,22 @@ class StreamExecutor
         cursor_ = cursor;
     }
 
-    void showAllBlobs() {
-        for(auto& item : this->global_blobs_) {
-            DLOG(INFO) <<"blob_id: "<<item.first <<" dtype: "<< getDataTypeStr(item.second.first);
+    void showAllBlobs()
+    {
+        for (auto& item : this->global_blobs_) {
+            DLOG(INFO) << "blob_id: " << item.first << " dtype: " << getDataTypeStr(item.second.first);
         }
     }
 
-
-    RetVal showBlob(int64_t blob_id) {
+    RetVal showBlob(int64_t blob_id)
+    {
         auto it = this->global_blobs_.find(blob_id);
-        if(it == this->global_blobs_.end()) {
-            DLOG(INFO) <<"Blob not found!";
+        if (it == this->global_blobs_.end()) {
+            DLOG(INFO) << "Blob not found!";
             return RetVal::FAILURE;
-        }else {
-            DLOG(INFO) << "blob_id: " << blob_id <<" type:" << getDataTypeStr(it->second.first) <<" value: " <<it->second;
+        } else {
+            DLOG(INFO) << "blob_id: " << blob_id << " type:" << getDataTypeStr(it->second.first)
+                       << " value: " << it->second;
             return RetVal::SUCCESS;
         }
     }

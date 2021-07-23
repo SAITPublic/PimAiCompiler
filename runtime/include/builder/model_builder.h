@@ -20,9 +20,8 @@ class ModelBuilder
 
     RetVal preloadModel();
 
-    std::shared_ptr<nncir::NNIR> get_runnable_ir(){
-        return this->runnable_ir_;
-    }
+    std::shared_ptr<nncir::NNIR> get_runnable_ir() { return this->runnable_ir_; }
+
    private:
     // Runnable NNIR
     std::shared_ptr<nncir::NNIR> runnable_ir_;

@@ -95,14 +95,18 @@ torch::jit::IValue boolToIValue(const bool& value) { return torch::jit::IValue(v
 
 torch::jit::IValue listToIValue(const c10::List<at::IValue>& value) { return torch::jit::IValue(value); }
 
-template<typename T>
-torch::jit::IValue vectorToIValue(const std::vector<T>& value) { return torch::jit::IValue(value); }
+template <typename T>
+torch::jit::IValue vectorToIValue(const std::vector<T>& value)
+{
+    return torch::jit::IValue(value);
+}
 
-bool isScalarType(DataType dtype) {
+bool isScalarType(DataType dtype)
+{
     return dtype == DataType::INT8 || dtype == DataType::UINT8 || dtype == DataType::INT16 ||
-            dtype == DataType::UINT16 || dtype == DataType::INT32 || dtype == DataType::INT64 ||
-            dtype == DataType::FLOAT16 || dtype == DataType::FLOAT32 || dtype == DataType::FLOAT64 ||
-            dtype == DataType::BOOL;
+           dtype == DataType::UINT16 || dtype == DataType::INT32 || dtype == DataType::INT64 ||
+           dtype == DataType::FLOAT16 || dtype == DataType::FLOAT32 || dtype == DataType::FLOAT64 ||
+           dtype == DataType::BOOL;
 }
 
 std::vector<int64_t> getInBlobIds(const nncir::Node& node)

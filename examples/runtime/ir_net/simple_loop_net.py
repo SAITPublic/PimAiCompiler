@@ -39,7 +39,7 @@ def simple1():
     print('x1:{}'.format(x1))
     print('x2:{}'.format(x2))
     print('out:{}'.format(output))
-    # frozen_model.save("simple_loop1.pt")
+    frozen_model.save("simple_loop1.pt")
 
 
 def simple2():
@@ -54,8 +54,8 @@ def simple2():
     print('x1:{}'.format(x1))
     print('x2:{}'.format(x2))
     print('out:{}'.format(output))
-    # frozen_model.save("simple_loop2.pt")
+    frozen_model.save("simple_loop2.pt")
 
 
 if __name__ == '__main__':
-    simple1()
+    simple2()

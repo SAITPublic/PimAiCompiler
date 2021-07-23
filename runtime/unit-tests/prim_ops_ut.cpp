@@ -1,9 +1,9 @@
 #include <gtest/gtest.h>
 #include <stdint.h>
-#include <vector>
 #include <torch/script.h>
-#include "glog/logging.h"
+#include <vector>
 #include "executor/prim_ops.h"
+#include "glog/logging.h"
 #include "ut_utils.h"
 
 using std::vector;
@@ -159,13 +159,13 @@ TEST(NnrUnitTest, primConstant)
 }
 
 TEST(NnrUnitTest, primListConstructAndUnpack)
-{   
-#define LIST_CONSTRUCT_TEST(name)                                        \
-    vector<torch::IValue> iv;                                            \
-    iv.clear();                                                          \
-    for (auto& item : vars) {                                            \
-        iv.push_back({item});                                            \
-    }                                                                    \
+{
+#define LIST_CONSTRUCT_TEST(name) \
+    vector<torch::IValue> iv;     \
+    iv.clear();                   \
+    for (auto& item : vars) {     \
+        iv.push_back({item});     \
+    }                             \
     nnrt::primListConstruct(iv, iv.size(), at::ListType::of##name##s());
 
     // case 1: int, int --> int[]
@@ -180,10 +180,9 @@ TEST(NnrUnitTest, primListConstructAndUnpack)
 
         // Unpack
         nnrt::primListUnpack(iv, vars.size());
-        for(int i=0;i<iv.size(); i++){
+        for (int i = 0; i < iv.size(); i++) {
             EXPECT_TRUE(iv[i].toInt() == vars[i]);
         }
-
     }
 
     // case 2: tensor, tensor --> tensor[]
@@ -193,7 +192,7 @@ TEST(NnrUnitTest, primListConstructAndUnpack)
         std::vector<torch::Tensor> vars = {torch::randn({sz, sz}, torch::kHalf),
                                            torch::randn({sz / 2, sz / 2}, torch::kHalf),
                                            torch::randn({sz / 2, sz / 2}, torch::kHalf)};
-        
+
         LIST_CONSTRUCT_TEST(Tensor);
         for (int i = 0; i < vars.size(); i++) {
             ASSERT_EQUAL(iv[0].toTensorList().get(i), vars[i]);
@@ -201,7 +200,7 @@ TEST(NnrUnitTest, primListConstructAndUnpack)
 
         // Unpack
         nnrt::primListUnpack(iv, vars.size());
-        for(int i=0;i<iv.size();i++){
+        for (int i = 0; i < iv.size(); i++) {
             ASSERT_EQUAL(iv[i].toTensor(), vars[i]);
         }
     }

@@ -5,7 +5,6 @@
 
 namespace nnrt
 {
-
 // these dtype are same with GraphGen
 enum DataType {
     UNDEFINED = 0,

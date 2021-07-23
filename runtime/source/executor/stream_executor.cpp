@@ -15,8 +15,8 @@ namespace nncir = nn_compiler::nn_ir;
 
 namespace nnrt
 {
-
-void StreamExecutor::loadWeightAndBias(nncir::Blob* blob, const std::string& kind, const std::string& device_type) {
+void StreamExecutor::loadWeightAndBias(nncir::Blob* blob, const std::string& kind, const std::string& device_type)
+{
     nncir::Shape4D shape = blob->getShape();
     int64_t blob_id = blob->getId();
 
@@ -46,9 +46,9 @@ void StreamExecutor::loadWeightAndBias(nncir::Blob* blob, const std::string& kin
     this->global_blobs_.insert({blob_id, {DataType::TENSOR, iv}});
 }
 
-StreamExecutor::StreamExecutor(const std::shared_ptr<nncir::NNIR> ir_graph_)
+StreamExecutor::StreamExecutor(const std::shared_ptr<nncir::NNIR> ir_graph)
 {
-    this->ir_graph_ = ir_graph_;
+    this->ir_graph_ = ir_graph;
     this->registerOp();
 
     // Get the output & input node from ir_graph at once
@@ -67,11 +67,11 @@ StreamExecutor::StreamExecutor(const std::shared_ptr<nncir::NNIR> ir_graph_)
             auto weight_blobs = lstm_node.getWeightBlob();
             auto bias_blobs = lstm_node.getBiasBlob();
 
-            for(auto blob : weight_blobs) {
+            for (auto blob : weight_blobs) {
                 this->loadWeightAndBias(blob, "weight", "gpu");
             }
 
-            for(auto blob : bias_blobs) {
+            for (auto blob : bias_blobs) {
                 this->loadWeightAndBias(blob, "bias", "gpu");
             }
         }
@@ -83,10 +83,7 @@ StreamExecutor::StreamExecutor(const std::shared_ptr<nncir::NNIR> ir_graph_)
     if (this->input_blob_ids_.size() == 0 || this->output_blob_ids_.size() == 0) {
         DLOG(ERROR) << "The Graph must have >= 1 inputs and outputs!";
     }
-
-    
 }
-
 
 RetVal StreamExecutor::inferenceModel(const std::shared_ptr<nncir::NNIR> graph,
                                       const std::vector<torch::Tensor>& input_tensors,

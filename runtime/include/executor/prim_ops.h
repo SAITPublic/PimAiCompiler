@@ -3,8 +3,8 @@
 #include <torch/script.h>
 #include <unordered_map>
 #include <vector>
-#include "glog/logging.h"
 #include "../nnrt_types.h"
+#include "glog/logging.h"
 
 namespace nnrt
 {

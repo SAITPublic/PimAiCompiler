@@ -3,8 +3,8 @@
 #include <memory>
 #include <tuple>
 #include <vector>
-#include "executor/stream_executor.h"
 #include "builder/model_builder.h"
+#include "executor/stream_executor.h"
 #include "nnrt_types.h"
 
 namespace nnrt

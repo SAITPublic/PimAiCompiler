@@ -37,7 +37,8 @@ template <typename T>
 torch::jit::IValue vectorToIValue(const std::vector<T>& value);
 
 template <typename T>
-at::ArrayRef<T> parseIValueArrayRef(const at::ArrayRef<at::IValue>& ivalue_array) {
+at::ArrayRef<T> parseIValueArrayRef(const at::ArrayRef<at::IValue>& ivalue_array)
+{
     assert(ivalue_array.size() > 0);
     std::vector<T> vec;
 
@@ -58,7 +59,8 @@ at::ArrayRef<T> parseIValueArrayRef(const at::ArrayRef<at::IValue>& ivalue_array
 }
 
 template <typename T>
-std::vector<T> parseIValueVector(const at::ArrayRef<at::IValue>& ivalue_array) {
+std::vector<T> parseIValueVector(const at::ArrayRef<at::IValue>& ivalue_array)
+{
     assert(ivalue_array.size() > 0);
     std::vector<T> vec;
 
@@ -75,8 +77,11 @@ std::vector<T> parseIValueVector(const at::ArrayRef<at::IValue>& ivalue_array) {
     }
     return vec;
 }
-template <typename ...T>
-torch::jit::IValue tupleToIValue(std::tuple<T...> tuple) { return torch::jit::IValue(tuple); }
+template <typename... T>
+torch::jit::IValue tupleToIValue(std::tuple<T...> tuple)
+{
+    return torch::jit::IValue(tuple);
+}
 
 bool isScalarType(DataType dtype);
 
