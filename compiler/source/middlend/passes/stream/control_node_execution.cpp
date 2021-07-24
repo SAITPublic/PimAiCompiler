@@ -6,7 +6,7 @@
 #include "compiler/include/middlend/passes/stream/control_node_execution.hpp"
 
 #include <stack>
-
+#include <iostream>
 namespace nn_compiler {
 
 /**
@@ -27,18 +27,18 @@ RetVal ControlNodeExecutionPass::initialize(const UtilManager& util_manager, con
  * @returns.    return RetVal
  */
 RetVal ControlNodeExecutionPass::run(nn_ir::NNIR& graph, CompilationContext& context) {
-    std::stack<nn_compiler::nn_ir::PrimIfNode*> if_nodes;
+    std::stack<std::pair<bool, nn_compiler::nn_ir::PrimIfNode*>> if_nodes;
     std::stack<nn_compiler::nn_ir::PrimEndIfNode*> then_net_end_if_nodes;
     std::stack<nn_compiler::nn_ir::PrimLoopNode*> loop_nodes;
-    bool then_net = true;
     for (auto& node : graph.getNodes()) {
+        int node_id = node.getId();
         if (node.getNodeType() == nn_compiler::nn_ir::NodeType::PRIMIF) {
             auto prim_if_node = cast_if<nn_ir::PrimIfNode>(node);
-            if_nodes.push(prim_if_node);
-            if_nodes.push(prim_if_node);
-            then_net = true;
+            if_nodes.push(std::make_pair(false, prim_if_node));
+            if_nodes.push(std::make_pair(true, prim_if_node));
         } else if (node.getNodeType() == nn_compiler::nn_ir::NodeType::PRIMENDIF) {
-            auto prim_if_node = if_nodes.top();
+            bool then_net = if_nodes.top().first;
+            auto prim_if_node = if_nodes.top().second;
             auto prim_end_if_node = cast_if<nn_ir::PrimEndIfNode>(node);
             prim_end_if_node->setIfNodeId(prim_if_node->getId());
             if (then_net) {
@@ -53,7 +53,6 @@ RetVal ControlNodeExecutionPass::run(nn_ir::NNIR& graph, CompilationContext& con
                 then_net_end_if_nodes.pop();
             }
             if_nodes.pop();
-            then_net = !then_net;
         } else if (node.getNodeType() == nn_compiler::nn_ir::NodeType::PRIMLOOP) {
             auto prim_loop_node = cast_if<nn_ir::PrimLoopNode>(node);
             loop_nodes.push(prim_loop_node);
