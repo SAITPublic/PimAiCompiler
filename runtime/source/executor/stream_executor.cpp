@@ -24,21 +24,34 @@ void StreamExecutor::loadWeightAndBias(nncir::Blob* blob, const std::string& kin
     if (data_blob == nullptr) {
         DLOG(ERROR) << "The blob is not weight or bias blob!";
     }
-    auto value_vec = data_blob->getBuf<float>();
     auto bit_width = blob->getBitWidth();
     at::ScalarType scalar_type;
-    if (bit_width == 16) {
-        scalar_type = torch::kHalf;
-    } else if (bit_width == 32) {
-        scalar_type = torch::kFloat;
-    } else {
-        DLOG(ERROR) << "Weight bit wise Error, unsupport data type when create Tensor!";
-    }
     torch::Tensor tensor_data;
     if (kind == "weight") {
-        tensor_data = at::from_blob(value_vec.data(), {shape.h, shape.w}, scalar_type).cuda();
+        if (bit_width == 16) {
+            auto value_vec = data_blob->getBuf<float16>();
+            scalar_type = torch::kHalf;
+            tensor_data = at::from_blob(value_vec.data(), {shape.h, shape.w}, scalar_type).cuda();
+        } else if (bit_width == 32) {
+            auto value_vec = data_blob->getBuf<float>();
+            scalar_type = torch::kFloat;
+            tensor_data = at::from_blob(value_vec.data(), {shape.h, shape.w}, scalar_type).cuda();
+        } else {
+            DLOG(ERROR) << "Weight bit witgh Error!";
+        }
+
     } else if (kind == "bias") {
-        tensor_data = at::from_blob(value_vec.data(), {shape.w}, scalar_type).cuda();
+        if (bit_width == 16) {
+            auto value_vec = data_blob->getBuf<float16>();
+            scalar_type = torch::kHalf;
+            tensor_data = at::from_blob(value_vec.data(), {shape.w}, scalar_type).cuda();
+        } else if (bit_width == 32) {
+            auto value_vec = data_blob->getBuf<float>();
+            scalar_type = torch::kFloat;
+            tensor_data = at::from_blob(value_vec.data(), {shape.w}, scalar_type).cuda();
+        } else {
+            DLOG(ERROR) << "Weight bit witgh Error!";
+        }
     } else {
         DLOG(ERROR) << "Kind Error, blob kind is" << kind;
     }
