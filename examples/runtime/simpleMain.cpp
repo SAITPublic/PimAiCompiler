@@ -5,30 +5,29 @@
 #include <iostream>
 #include <memory>
 #include <set>
-#include "runtime/include/executor/prim_utils.h"
 #include "nn_runtime.h"
+#include "runtime/include/executor/prim_utils.h"
 
 using namespace nnrt;
 
-
-torch::Tensor load_tensor(const std::string& bin_file, const std::vector<int64_t>& shape, DataType dtype) 
+torch::Tensor load_tensor(const std::string& bin_file, const std::vector<int64_t>& shape, DataType dtype)
 {
     // ref: // https://www.cnblogs.com/yaos/p/12105108.html
     // Get num-elements
     int num_elements = 1;
-    for(auto item : shape) {
+    for (auto item : shape) {
         num_elements *= item;
     }
 
     int total_size = -1;
-    if(dtype == DataType::INT64){
+    if (dtype == DataType::INT64) {
         total_size = num_elements * sizeof(int64_t);
-    } else if(dtype == DataType::FLOAT32) {
+    } else if (dtype == DataType::FLOAT32) {
         total_size = num_elements * sizeof(float);
-    } else if(dtype == DataType::FLOAT16) {
+    } else if (dtype == DataType::FLOAT16) {
         total_size = num_elements * sizeof(float) / 2;
     } else {
-        DLOG(ERROR) <<"Unsupport data type!";
+        DLOG(ERROR) << "Unsupport data type!";
     }
     char* buffer = new char[total_size];
     // read binary file
@@ -37,31 +36,26 @@ torch::Tensor load_tensor(const std::string& bin_file, const std::vector<int64_t
     ifs.close();
 
     auto tensor = createPtTensor((void*)buffer, shape, dtype);
-    return tensor; 
+    return tensor;
 }
 
-
-void run_rnnt_from_file(std::string ir_file) {
-
+void run_rnnt_from_file(std::string ir_file)
+{
     std::string feature_len_file = "path/to/feature_len.bin";
     std::string feature_file = "path/to/feature.bin";
     NNRuntime runtime(ir_file);
-    // runtime.test(); 
-    
-    std::vector<torch::Tensor> input_tensors;
 
+    std::vector<torch::Tensor> input_tensors;
     // load inputs from files
-    auto tensor_feature = load_tensor(feature_file, {341, 1, 240}, DataType::FLOAT16);
+    auto tensor_feature = load_tensor(feature_file, {341, 1, 240}, DataType::FLOAT16).cuda();
     auto tensor_feature_len = load_tensor(feature_len_file, {1}, DataType::INT64);
     input_tensors.push_back(tensor_feature);
     input_tensors.push_back(tensor_feature_len);
 
-    for(auto item : input_tensors) {
-        DLOG(INFO) <<"Input: " << "size: " <<item.sizes() <<" dtype:" <<item.dtype() <<" device:" <<item.device();
+    for (auto item : input_tensors) {
+        DLOG(INFO) << "Input: "
+                   << "size: " << item.sizes() << " dtype:" << item.dtype() << " device:" << item.device();
     }
-
-    std::cout<< tensor_feature_len <<std::endl;
-    std::cout<< tensor_feature[0] <<std::endl;
 
     // Inference
     auto output_tensors = runtime.inferenceModel(input_tensors);
@@ -70,7 +64,6 @@ void run_rnnt_from_file(std::string ir_file) {
 int main(int argc, const char* argv[])
 {
     LOG(INFO) << "start runtime! ";
-
     auto print_error = []() {
         LOG(ERROR) << "Usage: ./simpleMian model_path! or set ENV (export GRAPH_IR_FILE=path/to/your/graph_ir)";
         return -1;
@@ -88,20 +81,6 @@ int main(int argc, const char* argv[])
         return print_error();
     }
 
-    NNRuntime runtime(ir_file);
-    runtime.test();
-
-    std::vector<torch::Tensor> input_tensors;
-
-    // Set test inputs
-    // input_tensors.push_back(torch::tensor({{1,2,3},{4,5,6}}));
-    // input_tensors.push_back(torch::tensor({{20,2,30},{-4,50,70}}));
-
-    // For test RNNT with one sample
-    input_tensors.push_back(torch::ones({341, 1, 240}, torch::kFloat).cuda());
-    input_tensors.push_back(torch::tensor({341}, torch::kInt64));
-
-    // Inference
-    auto output_tensors = runtime.inferenceModel(input_tensors);
+    run_rnnt_from_file(ir_file);
     return 0;
 }

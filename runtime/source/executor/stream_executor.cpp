@@ -24,6 +24,7 @@ void StreamExecutor::loadWeightAndBias(nncir::Blob* blob, const std::string& kin
     if (data_blob == nullptr) {
         DLOG(ERROR) << "The blob is not weight or bias blob!";
     }
+
     auto bit_width = blob->getBitWidth();
     at::ScalarType scalar_type;
     torch::Tensor tensor_data;
@@ -182,6 +183,7 @@ void StreamExecutor::registerOp()
     this->global_op_register_.insert({nncir::NodeType::ATENCAT, executorAtenCat});
     this->global_op_register_.insert({nncir::NodeType::ATENCEIL, executorAtenCeil});
     this->global_op_register_.insert({nncir::NodeType::ATENCOPY, executorAtenCopy});
+    this->global_op_register_.insert({nncir::NodeType::ATENCUDA, executorAtenCuda});
     this->global_op_register_.insert({nncir::NodeType::ATENDERIVEINDEX, executorAtenDeriveIndex});
     this->global_op_register_.insert({nncir::NodeType::ATENDIM, executorAtenDim});
     this->global_op_register_.insert({nncir::NodeType::ATENDIV, executorAtenDiv});

@@ -1546,4 +1546,22 @@ void executorAtenZerosLike(const nncir::Node& op_node, StreamExecutor& stream_ex
     auto& out_edge = cast<nncir::DataEdge>(zeros_like_node.getFirstOutEdge());
     stream_executor.updateBlob(out_edge.getBlobId(), DataType::TENSOR, tensorToIValue(output));
 }
+
+void executorAtenCuda(const nncir::Node& op_node, StreamExecutor& stream_executor)
+{
+    DLOG(INFO) << "execute Aten Cuda node";
+    auto cuda_node = cast<nncir::AtenCudaNode>(op_node);
+
+    auto& input_edge = cast<nncir::DataEdge>(cuda_node.getInEdge(0));
+    int input_tensor_blob_id = input_edge.getBlobId();
+    torch::jit::IValue iv_tensor = stream_executor.findBlob(input_tensor_blob_id).second;
+    assert(iv_tensor.isTensor());
+    at::Tensor tensor = iv_tensor.toTensor();
+
+    // Need to check cuda available
+    at::Tensor output = tensor.cuda();
+    auto& out_edge = cast<nncir::DataEdge>(cuda_node.getFirstOutEdge());
+    stream_executor.updateBlob(out_edge.getBlobId(), DataType::TENSOR, tensorToIValue(output));
+}
+
 }  // namespace nnrt

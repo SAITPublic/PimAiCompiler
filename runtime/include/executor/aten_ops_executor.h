@@ -10,6 +10,7 @@
 
 namespace nnrt
 {
+void executorAtenCuda(const nncir::Node& op_node, StreamExecutor& stream_executor);
 void executorAtenDeriveIndex(const nncir::Node& op_node, StreamExecutor& stream_executor);
 void executorAtenGetItem(const nncir::Node& op_node, StreamExecutor& stream_executor);
 void executorAtenIs(const nncir::Node& op_node, StreamExecutor& stream_executor);

@@ -33,3 +33,11 @@ def compare_tensors(lst1, lst2):
         if not t1.equal(t2):
             return False
     return True
+
+def print_graph(torch_script_file : str):
+    script_model = torch.jit.load(torch_script_file)
+    print(script_model.graph)
+
+
+if __name__ == '__main__':
+    print_graph('/path/to/torchscript')
