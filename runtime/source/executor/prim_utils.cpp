@@ -102,4 +102,21 @@ at::ListTypePtr inferTypeFromDataType(DataType type)
     return list_type;
 }
 
+std::vector<int64_t> getDataShapeFromShape4D(nn_compiler::nn_ir::Shape4D shape) {
+    std::vector<int64_t> temp_shape;
+    if (shape.n != 0) {
+        temp_shape.push_back(shape.n);
+    }
+    if (shape.c != 0) {
+        temp_shape.push_back(shape.c);
+    }
+    if (shape.h != 0) {
+        temp_shape.push_back(shape.h);
+    }
+    if (shape.w != 0) {
+        temp_shape.push_back(shape.w);
+    }
+    return temp_shape;
+}
+
 }  // namespace nnrt

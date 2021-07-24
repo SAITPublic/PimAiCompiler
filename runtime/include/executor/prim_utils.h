@@ -4,6 +4,7 @@
 #include <exception>
 #include <vector>
 #include "../nnrt_types.h"
+#include "ir/include/ir_types.hpp"
 
 namespace nnrt
 {
@@ -40,5 +41,7 @@ torch::Tensor createPtTensor(void* data_ptr, const std::vector<int64_t>& shape, 
 DataType inferDataType(torch::jit::IValue ival);
 
 at::ListTypePtr inferTypeFromDataType(DataType type);
+
+std::vector<int64_t> getDataShapeFromShape4D(nn_compiler::nn_ir::Shape4D shape);
 
 }  // namespace nnrt

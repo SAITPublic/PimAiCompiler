@@ -74,9 +74,9 @@ void executePrimConstant(const nncir::Node& op_node, StreamExecutor& stream_exec
         }
 
         uint8_t* ptr = const_cast<uint8_t*>(constant_node.getData().data());
-        std::vector<int64_t> input_shape = {static_cast<int64_t>(shape_.n), static_cast<int64_t>(shape_.c),
-                                            static_cast<int64_t>(shape_.h), static_cast<int64_t>(shape_.w)};
+        std::vector<int64_t> input_shape = getDataShapeFromShape4D(shape_);
         auto tensor = primTensorConstant((void*)ptr, input_shape, scalar_type);
+        tensor = tensor.cuda();
         iv = tensorToIValue(tensor);
         dtype = DataType::TENSOR;
 
@@ -349,15 +349,17 @@ void executePrimVariable(const nncir::Node& op_node, StreamExecutor& stream_exec
 
     // list[scalar,scalar] list[tensor,tensor]
     if (node_data_type.find("List") != std::string::npos) {
-        int size = tensor_shape[0].n * tensor_shape[0].c * tensor_shape[0].h * tensor_shape[0].w;
+        auto temp_shape = getDataShapeFromShape4D(tensor_shape[0]);
+        int size = 1;
+        for (auto item : temp_shape) {
+            size *= item;
+        }
         std::vector<torch::IValue> inputs;
         int total_size = 0;
         auto scalar_type = DataType::NONE;
 
         for (uint32_t idx = 0; idx < tensor_shape.size(); idx++) {
-            std::vector<int64_t> input_shape = {
-                static_cast<int64_t>(tensor_shape.at(idx).n), static_cast<int64_t>(tensor_shape.at(idx).c),
-                static_cast<int64_t>(tensor_shape.at(idx).h), static_cast<int64_t>(tensor_shape.at(idx).w)};
+            std::vector<int64_t> input_shape = getDataShapeFromShape4D(tensor_shape.at(idx));
             torch::jit::IValue iv;
             scalar_type = DataType::NONE;
             auto sizeofnum = 0;
@@ -407,8 +409,11 @@ void executePrimVariable(const nncir::Node& op_node, StreamExecutor& stream_exec
                 iv = tensorToIValue(tensor);
             }
             inputs.push_back(iv);
-            total_size +=
-                tensor_shape.at(idx).n * tensor_shape.at(idx).c * tensor_shape.at(idx).h * tensor_shape.at(idx).w;
+            int temp_size = 1;
+            for (auto item : input_shape) {
+                temp_size *= item;
+            }
+            total_size += temp_size;
         }
 
         primListConstruct(inputs, inputs.size(), inferTypeFromDataType(scalar_type));
@@ -708,8 +713,6 @@ void executePrimBlock(const nncir::Node& op_node, StreamExecutor& stream_executo
             // auto in_blob = stream_executor.findBlob(in_blob_ids.at(1));
             // stream_executor.updateBlob(out_blob_ids.at(0), DataType::INT64, loop_index);
         } else {
-            // currently, only assume in_blob_ids.size == out_blob_ids.size
-            // assert(in_blob_ids.size() == out_blob_ids.size());
             std::vector<int64_t> temp_out_blob_ids(in_blob_ids.size(), -1);
             int out_id = 0;
             for (int i = 0; i < out_blob_ids.size(); i++) {
