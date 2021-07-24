@@ -203,7 +203,7 @@ void executePrimListUnpack(const nncir::Node& op_node, StreamExecutor& stream_ex
     // update output
     auto outedges = list_unpack_node.getOutEdgeIds();
     for (uint32_t idx = 0; idx < outedges.size(); idx++) {
-        auto& out_edge = cast<nncir::DataEdge>(list_unpack_node.getOutEdge(outedges.at(idx)));
+        auto& out_edge = cast<nncir::DataEdge>(list_unpack_node.getOutEdge(idx));
         auto type = inferDataType(inputs.at(idx));
         stream_executor.updateBlob(out_edge.getBlobId(), type, inputs.at(idx));
     }
@@ -254,7 +254,7 @@ void executePrimTupleIndex(const nncir::Node& op_node, StreamExecutor& stream_ex
     // cast Node -> PrimTupleIndexNode
     auto tuple_index_node = cast<nncir::PrimTupleIndexNode>(op_node);
     auto inedges = tuple_index_node.getInEdgeIds();
-    auto& data_edge = cast<nncir::DataEdge>(tuple_index_node.getInEdge(inedges.at(0)));
+    auto& data_edge = cast<nncir::DataEdge>(tuple_index_node.getInEdge(0));
     int input_data_blob_id = data_edge.getBlobId();
 
     // Find the input data blob
@@ -264,12 +264,15 @@ void executePrimTupleIndex(const nncir::Node& op_node, StreamExecutor& stream_ex
     for (auto tensor : tensors) {
         inputs.push_back(tensor.toTensor());
     }
+    int64_t index = tuple_index_node.getIndex();
+    if (nncir::isDefaultValue<int64_t>(index)) {
+        auto& index_edge = cast<nncir::DataEdge>(tuple_index_node.getInEdge(1));
+        int input_index_blob_id = index_edge.getBlobId();
+        // Find the input index blob
+        torch::jit::IValue index_iv = stream_executor.findBlob(input_index_blob_id).second;
+        index = index_iv.toInt();
+    }
 
-    auto& index_edge = cast<nncir::DataEdge>(tuple_index_node.getInEdge(inedges.at(1)));
-    int input_index_blob_id = index_edge.getBlobId();
-    // Find the input index blob
-    torch::jit::IValue index_iv = stream_executor.findBlob(input_index_blob_id).second;
-    int64_t index = index_iv.toInt();
     // Call OpKernel
     auto output = primTupleIndex(inputs, index);
     // update output
@@ -293,7 +296,7 @@ void executePrimTupleUnpack(const nncir::Node& op_node, StreamExecutor& stream_e
     // update output
     auto outedges = tuple_unpack_node.getOutEdgeIds();
     for (uint32_t idx = 0; idx < outedges.size(); idx++) {
-        auto& out_edge = cast<nncir::DataEdge>(tuple_unpack_node.getOutEdge(outedges.at(idx)));
+        auto& out_edge = cast<nncir::DataEdge>(tuple_unpack_node.getOutEdge(idx));
         auto type = inferDataType(output.at(idx));
         stream_executor.updateBlob(out_edge.getBlobId(), type, output.at(idx));
     }
