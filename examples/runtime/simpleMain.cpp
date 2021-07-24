@@ -41,8 +41,8 @@ torch::Tensor load_tensor(const std::string& bin_file, const std::vector<int64_t
 
 void run_rnnt_from_file(std::string ir_file)
 {
-    std::string feature_len_file = "path/to/feature_len.bin";
-    std::string feature_file = "path/to/feature.bin";
+    std::string feature_len_file = "/home/user/pim-workspace/Runtime-dev/NNCompiler/examples/runtime/resource/rnnt/inputs/feature_len.bin";
+    std::string feature_file = "/home/user/pim-workspace/Runtime-dev/NNCompiler/examples/runtime/resource/rnnt/inputs/feature.bin";
     NNRuntime runtime(ir_file);
 
     std::vector<torch::Tensor> input_tensors;

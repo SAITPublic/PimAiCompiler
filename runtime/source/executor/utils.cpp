@@ -119,6 +119,12 @@ std::vector<int64_t> getInBlobIds(const nncir::Node& node)
     return ret;
 }
 
+/**
+ * @brief Get the Out Blob Ids, the result <ids> may contain duplicates elements, for example {1, 1, 2, 3, 3}
+ * 
+ * @param node 
+ * @return std::vector<int64_t> 
+ */
 std::vector<int64_t> getOutBlobIds(const nncir::Node& node)
 {
     std::vector<int64_t> ret;
@@ -128,6 +134,21 @@ std::vector<int64_t> getOutBlobIds(const nncir::Node& node)
     }
     return ret;
 }
+
+std::vector<int64_t> getUniqueOutBlobIds(const nncir::Node& node)
+{
+    std::vector<int64_t> ret;
+    for (int i = 0; i < node.getOutEdgeIds().size(); i++) {
+        auto& data_edge = cast<nncir::DataEdge>(node.getOutEdge(i));
+        int blob_id = data_edge.getBlobId();
+        if(std::find(ret.begin(), ret.end(), blob_id) == ret.end()){
+            // not exist, insert
+            ret.push_back(data_edge.getBlobId());
+        }
+    }
+    return ret;
+}
+
 
 static std::unordered_map<DataType, std::string> dtype_to_str_map = {
     {DataType::UNDEFINED, "UNDEFINED"}, {DataType::INT8, "INT8"},

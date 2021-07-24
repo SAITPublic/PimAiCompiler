@@ -194,18 +194,17 @@ void executePrimListUnpack(const nncir::Node& op_node, StreamExecutor& stream_ex
     int input_blob_id = data_edge.getBlobId();
     // Find the input blob
     torch::jit::IValue iv = stream_executor.findBlob(input_blob_id).second;
+
+    // Don't need to call nnrt::primListUnpack anymore
     std::vector<torch::IValue> inputs;
-    for (auto item : iv.toTuple()->elements()) {
+    for (auto item : iv.toListRef()) {
         inputs.push_back(item);
     }
-    // Call OpKernel
-    primListUnpack(inputs, inputs.size());
-    // update output
-    auto outedges = list_unpack_node.getOutEdgeIds();
-    for (uint32_t idx = 0; idx < outedges.size(); idx++) {
-        auto& out_edge = cast<nncir::DataEdge>(list_unpack_node.getOutEdge(idx));
-        auto type = inferDataType(inputs.at(idx));
-        stream_executor.updateBlob(out_edge.getBlobId(), type, inputs.at(idx));
+
+    auto unique_out_blob_ids = getUniqueOutBlobIds(op_node);
+    for (int i = 0; i < inputs.size(); i++) {
+        auto type = inferDataType(inputs.at(i));
+        stream_executor.updateBlob(unique_out_blob_ids.at(i), type, inputs.at(i));
     }
 }
 
@@ -293,13 +292,12 @@ void executePrimTupleUnpack(const nncir::Node& op_node, StreamExecutor& stream_e
 
     // Call OpKernel
     auto output = primTupleUnpack(iv.toTuple());
+
     // update output
-    auto out_blob_ids = getOutBlobIds(op_node);
-    auto pos = std::unique(out_blob_ids.begin(), out_blob_ids.end());
-    out_blob_ids.erase(pos, out_blob_ids.end());
-    for (uint32_t idx = 0; idx < out_blob_ids.size(); idx++) {
-        auto type = inferDataType(output.at(idx));
-        stream_executor.updateBlob(out_blob_ids[idx], type, output.at(idx));
+    auto unique_out_blob_ids = getUniqueOutBlobIds(op_node);
+    for (int i = 0; i < output.size(); i++) {
+        auto type = inferDataType(output.at(i));
+        stream_executor.updateBlob(unique_out_blob_ids.at(i), type, output.at(i));
     }
 }
 
@@ -548,7 +546,7 @@ void executePrimEndIf(const nncir::Node& op_node, StreamExecutor& stream_executo
                     temp_out_blob_ids[out_id++] = out_blob_ids.at(i);
                 }
             }
-            
+
             for (int i = 0; i < in_blob_ids.size(); i++) {
                 auto in_data = stream_executor.findBlob(in_blob_ids[i]);
                 stream_executor.updateBlob(temp_out_blob_ids[i], in_data.first, in_data.second);
