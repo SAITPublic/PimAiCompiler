@@ -294,11 +294,12 @@ void executePrimTupleUnpack(const nncir::Node& op_node, StreamExecutor& stream_e
     // Call OpKernel
     auto output = primTupleUnpack(iv.toTuple());
     // update output
-    auto outedges = tuple_unpack_node.getOutEdgeIds();
-    for (uint32_t idx = 0; idx < outedges.size(); idx++) {
-        auto& out_edge = cast<nncir::DataEdge>(tuple_unpack_node.getOutEdge(idx));
+    auto out_blob_ids = getOutBlobIds(op_node);
+    auto pos = std::unique(out_blob_ids.begin(), out_blob_ids.end());
+    out_blob_ids.erase(pos, out_blob_ids.end());
+    for (uint32_t idx = 0; idx < out_blob_ids.size(); idx++) {
         auto type = inferDataType(output.at(idx));
-        stream_executor.updateBlob(out_edge.getBlobId(), type, output.at(idx));
+        stream_executor.updateBlob(out_blob_ids[idx], type, output.at(idx));
     }
 }
 
