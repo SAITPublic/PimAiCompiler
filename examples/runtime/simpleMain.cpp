@@ -1,10 +1,13 @@
 #include <glog/logging.h>
 #include <cstdio>
 #include <cstring>
+#include <experimental/filesystem>
 #include <fstream>
 #include <iostream>
 #include <memory>
 #include <set>
+#include <unistd.h>
+
 #include "nn_runtime.h"
 #include "runtime/include/executor/prim_utils.h"
 
@@ -41,8 +44,17 @@ torch::Tensor load_tensor(const std::string& bin_file, const std::vector<int64_t
 
 void run_rnnt_from_file(std::string ir_file)
 {
-    std::string feature_len_file = "/home/user/pim-workspace/Runtime-dev/NNCompiler/examples/runtime/resource/rnnt/inputs/feature_len.bin";
-    std::string feature_file = "/home/user/pim-workspace/Runtime-dev/NNCompiler/examples/runtime/resource/rnnt/inputs/feature.bin";
+    std::string feature_len_file = "examples/runtime/resource/rnnt/inputs/feature_len.bin";
+    std::string feature_file = "examples/runtime/resource/rnnt/inputs/feature.bin";
+    std::string current_path = std::experimental::filesystem::current_path();
+    if (current_path.find("/build") != std::string::npos) {
+        feature_len_file = "../" + feature_len_file;
+        feature_file = "../" + feature_file;
+    }
+    if (access(feature_len_file.c_str(), F_OK ) == -1 || access(feature_file.c_str(), F_OK ) == -1) {
+        DLOG(ERROR) << "Please run at base or build directory.";
+    }
+
     NNRuntime runtime(ir_file);
 
     std::vector<torch::Tensor> input_tensors;
