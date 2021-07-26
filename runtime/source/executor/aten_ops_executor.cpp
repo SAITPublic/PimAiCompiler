@@ -460,7 +460,7 @@ void executorAtenExpand(const nncir::Node& op_node, StreamExecutor& stream_execu
 
     auto self_tensor = iv_self.toTensor();
     auto size_ivalue_list = iv_size.toListRef();
-    auto size_list = parseIValueArrayRef<int64_t>(size_ivalue_list);
+    auto size_list = parseIValueVector<int64_t>(size_ivalue_list);
 
     int implicit = expand_node.getImplicit();
     if (nncir::isDefaultValue<int>(implicit)) {
@@ -471,7 +471,7 @@ void executorAtenExpand(const nncir::Node& op_node, StreamExecutor& stream_execu
         implicit = implicit_iv.toInt();
     }
 
-    auto output = nnrt::atenExpand(self_tensor, size_list, static_cast<bool>(implicit));
+    auto output = nnrt::atenExpand(self_tensor, at::ArrayRef<int64_t>(size_list), static_cast<bool>(implicit));
     // update output
     auto& out_edge = cast<nncir::DataEdge>(expand_node.getFirstOutEdge());
     stream_executor.updateBlob(out_edge.getBlobId(), DataType::TENSOR, tensorToIValue(output));
@@ -921,7 +921,6 @@ void executorAtenMatmul(const nncir::Node& op_node, StreamExecutor& stream_execu
     DLOG(INFO) << "execute Aten Matmul node";
 
     auto node = cast<nncir::AtenMatmulNode>(op_node);
-    assert(node.getNumInputs() == 2);
 
     auto& input_self = cast<nncir::DataEdge>(node.getInEdge(0));
     auto& input_other = cast<nncir::DataEdge>(node.getInEdge(1));
@@ -1298,11 +1297,11 @@ void executorAtenTensor(const nncir::Node& op_node, StreamExecutor& stream_execu
     assert(self_list.size() > 0);
     at::Tensor output;
     if (self_list[0].isInt()) {
-        auto array_ref = parseIValueArrayRef<int64_t>(self_list);
-        output = nnrt::atenTensor(array_ref, options);
+        auto array_ref = parseIValueVector<int64_t>(self_list);
+        output = nnrt::atenTensor(at::ArrayRef<int64_t>(array_ref), options);
     } else if (self_list[0].isDouble()) {
-        auto array_ref = parseIValueArrayRef<double>(self_list);
-        output = nnrt::atenTensor(array_ref, options);
+        auto array_ref = parseIValueVector<double>(self_list);
+        output = nnrt::atenTensor(at::ArrayRef<double>(array_ref), options);
     } else {
         DLOG(ERROR) << "Unsupported data type to parse ArrayRef.";
     }

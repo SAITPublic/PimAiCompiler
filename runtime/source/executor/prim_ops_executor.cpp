@@ -80,8 +80,19 @@ void executePrimConstant(const nncir::Node& op_node, StreamExecutor& stream_exec
         iv = tensorToIValue(tensor);
         dtype = DataType::TENSOR;
 
+    } else if (ntype == "(int, int, int)") {
+        std::vector<torch::IValue> inputs;
+        int64_t tmp = 0;
+        for (uint32_t i = 0; i < 3; i++) {
+            tmp = *(int64_t*)(ptr + sizeof(int64_t) * i);
+            torch::IValue iv_temp = scalarToIValue(tmp);
+            inputs.push_back(iv_temp);
+        }
+        primTupleConstruct(inputs, inputs.size());
+        iv = inputs.at(0);
+        dtype = DataType::TUPLE;
     } else {
-        DLOG(ERROR) << "PrimConstant Error, unsupport data type!";
+        DLOG(ERROR) << "PrimConstant Error, ntype: " << ntype << "unsupport!";
     }
 
     // save to global_blobs_ table
