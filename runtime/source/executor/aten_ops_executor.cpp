@@ -634,7 +634,6 @@ void executorAtenInt(const nncir::Node& op_node, StreamExecutor& stream_executor
     DLOG(INFO) << "execute Aten Int node";
 
     auto int_node = cast<nncir::AtenIntNode>(op_node);
-    assert(int_node.getNumInputs() == 1);
 
     auto& input_self = cast<nncir::DataEdge>(int_node.getInEdge(0));
     int input_self_blob_id = input_self.getBlobId();
@@ -948,18 +947,42 @@ void executorAtenMax(const nncir::Node& op_node, StreamExecutor& stream_executor
     auto max_node = cast<nncir::AtenMaxNode>(op_node);
     int edge_id = 0;
 
+    // Get first input
     auto& input_self = cast<nncir::DataEdge>(max_node.getInEdge(0));
-    auto& input_other = cast<nncir::DataEdge>(max_node.getInEdge(1));
-
-    // Get input blob
     int input_self_blob_id = input_self.getBlobId();
-    int input_other_blob_id = input_other.getBlobId();
-
-    // Find the input blob
     torch::jit::IValue iv_self = stream_executor.findBlob(input_self_blob_id).second;
-    torch::jit::IValue iv_other = stream_executor.findBlob(input_other_blob_id).second;
     assert(iv_self.isTensor());
     at::Tensor self_tensor = iv_self.toTensor();
+
+    auto dim = max_node.getDim();
+    int keep_dim = max_node.getKeepDim();
+
+    if (max_node.getInEdgeIds().size()){
+        if(nncir::isDefaultValue<int64_t>(dim) && nncir::isDefaultValue<int>(keep_dim)){
+            // aten::max(Tensor)
+            auto output = nnrt::atenMax(self_tensor);
+            // update output
+            auto& out_edge = cast<nncir::DataEdge>(max_node.getFirstOutEdge());
+            stream_executor.updateBlob(out_edge.getBlobId(), DataType::TENSOR, tensorToIValue(output));
+        }else{
+            // aten::max(Tensor, dim, keepdim)
+            auto output = nnrt::atenMax(self_tensor, dim, static_cast<bool>(keep_dim));
+            // update output
+            auto& out_edge = cast<nncir::DataEdge>(max_node.getFirstOutEdge());
+            auto out_blob_ids = getOutBlobIds(op_node);
+            auto pos = std::unique(out_blob_ids.begin(), out_blob_ids.end());
+            out_blob_ids.erase(pos, out_blob_ids.end());
+            stream_executor.updateBlob(out_blob_ids[0], DataType::TENSOR, tensorToIValue(std::get<0>(output)));
+            stream_executor.updateBlob(out_blob_ids[1], DataType::TENSOR, tensorToIValue(std::get<1>(output)));
+        }
+        return;
+    }
+
+    // Get second input
+    auto& input_other = cast<nncir::DataEdge>(max_node.getInEdge(1));
+    int input_other_blob_id = input_other.getBlobId();
+    torch::jit::IValue iv_other = stream_executor.findBlob(input_other_blob_id).second;
+
     auto dtype = stream_executor.findBlob(input_other_blob_id).first;
     if (dtype == DataType::TENSOR) {
         // aten::max(Tensor, Tensor)
@@ -992,7 +1015,12 @@ void executorAtenMax(const nncir::Node& op_node, StreamExecutor& stream_executor
         auto output = nnrt::atenMax(self_tensor, dim, static_cast<bool>(keep_dim));
         // update output
         auto& out_edge = cast<nncir::DataEdge>(max_node.getFirstOutEdge());
-        stream_executor.updateBlob(out_edge.getBlobId(), DataType::TUPLE, tupleToIValue(output));
+        auto out_blob_ids = getOutBlobIds(op_node);
+        auto pos = std::unique(out_blob_ids.begin(), out_blob_ids.end());
+        out_blob_ids.erase(pos, out_blob_ids.end());
+        stream_executor.updateBlob(out_blob_ids[0], DataType::TENSOR, tensorToIValue(std::get<0>(output)));
+        stream_executor.updateBlob(out_blob_ids[1], DataType::TENSOR, tensorToIValue(std::get<1>(output)));
+
     } else {
         DLOG(ERROR) << "Unsupported input type for aten::max";
     }
