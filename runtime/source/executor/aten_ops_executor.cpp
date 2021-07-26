@@ -549,56 +549,35 @@ void executorAtenFormat(const nncir::Node& op_node, StreamExecutor& stream_execu
 void executorAtenGt(const nncir::Node& op_node, StreamExecutor& stream_executor)
 {
     DLOG(INFO) << "execute Aten Gt node";
-
     auto node = cast<nncir::AtenGtNode>(op_node);
-    assert(node.getNumInputs() == 2);
 
-    auto& input_self = cast<nncir::DataEdge>(node.getInEdge(0));
-    auto& input_other = cast<nncir::DataEdge>(node.getInEdge(1));
-
-    // Get input blob
-    int input_self_blob_id = input_self.getBlobId();
-    int input_other_blob_id = input_other.getBlobId();
-
+    auto in_blob_ids = getInBlobIds(op_node);
+    assert(in_blob_ids.size() == 2);
     // Find the input blob
-    torch::jit::IValue iv_self = stream_executor.findBlob(input_self_blob_id).second;
-    torch::jit::IValue iv_other = stream_executor.findBlob(input_other_blob_id).second;
+    torch::jit::IValue iv_self = stream_executor.findBlob(in_blob_ids.at(0)).second;
+    torch::jit::IValue iv_other = stream_executor.findBlob(in_blob_ids.at(1)).second;
 
-    int tmp_self = iv_self.toScalar().toInt();
-    // DLOG(INFO) <<"AtenGt: "<<"iv_self:"<<iv_self.toScalar();
-    DLOG(INFO) << "AtenGt: "
-               << "iv_other:" << iv_other.toInt();
-    DLOG(INFO) << "AtenGt:"
-               << "tmp_self:" << tmp_self;
+    // Find output blob
+    auto out_blob_ids = getUniqueOutBlobIds(op_node);
+    assert(out_blob_ids.size() == 1);
 
-    int64_t output = tmp_self > iv_other.toInt();
-    DLOG(INFO) << "AtenGt:"
-               << "output:" << output;
-
-    auto& out_edge = cast<nncir::DataEdge>(node.getFirstOutEdge());
-    stream_executor.updateBlob(out_edge.getBlobId(), DataType::INT64, scalarToIValue<int64_t>(output));
-
-#if 0
-    // assert(iv_self.isTensor());
-    at::Tensor self_tensor = iv_self.toTensor();
-    auto dtype = stream_executor.findBlob(input_other_blob_id).first;
-    if (dtype == DataType::TENSOR) {
-        assert(iv_other.isTensor());
-        at::Tensor other_tensor = iv_other.toTensor();
-        auto output = nnrt::atenGt(self_tensor, other_tensor);
-        // update output
-        auto& out_edge = cast<nncir::DataEdge>(node.getFirstOutEdge());
-        stream_executor.updateBlob(out_edge.getBlobId(), DataType::TENSOR, tensorToIValue(output));
-    } else if (isScalarType(dtype)) {
-        assert(iv_other.isScalar());
-        at::Scalar other_scalar = iv_other.toScalar();
-        auto output = nnrt::atenGt(self_tensor, other_scalar);
-        // update output
-        auto& out_edge = cast<nncir::DataEdge>(node.getFirstOutEdge());
-        stream_executor.updateBlob(out_edge.getBlobId(), DataType::TENSOR, tensorToIValue(output));
+    if (iv_self.isTensor() && iv_other.isTensor()) {
+        // tensor = Gt(tensor, tensor)
+        auto output = nnrt::atenGt(iv_self.toTensor(), iv_other.toTensor());
+        stream_executor.updateBlob(out_blob_ids.at(0), DataType::TENSOR, tensorToIValue(output));
+    } else if (iv_self.isTensor() && iv_other.isScalar()) {
+        // tensor = Gt(tensor, scalar)
+        auto output = nnrt::atenGt(iv_self.toTensor(), iv_other.toScalar());
+        stream_executor.updateBlob(out_blob_ids.at(0), DataType::TENSOR, tensorToIValue(output));
+    } else if (iv_self.isScalar() && iv_other.isInt()) {
+        // int/bool Gt(scalar, int)
+        int64_t output = iv_self.toScalar().toInt() > iv_other.toInt();
+        stream_executor.updateBlob(out_blob_ids.at(0), DataType::BOOL, scalarToIValue<int64_t>(output));
+    } else if (iv_self.isInt() && iv_other.isInt()) {
+        // int/bool = Gt(int, int)
+        int64_t output = iv_self.toInt() > iv_other.toInt();
+        stream_executor.updateBlob(out_blob_ids.at(0), DataType::BOOL, scalarToIValue<int64_t>(output));
     }
-
-#endif  // 0
 }
 
 void executorAtenGetItem(const nncir::Node& op_node, StreamExecutor& stream_executor)
@@ -881,37 +860,34 @@ void executorAtenLSTM(const nncir::Node& op_node, StreamExecutor& stream_executo
 void executorAtenLt(const nncir::Node& op_node, StreamExecutor& stream_executor)
 {
     DLOG(INFO) << "execute Aten Lt node";
-
     auto node = cast<nncir::AtenLtNode>(op_node);
-    assert(node.getNumInputs() == 2);
 
-    auto& input_self = cast<nncir::DataEdge>(node.getInEdge(0));
-    auto& input_other = cast<nncir::DataEdge>(node.getInEdge(1));
-
-    // Get input blob
-    int input_self_blob_id = input_self.getBlobId();
-    int input_other_blob_id = input_other.getBlobId();
-
+    auto in_blob_ids = getInBlobIds(op_node);
+    assert(in_blob_ids.size() == 2);
     // Find the input blob
-    torch::jit::IValue iv_self = stream_executor.findBlob(input_self_blob_id).second;
-    torch::jit::IValue iv_other = stream_executor.findBlob(input_other_blob_id).second;
-    assert(iv_self.isTensor());
-    at::Tensor self_tensor = iv_self.toTensor();
-    auto dtype = stream_executor.findBlob(input_other_blob_id).first;
-    if (dtype == DataType::TENSOR) {
-        assert(iv_other.isTensor());
-        at::Tensor other_tensor = iv_other.toTensor();
-        auto output = nnrt::atenLt(self_tensor, other_tensor);
-        // update output
-        auto& out_edge = cast<nncir::DataEdge>(node.getFirstOutEdge());
-        stream_executor.updateBlob(out_edge.getBlobId(), DataType::TENSOR, tensorToIValue(output));
-    } else if (isScalarType(dtype)) {
-        assert(iv_other.isScalar());
-        at::Scalar other_scalar = iv_other.toScalar();
-        auto output = nnrt::atenLt(self_tensor, other_scalar);
-        // update output
-        auto& out_edge = cast<nncir::DataEdge>(node.getFirstOutEdge());
-        stream_executor.updateBlob(out_edge.getBlobId(), DataType::TENSOR, tensorToIValue(output));
+    torch::jit::IValue iv_self = stream_executor.findBlob(in_blob_ids.at(0)).second;
+    torch::jit::IValue iv_other = stream_executor.findBlob(in_blob_ids.at(1)).second;
+
+    // Find output blob
+    auto out_blob_ids = getUniqueOutBlobIds(op_node);
+    assert(out_blob_ids.size() == 1);
+
+    if (iv_self.isTensor() && iv_other.isTensor()) {
+        // tensor = Lt(tensor, tensor)
+        auto output = nnrt::atenLt(iv_self.toTensor(), iv_other.toTensor());
+        stream_executor.updateBlob(out_blob_ids.at(0), DataType::TENSOR, tensorToIValue(output));
+    } else if (iv_self.isTensor() && iv_other.isScalar()) {
+        // tensor = Lt(tensor, scalar)
+        auto output = nnrt::atenLt(iv_self.toTensor(), iv_other.toScalar());
+        stream_executor.updateBlob(out_blob_ids.at(0), DataType::TENSOR, tensorToIValue(output));
+    } else if (iv_self.isScalar() && iv_other.isInt()) {
+        // int/bool Lt(scalar, int)
+        int64_t output = iv_self.toScalar().toInt() < iv_other.toInt();
+        stream_executor.updateBlob(out_blob_ids.at(0), DataType::BOOL, scalarToIValue<int64_t>(output));
+    } else if (iv_self.isInt() && iv_other.isInt()) {
+        // int/bool = Lt(int, int)
+        int64_t output = iv_self.toInt() < iv_other.toInt();
+        stream_executor.updateBlob(out_blob_ids.at(0), DataType::BOOL, scalarToIValue<int64_t>(output));
     }
 }
 
