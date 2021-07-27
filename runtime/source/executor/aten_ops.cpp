@@ -40,6 +40,10 @@ at::Tensor atenAsTensor(at::Tensor &self, at::ScalarType dtype, at::Device devic
     return self.to(device, dtype);
 }
 
+at::Tensor atenBitwiseNot(const at::Tensor &self) { return at::bitwise_not(self); }
+
+at::Tensor atenBmm(const at::Tensor &self, const at::Tensor &other) { return at::bmm(self, other); }
+
 bool atenBool(const at::Tensor &self) {
     return self.is_nonzero();
 }
@@ -57,6 +61,10 @@ at::Tensor atenCat(at::TensorList tensors, int64_t dim) { return at::cat(tensors
 at::Tensor atenCat(at::TensorList tensors, at::Dimname dim) { return at::cat(tensors, dim); }
 
 at::Tensor atenCeil(const at::Tensor &self) { return at::ceil(self); }
+
+std::vector<at::Tensor> atenChunk(const at::Tensor &self, int chunks, int dim) {
+    return at::chunk(self, chunks, dim);
+}
 
 at::Tensor atenClamp(const at::Tensor &self, const at::Scalar &min, const at::Scalar &max) {
     return at::clamp(self, min, max);

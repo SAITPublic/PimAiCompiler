@@ -183,14 +183,17 @@ void StreamExecutor::registerOp()
     this->global_op_register_.insert({nncir::NodeType::ATENANY, executorAtenAny});
     this->global_op_register_.insert({nncir::NodeType::ATENAPPEND, executorAtenAppend});
     this->global_op_register_.insert({nncir::NodeType::ATENASTENSOR, executorAtenAsTensor});
+    this->global_op_register_.insert({nncir::NodeType::ATENBITWISENOT, executorAtenBitwiseNot});
+    this->global_op_register_.insert({nncir::NodeType::ATENBMM, executorAtenBmm});
     this->global_op_register_.insert({nncir::NodeType::ATENBOOL, executorAtenBool});
     this->global_op_register_.insert({nncir::NodeType::ATENCAT, executorAtenCat});
     this->global_op_register_.insert({nncir::NodeType::ATENCEIL, executorAtenCeil});
+    this->global_op_register_.insert({nncir::NodeType::ATENCHUNK, executorAtenChunk});
     this->global_op_register_.insert({nncir::NodeType::ATENCLAMP, executorAtenClamp});
     this->global_op_register_.insert({nncir::NodeType::ATENCLEAR, executorAtenClear});
     this->global_op_register_.insert({nncir::NodeType::ATENCONTIGUOUS, executorAtenContiguous});
-    this->global_op_register_.insert({nncir::NodeType::ATENCOPY, executorAtenCopy});
     this->global_op_register_.insert({nncir::NodeType::ATENCONV2D, executorAtenConv2d});
+    this->global_op_register_.insert({nncir::NodeType::ATENCOPY, executorAtenCopy});
     this->global_op_register_.insert({nncir::NodeType::ATENCPU, executorAtenCpu});
     this->global_op_register_.insert({nncir::NodeType::ATENCUDA, executorAtenCuda});
     this->global_op_register_.insert({nncir::NodeType::ATENDERIVEINDEX, executorAtenDeriveIndex});

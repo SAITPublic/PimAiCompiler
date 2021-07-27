@@ -26,6 +26,10 @@ void atenAppend(c10::List<at::IValue> &list, at::IValue el);
 
 at::Tensor atenAsTensor(at::Tensor &self, at::ScalarType dtype, at::Device device);
 
+at::Tensor atenBitwiseNot(const at::Tensor &self);
+
+at::Tensor atenBmm(const at::Tensor &self, const at::Tensor &other);
+
 bool atenBool(const at::Tensor &self);
 
 bool atenBool(const int64_t& i);
@@ -37,6 +41,8 @@ at::Tensor atenCat(at::TensorList tensors, int64_t dim = 0);
 at::Tensor atenCat(at::TensorList tensors, at::Dimname dim);
 
 at::Tensor atenCeil(const at::Tensor &self);
+
+std::vector<at::Tensor> atenChunk(const at::Tensor &self, int chunks, int dim);
 
 at::Tensor atenClamp(const at::Tensor &self, const at::Scalar &min, const at::Scalar &max);
 

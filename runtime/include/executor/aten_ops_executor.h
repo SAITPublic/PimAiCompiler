@@ -16,9 +16,12 @@ void executorAtenAnd(const nncir::Node& op_node, StreamExecutor& stream_executor
 void executorAtenAny(const nncir::Node& op_node, StreamExecutor& stream_executor);
 void executorAtenAppend(const nncir::Node& op_node, StreamExecutor& stream_executor);
 void executorAtenAsTensor(const nncir::Node& op_node, StreamExecutor& stream_executor);
+void executorAtenBitwiseNot(const nncir::Node& op_node, StreamExecutor& stream_executor);
+void executorAtenBmm(const nncir::Node& op_node, StreamExecutor& stream_executor);
 void executorAtenBool(const nncir::Node& op_node, StreamExecutor& stream_executor);
 void executorAtenCat(const nncir::Node& op_node, StreamExecutor& stream_executor);
 void executorAtenCeil(const nncir::Node& op_node, StreamExecutor& stream_executor);
+void executorAtenChunk(const nncir::Node& op_node, StreamExecutor& stream_executor);
 void executorAtenClamp(const nncir::Node& op_node, StreamExecutor& stream_executor);
 void executorAtenClear(const nncir::Node& op_node, StreamExecutor& stream_executor);
 void executorAtenContiguous(const nncir::Node& op_node, StreamExecutor& stream_executor);
