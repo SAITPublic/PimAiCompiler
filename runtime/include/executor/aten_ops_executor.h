@@ -11,8 +11,11 @@
 namespace nnrt
 {
 void executorAtenAdd(const nncir::Node& op_node, StreamExecutor& stream_executor);
-void executorAtenAppend(const nncir::Node& op_node, StreamExecutor& stream_executor);
 void executorAtenAddmm(const nncir::Node& op_node, StreamExecutor& stream_executor);
+void executorAtenAnd(const nncir::Node& op_node, StreamExecutor& stream_executor);
+void executorAtenAny(const nncir::Node& op_node, StreamExecutor& stream_executor);
+void executorAtenAppend(const nncir::Node& op_node, StreamExecutor& stream_executor);
+void executorAtenAsTensor(const nncir::Node& op_node, StreamExecutor& stream_executor);
 void executorAtenBool(const nncir::Node& op_node, StreamExecutor& stream_executor);
 void executorAtenCat(const nncir::Node& op_node, StreamExecutor& stream_executor);
 void executorAtenCeil(const nncir::Node& op_node, StreamExecutor& stream_executor);

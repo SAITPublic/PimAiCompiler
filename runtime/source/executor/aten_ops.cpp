@@ -27,7 +27,18 @@ at::Tensor atenAddmm(const at::Tensor &self, const at::Tensor &mat1, const at::T
     return at::addmm(self, mat1, mat2, beta, alpha);
 }
 
+bool atenAnd(bool& a, bool& b) { return a & b; }
+
+at::Tensor atenAny(const at::Tensor &self) {
+    return at::any(self);
+}
+
 void atenAppend(c10::List<at::IValue> &list, at::IValue el) { list.push_back(std::move(el)); }
+
+// refer to castTensorTo() in torch/csrc/jit/runtime/register_special_ops.cpp
+at::Tensor atenAsTensor(at::Tensor &self, at::ScalarType dtype, at::Device device) {
+    return self.to(device, dtype);
+}
 
 bool atenBool(const at::Tensor &self) {
     return self.is_nonzero();

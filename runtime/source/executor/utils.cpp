@@ -72,6 +72,36 @@ nnrt::DataType convertATScalarTypeToDType(at::ScalarType dtype)
     }
 }
 
+at::Device convertIntToATDevice(const int& value) {
+    // according to: pytorch/c10/core/DeviceType.h
+    switch (value) {
+        case 0:
+            return at::Device(at::DeviceType::CPU);
+        case 1:
+            return at::Device(at::DeviceType::CUDA);
+        case 2:
+            return at::Device(at::DeviceType::MKLDNN);
+        case 3:
+            return at::Device(at::DeviceType::OPENGL);
+        case 4:
+            return at::Device(at::DeviceType::OPENCL);
+        case 5:
+            return at::Device(at::DeviceType::IDEEP);
+        case 6:
+            return at::Device(at::DeviceType::HIP);
+        case 7:
+            return at::Device(at::DeviceType::FPGA);
+        case 8:
+            return at::Device(at::DeviceType::MSNPU);
+        case 9:
+            return at::Device(at::DeviceType::XLA);
+        case 10:
+            return at::Device(at::DeviceType::COMPILE_TIME_MAX_DEVICE_TYPES);
+        default:
+            DLOG(ERROR) << "Unsupported device type.";
+    }
+}
+
 at::MemoryFormat getMemoryFormat(int optional_memory_format)
 {
     // according to: pytorch/c10/core/MemoryFormat.h

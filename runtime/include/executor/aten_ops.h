@@ -18,7 +18,13 @@ at::Tensor &atenAdd_(at::Tensor &self, at::Scalar other, at::Scalar alpha = 1);
 at::Tensor atenAddmm(const at::Tensor &self, const at::Tensor &mat1, const at::Tensor &mat2, const at::Scalar &beta = 1,
                      const at::Scalar &alpha = 1);
 
+bool atenAnd(bool& a, bool& b);
+
+at::Tensor atenAny(const at::Tensor &self);
+
 void atenAppend(c10::List<at::IValue> &list, at::IValue el);
+
+at::Tensor atenAsTensor(at::Tensor &self, at::ScalarType dtype, at::Device device);
 
 bool atenBool(const at::Tensor &self);
 

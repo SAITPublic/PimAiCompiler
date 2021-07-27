@@ -106,6 +106,52 @@ void executorAtenAddmm(const nncir::Node& op_node, StreamExecutor& stream_execut
     stream_executor.updateBlob(out_edge.getBlobId(), DataType::TENSOR, tensorToIValue(output));
 }
 
+void executorAtenAnd(const nncir::Node& op_node, StreamExecutor& stream_executor)
+{
+    DLOG(INFO) << "execute Aten And node";
+
+    auto node = cast<nncir::AtenAndNode>(op_node);
+
+    auto& input_a = cast<nncir::DataEdge>(node.getInEdge(0));
+    auto& input_b = cast<nncir::DataEdge>(node.getInEdge(1));
+
+    // Get input blob
+    int input_a_blob_id = input_a.getBlobId();
+    int input_b_blob_id = input_b.getBlobId();
+
+    // Find the input blob
+    torch::jit::IValue iv_a = stream_executor.findBlob(input_a_blob_id).second;
+    torch::jit::IValue iv_b = stream_executor.findBlob(input_b_blob_id).second;
+
+    assert(iv_a.isBool() && iv_b.isBool());
+    auto value_a = iv_a.toBool();
+    auto value_b = iv_b.toBool();
+
+    auto output = nnrt::atenAnd(value_a, value_b);
+    auto& out_edge = cast<nncir::DataEdge>(node.getFirstOutEdge());
+    stream_executor.updateBlob(out_edge.getBlobId(), DataType::BOOL, boolToIValue(output));
+}
+
+void executorAtenAny(const nncir::Node& op_node, StreamExecutor& stream_executor) {
+    DLOG(INFO) << "execute Aten Any node";
+
+    auto node = cast<nncir::AtenAnyNode>(op_node);
+
+    auto& input_self = cast<nncir::DataEdge>(node.getInEdge(0));
+
+    // Get input blob
+    int input_self_blob_id = input_self.getBlobId();
+
+    // Find the input blob
+    torch::jit::IValue iv_self = stream_executor.findBlob(input_self_blob_id).second;
+    assert(iv_self.isTensor());
+    at::Tensor self_tensor = iv_self.toTensor();
+    auto output = nnrt::atenAny(self_tensor);
+    // update output
+    auto& out_edge = cast<nncir::DataEdge>(node.getFirstOutEdge());
+    stream_executor.updateBlob(out_edge.getBlobId(), DataType::TENSOR, torch::jit::IValue(output));
+}
+
 void executorAtenAppend(const nncir::Node& op_node, StreamExecutor& stream_executor)
 {
     DLOG(INFO) << "execute Aten Append node";
@@ -131,6 +177,45 @@ void executorAtenAppend(const nncir::Node& op_node, StreamExecutor& stream_execu
     // update output
     auto& out_edge = cast<nncir::DataEdge>(node.getFirstOutEdge());
     stream_executor.updateBlob(out_edge.getBlobId(), DataType::LIST, listToIValue(list));
+}
+
+void executorAtenAsTensor(const nncir::Node& op_node, StreamExecutor& stream_executor)
+{
+    DLOG(INFO) << "execute Aten AsTensor node";
+
+    auto node = cast<nncir::AtenAsTensorNode>(op_node);
+    int edge_id = 0;
+    auto& input_tensor = cast<nncir::DataEdge>(node.getInEdge(0));
+    int input_tensor_blob_id = input_tensor.getBlobId();
+    torch::jit::IValue iv_tensor = stream_executor.findBlob(input_tensor_blob_id).second;
+    assert(iv_tensor.isTensor());
+    auto in_tensor = iv_tensor.toTensor();
+    edge_id++;
+
+    auto int_dtype = node.getDtype();
+    if (nncir::isDefaultValue<int>(int_dtype)) {
+        auto& dtype_data_edge = cast<nncir::DataEdge>(node.getInEdge(edge_id++));
+        auto dtype_blob_id = dtype_data_edge.getBlobId();
+        auto iv = stream_executor.findBlob(dtype_blob_id).second;
+        int_dtype = iv.toInt();
+    }
+    auto dtype = convertDTypeToATScalarType(static_cast<nncir::DataType>(int_dtype));
+    
+    auto int_device = node.getDevice();
+    at::Tensor output;
+    if (nncir::isDefaultValue<int>(int_device)) {
+        auto& device_data_edge = cast<nncir::DataEdge>(node.getInEdge(edge_id++));
+        auto device_blob_id = device_data_edge.getBlobId();
+        auto iv = stream_executor.findBlob(device_blob_id).second;
+        auto device = iv.toDevice();
+        output = nnrt::atenAsTensor(in_tensor, dtype, device);
+    } else {
+        auto device = convertIntToATDevice(int_device);
+        output = nnrt::atenAsTensor(in_tensor, dtype, device);
+    }
+
+    auto& out_edge = cast<nncir::DataEdge>(node.getFirstOutEdge());
+    stream_executor.updateBlob(out_edge.getBlobId(), DataType::TENSOR, tensorToIValue(output));
 }
 
 void executorAtenBool(const nncir::Node& op_node, StreamExecutor& stream_executor)

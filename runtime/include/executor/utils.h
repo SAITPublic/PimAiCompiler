@@ -27,6 +27,8 @@ at::ScalarType convertDTypeToATScalarType(nnrt::DataType dtype);
 
 nnrt::DataType convertATScalarTypeToDType(at::ScalarType dtype);
 
+at::Device convertIntToATDevice(const int& value);
+
 at::MemoryFormat getMemoryFormat(int optional_memory_format);
 
 torch::jit::IValue intToIValue(const int64_t& value);
