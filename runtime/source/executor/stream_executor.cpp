@@ -141,7 +141,7 @@ RetVal StreamExecutor::inferenceModel(const std::shared_ptr<nncir::NNIR> graph,
     }
 
     // for debug
-    this->showAllBlobs();
+    // this->showAllBlobs();
     return RetVal::SUCCESS;
 }
 
@@ -254,11 +254,62 @@ void StreamExecutor::setInputTensors(const std::vector<torch::Tensor>& input_ten
 
 void StreamExecutor::getOutputTensors(std::vector<torch::Tensor>& output_tensors)
 {
-    output_tensors.clear();
-    // Read the output tensors
+    // output_tensors.clear();
+    std::vector<torch::Tensor> out_tensors;
+    std::vector<std::vector<int64_t>> out_list;
+
+    // checkout the dtype of outpus
+    bool is_all_tensor = true;
     for (auto& id_ : this->output_blob_ids_) {
-        auto blob = this->findBlob(id_);
-        output_tensors.push_back(blob.second.toTensor());
+        auto iv = this->findBlob(id_).second;
+        if (!iv.isTensor()) {
+            is_all_tensor = false;
+            break;
+        }
+    }
+
+    if (is_all_tensor) {
+        for (auto& id_ : this->output_blob_ids_) {
+            auto blob = this->findBlob(id_);
+            output_tensors.push_back(blob.second.toTensor());
+        }
+    } else {
+        // For RNNT, there's only one output with Tuple dtype
+        //  %774 : (Tensor, Tensor, int[][]) = prim::TupleConstruct(%x_padded3.1, %x_lens.1, %output.1)
+        //  return (%774)
+        if (this->output_blob_ids_.size() == 1) {
+            auto blob = this->findBlob(output_blob_ids_.at(0));
+            if (blob.second.isTuple()) {
+                auto tuple_ = blob.second.toTuple();
+                auto ivs = primTupleUnpack(tuple_);
+                for (auto& iv_ : ivs) {
+                    if (iv_.isTensor()) {
+                        auto tensor = iv_.toTensor();
+                        out_tensors.push_back(tensor);
+                    } else if (iv_.isList()) {
+                        // list[list]
+                        auto lst = iv_.toList().vec();
+                        for (auto item : iv_.toList().vec()) {
+                            std::vector<int64_t> vals;
+                            for (auto val : item.toList().vec()) {
+                                vals.push_back(val.toInt());
+                            }
+                            out_list.push_back(vals);
+                        }
+                    }
+                }
+            }
+
+            // print RNNT result
+            // logits, logits_lens, output
+            // _, _, transcript = self.greedy_decoder.forward(feature, feature_length)
+
+            std::stringstream ss;
+            for (auto& item : out_list.at(0)) {
+                ss << item << " ";
+            }
+            DLOG(INFO) << "RNNT_output: " << ss.str();
+        }
     }
 }
 
