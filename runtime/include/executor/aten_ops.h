@@ -15,6 +15,8 @@ at::IValue atenGetItem(const c10::List<at::IValue> &list, int idx);
 
 bool atenIs(const at::IValue &self, const at::IValue &other);
 
+int64_t atenAdd(int64_t &self, int64_t other, int64_t alpha = 1);
+
 at::Tensor atenAdd(const at::Tensor &self, at::Scalar other, at::Scalar alpha = 1);
 
 at::Tensor atenAdd(const at::Tensor &self, const at::Tensor &other, at::Scalar alpha = 1);

@@ -840,11 +840,15 @@ void executePrimEndLoop(const nncir::Node& op_node, StreamExecutor& stream_execu
     auto end_loop_input_blob_ids = getInBlobIds(op_node);
     auto prim_block_input_blob_ids = getInBlobIds(*stream_executor.getGraph()->getNode(loop_start_node_id + 2));
 
-    // skip 0 element
     // the 0 element is condition
     auto prim_loop_node = stream_executor.getGraph()->getNode(loop_start_node_id);
     auto prim_loop = cast_if<nncir::PrimLoopNode>(prim_loop_node);
-    prim_loop->setCond(end_loop_input_blob_ids.at(0));
+    auto cond_iv = stream_executor.findBlob(end_loop_input_blob_ids.at(0)).second;
+    if (cond_iv.isInt()) {
+        prim_loop->setCond(cond_iv.toInt());
+    } else {
+        prim_loop->setCond(cond_iv.toBool());
+    }
 
     for (int i = 1; i < end_loop_input_blob_ids.size(); i++) {
         auto end_loop_input_blob = stream_executor.findBlob(end_loop_input_blob_ids.at(i));

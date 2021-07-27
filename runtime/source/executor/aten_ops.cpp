@@ -61,6 +61,8 @@ c10::List<std::string> atenList(std::string &str)
 
 c10::List<at::IValue> atenList(const c10::List<at::IValue> &list) { return list.copy(); }
 
+int64_t atenAdd(int64_t &self, int64_t other, int64_t alpha) { return self + other * alpha; }
+
 at::Tensor atenAdd(const at::Tensor &self, at::Scalar other, at::Scalar alpha) { return at::add(self, other, alpha); }
 
 at::Tensor atenAdd(const at::Tensor &self, const at::Tensor &other, at::Scalar alpha)
@@ -225,6 +227,8 @@ std::tuple<at::Tensor, at::Tensor, at::Tensor> atenlstm(const at::Tensor &data, 
 {
     return at::lstm(data, batch_sizes, hx, params, has_biases, num_layers, dropout, train, bidirectional);
 }
+
+// bool atenLt(const at::Scalar &self, const at::Scalar &other) { return self.to; }
 
 at::Tensor atenLt(const at::Tensor &self, const at::Scalar &other) { return at::lt(self, other); }
 

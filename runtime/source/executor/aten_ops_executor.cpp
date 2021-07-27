@@ -25,11 +25,15 @@ void executorAtenAdd(const nncir::Node& op_node, StreamExecutor& stream_executor
     auto& input_other = cast<nncir::DataEdge>(add_node.getInEdge(1));
     int64_t alpha = add_node.getAlpha();
     if (nncir::isDefaultValue<int64_t>(alpha)) {
-        auto& alpha_edge = cast<nncir::DataEdge>(add_node.getInEdge(2));
-        int alpha_blob_id = alpha_edge.getBlobId();
-        auto alpha_iv = stream_executor.findBlob(alpha_blob_id).second;
-        assert(alpha_iv.isInt());
-        alpha = alpha_iv.toInt();
+        if (add_node.getInEdgeIds().size() == 3) {
+            auto& alpha_edge = cast<nncir::DataEdge>(add_node.getInEdge(2));
+            int alpha_blob_id = alpha_edge.getBlobId();
+            auto alpha_iv = stream_executor.findBlob(alpha_blob_id).second;
+            assert(alpha_iv.isInt());
+            alpha = alpha_iv.toInt();
+        } else {
+            alpha = 1;
+        }
     }
 
     // Get input blob
@@ -39,7 +43,14 @@ void executorAtenAdd(const nncir::Node& op_node, StreamExecutor& stream_executor
     // Find the input blob
     torch::jit::IValue iv_self = stream_executor.findBlob(input_self_blob_id).second;
     torch::jit::IValue iv_other = stream_executor.findBlob(input_other_blob_id).second;
-    assert(iv_self.isTensor());
+    if (iv_self.isInt() && iv_other.isInt()) {
+        int64_t in_self = iv_self.toInt();
+        auto output = nnrt::atenAdd(in_self, iv_other.toInt(), alpha);
+        // update output
+        auto& out_edge = cast<nncir::DataEdge>(add_node.getFirstOutEdge());
+        stream_executor.updateBlob(out_edge.getBlobId(), DataType::INT64, intToIValue(output));
+        return;
+    }
     at::Tensor self_tensor = iv_self.toTensor();
     auto dtype = stream_executor.findBlob(input_other_blob_id).first;
     if (dtype == DataType::TENSOR) {
@@ -558,8 +569,8 @@ void executorAtenEmbedding(const nncir::Node& op_node, StreamExecutor& stream_ex
         auto& scale_grad_by_freq_edge = cast<nncir::DataEdge>(node.getInEdge(edge_id++));
         int scale_grad_by_freq_blob_id = scale_grad_by_freq_edge.getBlobId();
         auto scale_grad_by_freq_iv = stream_executor.findBlob(scale_grad_by_freq_blob_id).second;
-        assert(scale_grad_by_freq_iv.isBool());
-        scale_grad_by_freq_val = scale_grad_by_freq_iv.toBool();
+        assert(scale_grad_by_freq_iv.isInt());
+        scale_grad_by_freq_val = scale_grad_by_freq_iv.toInt();
     }
     bool scale_grad_by_freq = static_cast<bool>(scale_grad_by_freq_val);
 
@@ -568,8 +579,8 @@ void executorAtenEmbedding(const nncir::Node& op_node, StreamExecutor& stream_ex
         auto& sparse_edge = cast<nncir::DataEdge>(node.getInEdge(edge_id++));
         int sparse_blob_id = sparse_edge.getBlobId();
         auto sparse_iv = stream_executor.findBlob(sparse_blob_id).second;
-        assert(sparse_iv.isBool());
-        sparse_val = sparse_iv.toBool();
+        assert(sparse_iv.isInt());
+        sparse_val = sparse_iv.toInt();
     }
     bool sparse = static_cast<bool>(sparse_val);
 
@@ -939,7 +950,6 @@ void executorAtenGt(const nncir::Node& op_node, StreamExecutor& stream_executor)
     auto node = cast<nncir::AtenGtNode>(op_node);
 
     auto in_blob_ids = getInBlobIds(op_node);
-    assert(in_blob_ids.size() == 2);
     // Find the input blob
     torch::jit::IValue iv_self = stream_executor.findBlob(in_blob_ids.at(0)).second;
     torch::jit::IValue iv_other = stream_executor.findBlob(in_blob_ids.at(1)).second;
@@ -1329,7 +1339,6 @@ void executorAtenLt(const nncir::Node& op_node, StreamExecutor& stream_executor)
     auto node = cast<nncir::AtenLtNode>(op_node);
 
     auto in_blob_ids = getInBlobIds(op_node);
-    assert(in_blob_ids.size() == 2);
     // Find the input blob
     torch::jit::IValue iv_self = stream_executor.findBlob(in_blob_ids.at(0)).second;
     torch::jit::IValue iv_other = stream_executor.findBlob(in_blob_ids.at(1)).second;
@@ -1761,21 +1770,37 @@ void executorAtenTensor(const nncir::Node& op_node, StreamExecutor& stream_execu
         options = options.layout(iv_layout.toLayout());
     }
     if (!iv_pin_memory.isNone()) {
-        options = options.pinned_memory(iv_pin_memory.toBool());
+        if (iv_pin_memory.isInt()) {
+            options = options.pinned_memory(iv_pin_memory.toInt());
+        } else if (iv_pin_memory.isBool()) {
+            options = options.pinned_memory(iv_pin_memory.toBool());
+        } else {
+            DLOG(ERROR) << "Unsupported data type to parse iv_pin_memory.";
+        }
     }
-    auto self_list = iv_self.toListRef();
-    assert(self_list.size() > 0);
+    // FIXME(SRCX): To get list item type, is there a better way?
+    torch::jit::IValue value_item;
+    while(iv_self.isList()){
+        if(!iv_self.toListRef()[0].isList()){
+            value_item = iv_self.toListRef()[0];
+        }
+        iv_self = iv_self.toListRef()[0];
+    }
+    
     at::Tensor output;
-    if (self_list[0].isInt()) {
-        auto array_ref = parseIValueVector<int64_t>(self_list);
-        output = nnrt::atenTensor(at::ArrayRef<int64_t>(array_ref), options);
-    } else if (self_list[0].isDouble()) {
-        auto array_ref = parseIValueVector<double>(self_list);
-        output = nnrt::atenTensor(at::ArrayRef<double>(array_ref), options);
-    } else {
-        DLOG(ERROR) << "Unsupported data type to parse ArrayRef.";
+    if (value_item.isInt()) {
+        std::vector<int64_t> value_vec;
+        std::vector<int64_t> dim = {1};
+        parseIValueList<int64_t>(stream_executor.findBlob(input_self_blob_id).second, value_vec, dim, 1);
+        output = nnrt::atenTensor(at::ArrayRef<int64_t>(value_vec), options).reshape(at::ArrayRef<int64_t>(dim));
+    } else if (value_item.isDouble()) {
+        std::vector<double> value_vec;
+        std::vector<int64_t> dim = {1};
+        parseIValueList<double>(stream_executor.findBlob(input_self_blob_id).second, value_vec, dim, 1);
+        output = nnrt::atenTensor(at::ArrayRef<double>(value_vec), options).reshape(at::ArrayRef<int64_t>(dim));
+    }else {
+        DLOG(ERROR) << "Unsupported data type to parse IValue list.";
     }
-
     auto& out_edge = cast<nncir::DataEdge>(tensor_node.getFirstOutEdge());
     stream_executor.updateBlob(out_edge.getBlobId(), DataType::TENSOR, tensorToIValue(output));
 }
@@ -1804,7 +1829,7 @@ void executorAtenTo(const nncir::Node& op_node, StreamExecutor& stream_executor)
         assert(ori_dtype_iv.isInt());
         ori_dtype = ori_dtype_iv.toInt();
     }
-    auto dtype = convertDTypeToATScalarType(static_cast<nncir::DataType>(ori_dtype));
+    auto dtype = at::ScalarType(ori_dtype);
 
     int non_blocking_val = to_node.getNonBlocking();
     if (nncir::isDefaultValue<int>(non_blocking_val)) {

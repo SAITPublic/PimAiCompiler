@@ -18,27 +18,27 @@ torch::jit::IValue tensorListToIValue(const torch::TensorList& tensor_list) { re
 
 torch::jit::IValue strToIValue(std::string str) { return torch::jit::IValue(str); }
 
-at::ScalarType convertDTypeToATScalarType(nncir::DataType dtype)
+at::ScalarType convertDTypeToATScalarType(nnrt::DataType dtype)
 {
     // according to: pytorch/c10/core/ScalarType.h
     switch (dtype) {
-        case nncir::DataType::UINT8:
+        case nnrt::DataType::UINT8:
             return at::ScalarType::Byte;
-        case nncir::DataType::INT8:
+        case nnrt::DataType::INT8:
             return at::ScalarType::Char;
-        case nncir::DataType::INT16:
+        case nnrt::DataType::INT16:
             return at::ScalarType::Short;
-        case nncir::DataType::INT32:
+        case nnrt::DataType::INT32:
             return at::ScalarType::Int;
-        case nncir::DataType::INT64:
+        case nnrt::DataType::INT64:
             return at::ScalarType::Long;
-        case nncir::DataType::FLOAT16:
+        case nnrt::DataType::FLOAT16:
             return at::ScalarType::Half;
-        case nncir::DataType::FLOAT32:
+        case nnrt::DataType::FLOAT32:
             return at::ScalarType::Float;
-        case nncir::DataType::FLOAT64:
+        case nnrt::DataType::FLOAT64:
             return at::ScalarType::Double;
-        case nncir::DataType::BOOL:
+        case nnrt::DataType::BOOL:
             return at::ScalarType::Bool;
         default:
             DLOG(ERROR) << "Complex type has not been supported.";

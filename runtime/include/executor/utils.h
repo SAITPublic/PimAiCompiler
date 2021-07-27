@@ -23,7 +23,7 @@ torch::jit::IValue tensorListToIValue(const torch::TensorList& tensor_list);
 
 torch::jit::IValue strToIValue(std::string str);
 
-at::ScalarType convertDTypeToATScalarType(nncir::DataType dtype);
+at::ScalarType convertDTypeToATScalarType(nnrt::DataType dtype);
 
 nnrt::DataType convertATScalarTypeToDType(at::ScalarType dtype);
 
@@ -73,10 +73,38 @@ std::vector<T> parseIValueVector(const at::ArrayRef<at::IValue>& ivalue_array)
             vec.push_back(item.toDouble());
         }
     } else {
-        DLOG(ERROR) << "Unsupported data type occurs in parseIValueInArrayRef().";
+        DLOG(ERROR) << "Unsupported data type occurs in parseIValueVector().";
     }
     return vec;
 }
+
+template <typename T>
+void parseIValueList(at::IValue& list_iv, std::vector<T>& value_vec, std::vector<int64_t>& dim, int dim_idx)
+{
+    c10::ArrayRef<at::IValue> ivs = list_iv.toListRef();
+    if (!ivs[0].isList()) {
+        if (ivs[0].isInt()) {
+            for (auto iv : ivs) {
+                value_vec.push_back(iv.toInt());
+                dim[dim_idx]++;
+            }
+        } else if (ivs[0].isDouble()) {
+            for (auto iv : ivs) {
+                value_vec.push_back(iv.toDouble());
+                dim[dim_idx]++;
+            }
+        } else {
+            DLOG(ERROR) << "Unsupported data type occurs in parseIValueList().";
+        }
+    } else {
+        dim.push_back(1);
+        dim_idx++;
+        for (auto nested_list : ivs) {
+            parseIValueList(nested_list, value_vec, dim, dim_idx);
+        }
+    }
+}
+
 template <typename... T>
 torch::jit::IValue tupleToIValue(std::tuple<T...> tuple)
 {

@@ -153,7 +153,7 @@ void StreamExecutor::updateBlob(int64_t blob_id, DataType dtype, const torch::ji
         this->global_blobs_.insert({blob_id, {dtype, iv}});
     } else {
         // exist
-        assert(it->second.first == dtype);
+        it->second.first = dtype;
         it->second.second = iv;
     }
 }
