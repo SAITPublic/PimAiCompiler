@@ -9,7 +9,7 @@
 
 namespace nnrt
 {
-int64_t atenDeriveIndex(int64_t start, int64_t index, int64_t step);
+int64_t atenDeriveIndex(int64_t index, int64_t start, int64_t step);
 
 at::IValue atenGetItem(const c10::List<at::IValue> &list, int idx);
 

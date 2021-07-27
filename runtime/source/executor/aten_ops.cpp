@@ -2,10 +2,10 @@
 // Created by heguoqiang on 2021/6/23.
 //
 #include "executor/aten_ops.h"
-
+#include <iostream>
 namespace nnrt
 {
-int64_t atenDeriveIndex(int64_t start, int64_t index, int64_t step) { return start + index * step; }
+int64_t atenDeriveIndex(int64_t index, int64_t start, int64_t step) { return start + index * step; }
 
 static int64_t normalizeIndex(int64_t idx, int64_t list_size)
 {
@@ -113,7 +113,7 @@ at::Tensor atenContiguous(const at::Tensor &self, at::MemoryFormat memory_format
 }
 
 at::Tensor &atenCopy_(at::Tensor &self, const at::Tensor &src, bool non_blocking)
-{
+{   
     return at::native::copy_(self, src, non_blocking);
 }
 
