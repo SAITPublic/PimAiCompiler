@@ -11,6 +11,7 @@
 #include "ir/include/edge.hpp"
 #include "ir/include/ir_types.hpp"
 #include "ir/include/nn_ir.hpp"
+#include "executor/tv_tools.h"
 
 namespace nnrt
 {

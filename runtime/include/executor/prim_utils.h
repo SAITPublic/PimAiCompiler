@@ -44,4 +44,5 @@ at::ListTypePtr inferTypeFromDataType(DataType type);
 
 std::vector<int64_t> getDataShapeFromShape4D(nn_compiler::nn_ir::Shape4D shape);
 
+torch::Tensor loadTensor(const std::string& bin_file, const std::vector<int64_t>& shape, DataType dtype);
 }  // namespace nnrt

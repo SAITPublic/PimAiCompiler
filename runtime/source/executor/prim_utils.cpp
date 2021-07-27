@@ -24,7 +24,6 @@ void drop(std::vector<torch::jit::IValue>& stack, size_t n) { stack.erase(stack.
  * @param dtype
  * @return torch::Tensor
  */
-
 torch::Tensor createPtTensor(void* data_ptr, const std::vector<int64_t>& shape, DataType dtype)
 {
     c10::ScalarType scalar_type;
@@ -102,7 +101,8 @@ at::ListTypePtr inferTypeFromDataType(DataType type)
     return list_type;
 }
 
-std::vector<int64_t> getDataShapeFromShape4D(nn_compiler::nn_ir::Shape4D shape) {
+std::vector<int64_t> getDataShapeFromShape4D(nn_compiler::nn_ir::Shape4D shape)
+{
     std::vector<int64_t> temp_shape;
     if (shape.n != 0) {
         temp_shape.push_back(shape.n);
@@ -117,6 +117,33 @@ std::vector<int64_t> getDataShapeFromShape4D(nn_compiler::nn_ir::Shape4D shape) 
         temp_shape.push_back(shape.w);
     }
     return temp_shape;
+}
+
+torch::Tensor loadTensor(const std::string& bin_file, const std::vector<int64_t>& shape, DataType dtype)
+{
+    int num_elements = 1;
+    for (auto item : shape) {
+        num_elements *= item;
+    }
+    int total_size = 0;
+    if (dtype == DataType::INT64) {
+        total_size = num_elements * sizeof(int64_t);
+    } else if (dtype == DataType::FLOAT32) {
+        total_size = num_elements * sizeof(float);
+    } else if (dtype == DataType::FLOAT16) {
+        total_size = num_elements * sizeof(float) / 2;
+    } else {
+        DLOG(ERROR) << "unsupported data type!";
+    }
+    char* buffer = new char[total_size];
+    // read binary file
+    std::ifstream ifs(bin_file, std::ios::binary | std::ios::in);
+    ifs.read(buffer, total_size);
+    ifs.close();
+
+    auto tensor = createPtTensor((void*)buffer, shape, dtype).clone();
+    delete[] buffer;
+    return tensor;
 }
 
 }  // namespace nnrt

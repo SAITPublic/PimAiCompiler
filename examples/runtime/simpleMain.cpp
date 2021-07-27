@@ -6,41 +6,10 @@
 #include <iostream>
 #include <memory>
 #include <set>
-#include <unistd.h>
-
 #include "nn_runtime.h"
 #include "runtime/include/executor/prim_utils.h"
 
 using namespace nnrt;
-
-torch::Tensor load_tensor(const std::string& bin_file, const std::vector<int64_t>& shape, DataType dtype)
-{
-    // ref: // https://www.cnblogs.com/yaos/p/12105108.html
-    // Get num-elements
-    int num_elements = 1;
-    for (auto item : shape) {
-        num_elements *= item;
-    }
-
-    int total_size = -1;
-    if (dtype == DataType::INT64) {
-        total_size = num_elements * sizeof(int64_t);
-    } else if (dtype == DataType::FLOAT32) {
-        total_size = num_elements * sizeof(float);
-    } else if (dtype == DataType::FLOAT16) {
-        total_size = num_elements * sizeof(float) / 2;
-    } else {
-        DLOG(ERROR) << "Unsupport data type!";
-    }
-    char* buffer = new char[total_size];
-    // read binary file
-    std::ifstream ifs(bin_file, std::ios::binary | std::ios::in);
-    ifs.read(buffer, total_size);
-    ifs.close();
-
-    auto tensor = createPtTensor((void*)buffer, shape, dtype);
-    return tensor;
-}
 
 void run_rnnt_from_file(std::string ir_file)
 {
@@ -51,16 +20,15 @@ void run_rnnt_from_file(std::string ir_file)
         feature_len_file = "../" + feature_len_file;
         feature_file = "../" + feature_file;
     }
-    if (access(feature_len_file.c_str(), F_OK ) == -1 || access(feature_file.c_str(), F_OK ) == -1) {
+    if (access(feature_len_file.c_str(), F_OK) == -1 || access(feature_file.c_str(), F_OK) == -1) {
         DLOG(ERROR) << "Please run at base or build directory.";
     }
 
     NNRuntime runtime(ir_file);
-
     std::vector<torch::Tensor> input_tensors;
     // load inputs from files
-    auto tensor_feature = load_tensor(feature_file, {341, 1, 240}, DataType::FLOAT16).cuda();
-    auto tensor_feature_len = load_tensor(feature_len_file, {1}, DataType::INT64);
+    auto tensor_feature = loadTensor(feature_file, {341, 1, 240}, DataType::FLOAT16).cuda();
+    auto tensor_feature_len = loadTensor(feature_len_file, {1}, DataType::INT64);
     input_tensors.push_back(tensor_feature);
     input_tensors.push_back(tensor_feature_len);
 
@@ -68,7 +36,6 @@ void run_rnnt_from_file(std::string ir_file)
         DLOG(INFO) << "Input: "
                    << "size: " << item.sizes() << " dtype:" << item.dtype() << " device:" << item.device();
     }
-
     // Inference
     auto output_tensors = runtime.inferenceModel(input_tensors);
 }
@@ -92,7 +59,6 @@ int main(int argc, const char* argv[])
     } else {
         return print_error();
     }
-
     run_rnnt_from_file(ir_file);
     return 0;
 }
