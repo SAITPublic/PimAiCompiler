@@ -4,6 +4,9 @@ option(BUILD_RUNTIME_UTEST "option for build utest" OFF)
 
 add_subdirectory(source)
 
+include_directories(${PROJECT_SOURCE_DIR})
+include_directories(${PROJECT_SOURCE_DIR}/runtime/include)
+
 if(BUILD_PY_RUNTIME)
     add_subdirectory(python)
 endif(BUILD_PY_RUNTIME)

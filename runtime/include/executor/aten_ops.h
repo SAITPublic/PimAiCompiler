@@ -1,7 +1,3 @@
-//
-// Created by heguoqiang on 2021/6/23.
-//
-
 #ifndef NNCOMPILER_ATEN_OP_H
 #define NNCOMPILER_ATEN_OP_H
 #include "ATen/ATen.h"
@@ -9,17 +5,11 @@
 
 namespace nnrt
 {
-int64_t atenDeriveIndex(int64_t index, int64_t start, int64_t step);
-
-at::IValue atenGetItem(const c10::List<at::IValue> &list, int idx);
-
-bool atenIs(const at::IValue &self, const at::IValue &other);
-
-int64_t atenAdd(int64_t &self, int64_t other, int64_t alpha = 1);
-
 at::Tensor atenAdd(const at::Tensor &self, at::Scalar other, at::Scalar alpha = 1);
 
 at::Tensor atenAdd(const at::Tensor &self, const at::Tensor &other, at::Scalar alpha = 1);
+
+int64_t atenAdd(int64_t &self, int64_t other, int64_t alpha = 1);
 
 at::Tensor &atenAdd_(at::Tensor &self, const at::Tensor &other, at::Scalar alpha = 1);
 
@@ -59,6 +49,8 @@ at::Tensor &atenCopy_(at::Tensor &self, const at::Tensor &src, bool non_blocking
 at::Tensor atenCpu(const at::Tensor &self);
 
 at::Tensor atenCuda(const at::Tensor &self);
+
+int64_t atenDeriveIndex(int64_t index, int64_t start, int64_t step);
 
 int64_t atenDim(const at::Tensor &tensor);
 
@@ -130,6 +122,8 @@ at::Tensor atenGe(const at::Tensor &self, const at::Scalar &other);
 
 at::Tensor atenGe(const at::Tensor &self, const at::Tensor &other);
 
+at::IValue atenGetItem(const c10::List<at::IValue> &list, int idx);
+
 at::Tensor atenGt(const at::Tensor &self, const at::Scalar &other);
 
 at::Tensor atenGt(const at::Tensor &self, const at::Tensor &other);
@@ -147,6 +141,8 @@ int64_t atenInt(const bool &b);
 int64_t atenInt(const float &f);
 
 int64_t atenInt(const at::IValue &scalar);
+
+bool atenIs(const at::IValue &self, const at::IValue &other);
 
 at::Scalar atenItem(const at::Tensor &self);
 

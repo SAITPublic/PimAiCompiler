@@ -10,10 +10,6 @@
 
 namespace nnrt
 {
-void executorAtenCuda(const nncir::Node& op_node, StreamExecutor& stream_executor);
-void executorAtenDeriveIndex(const nncir::Node& op_node, StreamExecutor& stream_executor);
-void executorAtenGetItem(const nncir::Node& op_node, StreamExecutor& stream_executor);
-void executorAtenIs(const nncir::Node& op_node, StreamExecutor& stream_executor);
 void executorAtenAdd(const nncir::Node& op_node, StreamExecutor& stream_executor);
 void executorAtenAppend(const nncir::Node& op_node, StreamExecutor& stream_executor);
 void executorAtenAddmm(const nncir::Node& op_node, StreamExecutor& stream_executor);
@@ -40,12 +36,14 @@ void executorAtenFloorDivide(const nncir::Node& op_node, StreamExecutor& stream_
 void executorAtenFormat(const nncir::Node& op_node, StreamExecutor& stream_executor);
 void executorAtenGather(const nncir::Node& op_node, StreamExecutor& stream_executor);
 void executorAtenGe(const nncir::Node& op_node, StreamExecutor& stream_executor);
+void executorAtenGetItem(const nncir::Node& op_node, StreamExecutor& stream_executor);
 void executorAtenGt(const nncir::Node& op_node, StreamExecutor& stream_executor);
 void executorAtenGetItem(const nncir::Node& op_node, StreamExecutor& stream_executor);
 void executorAtenIndex(const nncir::Node& op_node, StreamExecutor& stream_executor);
 void executorAtenIndexPut(const nncir::Node& op_node, StreamExecutor& stream_executor);
 void executorAtenIndexSelect(const nncir::Node& op_node, StreamExecutor& stream_executor);
 void executorAtenInt(const nncir::Node& op_node, StreamExecutor& stream_executor);
+void executorAtenIs(const nncir::Node& op_node, StreamExecutor& stream_executor);
 void executorAtenItem(const nncir::Node& op_node, StreamExecutor& stream_executor);
 void executorAtenLen(const nncir::Node& op_node, StreamExecutor& stream_executor);
 void executorAtenList(const nncir::Node& op_node, StreamExecutor& stream_executor);

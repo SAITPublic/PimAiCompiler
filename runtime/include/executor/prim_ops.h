@@ -3,37 +3,35 @@
 #include <torch/script.h>
 #include <unordered_map>
 #include <vector>
-#include "../nnrt_types.h"
+#include "nnrt_types.h"
 #include "glog/logging.h"
 
 namespace nnrt
 {
+torch::Tensor primData(const torch::Tensor& input_tensor);
+
 c10::Device primDevice(const torch::Tensor& input_tensor);
 
 int64_t primDtype(const torch::Tensor& input_tensor);
 
-torch::Tensor primData(const torch::Tensor& input_tensor);
-
-torch::IValue primUninitialized();
-
 template <typename T>
-T& primUncheckedCast(T& inputs)
+T& primEndIf(T& inputs)
 {
-    // noop
+    // auto ret = std::move<T>(inputs);
     return inputs;
 }
 
-void primRaiseException(std::string msg);
+std::vector<torch::Tensor> primEndLoop(const std::vector<torch::Tensor>& inputs);
 
-torch::Tensor primTupleIndex(const std::vector<torch::Tensor>& inputs, int64_t index);
-
-void primTupleConstruct(std::vector<torch::IValue>& stack, size_t num_inputs);
-
-std::vector<torch::IValue> primTupleUnpack(c10::intrusive_ptr<c10::ivalue::Tuple> tuple);
+bool primIf(bool cond);
 
 void primListConstruct(std::vector<torch::IValue>& stack, size_t num_inputs, at::ListTypePtr type);
 
 void primListUnpack(std::vector<torch::IValue>& stack, size_t num_outputs);
+
+void primLoop(int max_trip_cnt, torch::Tensor& cond, std::unordered_map<int, torch::Tensor>& blobs);
+
+void primRaiseException(std::string msg);
 
 // Provide 3 kinds Constant
 // template <typename T>
@@ -55,17 +53,18 @@ std::string primStrConstsnt(void* data_ptr);
 
 torch::Tensor primTensorConstant(void* data_ptr, std::vector<int64_t>& shape, DataType dtype);
 
-bool primIf(bool cond);
+void primTupleConstruct(std::vector<torch::IValue>& stack, size_t num_inputs);
+
+torch::Tensor primTupleIndex(const std::vector<torch::Tensor>& inputs, int64_t index);
+
+std::vector<torch::IValue> primTupleUnpack(c10::intrusive_ptr<c10::ivalue::Tuple> tuple);
 
 template <typename T>
-T& primEndIf(T& inputs)
+T& primUncheckedCast(T& inputs)
 {
-    // auto ret = std::move<T>(inputs);
+    // noop
     return inputs;
 }
 
-void primLoop(int max_trip_cnt, torch::Tensor& cond, std::unordered_map<int, torch::Tensor>& blobs);
-
-std::vector<torch::Tensor> primEndLoop(const std::vector<torch::Tensor>& inputs);
-
+torch::IValue primUninitialized();
 }  // namespace nnrt

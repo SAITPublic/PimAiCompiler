@@ -1,74 +1,15 @@
-//
-// Created by heguoqiang on 2021/6/23.
-//
 #include "executor/aten_ops.h"
 #include <iostream>
 namespace nnrt
 {
-int64_t atenDeriveIndex(int64_t index, int64_t start, int64_t step) { return start + index * step; }
-
-static int64_t normalizeIndex(int64_t idx, int64_t list_size)
-{
-    if (idx < 0) {
-        // Handle negative indexing
-        idx = list_size + idx;
-    }
-    return idx;
-}
-
-at::IValue atenGetItem(const c10::List<at::IValue> &list, int idx)
-{
-    const int64_t list_size = list.size();
-    const int64_t normalized_idx = normalizeIndex(idx, list_size);
-    if (normalized_idx < 0 || normalized_idx >= list_size) {
-        throw std::out_of_range("list index out of range");
-    }
-    return list.get(normalized_idx);
-}
-
-bool atenIs(const at::IValue &self, const at::IValue &other) { return self.is(other); }
-
-void atenAppend(c10::List<at::IValue> &list, at::IValue el) { list.push_back(std::move(el)); }
-
-int64_t atenDim(const at::Tensor &tensor) { return tensor.dim(); }
-
-int64_t atenLen(const c10::List<at::IValue> &list) { return list.size(); }
-
-int64_t atenInt(const at::Tensor &a) { return a.item<int64_t>(); }
-
-int64_t atenInt(const bool &b) { return static_cast<int64_t>(b); }
-
-int64_t atenInt(const float &f) { return static_cast<int64_t>(f); }
-
-int64_t atenInt(const at::IValue &scalar)
-{
-    if (scalar.isInt()) {
-        return scalar.toInt();
-    } else {
-        return static_cast<int64_t>(scalar.toScalar().toInt());
-    }
-}
-
-c10::List<std::string> atenList(std::string &str)
-{
-    c10::List<std::string> chars;
-    chars.reserve(str.size());
-    for (auto c : str) {
-        chars.push_back(std::string(1, c));
-    }
-    return chars;
-}
-
-c10::List<at::IValue> atenList(const c10::List<at::IValue> &list) { return list.copy(); }
-
-int64_t atenAdd(int64_t &self, int64_t other, int64_t alpha) { return self + other * alpha; }
-
 at::Tensor atenAdd(const at::Tensor &self, at::Scalar other, at::Scalar alpha) { return at::add(self, other, alpha); }
 
 at::Tensor atenAdd(const at::Tensor &self, const at::Tensor &other, at::Scalar alpha)
 {
     return at::add(self, other, alpha);
 }
+
+int64_t atenAdd(int64_t &self, int64_t other, int64_t alpha) { return self + other * alpha; }
 
 at::Tensor &atenAdd_(at::Tensor &self, const at::Tensor &other, at::Scalar alpha)
 {
@@ -85,6 +26,8 @@ at::Tensor atenAddmm(const at::Tensor &self, const at::Tensor &mat1, const at::T
 {
     return at::addmm(self, mat1, mat2, beta, alpha);
 }
+
+void atenAppend(c10::List<at::IValue> &list, at::IValue el) { list.push_back(std::move(el)); }
 
 bool atenBool(const at::Tensor &self) {
     return self.is_nonzero();
@@ -112,16 +55,16 @@ at::Tensor atenContiguous(const at::Tensor &self, at::MemoryFormat memory_format
     return at::native::contiguous(self, memory_format);
 }
 
-at::Tensor &atenCopy_(at::Tensor &self, const at::Tensor &src, bool non_blocking)
-{   
-    return at::native::copy_(self, src, non_blocking);
-}
-
 at::Tensor atenConv2d(const at::Tensor &input, const at::Tensor &weight,
                       const at::Tensor &bias, at::IntArrayRef stride,
                       at::IntArrayRef padding, at::IntArrayRef dilation, 
                       int64_t groups) {
     return at::conv2d(input, weight, bias, stride, padding, dilation, groups);
+}
+
+at::Tensor &atenCopy_(at::Tensor &self, const at::Tensor &src, bool non_blocking)
+{
+    return at::native::copy_(self, src, non_blocking);
 }
 
 at::Tensor atenCpu(const at::Tensor &self) {
@@ -131,6 +74,10 @@ at::Tensor atenCpu(const at::Tensor &self) {
 at::Tensor atenCuda(const at::Tensor &self) {
     return self.cuda();
 }
+
+int64_t atenDeriveIndex(int64_t index, int64_t start, int64_t step) { return start + index * step; }
+
+int64_t atenDim(const at::Tensor &tensor) { return tensor.dim(); }
 
 at::Tensor atenDiv(const at::Tensor &self, const at::Tensor &other) { return at::div(self, other); }
 
@@ -193,6 +140,25 @@ at::Tensor atenGe(const at::Tensor &self, const at::Scalar &other) { return at::
 
 at::Tensor atenGe(const at::Tensor &self, const at::Tensor &other) { return at::ge(self, other); }
 
+static int64_t normalizeIndex(int64_t idx, int64_t list_size)
+{
+    if (idx < 0) {
+        // Handle negative indexing
+        idx = list_size + idx;
+    }
+    return idx;
+}
+
+at::IValue atenGetItem(const c10::List<at::IValue> &list, int idx)
+{
+    const int64_t list_size = list.size();
+    const int64_t normalized_idx = normalizeIndex(idx, list_size);
+    if (normalized_idx < 0 || normalized_idx >= list_size) {
+        throw std::out_of_range("list index out of range");
+    }
+    return list.get(normalized_idx);
+}
+
 at::Tensor atenGt(const at::Tensor &self, const at::Scalar &other) { return at::gt(self, other); }
 
 at::Tensor atenGt(const at::Tensor &self, const at::Tensor &other) { return at::gt(self, other); }
@@ -210,7 +176,38 @@ at::Tensor atenIndexSelect(const at::Tensor &self, int64_t dim, const at::Tensor
     return at::index_select(self, dim, index);
 }
 
+int64_t atenInt(const at::Tensor &a) { return a.item<int64_t>(); }
+
+int64_t atenInt(const bool &b) { return static_cast<int64_t>(b); }
+
+int64_t atenInt(const float &f) { return static_cast<int64_t>(f); }
+
+int64_t atenInt(const at::IValue &scalar)
+{
+    if (scalar.isInt()) {
+        return scalar.toInt();
+    } else {
+        return static_cast<int64_t>(scalar.toScalar().toInt());
+    }
+}
+
+bool atenIs(const at::IValue &self, const at::IValue &other) { return self.is(other); }
+
 at::Scalar atenItem(const at::Tensor &self) { return at::native::item(self); }
+
+int64_t atenLen(const c10::List<at::IValue> &list) { return list.size(); }
+
+c10::List<std::string> atenList(std::string &str)
+{
+    c10::List<std::string> chars;
+    chars.reserve(str.size());
+    for (auto c : str) {
+        chars.push_back(std::string(1, c));
+    }
+    return chars;
+}
+
+c10::List<at::IValue> atenList(const c10::List<at::IValue> &list) { return list.copy(); }
 
 std::tuple<at::Tensor, at::Tensor, at::Tensor> atenLstm(const at::Tensor &input, at::TensorList hx,
                                                         at::TensorList params, bool has_biases, int64_t num_layers,
@@ -227,8 +224,6 @@ std::tuple<at::Tensor, at::Tensor, at::Tensor> atenlstm(const at::Tensor &data, 
 {
     return at::lstm(data, batch_sizes, hx, params, has_biases, num_layers, dropout, train, bidirectional);
 }
-
-// bool atenLt(const at::Scalar &self, const at::Scalar &other) { return self.to; }
 
 at::Tensor atenLt(const at::Tensor &self, const at::Scalar &other) { return at::lt(self, other); }
 
