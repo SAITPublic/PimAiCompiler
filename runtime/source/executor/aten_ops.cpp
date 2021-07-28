@@ -84,11 +84,27 @@ at::Tensor atenAddmm(const at::Tensor &self, const at::Tensor &mat1, const at::T
     return at::addmm(self, mat1, mat2, beta, alpha);
 }
 
+bool atenBool(const at::Tensor &self) {
+    return self.is_nonzero();
+}
+
+bool atenBool(int64_t& i) {
+    return (bool)i;
+}
+
+bool atenBool(double& d) {
+    return (bool)d;
+}
+
 at::Tensor atenCat(at::TensorList tensors, int64_t dim) { return at::cat(tensors, dim); }
 
 at::Tensor atenCat(at::TensorList tensors, at::Dimname dim) { return at::cat(tensors, dim); }
 
 at::Tensor atenCeil(const at::Tensor &self) { return at::ceil(self); }
+
+at::Tensor atenClamp(const at::Tensor &self, const at::Scalar &min, const at::Scalar &max) {
+    return at::clamp(self, min, max);
+}
 
 at::Tensor &atenCopy_(at::Tensor &self, const at::Tensor &src, bool non_blocking)
 {

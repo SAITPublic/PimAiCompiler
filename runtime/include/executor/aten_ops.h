@@ -28,11 +28,22 @@ at::Tensor atenAddmm(const at::Tensor &self, const at::Tensor &mat1, const at::T
 
 void atenAppend(c10::List<at::IValue> &list, at::IValue el);
 
+bool atenBool(const at::Tensor &self);
+
+bool atenBool(int64_t& i);
+
+bool atenBool(double& d);
+
 at::Tensor atenCat(at::TensorList tensors, int64_t dim = 0);
 
 at::Tensor atenCat(at::TensorList tensors, at::Dimname dim);
 
 at::Tensor atenCeil(const at::Tensor &self);
+
+at::Tensor atenClamp(const at::Tensor &self, const at::Scalar &min, const at::Scalar &max);
+
+template <typename T>
+void atenClear(at::List<T>& list) { list.clear(); }
 
 at::Tensor &atenCopy_(at::Tensor &self, const at::Tensor &src, bool non_blocking = false);
 
