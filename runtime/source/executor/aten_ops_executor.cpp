@@ -373,28 +373,33 @@ void executorAtenDeriveIndex(const nncir::Node& op_node, StreamExecutor& stream_
     DLOG(INFO) << "execute Aten derive_index node";
 
     auto derive_index_node = cast<nncir::AtenDeriveIndexNode>(op_node);
-    auto index = derive_index_node.getIndex();
-    auto step = derive_index_node.getStep();
     auto inedges = derive_index_node.getInEdgeIds();
+
+    // Index is an input, get Index
     int edge_id = 0;
     auto& data_edge = cast<nncir::DataEdge>(derive_index_node.getInEdge(edge_id));
     auto input_blob_id = data_edge.getBlobId();
     torch::jit::IValue iv = stream_executor.findBlob(input_blob_id).second;
-    auto start = iv.toInt();
+    auto index = iv.toInt();
     edge_id++;
 
-    if (nncir::isDefaultValue<int64_t>(index)) {
-        auto& index_data_edge = cast<nncir::DataEdge>(derive_index_node.getInEdge(edge_id));
-        input_blob_id = index_data_edge.getBlobId();
-        iv = stream_executor.findBlob(input_blob_id).second;
-        index = iv.toInt();
+    // Check and get start
+    auto start = derive_index_node.getStart();
+    if (nncir::isDefaultValue<int64_t>(start)) {
+        auto& start_data_edge = cast<nncir::DataEdge>(derive_index_node.getInEdge(edge_id));
+        auto start_blob_id = start_data_edge.getBlobId();
+        auto start_iv = stream_executor.findBlob(start_blob_id).second;
+        start = start_iv.toInt();
         edge_id++;
     }
+
+    // Check and get step
+    auto step = derive_index_node.getStep();
     if (nncir::isDefaultValue<int64_t>(step)) {
         auto& step_data_edge = cast<nncir::DataEdge>(derive_index_node.getInEdge(edge_id));
-        input_blob_id = step_data_edge.getBlobId();
-        iv = stream_executor.findBlob(input_blob_id).second;
-        step = iv.toInt();
+        auto step_blob_id = step_data_edge.getBlobId();
+        auto step_iv = stream_executor.findBlob(step_blob_id).second;
+        step = step_iv.toInt();
         edge_id++;
     }
 

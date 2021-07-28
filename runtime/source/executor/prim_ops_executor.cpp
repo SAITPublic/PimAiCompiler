@@ -91,6 +91,10 @@ void executePrimConstant(const nncir::Node& op_node, StreamExecutor& stream_exec
         primTupleConstruct(inputs, inputs.size());
         iv = inputs.at(0);
         dtype = DataType::TUPLE;
+
+    } else if (ntype == "None" || ntype == "(None, None, None, None)") {
+        dtype = DataType::NONE;
+
     } else {
         DLOG(ERROR) << "PrimConstant Error, ntype: " << ntype << "unsupport!";
     }
@@ -737,7 +741,7 @@ void executePrimBlock(const nncir::Node& op_node, StreamExecutor& stream_executo
                 stream_executor.updateBlob(temp_out_blob_ids.at(i), in_blob.first, in_blob.second);
             }
         }
-        stream_executor.updateBlob(out_blob_ids.at(0), DataType::INT64, loop_index);
+        stream_executor.updateBlob(out_blob_ids.at(0), DataType::INT64, intToIValue(loop_index));
         stream_executor.setCursor(block_node->getId() + 1);
     }
 }

@@ -689,8 +689,8 @@ IRNNNodeParser::parseNNNode<IR::NNNode::AnyType_AtenDeriveIndexNode>(const IR::N
     Log::IR::E_IF(aten_derive_index_node == nullptr)
         << "IRNNNodeParser::parseNNNode<NN::AtenDeriveIndexNode>() => wrong node type!";
     int64_t step = aten_derive_index_node->step();
-    int64_t index = aten_derive_index_node->index();
-    return std::make_unique<nn_ir::AtenDeriveIndexNode>(node_info, index, step);
+    int64_t start = aten_derive_index_node->start();
+    return std::make_unique<nn_ir::AtenDeriveIndexNode>(node_info, start, step);
 }
 
 template <>
