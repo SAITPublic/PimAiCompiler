@@ -30,9 +30,9 @@ void atenAppend(c10::List<at::IValue> &list, at::IValue el);
 
 bool atenBool(const at::Tensor &self);
 
-bool atenBool(int64_t& i);
+bool atenBool(const int64_t& i);
 
-bool atenBool(double& d);
+bool atenBool(const double& d);
 
 at::Tensor atenCat(at::TensorList tensors, int64_t dim = 0);
 
@@ -46,6 +46,11 @@ template <typename T>
 void atenClear(at::List<T>& list) { list.clear(); }
 
 at::Tensor atenContiguous(const at::Tensor &self, at::MemoryFormat memory_format);
+
+at::Tensor atenConv2d(const at::Tensor &input, const at::Tensor &weight,
+                      const at::Tensor &bias, at::IntArrayRef stride,
+                      at::IntArrayRef padding, at::IntArrayRef dilation, 
+                      int64_t groups);
 
 at::Tensor &atenCopy_(at::Tensor &self, const at::Tensor &src, bool non_blocking = false);
 

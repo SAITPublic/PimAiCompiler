@@ -88,11 +88,11 @@ bool atenBool(const at::Tensor &self) {
     return self.is_nonzero();
 }
 
-bool atenBool(int64_t& i) {
+bool atenBool(const int64_t& i) {
     return (bool)i;
 }
 
-bool atenBool(double& d) {
+bool atenBool(const double& d) {
     return (bool)d;
 }
 
@@ -113,6 +113,13 @@ at::Tensor atenContiguous(const at::Tensor &self, at::MemoryFormat memory_format
 at::Tensor &atenCopy_(at::Tensor &self, const at::Tensor &src, bool non_blocking)
 {
     return at::native::copy_(self, src, non_blocking);
+}
+
+at::Tensor atenConv2d(const at::Tensor &input, const at::Tensor &weight,
+                      const at::Tensor &bias, at::IntArrayRef stride,
+                      at::IntArrayRef padding, at::IntArrayRef dilation, 
+                      int64_t groups) {
+    return at::conv2d(input, weight, bias, stride, padding, dilation, groups);
 }
 
 at::Tensor atenCpu(const at::Tensor &self) {

@@ -280,6 +280,49 @@ void executorAtenContiguous(const nncir::Node& op_node, StreamExecutor& stream_e
     stream_executor.updateBlob(out_edge.getBlobId(), DataType::TENSOR, tensorToIValue(output));
 }
 
+void executorAtenConv2d(const nncir::Node& op_node, StreamExecutor& stream_executor) {
+    DLOG(INFO) << "execute Aten Conv2d node";
+
+    auto node = cast<nncir::AtenConv2dNode>(op_node);
+
+    auto& input_self_edge = cast<nncir::DataEdge>(node.getInEdge(0));
+    int input_self_blob_id = input_self_edge.getBlobId();
+    torch::jit::IValue iv_self = stream_executor.findBlob(input_self_blob_id).second;
+    assert(iv_self.isTensor());
+    at::Tensor self_tensor = iv_self.toTensor();
+
+    auto weight_blob_id = (node.getWeightBlobId())[0];
+    auto bias_blob_id = (node.getBiasBlobId())[0];
+    std::vector<at::Tensor> weights;
+    auto weight_iv = stream_executor.findBlob(weight_blob_id).second;
+    auto bias_iv = stream_executor.findBlob(weight_blob_id).second;
+    assert(weight_iv.isTensor() && bias_iv.isTensor());
+    auto weight_tensor = weight_iv.toTensor();
+    auto bias_tensor = bias_iv.toTensor();
+
+    // attributes of conv2d don't need default-value check, because its default values
+    // are set as same as default values in aten::conv2d.
+    auto stride = node.getStride();
+    auto padding = node.getPadding();
+    auto dilation = node.getDilation();
+    auto groups = node.getGroups();
+
+    std::vector<int64_t> stride_vec = {static_cast<int64_t>(stride.h), static_cast<int64_t>(stride.w)};
+    std::vector<int64_t> padding_vec = {static_cast<int64_t>(padding.t),
+                                        static_cast<int64_t>(padding.b),
+                                        static_cast<int64_t>(padding.l),
+                                        static_cast<int64_t>(padding.r)};
+    std::vector<int64_t> dilation_vec = {static_cast<int64_t>(dilation.h),
+                                         static_cast<int64_t>(dilation.w)};
+
+    auto output = nnrt::atenConv2d(self_tensor, weight_tensor, bias_tensor,
+                                   at::ArrayRef<int64_t>(stride_vec), at::ArrayRef<int64_t>(padding_vec),
+                                   at::ArrayRef<int64_t>(dilation_vec), groups);
+    // update output
+    auto& out_edge = cast<nncir::DataEdge>(node.getFirstOutEdge());
+    stream_executor.updateBlob(out_edge.getBlobId(), DataType::TENSOR, tensorToIValue(output));
+}
+
 void executorAtenCpu(const nncir::Node& op_node, StreamExecutor& stream_executor) {
     DLOG(INFO) << "execute Aten Cpu node";
 

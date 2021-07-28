@@ -23,6 +23,7 @@ void executorAtenCeil(const nncir::Node& op_node, StreamExecutor& stream_executo
 void executorAtenClamp(const nncir::Node& op_node, StreamExecutor& stream_executor);
 void executorAtenClear(const nncir::Node& op_node, StreamExecutor& stream_executor);
 void executorAtenContiguous(const nncir::Node& op_node, StreamExecutor& stream_executor);
+void executorAtenConv2d(const nncir::Node& op_node, StreamExecutor& stream_executor);
 void executorAtenCopy(const nncir::Node& op_node, StreamExecutor& stream_executor);
 void executorAtenCpu(const nncir::Node& op_node, StreamExecutor& stream_executor);
 void executorAtenCuda(const nncir::Node& op_node, StreamExecutor& stream_executor);

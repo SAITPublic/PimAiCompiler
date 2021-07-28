@@ -187,6 +187,7 @@ void StreamExecutor::registerOp()
     this->global_op_register_.insert({nncir::NodeType::ATENCLEAR, executorAtenClear});
     this->global_op_register_.insert({nncir::NodeType::ATENCONTIGUOUS, executorAtenContiguous});
     this->global_op_register_.insert({nncir::NodeType::ATENCOPY, executorAtenCopy});
+    this->global_op_register_.insert({nncir::NodeType::ATENCONV2D, executorAtenConv2d});
     this->global_op_register_.insert({nncir::NodeType::ATENCPU, executorAtenCpu});
     this->global_op_register_.insert({nncir::NodeType::ATENCUDA, executorAtenCuda});
     this->global_op_register_.insert({nncir::NodeType::ATENDERIVEINDEX, executorAtenDeriveIndex});
