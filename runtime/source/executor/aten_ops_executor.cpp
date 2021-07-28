@@ -619,6 +619,32 @@ void executorAtenEq(const nncir::Node& op_node, StreamExecutor& stream_executor)
     }
 }
 
+void executorAtenEqual(const nncir::Node& op_node, StreamExecutor& stream_executor)
+{
+    DLOG(INFO) << "execute Aten Equal node";
+
+    auto node = cast<nncir::AtenEqualNode>(op_node);
+
+    auto& input_self = cast<nncir::DataEdge>(node.getInEdge(0));
+    auto& input_other = cast<nncir::DataEdge>(node.getInEdge(1));
+
+    // Get input blob
+    int input_self_blob_id = input_self.getBlobId();
+    int input_other_blob_id = input_other.getBlobId();
+
+    // Find the input blob
+    torch::jit::IValue iv_self = stream_executor.findBlob(input_self_blob_id).second;
+    torch::jit::IValue iv_other = stream_executor.findBlob(input_other_blob_id).second;
+    assert(iv_self.isTensor() && iv_other.isTensor());
+    at::Tensor self_tensor = iv_self.toTensor();
+    at::Tensor other_tensor = iv_other.toTensor();
+
+    auto output = nnrt::atenEqual(self_tensor, other_tensor);
+    // update output
+    auto& out_edge = cast<nncir::DataEdge>(node.getFirstOutEdge());
+    stream_executor.updateBlob(out_edge.getBlobId(), DataType::BOOL, boolToIValue(output));
+}
+
 void executorAtenExpand(const nncir::Node& op_node, StreamExecutor& stream_executor)
 {
     DLOG(INFO) << "execute Aten Expand node";
@@ -655,6 +681,78 @@ void executorAtenExpand(const nncir::Node& op_node, StreamExecutor& stream_execu
     // update output
     auto& out_edge = cast<nncir::DataEdge>(expand_node.getFirstOutEdge());
     stream_executor.updateBlob(out_edge.getBlobId(), DataType::TENSOR, tensorToIValue(output));
+}
+
+void executorAtenFill(const nncir::Node& op_node, StreamExecutor& stream_executor)
+{
+    DLOG(INFO) << "execute Aten Fill node";
+
+    auto node = cast<nncir::AtenEqNode>(op_node);
+
+    auto& input_self = cast<nncir::DataEdge>(node.getInEdge(0));
+    auto& input_other = cast<nncir::DataEdge>(node.getInEdge(1));
+
+    // Get input blob
+    int input_self_blob_id = input_self.getBlobId();
+    int input_other_blob_id = input_other.getBlobId();
+
+    // Find the input blob
+    torch::jit::IValue iv_self = stream_executor.findBlob(input_self_blob_id).second;
+    torch::jit::IValue iv_other = stream_executor.findBlob(input_other_blob_id).second;
+    assert(iv_self.isTensor());
+    at::Tensor self_tensor = iv_self.toTensor();
+
+    if (iv_other.isTensor()) {
+        at::Tensor other_tensor = iv_other.toTensor();
+        auto output = nnrt::atenFill(self_tensor, other_tensor);
+        // update output
+        auto& out_edge = cast<nncir::DataEdge>(node.getFirstOutEdge());
+        stream_executor.updateBlob(out_edge.getBlobId(), DataType::TENSOR, tensorToIValue(output));
+    } else if (iv_other.isScalar()) {
+        at::Scalar other_scalar = iv_other.toScalar();
+        auto output = nnrt::atenFill(self_tensor, other_scalar);
+        // update output
+        auto& out_edge = cast<nncir::DataEdge>(node.getFirstOutEdge());
+        stream_executor.updateBlob(out_edge.getBlobId(), DataType::TENSOR, scalarToIValue(output));
+    } else {
+        DLOG(ERROR) << "Unsupported input type for aten::fill_";
+    }
+}
+
+void executorAtenFloorDivide(const nncir::Node& op_node, StreamExecutor& stream_executor)
+{
+    DLOG(INFO) << "execute Aten FloorDivide node";
+
+    auto node = cast<nncir::AtenFloorDivideNode>(op_node);
+
+    auto& input_self = cast<nncir::DataEdge>(node.getInEdge(0));
+    auto& input_other = cast<nncir::DataEdge>(node.getInEdge(1));
+
+    // Get input blob
+    int input_self_blob_id = input_self.getBlobId();
+    int input_other_blob_id = input_other.getBlobId();
+
+    // Find the input blob
+    torch::jit::IValue iv_self = stream_executor.findBlob(input_self_blob_id).second;
+    torch::jit::IValue iv_other = stream_executor.findBlob(input_other_blob_id).second;
+    assert(iv_self.isTensor());
+    at::Tensor self_tensor = iv_self.toTensor();
+
+    if (iv_other.isTensor()) {
+        at::Tensor other_tensor = iv_other.toTensor();
+        auto output = nnrt::atenFloorDivide(self_tensor, other_tensor);
+        // update output
+        auto& out_edge = cast<nncir::DataEdge>(node.getFirstOutEdge());
+        stream_executor.updateBlob(out_edge.getBlobId(), DataType::TENSOR, tensorToIValue(output));
+    } else if (iv_other.isScalar()) {
+        at::Scalar other_scalar = iv_other.toScalar();
+        auto output = nnrt::atenFloorDivide(self_tensor, other_scalar);
+        // update output
+        auto& out_edge = cast<nncir::DataEdge>(node.getFirstOutEdge());
+        stream_executor.updateBlob(out_edge.getBlobId(), DataType::TENSOR, scalarToIValue(output));
+    } else {
+        DLOG(ERROR) << "Unsupported input type for aten::floor_divide";
+    }
 }
 
 void executorAtenFormat(const nncir::Node& op_node, StreamExecutor& stream_executor)

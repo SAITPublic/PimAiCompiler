@@ -165,6 +165,24 @@ at::Tensor atenExpand(const at::Tensor &self, at::IntArrayRef size, bool implici
 
 at::Tensor atenEq(const at::Tensor &self, const at::Tensor &other) { return at::eq(self, other); }
 
+bool atenEqual(const at::Tensor &self, const at::Tensor &other) { return at::equal(self, other); }
+
+at::Tensor atenFill(at::Tensor &self, at::Scalar value) {
+    return at::fill_(self, value);
+}
+
+at::Tensor atenFill(at::Tensor &self, at::Tensor &other) {
+    return at::fill_(self, other);
+}
+
+at::Tensor atenFloorDivide(const at::Tensor &self, at::Scalar value) {
+    return at::floor_divide(self, value);
+}
+
+at::Tensor atenFloorDivide(const at::Tensor &self, const at::Tensor &other) {
+    return at::floor_divide(self, other);
+}
+
 at::Tensor atenGt(const at::Tensor &self, const at::Scalar &other) { return at::gt(self, other); }
 
 at::Tensor atenGt(const at::Tensor &self, const at::Tensor &other) { return at::gt(self, other); }

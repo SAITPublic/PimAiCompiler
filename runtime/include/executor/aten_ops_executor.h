@@ -33,7 +33,10 @@ void executorAtenDiv(const nncir::Node& op_node, StreamExecutor& stream_executor
 void executorAtenDropout(const nncir::Node& op_node, StreamExecutor& stream_executor);
 void executorAtenEmbedding(const nncir::Node& op_node, StreamExecutor& stream_executor);
 void executorAtenEq(const nncir::Node& op_node, StreamExecutor& stream_executor);
+void executorAtenEqual(const nncir::Node& op_node, StreamExecutor& stream_executor);
 void executorAtenExpand(const nncir::Node& op_node, StreamExecutor& stream_executor);
+void executorAtenFill(const nncir::Node& op_node, StreamExecutor& stream_executor);
+void executorAtenFloorDivide(const nncir::Node& op_node, StreamExecutor& stream_executor);
 void executorAtenFormat(const nncir::Node& op_node, StreamExecutor& stream_executor);
 void executorAtenGt(const nncir::Node& op_node, StreamExecutor& stream_executor);
 void executorAtenGetItem(const nncir::Node& op_node, StreamExecutor& stream_executor);
