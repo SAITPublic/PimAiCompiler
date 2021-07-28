@@ -43,6 +43,8 @@ void executorAtenGe(const nncir::Node& op_node, StreamExecutor& stream_executor)
 void executorAtenGt(const nncir::Node& op_node, StreamExecutor& stream_executor);
 void executorAtenGetItem(const nncir::Node& op_node, StreamExecutor& stream_executor);
 void executorAtenIndex(const nncir::Node& op_node, StreamExecutor& stream_executor);
+void executorAtenIndexPut(const nncir::Node& op_node, StreamExecutor& stream_executor);
+void executorAtenIndexSelect(const nncir::Node& op_node, StreamExecutor& stream_executor);
 void executorAtenInt(const nncir::Node& op_node, StreamExecutor& stream_executor);
 void executorAtenItem(const nncir::Node& op_node, StreamExecutor& stream_executor);
 void executorAtenLen(const nncir::Node& op_node, StreamExecutor& stream_executor);

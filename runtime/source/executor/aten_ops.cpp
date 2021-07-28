@@ -167,11 +167,11 @@ at::Tensor atenEq(const at::Tensor &self, const at::Tensor &other) { return at::
 
 bool atenEqual(const at::Tensor &self, const at::Tensor &other) { return at::equal(self, other); }
 
-at::Tensor atenFill(at::Tensor &self, at::Scalar value) {
+at::Tensor &atenFill(at::Tensor &self, at::Scalar value) {
     return at::fill_(self, value);
 }
 
-at::Tensor atenFill(at::Tensor &self, at::Tensor &other) {
+at::Tensor &atenFill(at::Tensor &self, at::Tensor &other) {
     return at::fill_(self, other);
 }
 
@@ -197,6 +197,15 @@ at::Tensor atenGt(const at::Tensor &self, const at::Tensor &other) { return at::
 
 at::Tensor atenIndex(const at::Tensor &self, at::TensorList indices) {
     return at::index(self, indices);
+}
+
+at::Tensor &atenIndexPut(at::Tensor &self, at::TensorList indices,
+                         const at::Tensor &values, bool accumulate) {
+    return at::index_put_(self, indices, values, accumulate);
+}
+
+at::Tensor atenIndexSelect(const at::Tensor &self, int64_t dim, const at::Tensor &index) {
+    return at::index_select(self, dim, index);
 }
 
 at::Scalar atenItem(const at::Tensor &self) { return at::native::item(self); }

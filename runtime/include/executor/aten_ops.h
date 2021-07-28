@@ -85,9 +85,9 @@ bool atenEq(const at::Scalar &self, const at::Scalar &other);
 
 at::Tensor atenExpand(const at::Tensor &self, at::IntArrayRef size, bool implicit = false);
 
-at::Tensor atenFill(at::Tensor &self, at::Scalar value);
+at::Tensor &atenFill(at::Tensor &self, at::Scalar value);
 
-at::Tensor atenFill(at::Tensor &self, at::Tensor &other);
+at::Tensor &atenFill(at::Tensor &self, at::Tensor &other);
 
 at::Tensor atenFloorDivide(const at::Tensor &self, at::Scalar value);
 
@@ -133,6 +133,10 @@ at::Tensor atenGt(const at::Tensor &self, const at::Scalar &other);
 at::Tensor atenGt(const at::Tensor &self, const at::Tensor &other);
 
 at::Tensor atenIndex(const at::Tensor &self, at::TensorList indices);
+
+at::Tensor &atenIndexPut(at::Tensor &self, at::TensorList indices, const at::Tensor &values, bool accumulate);
+
+at::Tensor atenIndexSelect(const at::Tensor &self, int64_t dim, const at::Tensor &index);
 
 int64_t atenInt(const at::Tensor &a);
 
