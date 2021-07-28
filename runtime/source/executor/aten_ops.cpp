@@ -106,9 +106,21 @@ at::Tensor atenClamp(const at::Tensor &self, const at::Scalar &min, const at::Sc
     return at::clamp(self, min, max);
 }
 
+at::Tensor atenContiguous(const at::Tensor &self, at::MemoryFormat memory_format) {
+    return at::native::contiguous(self, memory_format);
+}
+
 at::Tensor &atenCopy_(at::Tensor &self, const at::Tensor &src, bool non_blocking)
 {
     return at::native::copy_(self, src, non_blocking);
+}
+
+at::Tensor atenCpu(const at::Tensor &self) {
+    return self.cpu();
+}
+
+at::Tensor atenCuda(const at::Tensor &self) {
+    return self.cuda();
 }
 
 at::Tensor atenDiv(const at::Tensor &self, const at::Tensor &other) { return at::div(self, other); }

@@ -45,7 +45,13 @@ at::Tensor atenClamp(const at::Tensor &self, const at::Scalar &min, const at::Sc
 template <typename T>
 void atenClear(at::List<T>& list) { list.clear(); }
 
+at::Tensor atenContiguous(const at::Tensor &self, at::MemoryFormat memory_format);
+
 at::Tensor &atenCopy_(at::Tensor &self, const at::Tensor &src, bool non_blocking = false);
+
+at::Tensor atenCpu(const at::Tensor &self);
+
+at::Tensor atenCuda(const at::Tensor &self);
 
 int64_t atenDim(const at::Tensor &tensor);
 
