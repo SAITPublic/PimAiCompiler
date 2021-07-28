@@ -183,9 +183,21 @@ at::Tensor atenFloorDivide(const at::Tensor &self, const at::Tensor &other) {
     return at::floor_divide(self, other);
 }
 
+at::Tensor atenGather(const at::Tensor &self, int64_t dim, const at::Tensor &index, bool sparse_grad) {
+    return at::gather(self, dim, index, sparse_grad);
+}
+
+at::Tensor atenGe(const at::Tensor &self, const at::Scalar &other) { return at::ge(self, other); }
+
+at::Tensor atenGe(const at::Tensor &self, const at::Tensor &other) { return at::ge(self, other); }
+
 at::Tensor atenGt(const at::Tensor &self, const at::Scalar &other) { return at::gt(self, other); }
 
 at::Tensor atenGt(const at::Tensor &self, const at::Tensor &other) { return at::gt(self, other); }
+
+at::Tensor atenIndex(const at::Tensor &self, at::TensorList indices) {
+    return at::index(self, indices);
+}
 
 at::Scalar atenItem(const at::Tensor &self) { return at::native::item(self); }
 

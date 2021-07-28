@@ -824,6 +824,51 @@ void executorAtenFormat(const nncir::Node& op_node, StreamExecutor& stream_execu
     }
 }
 
+void executorAtenGather(const nncir::Node& op_node, StreamExecutor& stream_executor)
+{
+    DLOG(INFO) << "execute Aten Gather node";
+
+    auto node = cast<nncir::AtenGatherNode>(op_node);
+    int edge_id = 0;
+
+    auto& input_self = cast<nncir::DataEdge>(node.getInEdge(0));
+    int input_self_blob_id = input_self.getBlobId();
+
+    torch::jit::IValue iv_self = stream_executor.findBlob(input_self_blob_id).second;
+    assert(iv_self.isTensor());
+    auto self_tensor = iv_self.toTensor();
+
+    auto dim = node.getDim();
+    if (nncir::isDefaultValue<int64_t>(dim)) {
+        auto& dim_edge = cast<nncir::DataEdge>(node.getInEdge(edge_id++));
+        int dim_blob_id = dim_edge.getBlobId();
+        auto dim_iv = stream_executor.findBlob(dim_blob_id).second;
+        assert(dim_iv.isInt());
+        dim = dim_iv.toInt();
+    }
+
+    auto& input_index = cast<nncir::DataEdge>(node.getInEdge(edge_id++));
+    int input_index_blob_id = input_index.getBlobId();
+
+    torch::jit::IValue iv_index = stream_executor.findBlob(input_index_blob_id).second;
+    assert(iv_index.isTensor());
+    auto index_tensor = iv_index.toTensor();
+
+    auto sparse_grad = node.getSparseGrad();
+    if (nncir::isDefaultValue<int>(sparse_grad)) {
+        auto& sparse_grad_edge = cast<nncir::DataEdge>(node.getInEdge(edge_id++));
+        int sparse_grad_blob_id = sparse_grad_edge.getBlobId();
+        auto sparse_grad_iv = stream_executor.findBlob(sparse_grad_blob_id).second;
+        assert(sparse_grad_iv.isInt());
+        sparse_grad = static_cast<int>(sparse_grad_iv.toInt());
+    }
+
+    auto output = nnrt::atenGather(self_tensor, dim, index_tensor, sparse_grad);
+    // update output
+    auto& out_edge = cast<nncir::DataEdge>(node.getFirstOutEdge());
+    stream_executor.updateBlob(out_edge.getBlobId(), DataType::TENSOR, tensorToIValue(output));
+}
+
 void executorAtenGt(const nncir::Node& op_node, StreamExecutor& stream_executor)
 {
     DLOG(INFO) << "execute Aten Gt node";
@@ -858,6 +903,42 @@ void executorAtenGt(const nncir::Node& op_node, StreamExecutor& stream_executor)
     }
 }
 
+void executorAtenGe(const nncir::Node& op_node, StreamExecutor& stream_executor)
+{
+    DLOG(INFO) << "execute Aten Ge node";
+
+    auto node = cast<nncir::AtenGeNode>(op_node);
+
+    auto& input_self = cast<nncir::DataEdge>(node.getInEdge(0));
+    auto& input_other = cast<nncir::DataEdge>(node.getInEdge(1));
+
+    // Get input blob
+    int input_self_blob_id = input_self.getBlobId();
+    int input_other_blob_id = input_other.getBlobId();
+
+    // Find the input blob
+    torch::jit::IValue iv_self = stream_executor.findBlob(input_self_blob_id).second;
+    torch::jit::IValue iv_other = stream_executor.findBlob(input_other_blob_id).second;
+    assert(iv_self.isTensor());
+    at::Tensor self_tensor = iv_self.toTensor();
+
+    if (iv_other.isTensor()) {
+        at::Tensor other_tensor = iv_other.toTensor();
+        auto output = nnrt::atenGe(self_tensor, other_tensor);
+        // update output
+        auto& out_edge = cast<nncir::DataEdge>(node.getFirstOutEdge());
+        stream_executor.updateBlob(out_edge.getBlobId(), DataType::TENSOR, tensorToIValue(output));
+    } else if (iv_other.isScalar()) {
+        at::Scalar other_scalar = iv_other.toScalar();
+        auto output = nnrt::atenGe(self_tensor, other_scalar);
+        // update output
+        auto& out_edge = cast<nncir::DataEdge>(node.getFirstOutEdge());
+        stream_executor.updateBlob(out_edge.getBlobId(), DataType::TENSOR, scalarToIValue(output));
+    } else {
+        DLOG(ERROR) << "Unsupported input type for aten::ge";
+    }
+}
+
 void executorAtenGetItem(const nncir::Node& op_node, StreamExecutor& stream_executor)
 {
     DLOG(INFO) << "execute Aten GetItem node";
@@ -884,6 +965,36 @@ void executorAtenGetItem(const nncir::Node& op_node, StreamExecutor& stream_exec
     // update output
     auto& out_edge = cast<nncir::DataEdge>(get_item_node.getFirstOutEdge());
     stream_executor.updateBlob(out_edge.getBlobId(), DataType::IVALUE, output);
+}
+
+void executorAtenIndex(const nncir::Node& op_node, StreamExecutor& stream_executor)
+{
+    DLOG(INFO) << "execute Aten Index node";
+
+    auto node = cast<nncir::AtenIndexNode>(op_node);
+
+    auto& input_self = cast<nncir::DataEdge>(node.getInEdge(0));
+    int input_self_blob_id = input_self.getBlobId();
+
+    torch::jit::IValue iv_self = stream_executor.findBlob(input_self_blob_id).second;
+    assert(iv_self.isTensor());
+    auto self_tensor = iv_self.toTensor();
+
+    auto& indices_edge = cast<nncir::DataEdge>(node.getInEdge(1));
+    int indices_blob_id = indices_edge.getBlobId();
+    auto indices_iv = stream_executor.findBlob(indices_blob_id).second;
+    assert(indices_iv.isTensorList());
+    auto indices_list_tensor = indices_iv.toTensorList();
+    std::vector<at::Tensor> indices_list_tensor_vector;
+    for (auto tensor : indices_list_tensor) {
+        indices_list_tensor_vector.push_back(tensor);
+    }
+    at::TensorList indices(indices_list_tensor_vector);
+
+    auto output = nnrt::atenIndex(self_tensor, indices);
+    // update output
+    auto& out_edge = cast<nncir::DataEdge>(node.getFirstOutEdge());
+    stream_executor.updateBlob(out_edge.getBlobId(), DataType::TENSOR, tensorToIValue(output));
 }
 
 void executorAtenInt(const nncir::Node& op_node, StreamExecutor& stream_executor)

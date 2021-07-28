@@ -122,9 +122,17 @@ std::string atenFormat(std::string &fmt, const T &next, const Types &... args)
     return atenFormat(fmt, args...);
 }
 
+at::Tensor atenGather(const at::Tensor &self, int64_t dim, const at::Tensor &index, bool sparse_grad);
+
+at::Tensor atenGe(const at::Tensor &self, const at::Scalar &other);
+
+at::Tensor atenGe(const at::Tensor &self, const at::Tensor &other);
+
 at::Tensor atenGt(const at::Tensor &self, const at::Scalar &other);
 
 at::Tensor atenGt(const at::Tensor &self, const at::Tensor &other);
+
+at::Tensor atenIndex(const at::Tensor &self, at::TensorList indices);
 
 int64_t atenInt(const at::Tensor &a);
 
