@@ -262,6 +262,14 @@ at::Tensor atenLt(const at::Tensor &self, const at::Scalar &other) { return at::
 
 at::Tensor atenLt(const at::Tensor &self, const at::Tensor &other) { return at::lt(self, other); }
 
+at::Tensor atenMaskedFill(const at::Tensor &self, const at::Tensor &mask, at::Scalar value) {
+    return at::masked_fill(self, mask, value);
+}
+
+at::Tensor atenMaskedFill(const at::Tensor &self, const at::Tensor &mask, const at::Tensor &value) {
+    return at::masked_fill(self, mask, value);
+}
+
 at::Tensor atenMatmul(const at::Tensor &self, const at::Tensor &other) { return at::matmul(self, other); }
 
 at::Tensor atenMax(const at::Tensor &self) { return at::max(self); }

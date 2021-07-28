@@ -186,6 +186,10 @@ at::Tensor atenLt(const at::Tensor &self, const at::Scalar &other);
 
 at::Tensor atenLt(const at::Tensor &self, const at::Tensor &other);
 
+at::Tensor atenMaskedFill(const at::Tensor &self, const at::Tensor &mask, at::Scalar value);
+
+at::Tensor atenMaskedFill(const at::Tensor &self, const at::Tensor &mask, const at::Tensor &value);
+
 at::Tensor atenMatmul(const at::Tensor &self, const at::Tensor &other);
 
 at::Tensor atenMax(const at::Tensor &self);

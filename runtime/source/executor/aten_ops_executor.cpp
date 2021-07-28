@@ -1644,6 +1644,46 @@ void executorAtenLt(const nncir::Node& op_node, StreamExecutor& stream_executor)
     }
 }
 
+void executorAtenMaskedFill(const nncir::Node& op_node, StreamExecutor& stream_executor)
+{
+    DLOG(INFO) << "execute Aten MaskedFill node";
+
+    auto node = cast<nncir::AtenEqNode>(op_node);
+
+    auto& input_self = cast<nncir::DataEdge>(node.getInEdge(0));
+    auto& input_other = cast<nncir::DataEdge>(node.getInEdge(1));
+    auto& input_value = cast<nncir::DataEdge>(node.getInEdge(2));
+
+    // Get input blob
+    int input_self_blob_id = input_self.getBlobId();
+    int input_other_blob_id = input_other.getBlobId();
+    int input_value_blob_id = input_value.getBlobId();
+
+    // Find the input blob
+    auto iv_self = stream_executor.findBlob(input_self_blob_id).second;
+    auto iv_other = stream_executor.findBlob(input_other_blob_id).second;
+    auto iv_value = stream_executor.findBlob(input_value_blob_id).second;
+    assert(iv_self.isTensor() && iv_other.isTensor());
+    auto self_tensor = iv_self.toTensor();
+    auto other_tensor = iv_other.toTensor();
+
+    if (iv_value.isTensor()) {
+        auto value_tensor = iv_value.toTensor();
+        auto output = nnrt::atenMaskedFill(self_tensor, other_tensor, value_tensor);
+        // update output
+        auto& out_edge = cast<nncir::DataEdge>(node.getFirstOutEdge());
+        stream_executor.updateBlob(out_edge.getBlobId(), DataType::TENSOR, tensorToIValue(output));
+    } else if (iv_value.isScalar()) {
+        at::Scalar value_scalar = iv_value.toScalar();
+        auto output = nnrt::atenMaskedFill(self_tensor, other_tensor, value_scalar);
+        // update output
+        auto& out_edge = cast<nncir::DataEdge>(node.getFirstOutEdge());
+        stream_executor.updateBlob(out_edge.getBlobId(), DataType::TENSOR, tensorToIValue(output));
+    } else {
+        DLOG(ERROR) << "Unsupported input type for aten::masked_fill";
+    }
+}
+
 void executorAtenMatmul(const nncir::Node& op_node, StreamExecutor& stream_executor)
 {
     DLOG(INFO) << "execute Aten Matmul node";
