@@ -217,8 +217,12 @@ void StreamExecutor::registerOp()
     this->global_op_register_.insert({nncir::NodeType::ATENINT, executorAtenInt});
     this->global_op_register_.insert({nncir::NodeType::ATENITEM, executorAtenItem});
     this->global_op_register_.insert({nncir::NodeType::ATENIS, executorAtenIs});
+    this->global_op_register_.insert({nncir::NodeType::ATENLEAKYRELU, executorAtenLeakyRelu});
     this->global_op_register_.insert({nncir::NodeType::ATENLEN, executorAtenLen});
+    this->global_op_register_.insert({nncir::NodeType::ATENLINEAR, executorAtenLinear});
     this->global_op_register_.insert({nncir::NodeType::ATENLIST, executorAtenList});
+    this->global_op_register_.insert({nncir::NodeType::ATENLOG, executorAtenLog});
+    this->global_op_register_.insert({nncir::NodeType::ATENLOGSOFTMAX, executorAtenLogSoftmax});
     this->global_op_register_.insert({nncir::NodeType::ATENLSTM, executorAtenLSTM});
     this->global_op_register_.insert({nncir::NodeType::ATENLT, executorAtenLt});
     this->global_op_register_.insert({nncir::NodeType::ATENMATMUL, executorAtenMatmul});

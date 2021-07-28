@@ -214,7 +214,15 @@ bool atenIs(const at::IValue &self, const at::IValue &other) { return self.is(ot
 
 at::Scalar atenItem(const at::Tensor &self) { return at::native::item(self); }
 
+at::Tensor atenLeakyRelu(const at::Tensor &self, at::Scalar negative_slope) {
+    return at::leaky_relu(self, negative_slope);
+}
+
 int64_t atenLen(const c10::List<at::IValue> &list) { return list.size(); }
+
+at::Tensor atenLinear(const at::Tensor &input, const at::Tensor &weight, const at::Tensor &bias) {
+    return at::linear(input, weight, bias);
+}
 
 c10::List<std::string> atenList(std::string &str)
 {
@@ -227,6 +235,12 @@ c10::List<std::string> atenList(std::string &str)
 }
 
 c10::List<at::IValue> atenList(const c10::List<at::IValue> &list) { return list.copy(); }
+
+at::Tensor atenLog(const at::Tensor &self) { return at::log(self); }
+
+at::Tensor atenLogSoftmax(const at::Tensor &self, int64_t dim, at::ScalarType dtype) {
+    return at::log_softmax(self, dim, dtype);
+}
 
 std::tuple<at::Tensor, at::Tensor, at::Tensor> atenLstm(const at::Tensor &input, at::TensorList hx,
                                                         at::TensorList params, bool has_biases, int64_t num_layers,

@@ -51,8 +51,12 @@ void executorAtenIndexSelect(const nncir::Node& op_node, StreamExecutor& stream_
 void executorAtenInt(const nncir::Node& op_node, StreamExecutor& stream_executor);
 void executorAtenIs(const nncir::Node& op_node, StreamExecutor& stream_executor);
 void executorAtenItem(const nncir::Node& op_node, StreamExecutor& stream_executor);
+void executorAtenLeakyRelu(const nncir::Node& op_node, StreamExecutor& stream_executor);
 void executorAtenLen(const nncir::Node& op_node, StreamExecutor& stream_executor);
+void executorAtenLinear(const nncir::Node& op_node, StreamExecutor& stream_executor);
 void executorAtenList(const nncir::Node& op_node, StreamExecutor& stream_executor);
+void executorAtenLog(const nncir::Node& op_node, StreamExecutor& stream_executor);
+void executorAtenLogSoftmax(const nncir::Node& op_node, StreamExecutor& stream_executor);
 void executorAtenLSTM(const nncir::Node& op_node, StreamExecutor& stream_executor);
 void executorAtenLt(const nncir::Node& op_node, StreamExecutor& stream_executor);
 void executorAtenMatmul(const nncir::Node& op_node, StreamExecutor& stream_executor);
