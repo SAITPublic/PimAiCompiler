@@ -211,6 +211,20 @@ std::tuple<at::Tensor, at::Tensor> atenMax(const at::Tensor &self, at::Dimname d
 at::Tensor atenMaxPool2d(const at::Tensor &self, at::IntArrayRef kernel_size, at::IntArrayRef stride,
                          at::IntArrayRef padding, at::IntArrayRef dilation, bool ceil_mode);
 
+at::Tensor atenMin(const at::Tensor &self);
+
+at::Tensor atenMin(const at::Tensor &self, const at::Tensor &other);
+
+std::tuple<at::Tensor, at::Tensor> atenMin(const at::Tensor &self, int64_t dim, bool keepdim);
+
+int64_t atenMul(const int64_t &self, const int64_t &other);
+
+double atenMul(const double &self, const double &other);
+
+at::Tensor atenMul(const at::Tensor &self, const at::Tensor &other);
+
+at::Tensor atenMul(const at::Tensor &self, const at::Scalar &other);
+
 at::Tensor atenNe(const at::Tensor &self, const at::Tensor &other);
 
 at::Tensor atenNe(const at::Tensor &self, const at::Scalar &other);
@@ -224,6 +238,8 @@ bool atenNe(const c10::List<T> &a, const c10::List<T> &b)
 bool atenNe(const at::Scalar &self, const at::Scalar &other);
 
 at::Tensor atenNeg(const at::Tensor &self);
+
+at::Tensor atenNot(const at::Tensor &self);
 
 at::Tensor atenPow(const at::Tensor &self, const at::Tensor &exponent);
 

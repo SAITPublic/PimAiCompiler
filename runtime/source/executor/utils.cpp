@@ -162,6 +162,8 @@ at::MemoryFormat getMemoryFormat(int optional_memory_format)
 
 torch::jit::IValue intToIValue(const int64_t& value) { return torch::jit::IValue(value); }
 
+torch::jit::IValue doubleToIValue(const double& value) { return torch::jit::IValue(value); }
+
 torch::jit::IValue boolToIValue(const bool& value) { return torch::jit::IValue(value); }
 
 torch::jit::IValue listToIValue(const c10::List<at::IValue>& value) { return torch::jit::IValue(value); }

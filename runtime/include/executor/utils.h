@@ -33,6 +33,8 @@ at::MemoryFormat getMemoryFormat(int optional_memory_format);
 
 torch::jit::IValue intToIValue(const int64_t& value);
 
+torch::jit::IValue doubleToIValue(const double& value);
+
 torch::jit::IValue listToIValue(const c10::List<at::IValue>& value);
 
 template <typename T>

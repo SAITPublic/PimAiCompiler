@@ -303,6 +303,26 @@ at::Tensor atenMaxPool2d(const at::Tensor &self, at::IntArrayRef kernel_size, at
     return at::max_pool2d(self, kernel_size, stride, padding, dilation, ceil_mode);
 }
 
+at::Tensor atenMin(const at::Tensor &self) { return at::min(self); }
+
+at::Tensor atenMin(const at::Tensor &self, const at::Tensor &other) { return at::min(self, other); }
+
+std::tuple<at::Tensor, at::Tensor> atenMin(const at::Tensor &self, int64_t dim, bool keepdim) {
+    return at::min(self, dim, keepdim);
+}
+
+int64_t atenMul(const int64_t &self, const int64_t &other) { return self * other; }
+
+double atenMul(const double &self, const double &other) { return self * other; }
+
+at::Tensor atenMul(const at::Tensor &self, const at::Tensor &other) {
+    return at::mul(self, other);
+}
+
+at::Tensor atenMul(const at::Tensor &self, const at::Scalar &other) {
+    return at::mul(self, other);
+}
+
 at::Tensor atenNe(const at::Tensor &self, const at::Tensor &other) { return at::ne(self, other); }
 
 at::Tensor atenNe(const at::Tensor &self, const at::Scalar &other) { return at::ne(self, other); }
@@ -322,6 +342,8 @@ bool atenNe(const at::Scalar &self, const at::Scalar &other)
 }
 
 at::Tensor atenNeg(const at::Tensor &self) { return at::neg(self); }
+
+at::Tensor atenNot(const at::Tensor &self) { return at::logical_not(self); }
 
 at::Tensor atenPow(const at::Tensor &self, const at::Tensor &exponent) { return at::pow(self, exponent); }
 
