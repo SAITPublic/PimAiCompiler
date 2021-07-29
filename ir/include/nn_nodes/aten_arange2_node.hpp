@@ -57,7 +57,7 @@ class AtenArange2Node : public NodeMixin<AtenArange2Node, NNNode> {
     int64_t end_    = INT64_MIN;
     int64_t dtype_  = INT32_MIN;
     int layout_     = INT32_MIN;
-	int device_     = INT32_MIN;
+    int device_     = INT32_MIN;
     int pin_memory_ = INT32_MIN;
 
 }; // class AtenArange2Node

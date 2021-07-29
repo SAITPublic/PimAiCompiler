@@ -35,6 +35,18 @@ at::Tensor atenAny(const at::Tensor &self) {
 
 void atenAppend(c10::List<at::IValue> &list, at::IValue el) { list.push_back(std::move(el)); }
 
+at::Tensor atenArange1(at::Scalar end, const at::TensorOptions &options) {
+    return at::arange(end, options);
+}
+
+at::Tensor atenArange2(at::Scalar start, at::Scalar end, const at::TensorOptions &options) {
+    return at::arange(start, end, options);
+}
+
+at::Tensor atenArange3(at::Scalar start, at::Scalar end, at::Scalar step, const at::TensorOptions &options) {
+    return at::arange(start, end, step, options);
+}
+
 // refer to castTensorTo() in torch/csrc/jit/runtime/register_special_ops.cpp
 at::Tensor atenAsTensor(at::Tensor &self, at::ScalarType dtype, at::Device device) {
     return self.to(device, dtype);

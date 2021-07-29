@@ -24,6 +24,12 @@ at::Tensor atenAny(const at::Tensor &self);
 
 void atenAppend(c10::List<at::IValue> &list, at::IValue el);
 
+at::Tensor atenArange1(at::Scalar end, const at::TensorOptions &options);
+
+at::Tensor atenArange2(at::Scalar start, at::Scalar end, const at::TensorOptions &options);
+
+at::Tensor atenArange3(at::Scalar start, at::Scalar end, at::Scalar step, const at::TensorOptions &options);
+
 at::Tensor atenAsTensor(at::Tensor &self, at::ScalarType dtype, at::Device device);
 
 at::Tensor atenBitwiseNot(const at::Tensor &self);

@@ -179,6 +179,114 @@ void executorAtenAppend(const nncir::Node& op_node, StreamExecutor& stream_execu
     stream_executor.updateBlob(out_edge.getBlobId(), DataType::LIST, listToIValue(list));
 }
 
+void executorAtenArange1(const nncir::Node& op_node, StreamExecutor& stream_executor)
+{
+    DLOG(INFO) << "execute Aten Arange1 node";
+
+    auto node = cast<nncir::AtenArange1Node>(op_node);
+    int edge_id = 0;
+
+    auto& end_edge = cast<nncir::DataEdge>(node.getInEdge(edge_id++));
+    int end_blob_id = end_edge.getBlobId();
+    auto iv_end = stream_executor.findBlob(end_blob_id).second;
+    assert(iv_end.isScalar());
+    auto end = iv_end.toScalar();
+
+    at::TensorOptions options;
+    auto& edge_dtype = cast<nncir::DataEdge>(node.getInEdge(edge_id++));
+    auto& edge_layout = cast<nncir::DataEdge>(node.getInEdge(edge_id++));
+    auto& edge_device = cast<nncir::DataEdge>(node.getInEdge(edge_id++));
+    auto& edge_pin_memory = cast<nncir::DataEdge>(node.getInEdge(edge_id++));
+    auto dtype_id = edge_dtype.getBlobId();
+    auto layout_id = edge_layout.getBlobId();
+    auto device_id = edge_device.getBlobId();
+    auto pin_memory_id = edge_pin_memory.getBlobId();
+    auto iv_dtype = stream_executor.findBlob(dtype_id).second;
+    auto iv_layout = stream_executor.findBlob(layout_id).second;
+    auto iv_device = stream_executor.findBlob(device_id).second;
+    auto iv_pin_memory = stream_executor.findBlob(pin_memory_id).second;
+
+    auto output = nnrt::atenArange1(end, options);
+    auto& out_edge = cast<nncir::DataEdge>(node.getFirstOutEdge());
+    stream_executor.updateBlob(out_edge.getBlobId(), DataType::TENSOR, tensorToIValue(output));
+}
+
+void executorAtenArange2(const nncir::Node& op_node, StreamExecutor& stream_executor)
+{
+    DLOG(INFO) << "execute Aten Arange2 node";
+
+    auto node = cast<nncir::AtenArange2Node>(op_node);
+    int edge_id = 0;
+
+    auto& start_edge = cast<nncir::DataEdge>(node.getInEdge(edge_id++));
+    auto& end_edge = cast<nncir::DataEdge>(node.getInEdge(edge_id++));
+    int start_blob_id = start_edge.getBlobId();
+    int end_blob_id = end_edge.getBlobId();
+    auto iv_start = stream_executor.findBlob(start_blob_id).second;
+    auto iv_end = stream_executor.findBlob(end_blob_id).second;
+    assert(iv_start.isScalar() && iv_end.isScalar());
+    auto start = iv_start.toScalar();
+    auto end = iv_end.toScalar();
+
+    at::TensorOptions options;
+    auto& edge_dtype = cast<nncir::DataEdge>(node.getInEdge(edge_id++));
+    auto& edge_layout = cast<nncir::DataEdge>(node.getInEdge(edge_id++));
+    auto& edge_device = cast<nncir::DataEdge>(node.getInEdge(edge_id++));
+    auto& edge_pin_memory = cast<nncir::DataEdge>(node.getInEdge(edge_id++));
+    auto dtype_id = edge_dtype.getBlobId();
+    auto layout_id = edge_layout.getBlobId();
+    auto device_id = edge_device.getBlobId();
+    auto pin_memory_id = edge_pin_memory.getBlobId();
+    auto iv_dtype = stream_executor.findBlob(dtype_id).second;
+    auto iv_layout = stream_executor.findBlob(layout_id).second;
+    auto iv_device = stream_executor.findBlob(device_id).second;
+    auto iv_pin_memory = stream_executor.findBlob(pin_memory_id).second;
+
+    auto output = nnrt::atenArange2(start, end, options);
+    auto& out_edge = cast<nncir::DataEdge>(node.getFirstOutEdge());
+    stream_executor.updateBlob(out_edge.getBlobId(), DataType::TENSOR, tensorToIValue(output));
+}
+
+void executorAtenArange3(const nncir::Node& op_node, StreamExecutor& stream_executor)
+{
+    DLOG(INFO) << "execute Aten Arange3 node";
+
+    auto node = cast<nncir::AtenArange3Node>(op_node);
+    int edge_id = 0;
+
+    auto& start_edge = cast<nncir::DataEdge>(node.getInEdge(edge_id++));
+    auto& end_edge = cast<nncir::DataEdge>(node.getInEdge(edge_id++));
+    auto& step_edge = cast<nncir::DataEdge>(node.getInEdge(edge_id++));
+    int start_blob_id = start_edge.getBlobId();
+    int end_blob_id = end_edge.getBlobId();
+    int step_blob_id = step_edge.getBlobId();
+    auto iv_start = stream_executor.findBlob(start_blob_id).second;
+    auto iv_end = stream_executor.findBlob(end_blob_id).second;
+    auto iv_step = stream_executor.findBlob(step_blob_id).second;
+    assert(iv_start.isScalar() && iv_end.isScalar() && iv_step.isScalar());
+    auto start = iv_start.toScalar();
+    auto end = iv_end.toScalar();
+    auto step = iv_step.toScalar();
+
+    at::TensorOptions options;
+    auto& edge_dtype = cast<nncir::DataEdge>(node.getInEdge(edge_id++));
+    auto& edge_layout = cast<nncir::DataEdge>(node.getInEdge(edge_id++));
+    auto& edge_device = cast<nncir::DataEdge>(node.getInEdge(edge_id++));
+    auto& edge_pin_memory = cast<nncir::DataEdge>(node.getInEdge(edge_id++));
+    auto dtype_id = edge_dtype.getBlobId();
+    auto layout_id = edge_layout.getBlobId();
+    auto device_id = edge_device.getBlobId();
+    auto pin_memory_id = edge_pin_memory.getBlobId();
+    auto iv_dtype = stream_executor.findBlob(dtype_id).second;
+    auto iv_layout = stream_executor.findBlob(layout_id).second;
+    auto iv_device = stream_executor.findBlob(device_id).second;
+    auto iv_pin_memory = stream_executor.findBlob(pin_memory_id).second;
+
+    auto output = nnrt::atenArange3(start, end, step, options);
+    auto& out_edge = cast<nncir::DataEdge>(node.getFirstOutEdge());
+    stream_executor.updateBlob(out_edge.getBlobId(), DataType::TENSOR, tensorToIValue(output));
+}
+
 void executorAtenAsTensor(const nncir::Node& op_node, StreamExecutor& stream_executor)
 {
     DLOG(INFO) << "execute Aten AsTensor node";

@@ -15,6 +15,9 @@ void executorAtenAddmm(const nncir::Node& op_node, StreamExecutor& stream_execut
 void executorAtenAnd(const nncir::Node& op_node, StreamExecutor& stream_executor);
 void executorAtenAny(const nncir::Node& op_node, StreamExecutor& stream_executor);
 void executorAtenAppend(const nncir::Node& op_node, StreamExecutor& stream_executor);
+void executorAtenArange1(const nncir::Node& op_node, StreamExecutor& stream_executor);
+void executorAtenArange2(const nncir::Node& op_node, StreamExecutor& stream_executor);
+void executorAtenArange3(const nncir::Node& op_node, StreamExecutor& stream_executor);
 void executorAtenAsTensor(const nncir::Node& op_node, StreamExecutor& stream_executor);
 void executorAtenBitwiseNot(const nncir::Node& op_node, StreamExecutor& stream_executor);
 void executorAtenBmm(const nncir::Node& op_node, StreamExecutor& stream_executor);

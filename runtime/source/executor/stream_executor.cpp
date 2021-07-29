@@ -182,6 +182,9 @@ void StreamExecutor::registerOp()
     this->global_op_register_.insert({nncir::NodeType::ATENAND, executorAtenAnd});
     this->global_op_register_.insert({nncir::NodeType::ATENANY, executorAtenAny});
     this->global_op_register_.insert({nncir::NodeType::ATENAPPEND, executorAtenAppend});
+    this->global_op_register_.insert({nncir::NodeType::ATENARANGE1, executorAtenArange1});
+    this->global_op_register_.insert({nncir::NodeType::ATENARANGE2, executorAtenArange2});
+    this->global_op_register_.insert({nncir::NodeType::ATENARANGE3, executorAtenArange3});
     this->global_op_register_.insert({nncir::NodeType::ATENASTENSOR, executorAtenAsTensor});
     this->global_op_register_.insert({nncir::NodeType::ATENBITWISENOT, executorAtenBitwiseNot});
     this->global_op_register_.insert({nncir::NodeType::ATENBMM, executorAtenBmm});

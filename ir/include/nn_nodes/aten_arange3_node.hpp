@@ -59,10 +59,10 @@ class AtenArange3Node : public NodeMixin<AtenArange3Node, NNNode> {
  private:
     int64_t start_  = INT64_MIN;
     int64_t end_    = INT64_MIN;
-	int64_t step_   = INT64_MIN;
+    int64_t step_   = INT64_MIN;
     int64_t dtype_  = INT32_MIN;
     int layout_     = INT32_MIN;
-	int device_     = INT32_MIN;
+    int device_     = INT32_MIN;
     int pin_memory_ = INT32_MIN;
 
 }; // class AtenArange3Node
