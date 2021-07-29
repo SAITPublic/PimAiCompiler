@@ -198,7 +198,9 @@ class AtenAddmmNode;
 class AtenAndNode;
 class AtenAnyNode;
 class AtenAppendNode;
-class AtenArangeNode;
+class AtenArange1Node;
+class AtenArange2Node;
+class AtenArange3Node;
 class AtenAsTensorNode;
 class AtenBitwiseNotNode;
 class AtenBmmNode;
@@ -391,7 +393,9 @@ enum class NodeType {
     ATENAND,
     ATENANY,
     ATENAPPEND,
-    ATENARANGE,
+    ATENARANGE1,
+    ATENARANGE2,
+    ATENARANGE3,
     ATENASTENSOR,
     ATENBITWISENOT,
     ATENBMM,
@@ -538,7 +542,9 @@ inline std::ostream& operator<<(std::ostream& s, nn_ir::NodeType type) {
         ENUM_STR(ATENAND)
         ENUM_STR(ATENANY)
         ENUM_STR(ATENAPPEND)
-        ENUM_STR(ATENARANGE)
+        ENUM_STR(ATENARANGE1)
+        ENUM_STR(ATENARANGE2)
+        ENUM_STR(ATENARANGE3)
         ENUM_STR(ATENASTENSOR)
         ENUM_STR(ATENBITWISENOT)
         ENUM_STR(ATENBMM)

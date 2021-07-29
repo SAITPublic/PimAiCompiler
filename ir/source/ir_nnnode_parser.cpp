@@ -496,19 +496,56 @@ IRNNNodeParser::parseNNNode<IR::NNNode::AnyType_AtenAppendNode>(const IR::NnNode
 
 template <>
 std::unique_ptr<nn_ir::NNNode>
-IRNNNodeParser::parseNNNode<IR::NNNode::AnyType_AtenArangeNode>(const IR::NnNode*      ir_node,
-                                                                const nn_ir::NodeInfo& node_info) {
-    auto aten_arange_node = ir_node->nn_node_as_AtenArangeNode();
+IRNNNodeParser::parseNNNode<IR::NNNode::AnyType_AtenArange1Node>(const IR::NnNode*      ir_node,
+                                                                 const nn_ir::NodeInfo& node_info) {
+    auto aten_arange_node = ir_node->nn_node_as_AtenArange1Node();
     Log::IR::E_IF(aten_arange_node == nullptr)
-            << "IRNNNodeParser::parseNNNode<NN::AtenArangeNode>() => wrong node type!";
+            << "IRNNNodeParser::parseNNNode<NN::AtenArange1Node>() => wrong node type!";
+
+    auto end = aten_arange_node->end();
+    auto dtype = aten_arange_node->dtype();
+    auto layout = aten_arange_node->layout();
+    auto device = aten_arange_node->device();
+    auto pim_memory = aten_arange_node->pin_memory();
+
+    return std::make_unique<nn_ir::AtenArange1Node>(node_info, end, dtype, layout, device, pim_memory);
+}
+
+template <>
+std::unique_ptr<nn_ir::NNNode>
+IRNNNodeParser::parseNNNode<IR::NNNode::AnyType_AtenArange2Node>(const IR::NnNode*      ir_node,
+                                                                 const nn_ir::NodeInfo& node_info) {
+    auto aten_arange_node = ir_node->nn_node_as_AtenArange2Node();
+    Log::IR::E_IF(aten_arange_node == nullptr)
+            << "IRNNNodeParser::parseNNNode<NN::AtenArange2Node>() => wrong node type!";
 
     auto start = aten_arange_node->start();
+    auto end = aten_arange_node->end();
+    auto dtype = aten_arange_node->dtype();
+    auto layout = aten_arange_node->layout();
+    auto device = aten_arange_node->device();
+    auto pim_memory = aten_arange_node->pin_memory();
+
+    return std::make_unique<nn_ir::AtenArange2Node>(node_info, start, end, dtype, layout, device, pim_memory);
+}
+
+template <>
+std::unique_ptr<nn_ir::NNNode>
+IRNNNodeParser::parseNNNode<IR::NNNode::AnyType_AtenArange3Node>(const IR::NnNode*      ir_node,
+                                                                 const nn_ir::NodeInfo& node_info) {
+    auto aten_arange_node = ir_node->nn_node_as_AtenArange3Node();
+    Log::IR::E_IF(aten_arange_node == nullptr)
+            << "IRNNNodeParser::parseNNNode<NN::AtenArange3Node>() => wrong node type!";
+
+    auto start = aten_arange_node->start();
+    auto end = aten_arange_node->end();
     auto step = aten_arange_node->step();
     auto dtype = aten_arange_node->dtype();
     auto layout = aten_arange_node->layout();
+    auto device = aten_arange_node->device();
     auto pim_memory = aten_arange_node->pin_memory();
 
-    return std::make_unique<nn_ir::AtenArangeNode>(node_info, start, step, dtype, layout, pim_memory);
+    return std::make_unique<nn_ir::AtenArange3Node>(node_info, start, end, step, dtype, layout, device, pim_memory);
 }
 
 template <>

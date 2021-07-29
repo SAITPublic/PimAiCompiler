@@ -19,42 +19,42 @@
 namespace nn_compiler {
 namespace nn_ir {
 
-class AtenArangeNode : public NodeMixin<AtenArangeNode, NNNode> {
+class AtenArange1Node : public NodeMixin<AtenArange1Node, NNNode> {
  public:
-    explicit AtenArangeNode(const NodeInfo& node_info, int start, int step, int dtype, int layout, int pin_memory) :
-            NodeMixin(node_info, NodeType::ATENARANGE), start_(start),
-            step_(step), dtype_(dtype), layout_(layout), pin_memory_(pin_memory) {}
+    explicit AtenArange1Node(const NodeInfo& node_info, int64_t end, int64_t dtype, int layout, int device, int pin_memory) :
+            NodeMixin(node_info, NodeType::ATENARANGE1), end_(end),
+            dtype_(dtype), layout_(layout), device_(device), pin_memory_(pin_memory) {}
 
-    std::string getNodeTypeAsString(void) const override { return "AtenArange"; }
+    std::string getNodeTypeAsString(void) const override { return "AtenArange1"; }
 
-    void setStart(int start) { start_ = start; }
+    void setEnd(int64_t end) { end_ = end; }
 
-    int getStart() const { return start_; }
+    int64_t getEnd() const { return end_; }
 
-    void setStep(int step) { step_ = step; }
+    void setDtype(int64_t dtype) { dtype_ = dtype; }
 
-    int getStep() const { return step_; }
-
-    void setDtype(int dtype) { dtype_ = dtype; }
-
-    int getDtype() const { return dtype_; }
+    int64_t getDtype() const { return dtype_; }
 
     void setLayout(int layout) { layout_ = layout; }
 
     int getLayout() const { return layout_; }
+
+    void setDevice(int device) { device_ = device; }
+
+    int getDevice() const { return device_; }
 
     void setPinMemory(int pin_memory) { pin_memory_ = pin_memory; }
 
     int getPinMemory() const { return pin_memory_; }
     
  private:
-    int  start_     = INT32_MAX;
-    int  step_      = INT32_MAX;
-    int  dtype_     = INT32_MAX;
-    int  layout_    = INT32_MAX;
-    int pin_memory_ = INT32_MAX;
+    int64_t end_    = INT64_MIN;
+    int64_t dtype_  = INT32_MIN;
+    int layout_     = INT32_MIN;
+	int device_     = INT32_MIN;
+    int pin_memory_ = INT32_MIN;
 
-}; // class AtenArangeNode
+}; // class AtenArange1Node
 
 } // namespace nn_ir
 } // namespace nn_compiler
