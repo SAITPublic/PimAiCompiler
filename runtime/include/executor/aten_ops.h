@@ -197,12 +197,13 @@ at::Tensor atenMax(const at::Tensor &self);
 at::Tensor atenMax(const at::Tensor &self, const at::Tensor &other);
 
 std::tuple<at::Tensor, at::Tensor> atenMax(const at::Tensor &self, int64_t dim,
-
                                            bool keepdim = false);
 
 std::tuple<at::Tensor, at::Tensor> atenMax(const at::Tensor &self, at::Dimname dim,
-
                                            bool keepdim = false);
+
+at::Tensor atenMaxPool2d(const at::Tensor &self, at::IntArrayRef kernel_size, at::IntArrayRef stride,
+                         at::IntArrayRef padding, at::IntArrayRef dilation, bool ceil_mode);
 
 at::Tensor atenNe(const at::Tensor &self, const at::Tensor &other);
 

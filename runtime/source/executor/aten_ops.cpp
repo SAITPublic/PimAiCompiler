@@ -286,6 +286,11 @@ std::tuple<at::Tensor, at::Tensor> atenMax(const at::Tensor &self, at::Dimname d
     return at::max(self, dim, keepdim);
 }
 
+at::Tensor atenMaxPool2d(const at::Tensor &self, at::IntArrayRef kernel_size, at::IntArrayRef stride,
+                         at::IntArrayRef padding, at::IntArrayRef dilation, bool ceil_mode) {
+    return at::max_pool2d(self, kernel_size, stride, padding, dilation, ceil_mode);
+}
+
 at::Tensor atenNe(const at::Tensor &self, const at::Tensor &other) { return at::ne(self, other); }
 
 at::Tensor atenNe(const at::Tensor &self, const at::Scalar &other) { return at::ne(self, other); }

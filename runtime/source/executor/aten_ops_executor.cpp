@@ -1795,6 +1795,95 @@ void executorAtenMax(const nncir::Node& op_node, StreamExecutor& stream_executor
     }
 }
 
+void executorAtenMaxPool2d(const nncir::Node& op_node, StreamExecutor& stream_executor)
+{
+    DLOG(INFO) << "execute Aten MaxPool2d node";
+
+    auto node = cast<nncir::AtenMaxPool2dNode>(op_node);
+    int edge_id = 0;
+
+    auto& input_self = cast<nncir::DataEdge>(node.getInEdge(edge_id++));
+    int input_self_blob_id = input_self.getBlobId();
+    torch::jit::IValue iv_self = stream_executor.findBlob(input_self_blob_id).second;
+    assert(iv_self.isTensor());
+    auto self_tensor = iv_self.toTensor();
+    edge_id++;
+
+    auto kernel_size = node.getKernelSize();
+    std::vector<int64_t> kernel_size_vec;
+    if (kernel_size.h == INT64_MIN && kernel_size.w == INT64_MIN) {
+        auto& data_edge = cast<nncir::DataEdge>(node.getInEdge(edge_id++));
+        int data_blob_id = data_edge.getBlobId();
+        auto data_iv = stream_executor.findBlob(data_blob_id).second;
+        assert(data_iv.isList());
+        auto data_list = data_iv.toListRef();
+        kernel_size_vec = parseIValueVector<int64_t>(data_list);
+    } else {
+        kernel_size_vec.push_back(kernel_size.h);
+        kernel_size_vec.push_back(kernel_size.w);
+    }
+
+    auto stride = node.getStride();
+    std::vector<int64_t> stride_vec;
+    if (stride.h == INT64_MIN && stride.w == INT64_MIN) {
+        auto& data_edge = cast<nncir::DataEdge>(node.getInEdge(edge_id++));
+        int data_blob_id = data_edge.getBlobId();
+        auto data_iv = stream_executor.findBlob(data_blob_id).second;
+        assert(data_iv.isList());
+        auto data_list = data_iv.toListRef();
+        stride_vec = parseIValueVector<int64_t>(data_list);
+    } else {
+        stride_vec.push_back(stride.h);
+        stride_vec.push_back(stride.w);
+    }
+
+    auto padding = node.getPad();
+    std::vector<int64_t> padding_vec;
+    if (padding.t == INT64_MIN && padding.b == INT64_MIN && padding.l == INT64_MIN && padding.r == INT64_MIN) {
+        auto& data_edge = cast<nncir::DataEdge>(node.getInEdge(edge_id++));
+        int data_blob_id = data_edge.getBlobId();
+        auto data_iv = stream_executor.findBlob(data_blob_id).second;
+        assert(data_iv.isList());
+        auto data_list = data_iv.toListRef();
+        padding_vec = parseIValueVector<int64_t>(data_list);
+    } else {
+        padding_vec.push_back(padding.t);
+        padding_vec.push_back(padding.b);
+        padding_vec.push_back(padding.l);
+        padding_vec.push_back(padding.r);
+    }
+
+    auto dilation = node.getDilation();
+    std::vector<int64_t> dilation_vec;
+    if (dilation.h == INT64_MIN && dilation.w == INT64_MIN) {
+        auto& data_edge = cast<nncir::DataEdge>(node.getInEdge(edge_id++));
+        int data_blob_id = data_edge.getBlobId();
+        auto data_iv = stream_executor.findBlob(data_blob_id).second;
+        assert(data_iv.isList());
+        auto data_list = data_iv.toListRef();
+        dilation_vec = parseIValueVector<int64_t>(data_list);
+    } else {
+        dilation_vec.push_back(dilation.h);
+        dilation_vec.push_back(dilation.w);
+    }
+
+    auto ceil_mode = node.getCeilMode();
+    if (nncir::isDefaultValue<int>(ceil_mode)) {
+        auto& data_edge = cast<nncir::DataEdge>(node.getInEdge(edge_id++));
+        int data_blob_id = data_edge.getBlobId();
+        auto data_iv = stream_executor.findBlob(data_blob_id).second;
+        assert(data_iv.isInt());
+        ceil_mode = data_iv.toInt();
+    }
+
+    auto output = nnrt::atenMaxPool2d(self_tensor, at::ArrayRef<int64_t>(kernel_size_vec),
+                                      at::ArrayRef<int64_t>(stride_vec), at::ArrayRef<int64_t>(padding_vec),
+                                      at::ArrayRef<int64_t>(dilation_vec), static_cast<bool>(ceil_mode));
+    // update output
+    auto& out_edge = cast<nncir::DataEdge>(node.getFirstOutEdge());
+    stream_executor.updateBlob(out_edge.getBlobId(), DataType::TENSOR, tensorToIValue(output));
+}
+
 void executorAtenNe(const nncir::Node& op_node, StreamExecutor& stream_executor)
 {
     DLOG(INFO) << "execute Aten Ne node";

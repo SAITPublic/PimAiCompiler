@@ -13,14 +13,14 @@ namespace nn_ir
 class AtenMaxPool2dNode : public NodeMixin<AtenMaxPool2dNode, NNNode>
 {
    public:
-    explicit AtenMaxPool2dNode(const NodeInfo& node_info, Shape2D kernel_size, Pad4 pad, Shape2D stride,
-                               Shape2D dilation, int return_indices)
+    explicit AtenMaxPool2dNode(const NodeInfo& node_info, Shape2D kernel_size, Shape2D stride, Pad4 pad,
+                               Shape2D dilation, int ceil_mode)
         : NodeMixin(node_info, NodeType::ATENMAXPOOL2D),
           kernel_size_(kernel_size),
-          pad_(pad),
           stride_(stride),
+          pad_(pad),
           dilation_(dilation),
-          return_indices_(return_indices)
+          ceil_mode_(ceil_mode)
     {
     }
 
@@ -29,14 +29,14 @@ class AtenMaxPool2dNode : public NodeMixin<AtenMaxPool2dNode, NNNode>
     Pad4 getPad() const { return pad_; }
     Shape2D getStride() const { return stride_; }
     Shape2D getDilation() const { return dilation_; }
-    int getReturnIndices() const { return return_indices_; }
+    int getCeilMode() const { return ceil_mode_; }
 
    private:
     Shape2D kernel_size_;
-    Pad4 pad_;
     Shape2D stride_;
+    Pad4 pad_;
     Shape2D dilation_;
-    int return_indices_;
+    int ceil_mode_;
 };  // class AtenMaxPool2dNode
 
 }  // namespace nn_ir

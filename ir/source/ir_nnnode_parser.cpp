@@ -1062,17 +1062,17 @@ std::unique_ptr<nn_ir::NNNode> IRNNNodeParser::parseNNNode<IR::NNNode::AnyType_A
         << "IRNNNodeParser::parseNNNode<NN::AtenMaxPool2dNode>() => wrong node type!";
 
     auto ir_kernel_size = aten_max_pool2d_node->kernel_size();
-    auto ir_pad = aten_max_pool2d_node->pad();
     auto ir_stride = aten_max_pool2d_node->stride();
+    auto ir_pad = aten_max_pool2d_node->padding();
     auto ir_dilation = aten_max_pool2d_node->dilation();
-    auto return_indices = aten_max_pool2d_node->return_indices();
+    auto ceil_mode = aten_max_pool2d_node->ceil_mode();
 
     auto kernel_size = std::get<nn_ir::Shape2D>(nn_ir::parseParam(ir_kernel_size));
-    auto pad = std::get<nn_ir::Pad4>(nn_ir::parseParam(ir_pad));
     auto stride = std::get<nn_ir::Shape2D>(nn_ir::parseParam(ir_stride));
+    auto pad = std::get<nn_ir::Pad4>(nn_ir::parseParam(ir_pad));
     auto dilation = std::get<nn_ir::Shape2D>(nn_ir::parseParam(ir_dilation));
 
-    return std::make_unique<nn_ir::AtenMaxPool2dNode>(node_info, kernel_size, pad, stride, dilation, return_indices);
+    return std::make_unique<nn_ir::AtenMaxPool2dNode>(node_info, kernel_size, stride, pad, dilation, ceil_mode);
 }
 
 template <>
