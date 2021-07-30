@@ -1413,14 +1413,14 @@ void executorAtenMax(const nncir::Node& op_node, StreamExecutor& stream_executor
     auto dim = max_node.getDim();
     int keep_dim = max_node.getKeepDim();
 
-    if (max_node.getInEdgeIds().size()){
-        if(nncir::isDefaultValue<int64_t>(dim) && nncir::isDefaultValue<int>(keep_dim)){
+    if (max_node.getInEdgeIds().size() == 1) {
+        if (nncir::isDefaultValue<int64_t>(dim) && nncir::isDefaultValue<int>(keep_dim)) {
             // aten::max(Tensor)
             auto output = nnrt::atenMax(self_tensor);
             // update output
             auto& out_edge = cast<nncir::DataEdge>(max_node.getFirstOutEdge());
             stream_executor.updateBlob(out_edge.getBlobId(), DataType::TENSOR, tensorToIValue(output));
-        }else{
+        } else {
             // aten::max(Tensor, dim, keepdim)
             auto output = nnrt::atenMax(self_tensor, dim, static_cast<bool>(keep_dim));
             // update output

@@ -72,8 +72,8 @@ void executePrimConstant(const nncir::Node& op_node, StreamExecutor& stream_exec
         } else {
             DLOG(ERROR) << "PrimConstant Error, unsupport data type when create Tensor!";
         }
-
-        uint8_t* ptr = const_cast<uint8_t*>(constant_node.getData().data());
+        auto temp_data = constant_node.getData();
+        uint8_t* ptr = const_cast<uint8_t*>(temp_data.data());
         std::vector<int64_t> input_shape = getDataShapeFromShape4D(shape_);
         auto tensor = primTensorConstant((void*)ptr, input_shape, scalar_type);
         tensor = tensor.cuda();
@@ -717,6 +717,11 @@ void executePrimBlock(const nncir::Node& op_node, StreamExecutor& stream_executo
             stream_executor.updateBlob(end_loop_out_blobs.at(i), in_blob.first, in_blob.second);
         }
         // Jump to End Loop'next
+        int64_t temp_cond = stream_executor.loop_condition_stack.top();
+        stream_executor.loop_condition_stack.pop();
+        auto op_node = stream_executor.getGraph()->getNode(loop_node_id);
+        auto loop_node = cast_if<nncir::PrimLoopNode>(op_node);
+        loop_node->setCond(temp_cond);
         stream_executor.setCursor(end_loop_next_id);
     } else {
         auto graph = stream_executor.getGraph();
@@ -756,6 +761,7 @@ void executePrimLoop(const nncir::Node& op_node, StreamExecutor& stream_executor
 
     // ref: torch_jit Loop: https://github.com/pytorch/pytorch/blob/master/torch/csrc/jit/OVERVIEW.md#loops
     int64_t loop_cond = loop_node->getCond();
+    stream_executor.loop_condition_stack.push(loop_cond);
     int64_t max_trip_cnt = loop_node->getTripCount();
 
     int edge_id = 0;
@@ -803,13 +809,6 @@ void executePrimLoop(const nncir::Node& op_node, StreamExecutor& stream_executor
 
     executePrimBlock(*loop_block_node, stream_executor);
     DLOG(INFO) << "PrimLoop: loop_index = " << loop_index;
-
-    if (loop_index < max_trip_cnt && loop_cond == 1) {
-        // Set to Block's next node
-        stream_executor.setCursor(loop_block_id + 1);
-    } else {
-        // jump to matched EndLoop
-    }
 }
 
 void executePrimEndLoop(const nncir::Node& op_node, StreamExecutor& stream_executor)
