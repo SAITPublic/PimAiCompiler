@@ -2,6 +2,9 @@
 import torch
 import sys
 import os
+import time
+import timeit
+import tqdm
 from ir_net.utils import Nnrt
 from ir_net.utils import inference_pytorch, inference_nnruntime, compare_tensors
 current_dir = os.path.dirname(os.path.abspath(__file__))
@@ -69,16 +72,18 @@ def test_rnnt_inference(model_ir_file : str, feature_file : str, feature_len_fil
     feature_len = torch.load(feature_len_file)  # dtype=torch.long
     # Init nnruntime
     rt = Nnrt.NNRuntime(model_ir_file)
-    # Run
-    _, _, transcript = rt.inferenceModel([feature, feature_len])
-    print('*' * 50)
-    print(transcript)
+    # Run and test
+    time_start = time.time()
+    test_cnt = 100
+    for i in tqdm.tqdm(range(test_cnt)):
+        _, _, transcript = rt.inferenceModel([feature, feature_len])
+    time_end = time.time()
+    print('RNNT avg_time:{}ms'.format((time_end - time_start) / test_cnt * 1000))
 
 
 if __name__ == '__main__':
     # Inference RNNT
-    # rnnt_ir_file = 'path/to/rnnt/frontend.ir'
-    rnnt_ir_file = '/home/user/pim-workspace/NNRuntime-dev/Runtime-dev/resource/frontend.ir'
+    rnnt_ir_file = 'path/to/rnnt/frontend.ir'
     feature_file = os.path.join(current_dir, './resource/rnnt/inputs/feature.pth')
     feature_len_file = os.path.join(current_dir,'./resource/rnnt/inputs/feature_len.pth')
     test_rnnt_inference(rnnt_ir_file, feature_file, feature_len_file)

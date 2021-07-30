@@ -50,9 +50,9 @@ void executePrimConstant(const nncir::Node& op_node, StreamExecutor& stream_exec
         // set bool as int64
         int64_t tmp = 0;
         tmp = *(int64_t*)ptr;
-        LOG(INFO) << "Set Data: " << tmp;
+        DLOG(INFO) << "Set Data: " << tmp;
         iv = scalarToIValue(tmp);
-        LOG(INFO) << "IV: " << iv;
+        DLOG(INFO) << "IV: " << iv;
         dtype = DataType::INT64;
 
     } else if (ntype == "float") {
