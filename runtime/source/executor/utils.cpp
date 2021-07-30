@@ -21,102 +21,143 @@ torch::jit::IValue strToIValue(std::string str) { return torch::jit::IValue(str)
 at::ScalarType convertDTypeToATScalarType(nnrt::DataType dtype)
 {
     // according to: pytorch/c10/core/ScalarType.h
+    at::ScalarType scalar_type = at::ScalarType::Byte;
     switch (dtype) {
         case nnrt::DataType::UINT8:
-            return at::ScalarType::Byte;
+            scalar_type = at::ScalarType::Byte;
+            break;
         case nnrt::DataType::INT8:
-            return at::ScalarType::Char;
+            scalar_type = at::ScalarType::Char;
+            break;
         case nnrt::DataType::INT16:
-            return at::ScalarType::Short;
+            scalar_type = at::ScalarType::Short;
+            break;
         case nnrt::DataType::INT32:
-            return at::ScalarType::Int;
+            scalar_type = at::ScalarType::Int;
+            break;
         case nnrt::DataType::INT64:
-            return at::ScalarType::Long;
+            scalar_type = at::ScalarType::Long;
+            break;
         case nnrt::DataType::FLOAT16:
-            return at::ScalarType::Half;
+            scalar_type = at::ScalarType::Half;
+            break;
         case nnrt::DataType::FLOAT32:
-            return at::ScalarType::Float;
+            scalar_type = at::ScalarType::Float;
+            break;
         case nnrt::DataType::FLOAT64:
-            return at::ScalarType::Double;
+            scalar_type = at::ScalarType::Double;
+            break;
         case nnrt::DataType::BOOL:
-            return at::ScalarType::Bool;
+            scalar_type = at::ScalarType::Bool;
+            break;
         default:
-            DLOG(ERROR) << "Complex type has not been supported.";
+            DLOG(FATAL) << "Complex type has not been supported.";
     }
+    return scalar_type;
 }
 
 nnrt::DataType convertATScalarTypeToDType(at::ScalarType dtype)
 {
     // according to: pytorch/c10/core/ScalarType.h
+    nnrt::DataType data_type = nnrt::DataType::NONE;
     switch (dtype) {
         case at::ScalarType::Byte:
-            return nnrt::DataType::UINT8;
+            data_type = nnrt::DataType::UINT8;
+            break;
         case at::ScalarType::Char:
-            return nnrt::DataType::INT8;
+            data_type = nnrt::DataType::INT8;
+            break;
         case at::ScalarType::Short:
-            return nnrt::DataType::INT16;
+            data_type = nnrt::DataType::INT16;
+            break;
         case at::ScalarType::Int:
-            return nnrt::DataType::INT32;
+            data_type = nnrt::DataType::INT32;
+            break;
         case at::ScalarType::Long:
-            return nnrt::DataType::INT64;
+            data_type = nnrt::DataType::INT64;
+            break;
         case at::ScalarType::Half:
-            return nnrt::DataType::FLOAT16;
+            data_type = nnrt::DataType::FLOAT16;
+            break;
         case at::ScalarType::Float:
-            return nnrt::DataType::FLOAT32;
+            data_type = nnrt::DataType::FLOAT32;
+            break;
         case at::ScalarType::Double:
-            return nnrt::DataType::FLOAT64;
+            data_type = nnrt::DataType::FLOAT64;
+            break;
         case at::ScalarType::Bool:
-            return nnrt::DataType::BOOL;
+            data_type = nnrt::DataType::BOOL;
+            break;
         default:
-            DLOG(ERROR) << "Complex type has not been supported.";
+            DLOG(FATAL) << "Complex type has not been supported.";
     }
+    return data_type;
 }
 
 at::Device convertIntToATDevice(const int& value) {
     // according to: pytorch/c10/core/DeviceType.h
+    at::Device device(at::DeviceType::CPU);
     switch (value) {
         case 0:
-            return at::Device(at::DeviceType::CPU);
+            device = at::Device(at::DeviceType::CPU);
+            break;
         case 1:
-            return at::Device(at::DeviceType::CUDA);
+            device = at::Device(at::DeviceType::CUDA);
+            break;
         case 2:
-            return at::Device(at::DeviceType::MKLDNN);
+            device = at::Device(at::DeviceType::MKLDNN);
+            break;
         case 3:
-            return at::Device(at::DeviceType::OPENGL);
+            device = at::Device(at::DeviceType::OPENGL);
+            break;
         case 4:
-            return at::Device(at::DeviceType::OPENCL);
+            device = at::Device(at::DeviceType::OPENCL);
+            break;
         case 5:
-            return at::Device(at::DeviceType::IDEEP);
+            device = at::Device(at::DeviceType::IDEEP);
+            break;
         case 6:
-            return at::Device(at::DeviceType::HIP);
+            device = at::Device(at::DeviceType::HIP);
+            break;
         case 7:
-            return at::Device(at::DeviceType::FPGA);
+            device = at::Device(at::DeviceType::FPGA);
+            break;
         case 8:
-            return at::Device(at::DeviceType::MSNPU);
+            device = at::Device(at::DeviceType::MSNPU);
+            break;
         case 9:
-            return at::Device(at::DeviceType::XLA);
+            device = at::Device(at::DeviceType::XLA);
+            break;
         case 10:
-            return at::Device(at::DeviceType::COMPILE_TIME_MAX_DEVICE_TYPES);
+            device = at::Device(at::DeviceType::COMPILE_TIME_MAX_DEVICE_TYPES);
+            break;
         default:
-            DLOG(ERROR) << "Unsupported device type.";
+            DLOG(FATAL) << "Unsupported device type.";
     }
+    return device;
 }
 
 at::MemoryFormat getMemoryFormat(int optional_memory_format)
 {
     // according to: pytorch/c10/core/MemoryFormat.h
+    at::MemoryFormat memory_format = at::MemoryFormat::Contiguous;
     switch (optional_memory_format) {
         case 0:
-            return at::MemoryFormat::Contiguous;
+            memory_format = at::MemoryFormat::Contiguous;
+            break;
         case 1:
-            return at::MemoryFormat::Preserve;
+            memory_format = at::MemoryFormat::Preserve;
+            break;
         case 2:
-            return at::MemoryFormat::ChannelsLast;
+            memory_format = at::MemoryFormat::ChannelsLast;
+            break;
         case 3:
-            return at::MemoryFormat::ChannelsLast3d;
+            memory_format = at::MemoryFormat::ChannelsLast3d;
+            break;
         default:
-            DLOG(ERROR) << "Wrong reference to aten MemoryFormat.";
+            DLOG(FATAL) << "Wrong reference to aten MemoryFormat.";
     }
+    return memory_format;
 }
 
 torch::jit::IValue intToIValue(const int64_t& value) { return torch::jit::IValue(value); }
