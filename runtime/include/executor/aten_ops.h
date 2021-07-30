@@ -241,6 +241,17 @@ at::Tensor atenNeg(const at::Tensor &self);
 
 at::Tensor atenNot(const at::Tensor &self);
 
+at::Tensor atenOnes(at::IntArrayRef size, const at::TensorOptions &options);
+
+std::tuple<at::Tensor, at::Tensor> atenPackPaddedSequence(const at::Tensor &input,
+                                                          const at::Tensor &lengths, bool batch_first);
+
+std::tuple<at::Tensor, at::Tensor> atenPadPackedSequence(const at::Tensor &data,
+                                                         const at::Tensor &batch_sizes,
+                                                         bool batch_first,
+                                                         at::Scalar padding_value,
+                                                         int64_t total_length);
+
 at::Tensor atenPow(const at::Tensor &self, const at::Tensor &exponent);
 
 at::Tensor atenPow(at::Scalar self, const at::Tensor &exponent);

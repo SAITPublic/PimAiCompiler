@@ -345,6 +345,21 @@ at::Tensor atenNeg(const at::Tensor &self) { return at::neg(self); }
 
 at::Tensor atenNot(const at::Tensor &self) { return at::logical_not(self); }
 
+at::Tensor atenOnes(at::IntArrayRef size, const at::TensorOptions &options) { return at::ones(size, options); }
+
+std::tuple<at::Tensor, at::Tensor> atenPackPaddedSequence(const at::Tensor &input,
+                                                          const at::Tensor &lengths, bool batch_first) {
+    return at::_pack_padded_sequence(input, lengths, batch_first);
+}
+
+std::tuple<at::Tensor, at::Tensor> atenPadPackedSequence(const at::Tensor &data,
+                                                         const at::Tensor &batch_sizes,
+                                                         bool batch_first,
+                                                         at::Scalar padding_value,
+                                                         int64_t total_length) {
+    return at::_pad_packed_sequence(data, batch_sizes, batch_first, padding_value, total_length);
+}
+
 at::Tensor atenPow(const at::Tensor &self, const at::Tensor &exponent) { return at::pow(self, exponent); }
 
 at::Tensor atenPow(at::Scalar self, const at::Tensor &exponent) { return at::pow(self, exponent); }

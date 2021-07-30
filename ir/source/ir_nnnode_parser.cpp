@@ -1202,7 +1202,8 @@ std::unique_ptr<nn_ir::NNNode> IRNNNodeParser::parseNNNode<IR::NNNode::AnyType_A
 
     auto batch_first = aten_pad_packed_sequence_node->batch_first();
     auto padding_value = aten_pad_packed_sequence_node->padding_value();
-    return std::make_unique<nn_ir::AtenPadPackedSequenceNode>(node_info, batch_first, padding_value);
+    auto total_length = aten_pad_packed_sequence_node->total_length();
+    return std::make_unique<nn_ir::AtenPadPackedSequenceNode>(node_info, batch_first, padding_value, total_length);
 }
 
 template <>

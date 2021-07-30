@@ -23,10 +23,11 @@ namespace nn_ir
 class AtenPadPackedSequenceNode : public NodeMixin<AtenPadPackedSequenceNode, NNNode>
 {
    public:
-    explicit AtenPadPackedSequenceNode(const NodeInfo& node_info, int batch_first, float padding_value)
+    explicit AtenPadPackedSequenceNode(const NodeInfo& node_info, int batch_first, float padding_value, int64_t total_length)
         : NodeMixin(node_info, NodeType::ATENPADPACKEDSEQUENCE),
           batch_first_(batch_first),
-          padding_value_(padding_value)
+          padding_value_(padding_value),
+          total_length_(total_length)
     {
     }
 
@@ -37,10 +38,12 @@ class AtenPadPackedSequenceNode : public NodeMixin<AtenPadPackedSequenceNode, NN
 
     int getBatchFirst() const { return batch_first_; }
     float getPaddingValue() const { return padding_value_; }
+    int64_t getTotalLength() const { return total_length_; }
 
    private:
     int batch_first_;
     float padding_value_;
+    int64_t total_length_;
 
 };  // class AtenPadPackedSequenceNode
 

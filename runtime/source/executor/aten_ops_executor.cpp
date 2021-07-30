@@ -2196,6 +2196,143 @@ void executorAtenNot(const nncir::Node& op_node, StreamExecutor& stream_executor
 
 }
 
+void executorAtenOnes(const nncir::Node& op_node, StreamExecutor& stream_executor)
+{
+    DLOG(INFO) << "execute Aten Ones node";
+    auto node = cast<nncir::AtenOnesNode>(op_node);
+    int edge_id = 0;
+
+    auto& input_tensor = cast<nncir::DataEdge>(node.getInEdge(edge_id++));
+    int input_tensor_blob_id = input_tensor.getBlobId();
+    auto iv_self = stream_executor.findBlob(input_tensor_blob_id).second;
+    assert(iv_self.isList());
+    auto self_list = iv_self.toListRef();
+    auto array_ref = parseIValueVector<int64_t>(self_list);
+
+    at::TensorOptions options;
+    auto& edge_dtype = cast<nncir::DataEdge>(node.getInEdge(edge_id++));
+    auto& edge_layout = cast<nncir::DataEdge>(node.getInEdge(edge_id++));
+    auto& edge_device = cast<nncir::DataEdge>(node.getInEdge(edge_id++));
+    auto& edge_pin_memory = cast<nncir::DataEdge>(node.getInEdge(edge_id++));
+    auto dtype_id = edge_dtype.getBlobId();
+    auto layout_id = edge_layout.getBlobId();
+    auto device_id = edge_device.getBlobId();
+    auto pin_memory_id = edge_pin_memory.getBlobId();
+    auto iv_dtype = stream_executor.findBlob(dtype_id).second;
+    auto iv_layout = stream_executor.findBlob(layout_id).second;
+    auto iv_device = stream_executor.findBlob(device_id).second;
+    auto iv_pin_memory = stream_executor.findBlob(pin_memory_id).second;
+
+    if (!iv_dtype.isNone()) {
+        options = options.dtype(iv_dtype.toScalarType());
+    }
+    if (!iv_layout.isNone()) {
+        options = options.layout(iv_layout.toLayout());
+    }
+    if (!iv_layout.isNone()) {
+        options = options.device(iv_device.toDevice());
+    }
+    if (!iv_pin_memory.isNone()) {
+        options = options.pinned_memory(iv_pin_memory.toBool());
+    }
+
+    auto output = nnrt::atenOnes(at::ArrayRef<int64_t>(array_ref), options);
+    auto& out_edge = cast<nncir::DataEdge>(node.getFirstOutEdge());
+    stream_executor.updateBlob(out_edge.getBlobId(), DataType::TENSOR, tensorToIValue(output));
+}
+
+void executorAtenPackPaddedSequence(const nncir::Node& op_node, StreamExecutor& stream_executor) {
+    DLOG(INFO) << "execute Aten PackPaddedSequence node";
+
+    auto node = cast<nncir::AtenPackPaddedSequenceNode>(op_node);
+
+    auto& input_self = cast<nncir::DataEdge>(node.getInEdge(0));
+    auto& input_other = cast<nncir::DataEdge>(node.getInEdge(1));
+
+    // Get input blob
+    int input_self_blob_id = input_self.getBlobId();
+    int input_other_blob_id = input_other.getBlobId();
+
+    // Find the input blob
+    torch::jit::IValue iv_self = stream_executor.findBlob(input_self_blob_id).second;
+    torch::jit::IValue iv_other = stream_executor.findBlob(input_other_blob_id).second;
+    assert(iv_self.isTensor() && iv_other.isTensor());
+    auto self_tensor = iv_self.toTensor();
+    auto other_tensor = iv_other.toTensor();
+
+    auto batch_first = node.getBatchFirst();
+    if (nncir::isDefaultValue<int>(batch_first)) {
+        auto& data_edge = cast<nncir::DataEdge>(node.getInEdge(2));
+        int data_blob_id = data_edge.getBlobId();
+        auto data_iv = stream_executor.findBlob(data_blob_id).second;
+        assert(data_iv.isInt());
+        batch_first = static_cast<int>(data_iv.toInt());
+    }
+
+    auto output = nnrt::atenPackPaddedSequence(self_tensor, other_tensor, static_cast<bool>(batch_first));
+    auto out_blob_ids = getOutBlobIds(op_node);
+    auto pos = std::unique(out_blob_ids.begin(), out_blob_ids.end());
+    out_blob_ids.erase(pos, out_blob_ids.end());
+    stream_executor.updateBlob(out_blob_ids[0], DataType::TENSOR, tensorToIValue(std::get<0>(output)));
+    stream_executor.updateBlob(out_blob_ids[1], DataType::TENSOR, tensorToIValue(std::get<1>(output)));
+}
+
+void executorAtenPadPackedSequence(const nncir::Node& op_node, StreamExecutor& stream_executor) {
+    DLOG(INFO) << "execute Aten PadPackedSequence node";
+
+    auto node = cast<nncir::AtenPadPackedSequenceNode>(op_node);
+    int edge_id = 0;
+
+    auto& input_self = cast<nncir::DataEdge>(node.getInEdge(edge_id++));
+    auto& input_other = cast<nncir::DataEdge>(node.getInEdge(edge_id++));
+
+    // Get input blob
+    int input_self_blob_id = input_self.getBlobId();
+    int input_other_blob_id = input_other.getBlobId();
+
+    // Find the input blob
+    torch::jit::IValue iv_self = stream_executor.findBlob(input_self_blob_id).second;
+    torch::jit::IValue iv_other = stream_executor.findBlob(input_other_blob_id).second;
+    assert(iv_self.isTensor() && iv_other.isTensor());
+    auto self_tensor = iv_self.toTensor();
+    auto other_tensor = iv_other.toTensor();
+
+    auto batch_first = node.getBatchFirst();
+    if (nncir::isDefaultValue<int>(batch_first)) {
+        auto& data_edge = cast<nncir::DataEdge>(node.getInEdge(edge_id++));
+        int data_blob_id = data_edge.getBlobId();
+        auto data_iv = stream_executor.findBlob(data_blob_id).second;
+        assert(data_iv.isInt());
+        batch_first = static_cast<int>(data_iv.toInt());
+    }
+
+    auto padding_value = node.getPaddingValue();
+    if (nncir::isDefaultValue<float>(padding_value)) {
+        auto& data_edge = cast<nncir::DataEdge>(node.getInEdge(edge_id++));
+        int data_blob_id = data_edge.getBlobId();
+        auto data_iv = stream_executor.findBlob(data_blob_id).second;
+        assert(data_iv.isDouble());
+        padding_value = static_cast<float>(data_iv.toDouble());
+    }
+
+    auto total_length = node.getTotalLength();
+    if (nncir::isDefaultValue<int64_t>(total_length)) {
+        auto& data_edge = cast<nncir::DataEdge>(node.getInEdge(edge_id++));
+        int data_blob_id = data_edge.getBlobId();
+        auto data_iv = stream_executor.findBlob(data_blob_id).second;
+        assert(data_iv.isInt());
+        total_length = data_iv.toInt();
+    }
+
+    auto output = nnrt::atenPadPackedSequence(self_tensor, other_tensor, static_cast<bool>(batch_first),
+                                              padding_value, total_length);
+    auto out_blob_ids = getOutBlobIds(op_node);
+    auto pos = std::unique(out_blob_ids.begin(), out_blob_ids.end());
+    out_blob_ids.erase(pos, out_blob_ids.end());
+    stream_executor.updateBlob(out_blob_ids[0], DataType::TENSOR, tensorToIValue(std::get<0>(output)));
+    stream_executor.updateBlob(out_blob_ids[1], DataType::TENSOR, tensorToIValue(std::get<1>(output)));
+}
+
 void executorAtenPow(const nncir::Node& op_node, StreamExecutor& stream_executor)
 {
     DLOG(INFO) << "execute Aten Pow node";
