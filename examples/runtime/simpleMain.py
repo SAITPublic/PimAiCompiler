@@ -45,8 +45,8 @@ def test_simple_loop_net(graph_ir_files : str):
         # compare
         assert compare_tensors([pytorch_outs], nnrt_outs)
 
-
-if __name__ == '__main__':
+def test_simple_cases():
+    # Some simple cases
     # Set IR files
     add_ir_file = os.path.join(current_dir, 'ir_files/simple_add_net/sample_add_frontend.ir')
     loop_ir_files = [
@@ -58,3 +58,27 @@ if __name__ == '__main__':
     # inference & compare result
     test_simple_add_net(add_ir_file)
     test_simple_loop_net(loop_ir_files)
+
+
+def test_rnnt_inference(model_ir_file : str, feature_file : str, feature_len_file : str):
+    assert os.path.isfile(model_ir_file)
+    assert os.path.isfile(feature_file)
+    assert os.path.isfile(feature_len_file)
+    # Prepare inputs
+    feature = torch.load(feature_file).cuda()   # dtype=torch.fp16
+    feature_len = torch.load(feature_len_file)  # dtype=torch.long
+    # Init nnruntime
+    rt = Nnrt.NNRuntime(model_ir_file)
+    # Run
+    _, _, transcript = rt.inferenceModel([feature, feature_len])
+    print('*' * 50)
+    print(transcript)
+
+
+if __name__ == '__main__':
+    # Inference RNNT
+    # rnnt_ir_file = 'path/to/rnnt/frontend.ir'
+    rnnt_ir_file = '/home/user/pim-workspace/NNRuntime-dev/Runtime-dev/resource/frontend.ir'
+    feature_file = os.path.join(current_dir, './resource/rnnt/inputs/feature.pth')
+    feature_len_file = os.path.join(current_dir,'./resource/rnnt/inputs/feature_len.pth')
+    test_rnnt_inference(rnnt_ir_file, feature_file, feature_len_file)

@@ -2,7 +2,7 @@
 
 #include <torch/script.h>
 #include <functional>
-#include<stack>
+#include <stack>
 #include <string>
 #include <vector>
 #include "builder/model_builder.h"
@@ -80,18 +80,7 @@ class StreamExecutor
     std::vector<int64_t> output_blob_ids_;
     std::shared_ptr<nncir::NNIR> ir_graph_;
     int64_t cursor_ = 0;  // like the program counter
-    std::stack<int64_t> loop_condition_stack; 
+    std::stack<int64_t> loop_condition_stack;
 };
-
-// execute current op in runtime
-void executeOp(OpNodeDescription* cur_op);
-
-/**
- * @brief Get the Next Execution Node object
- *
- * @param cur_op currently Op
- * @return OpNodeDescription* the next
- */
-OpNodeDescription* getNextExecutionOp(OpNodeDescription* cur_op);
 
 }  // namespace nnrt

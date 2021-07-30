@@ -206,61 +206,6 @@ TEST(NnrUnitTest, primListConstructAndUnpack)
     }
 }
 
-TEST(NnrUnitTest, primIf)
-{
-    /**
-     *  A Simple TestCase
-     *
-     * a1 = 10
-     * b1 = 5
-     * c1 = 3
-     * d1 = 2
-     * bool x1 = a1 > b1
-     * if x1:
-     *      y1 = a1 + b1
-     *      y2 = y1 * c1
-     *      return y2
-     * else:
-     *      z1 = a1 * b1
-     *      z2 = z1 + d1
-     *      return z2
-     *
-     */
-
-    int a1 = 10, b1 = 5, c1 = 3, d1 = 2;
-    bool x1 = a1 > b1;
-
-    auto fun_1 = [=]() {
-        int ret = 0;
-        if (x1) {
-            int y1 = a1 + b1;
-            int y2 = y1 * c1;
-            ret = y2;
-        } else {
-            int z1 = a1 * b1;
-            int z2 = z1 + d1;
-            ret = z2;
-        }
-        return ret;
-    };
-
-    auto fun_2 = [=]() {
-        int ret = 0;
-        if (nnrt::primIf(x1)) {
-            int y1 = a1 + b1;
-            int y2 = y1 * c1;
-            ret = nnrt::primEndIf(y2);
-        } else {
-            int z1 = a1 * b1;
-            int z2 = z1 + d1;
-            ret = nnrt::primEndIf(z2);
-        }
-        return ret;
-    };
-
-    EXPECT_TRUE(fun_1() == fun_2());
-}
-
 TEST(NnrUnitTest, primUncheckedCast)
 {
     int sz = 10;

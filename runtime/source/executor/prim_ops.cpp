@@ -35,41 +35,12 @@ std::vector<T>& primEndLoop(const std::vector<T>& inputs)
     return inputs;
 }
 
-/**
- * @brief The input to primIf is a cond with bool type
- * the caller should choose execution edge based on the retruned value
- *
- * @param cond
- * @return true/false
- */
-bool primIf(bool cond) { return cond; }
-
-/**
- * @brief primEndIf
- *  The GraphGen add the prim::endif Op at the end of PrimIf's block.
- *  Here's an example with primIf block, the input of primEndIf is %hx.3 or %hx0.2,
- *  the output of primEndIf is the reference of primEndIf's input
- *
- *  %hx.2 : (Tensor, Tensor) = prim::If(%214)
- *    block0():
- *       %zeros.2 : Tensor = aten::zeros(%364, %24, %58, %363, %58)
- *       %hx.3 : (Tensor, Tensor) = prim::TupleConstruct(%zeros.2, %zeros.2)
- *       -> (%hx.3)
- *    block1():
- *       %hx0.2 : (Tensor, Tensor) = prim::unchecked_cast(%state1.1)
- *       -> (%hx0.2)
- *  out = prim::endif(%hx0.2 or %hx.3)
- *
- * @tparam T
- * @param inputs
- * @return T
- */
-// template <typename T>
-// T primEndIf(T& inputs)
-// {
-//     auto ret = std::move<T>(inputs);
-//     return ret;
-// }
+// STRING, DEVICE
+std::string primStrConstsnt(void* data_ptr)
+{
+    std::string ret = static_cast<char*>(data_ptr);
+    return ret;
+}
 
 // For Tensor[], list_type=at::ListType::ofTensors()
 void primListConstruct(std::vector<torch::IValue>& stack, size_t num_inputs, at::ListTypePtr type)
@@ -91,49 +62,11 @@ void primListUnpack(std::vector<torch::IValue>& stack, size_t num_outputs)
     stack.insert(stack.end(), list.begin(), list.end());
 }
 
-// blobs is a Global table
-void primLoop(int max_trip_cnt, torch::Tensor& cond, int op_id, std::unordered_map<int, torch::Tensor>& blobs)
-{
-    // In Graphgen, Each PrimLoop Op contains a loop_index
-    // example: for(loop_index = 0; loop_index < max_trip_cnt; loop_index++) { }
-    OpNodeDescription* loop_index_node = getNextExecutionOp(new OpNodeDescription(op_id, "PrimLoop"));
-
-    // Set initail value for loop_index, default is zero
-    int loop_index = blobs.find(loop_index_node->id)->second.item().toInt();
-    loop_index = 0;
-    // modify the blob in blobs'table
-    blobs[loop_index_node->id] = torch::tensor(loop_index);
-
-    // skip LoopIndexNode
-    OpNodeDescription* loop_start_op = getNextExecutionOp(loop_index_node);
-    OpNodeDescription* op_node = loop_start_op;
-
-    // Generate a Loop
-    while (loop_index < max_trip_cnt && cond.item().toBool()) {
-        while (op_node->type != "PrimEndLoop") {
-            // the cond may changed while execution
-            executeOp(op_node);
-            op_node = getNextExecutionOp(op_node);
-        }
-        loop_index++;
-        blobs[loop_index_node->id] = torch::tensor(loop_index);
-        // move to start
-        op_node = loop_start_op;
-    }
-}
-
 void primRaiseException(std::string msg)
 {
     nnrt::NNRuntimeException exception(msg);
     DLOG(INFO) << exception.what();
     throw exception;
-}
-
-// STRING, DEVICE
-std::string primStrConstsnt(void* data_ptr)
-{
-    std::string ret = static_cast<char*>(data_ptr);
-    return ret;
 }
 
 torch::Tensor primTensorConstant(void* data_ptr, std::vector<int64_t>& shape, DataType dtype)

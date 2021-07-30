@@ -283,8 +283,7 @@ void StreamExecutor::setInputTensors(const std::vector<torch::Tensor>& input_ten
 
 void StreamExecutor::getOutputTensors(std::vector<torch::Tensor>& output_tensors)
 {
-    // output_tensors.clear();
-    std::vector<torch::Tensor> out_tensors;
+    output_tensors.clear();
     std::vector<std::vector<int64_t>> out_list;
 
     // checkout the dtype of outpus
@@ -314,7 +313,7 @@ void StreamExecutor::getOutputTensors(std::vector<torch::Tensor>& output_tensors
                 for (auto& iv_ : ivs) {
                     if (iv_.isTensor()) {
                         auto tensor = iv_.toTensor();
-                        out_tensors.push_back(tensor);
+                        output_tensors.push_back(tensor);
                     } else if (iv_.isList()) {
                         // list[list]
                         auto lst = iv_.toList().vec();
@@ -328,34 +327,24 @@ void StreamExecutor::getOutputTensors(std::vector<torch::Tensor>& output_tensors
                     }
                 }
             }
-
             // print RNNT result
             // logits, logits_lens, output
             // _, _, transcript = self.greedy_decoder.forward(feature, feature_length)
-
             std::stringstream ss;
             for (auto& item : out_list.at(0)) {
                 ss << item << " ";
             }
             DLOG(INFO) << "RNNT_output: " << ss.str();
+            // convert list[list[int]] to tensor
+            torch::Tensor out_ =
+                torch::from_blob(out_list.at(0).data(), {1, static_cast<int64_t>(out_list.at(0).size())}, torch::kLong)
+                    .clone();
+            output_tensors.push_back(std::move(out_));
+            // DLOG(INFO) << "Inference output: " << output_tensors.at(2);
         }
     }
 }
 
 const std::shared_ptr<nncir::NNIR> StreamExecutor::getGraph() { return this->ir_graph_; }
-
-void executeOp(OpNodeDescription* cur_op) {}
-
-/**
- * @brief Get the Next Execution Node object
- *
- * @param cur_op currently Op
- * @return OpNodeDescription* the next
- */
-OpNodeDescription* getNextExecutionOp(OpNodeDescription* cur_op)
-{
-    // TODO
-    return nullptr;
-}
 
 }  // namespace nnrt

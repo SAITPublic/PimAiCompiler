@@ -38,6 +38,10 @@ The NNRuntime Python extension is installed in `/opt/rocm/lib/`, named `Nnrt.cpy
 
 ```
 export PYTHONPATH=$PYTHONPATH:/opt/rocm/lib/
+
+cd NNCompiler/example/runtime
+# here provides one sample input for RNNT model: example/runtime/resource/rnnt/input
+
 python3 simpleMain.py
 
 ```
