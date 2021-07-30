@@ -56,6 +56,12 @@ $ ./scripts/build.sh all -o .
 # How to run
 
 ## Compiler
+### Set ME_PASS_CONFIG_PATH
+```
+default file is: compiler/include/middlend/passes/pass_config.json
+```
+
+### Run compiler
 ```
 ./build/compiler/compiler -h [--help]
 

@@ -5,26 +5,15 @@
 #include "compiler/include/middlend/passes/memory/memory_labeling.hpp"
 #include "compiler/include/middlend/passes/stream/control_node_execution.hpp"
 
-#include <experimental/filesystem>
-#include <unistd.h>
-
 namespace nn_compiler {
 
 template <typename... ArgTs>
 void PassBuilder<ArgTs...>::getPassConfig(conf_json::Document& config,
                                           cl_opt::Option<std::string>& pass_config_file_path) const {
-    std::string current_path = std::experimental::filesystem::current_path();
-    if (current_path.find("/build") != std::string::npos) {
-        std::string build_path = "../" + static_cast<std::string>(pass_config_file_path);
-        pass_config_file_path.setValue(build_path);
-    } else if (current_path.find("/build/compiler") != std::string::npos) {
-        std::string build_path = "../../" + static_cast<std::string>(pass_config_file_path);
-        pass_config_file_path.setValue(build_path);
-    }
-
     std::ifstream config_file(pass_config_file_path);
     if (!config_file) {
-        Log::ME::E() << LOG_PREFIX() "Failed to open pass configuration file! Please run at base or build directory.";
+        Log::ME::E() << LOG_PREFIX() "Failed to open pass configuration file! "
+                                     "Please speficy correct path of pass config file in env path.";
     }
 
     Log::ME::I() << "Read passes configuration from " << pass_config_file_path.get();

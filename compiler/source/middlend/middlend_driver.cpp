@@ -5,6 +5,9 @@
 
 #include "compiler/include/middlend/middlend_driver.hpp"
 
+#include <cstdio>
+#include <cstdlib> 
+
 /// Command-line options
 static cl_opt::Option<int> verify_level("-v",
                                         "<level>",
@@ -17,7 +20,7 @@ static cl_opt::Option<int> verify_level("-v",
 static cl_opt::Option<std::string>
         pass_config_file_path("-c",
                               "<configuration file>",
-                              "pass config file path, default: compiler/include/middlend/passes/pass_config.json",
+                              "pass config file path, please set in environment path ${ME_PASS_CONFIG_PATH}",
                               cl_opt::Required::NO,
                               cl_opt::Hidden::NO,
                               "compiler/include/middlend/passes/pass_config.json");
@@ -99,8 +102,17 @@ void MiddlendDriver::buildPasses() {
     PassBuilder<> pass_builder;
 
     conf_json::Document config;
+    
+    char* pass_config_file_env_path = getenv("ME_PASS_CONFIG_PATH");
+    if (pass_config_file_env_path == NULL) {
+        Log::ME::E() << "Please specify the file path of middlend pass config "
+                         "in environment path by ${ME_PASS_CONFIG_PATH}. "
+                         "Default file is put at: compiler/include/middlend/passes/pass_config.json.";
+    } else {
+        Log::ME::I() << "file path of middlend pass config: " << pass_config_file_env_path;
+    }
+    pass_config_file_path.setValue(pass_config_file_env_path);
     pass_builder.getPassConfig(config, pass_config_file_path);
-
     if (!config.isObject()) {
         buildPasses(config, pass_builder);
     } else if (auto passes = config.get("passes", conf_json::Value())) {
