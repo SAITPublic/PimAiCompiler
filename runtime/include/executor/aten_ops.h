@@ -225,11 +225,23 @@ bool atenNe(const at::Scalar &self, const at::Scalar &other);
 
 at::Tensor atenNeg(const at::Tensor &self);
 
+at::Tensor atenPow(const at::Tensor &self, const at::Tensor &exponent);
+
+at::Tensor atenPow(at::Scalar self, const at::Tensor &exponent);
+
+at::Tensor atenPow(const at::Tensor &self, at::Scalar exponent);
+
 at::Tensor atenRelu(const at::Tensor &self);
 
 at::Tensor atenSelect(const at::Tensor &self, at::Dimname dim, int64_t index);
 
 at::Tensor atenSelect(const at::Tensor &self, int64_t dim, int64_t index);
+
+template<typename T>
+at::List<T> atenSetItem(at::List<T> list, int indice, T item) {
+    list[indice] = item;
+    return list;
+}
 
 std::vector<int64_t> atenSize(const at::Tensor &tensor);
 
@@ -239,6 +251,8 @@ int64_t atenSize(const at::Tensor &self, at::Dimname dim);
 
 at::Tensor atenSlice(const at::Tensor &self, int64_t dim = 0, int64_t start = 0, int64_t end = 9223372036854775807,
                      int64_t step = 1);
+
+at::Tensor atenSoftmax(const at::Tensor &self, int64_t dim, at::ScalarType dtype);
 
 at::Tensor atenSub(const at::Tensor &self, at::Scalar other, at::Scalar alpha = 1);
 

@@ -23,19 +23,19 @@ namespace nn_ir
 class AtenSetItemNode : public NodeMixin<AtenSetItemNode, NNNode>
 {
    public:
-    explicit AtenSetItemNode(const NodeInfo& node_info, int indices)
+    explicit AtenSetItemNode(const NodeInfo& node_info, int64_t indices)
         : NodeMixin(node_info, NodeType::ATENSETITEM), indices_(indices)
     {
     }
 
     std::string getNodeTypeAsString() const override { return "AtenSetItem"; }
 
-    void setIndices(int indices) { indices_ = indices; }
+    void setIndices(int64_t indices) { indices_ = indices; }
 
-    int getIndices() const { return indices_; }
+    int64_t getIndices() const { return indices_; }
 
    private:
-    int indices_;
+    int64_t indices_;
 };  // class AtenSetItemNode
 
 }  // namespace nn_ir

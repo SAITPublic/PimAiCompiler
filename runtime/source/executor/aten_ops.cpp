@@ -323,6 +323,12 @@ bool atenNe(const at::Scalar &self, const at::Scalar &other)
 
 at::Tensor atenNeg(const at::Tensor &self) { return at::neg(self); }
 
+at::Tensor atenPow(const at::Tensor &self, const at::Tensor &exponent) { return at::pow(self, exponent); }
+
+at::Tensor atenPow(at::Scalar self, const at::Tensor &exponent) { return at::pow(self, exponent); }
+
+at::Tensor atenPow(const at::Tensor &self, at::Scalar exponent) { return at::pow(self, exponent); }
+
 at::Tensor atenRelu(const at::Tensor &self) { return at::relu(self); }
 
 at::Tensor atenSelect(const at::Tensor &self, at::Dimname dim, int64_t index) { return at::select(self, dim, index); }
@@ -338,6 +344,10 @@ int64_t atenSize(const at::Tensor &self, at::Dimname dim) { return at::size(self
 at::Tensor atenSlice(const at::Tensor &self, int64_t dim, int64_t start, int64_t end, int64_t step)
 {
     return at::slice(self, dim, start, end, step);
+}
+
+at::Tensor atenSoftmax(const at::Tensor &self, int64_t dim, at::ScalarType dtype) {
+    return at::softmax(self, dim, dtype);
 }
 
 at::Tensor atenSub(const at::Tensor &self, at::Scalar other, at::Scalar alpha) { return at::sub(self, other, alpha); }
