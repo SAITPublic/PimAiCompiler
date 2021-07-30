@@ -717,8 +717,8 @@ void executePrimBlock(const nncir::Node& op_node, StreamExecutor& stream_executo
             stream_executor.updateBlob(end_loop_out_blobs.at(i), in_blob.first, in_blob.second);
         }
         // Jump to End Loop'next
-        int64_t temp_cond = stream_executor.loop_condition_stack.top();
-        stream_executor.loop_condition_stack.pop();
+        int64_t temp_cond = stream_executor.loop_condition_stack_.top();
+        stream_executor.loop_condition_stack_.pop();
         auto op_node = stream_executor.getGraph()->getNode(loop_node_id);
         auto loop_node = cast_if<nncir::PrimLoopNode>(op_node);
         loop_node->setCond(temp_cond);
@@ -761,7 +761,7 @@ void executePrimLoop(const nncir::Node& op_node, StreamExecutor& stream_executor
 
     // ref: torch_jit Loop: https://github.com/pytorch/pytorch/blob/master/torch/csrc/jit/OVERVIEW.md#loops
     int64_t loop_cond = loop_node->getCond();
-    stream_executor.loop_condition_stack.push(loop_cond);
+    stream_executor.loop_condition_stack_.push(loop_cond);
     int64_t max_trip_cnt = loop_node->getTripCount();
 
     int edge_id = 0;
