@@ -284,11 +284,17 @@ at::Tensor atenTo(const at::Tensor &self, at::ScalarType dtype, bool non_blockin
 at::Tensor atenTo(const at::Tensor &self, const at::Tensor &other, bool non_blocking = false, bool copy = false,
                   c10::optional<at::MemoryFormat> memory_format = c10::nullopt);
 
+std::tuple<at::Tensor, at::Tensor> atenTopk(const at::Tensor &self, int64_t k, int64_t dim, bool largest, bool sorted);
+
 at::Tensor atenTranspose(const at::Tensor &self, int64_t dim0, int64_t dim1);
 
 at::Tensor atenTranspose(const at::Tensor &self, at::Dimname dim0, at::Dimname dim1);
 
 at::Tensor atenUnsqueeze(const at::Tensor &self, int64_t dim);
+
+at::Tensor atenView(const at::Tensor &self, at::IntArrayRef size);
+
+void atenWarn(const std::string &str);
 
 at::Tensor atenZeros(at::IntArrayRef size, c10::optional<at::DimnameList> names, at::TensorOptions options = {});
 

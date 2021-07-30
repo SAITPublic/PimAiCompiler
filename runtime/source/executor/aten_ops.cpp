@@ -403,6 +403,10 @@ at::Tensor atenTo(const at::Tensor &self, const at::Tensor &other, bool non_bloc
     return at::native::to(self, other, non_blocking, copy, memory_format);
 }
 
+std::tuple<at::Tensor, at::Tensor> atenTopk(const at::Tensor &self, int64_t k, int64_t dim, bool largest, bool sorted) {
+    return at::topk(self, k, dim, largest, sorted);
+}
+
 at::Tensor atenTranspose(const at::Tensor &self, int64_t dim0, int64_t dim1) { return at::transpose(self, dim0, dim1); }
 
 at::Tensor atenTranspose(const at::Tensor &self, at::Dimname dim0, at::Dimname dim1)
@@ -411,6 +415,12 @@ at::Tensor atenTranspose(const at::Tensor &self, at::Dimname dim0, at::Dimname d
 }
 
 at::Tensor atenUnsqueeze(const at::Tensor &self, int64_t dim) { return at::unsqueeze(self, dim); }
+
+at::Tensor atenView(const at::Tensor &self, at::IntArrayRef size) {
+    return at::native::view(self, size);
+}
+
+void atenWarn(const std::string &str) { LOG(WARNING) << str; }
 
 at::Tensor atenZeros(at::IntArrayRef size, c10::optional<at::DimnameList> names, at::TensorOptions options)
 {

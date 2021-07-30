@@ -23,26 +23,26 @@ namespace nn_ir
 class AtenTopkNode : public NodeMixin<AtenTopkNode, NNNode>
 {
    public:
-    explicit AtenTopkNode(const NodeInfo& node_info, int k, int dim, int largest, int sorted)
+    explicit AtenTopkNode(const NodeInfo& node_info, int64_t k, int64_t dim, int largest, int sorted)
         : NodeMixin(node_info, NodeType::ATENTOPK), k_(k), dim_(dim), largest_(largest), sorted_(sorted)
     {
     }
 
     std::string getNodeTypeAsString() const override { return "AtenTopk"; }
 
-    void setK(int k) { k_ = k; }
+    void setK(int64_t k) { k_ = k; }
     void setLargest(int largest) { largest_ = largest; }
-    void setDim(int dim) { dim_ = dim; }
+    void setDim(int64_t dim) { dim_ = dim; }
     void setSorted(int sorted) { sorted_ = sorted; }
 
-    int getK() { return k_; }
-    int getDim() { return dim_; }
+    int64_t getK() { return k_; }
+    int64_t getDim() { return dim_; }
     int getLargest() { return largest_; }
     int getSorted() { return sorted_; }
 
    private:
-    int k_;
-    int dim_;
+    int64_t k_;
+    int64_t dim_;
     int largest_;
     int sorted_;
 
