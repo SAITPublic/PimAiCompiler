@@ -254,9 +254,15 @@ at::Tensor atenSlice(const at::Tensor &self, int64_t dim = 0, int64_t start = 0,
 
 at::Tensor atenSoftmax(const at::Tensor &self, int64_t dim, at::ScalarType dtype);
 
+at::Tensor atenSqueeze(const at::Tensor &self, int64_t dim);
+
 at::Tensor atenSub(const at::Tensor &self, at::Scalar other, at::Scalar alpha = 1);
 
 at::Tensor atenSub(const at::Tensor &self, const at::Tensor &other, at::Scalar alpha = 1);
+
+at::Tensor atenSum(const at::Tensor &self, at::IntArrayRef dim, bool keepdim, at::ScalarType dtype);
+
+at::Tensor atenTanh(const at::Tensor &self);
 
 at::Tensor atenTensor(int64_t value);
 

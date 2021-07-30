@@ -241,7 +241,10 @@ void StreamExecutor::registerOp()
     this->global_op_register_.insert({nncir::NodeType::ATENSIZE, executorAtenSize});
     this->global_op_register_.insert({nncir::NodeType::ATENSLICE, executorAtenSlice});
     this->global_op_register_.insert({nncir::NodeType::ATENSOFTMAX, executorAtenSoftmax});
+    this->global_op_register_.insert({nncir::NodeType::ATENSQUEEZE, executorAtenSqueeze});
     this->global_op_register_.insert({nncir::NodeType::ATENSUB, executorAtenSub});
+    this->global_op_register_.insert({nncir::NodeType::ATENSUM, executorAtenSum});
+    this->global_op_register_.insert({nncir::NodeType::ATENTANH, executorAtenTanh});
     this->global_op_register_.insert({nncir::NodeType::ATENTENSOR, executorAtenTensor});
     this->global_op_register_.insert({nncir::NodeType::ATENTRANSPOSE, executorAtenTranspose});
     this->global_op_register_.insert({nncir::NodeType::ATENTO, executorAtenTo});

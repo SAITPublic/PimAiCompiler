@@ -75,7 +75,10 @@ void executorAtenSetItem(const nncir::Node& op_node, StreamExecutor& stream_exec
 void executorAtenSize(const nncir::Node& op_node, StreamExecutor& stream_executor);
 void executorAtenSlice(const nncir::Node& op_node, StreamExecutor& stream_executor);
 void executorAtenSoftmax(const nncir::Node& op_node, StreamExecutor& stream_executor);
+void executorAtenSqueeze(const nncir::Node& op_node, StreamExecutor& stream_executor);
 void executorAtenSub(const nncir::Node& op_node, StreamExecutor& stream_executor);
+void executorAtenSum(const nncir::Node& op_node, StreamExecutor& stream_executor);
+void executorAtenTanh(const nncir::Node& op_node, StreamExecutor& stream_executor);
 void executorAtenTensor(const nncir::Node& op_node, StreamExecutor& stream_executor);
 void executorAtenTo(const nncir::Node& op_node, StreamExecutor& stream_executor);
 void executorAtenTranspose(const nncir::Node& op_node, StreamExecutor& stream_executor);

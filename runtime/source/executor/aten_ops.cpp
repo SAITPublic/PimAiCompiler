@@ -350,12 +350,20 @@ at::Tensor atenSoftmax(const at::Tensor &self, int64_t dim, at::ScalarType dtype
     return at::softmax(self, dim, dtype);
 }
 
+at::Tensor atenSqueeze(const at::Tensor &self, int64_t dim) { return at::squeeze(self, dim); }
+
 at::Tensor atenSub(const at::Tensor &self, at::Scalar other, at::Scalar alpha) { return at::sub(self, other, alpha); }
 
 at::Tensor atenSub(const at::Tensor &self, const at::Tensor &other, at::Scalar alpha)
 {
     return at::sub(self, other, alpha);
 }
+
+at::Tensor atenSum(const at::Tensor &self, at::IntArrayRef dim, bool keepdim, at::ScalarType dtype) {
+    return at::sum(self, dim, keepdim, dtype);
+}
+
+at::Tensor atenTanh(const at::Tensor &self) { return at::tanh(self); }
 
 at::Tensor atenTensor(int64_t value) { return at::tensor(value); }
 

@@ -23,7 +23,7 @@ namespace nn_ir
 class AtenSumNode : public NodeMixin<AtenSumNode, NNNode>
 {
    public:
-    explicit AtenSumNode(const NodeInfo &node_info, const std::vector<int64_t> &dim, int keepdim, int dtype)
+    explicit AtenSumNode(const NodeInfo &node_info, const std::vector<int64_t> &dim, int keepdim, int64_t dtype)
         : NodeMixin(node_info, NodeType::ATENSUM), dim_(dim), keepdim_(keepdim), dtype_(dtype)
     {
     }
@@ -31,17 +31,17 @@ class AtenSumNode : public NodeMixin<AtenSumNode, NNNode>
     std::string getNodeTypeAsString() const override { return "AtenSum"; }
 
     void setDim(const std::vector<int64_t> &dim) { dim_ = dim; }
-    void setDtype(int dtype) { dtype_ = dtype; }
+    void setDtype(int64_t dtype) { dtype_ = dtype; }
     void setKeepdim(int keepdim) { keepdim_ = keepdim; }
 
     const std::vector<int64_t> getDim() const { return dim_; }
-    int getDtype() const { return dtype_; }
+    int64_t getDtype() const { return dtype_; }
     int getKeepdim() const { return keepdim_; }
 
    private:
     std::vector<int64_t> dim_;
     int keepdim_;
-    int dtype_;
+    int64_t dtype_;
 };  // class AtenSumNode
 
 }  // namespace nn_ir
