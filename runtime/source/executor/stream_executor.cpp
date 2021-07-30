@@ -262,15 +262,18 @@ void StreamExecutor::registerOp()
     this->global_op_register_.insert({nncir::NodeType::PRIMDTYPE, executePrimDtype});
     this->global_op_register_.insert({nncir::NodeType::PRIMENDLOOP, executePrimEndLoop});
     this->global_op_register_.insert({nncir::NodeType::PRIMIF, executePrimIf});
+    this->global_op_register_.insert({nncir::NodeType::PRIMGETATTR, executePrimGetAttr});
     this->global_op_register_.insert({nncir::NodeType::PRIMENDIF, executePrimEndIf});
     this->global_op_register_.insert({nncir::NodeType::PRIMLOOP, executePrimLoop});
     this->global_op_register_.insert({nncir::NodeType::PRIMLOOPINDEX, executePrimLoopIndex});
     this->global_op_register_.insert({nncir::NodeType::PRIMLISTCONSTRUCT, executePrimListConstruct});
     this->global_op_register_.insert({nncir::NodeType::PRIMLISTUNPACK, executePrimListUnpack});
     this->global_op_register_.insert({nncir::NodeType::PRIMRAISEEXCEPTION, executePrimRaiseException});
+    this->global_op_register_.insert({nncir::NodeType::PRIMSETATTR, executePrimSetAttr});
     this->global_op_register_.insert({nncir::NodeType::PRIMTUPLECONSTRUCT, executePrimTupleConstruct});
     this->global_op_register_.insert({nncir::NodeType::PRIMTUPLEINDEX, executePrimTupleIndex});
     this->global_op_register_.insert({nncir::NodeType::PRIMTUPLEUNPACK, executePrimTupleUnpack});
+    this->global_op_register_.insert({nncir::NodeType::PRIMTYPE, executePrimType});
     this->global_op_register_.insert({nncir::NodeType::PRIMUNCHECKEDCAST, executePrimUncheckedCast});
     this->global_op_register_.insert({nncir::NodeType::PRIMUNINITIALIZED, executePrimUninitialized});
     this->global_op_register_.insert({nncir::NodeType::PRIMVARIABLE, executePrimVariable});
