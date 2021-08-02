@@ -88,6 +88,10 @@ StreamExecutor::StreamExecutor(const std::shared_ptr<nncir::NNIR> ir_graph)
             for (auto blob : bias_blobs) {
                 this->loadWeightAndBias(blob, "bias", "gpu");
             }
+        } else if (op_node.getNodeType() == nncir::NodeType::PRIMCONSTANT) {
+            // to speed up, runtime only load Constant data once, all constants are reused
+            // in every inference forward
+            executePrimConstant(op_node, *this);
         }
     }
 
@@ -127,7 +131,14 @@ RetVal StreamExecutor::inferenceModel(const std::shared_ptr<nncir::NNIR> graph,
         DLOG(INFO) << "Node id:" << node->getId() << " name:" << node->getName() << " type:" << node->getNodeType();
         auto node_type = node->getNodeType();
         auto op_executor = this->findOpExecutor(node_type);
-        op_executor(*node, *this);
+
+        if (node_type == nncir::NodeType::PRIMCONSTANT) {
+            // skip PrimConstant, constant are pre-loaded
+            cursor_++;
+            continue;
+        } else {
+            op_executor(*node, *this);
+        }
 
         if (!is_control_op(node_type)) {
             cursor_++;
@@ -137,11 +148,8 @@ RetVal StreamExecutor::inferenceModel(const std::shared_ptr<nncir::NNIR> graph,
     // Read Output Tensors
     this->getOutputTensors(output_tensors);
     for (auto& out : output_tensors) {
-        DLOG(INFO) << "Output Tensor:" << out.sizes() << " data:" << out;
+        DLOG(INFO) << "Output Tensor:" << out.sizes();
     }
-
-    // for debug
-    // this->showAllBlobs();
     return RetVal::SUCCESS;
 }
 
@@ -358,7 +366,7 @@ void StreamExecutor::getOutputTensors(std::vector<torch::Tensor>& output_tensors
                 torch::from_blob(out_list.at(0).data(), {1, static_cast<int64_t>(out_list.at(0).size())}, torch::kLong)
                     .clone();
             output_tensors.push_back(std::move(out_));
-            // DLOG(INFO) << "Inference output: " << output_tensors.at(2);
+            DLOG(INFO) << "Inference output: " << output_tensors.at(2);
         }
     }
 }
