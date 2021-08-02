@@ -23,8 +23,6 @@ torch::jit::IValue tensorListToIValue(const torch::TensorList& tensor_list);
 
 torch::jit::IValue strToIValue(std::string str);
 
-at::ScalarType convertDTypeToATScalarType(nnrt::DataType dtype);
-
 nnrt::DataType convertATScalarTypeToDType(at::ScalarType dtype);
 
 at::Device convertIntToATDevice(const int& value);

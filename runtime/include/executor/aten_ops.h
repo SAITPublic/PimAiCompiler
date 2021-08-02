@@ -235,6 +235,8 @@ bool atenNe(const c10::List<T> &a, const c10::List<T> &b)
     return a != b;
 }
 
+bool atenNe(const std::string a, const std::string b);
+
 bool atenNe(const at::Scalar &self, const at::Scalar &other);
 
 at::Tensor atenNeg(const at::Tensor &self);

@@ -307,18 +307,22 @@ void executorAtenAsTensor(const nncir::Node& op_node, StreamExecutor& stream_exe
         auto iv = stream_executor.findBlob(dtype_blob_id).second;
         int_dtype = iv.toInt();
     }
-    auto dtype = convertDTypeToATScalarType(static_cast<nnrt::DataType>(int_dtype));
+    auto dtype = at::ScalarType(int_dtype);
     
     auto int_device = node.getDevice();
     at::Tensor output;
+    at::Device device = at::DeviceType::CPU;
     if (nncir::isDefaultValue<int>(int_device)) {
         auto& device_data_edge = cast<nncir::DataEdge>(node.getInEdge(edge_id++));
         auto device_blob_id = device_data_edge.getBlobId();
-        auto iv = stream_executor.findBlob(device_blob_id).second;
-        auto device = iv.toDevice();
+        auto map_value = stream_executor.findBlob(device_blob_id);
+        auto iv = map_value.second;
+        if (map_value.first != DataType::NONE){
+            device = iv.toDevice();
+        }
         output = nnrt::atenAsTensor(in_tensor, dtype, device);
     } else {
-        auto device = convertIntToATDevice(int_device);
+        device = convertIntToATDevice(int_device);
         output = nnrt::atenAsTensor(in_tensor, dtype, device);
     }
 
@@ -1370,10 +1374,17 @@ void executorAtenInt(const nncir::Node& op_node, StreamExecutor& stream_executor
     int input_self_blob_id = input_self.getBlobId();
 
     torch::jit::IValue iv_self = stream_executor.findBlob(input_self_blob_id).second;
-    assert(iv_self.isScalar());
-    auto self_scalar = iv_self.toScalar();
-
-    auto output = nnrt::atenInt(self_scalar);
+    int64_t output = -1;
+    if (iv_self.isScalar()) {
+        auto self_scalar = iv_self.toScalar();
+        output = nnrt::atenInt(self_scalar);
+    } else if (iv_self.isTensor()) {
+        auto self_tensor = iv_self.toTensor();
+        output = nnrt::atenInt(self_tensor);
+    } else {
+         DLOG(ERROR) << "AtenInt data type do not support!";
+    }
+    
     // update output
     auto& out_edge = cast<nncir::DataEdge>(int_node.getFirstOutEdge());
     stream_executor.updateBlob(out_edge.getBlobId(), DataType::INT64, scalarToIValue(output));
@@ -1569,7 +1580,7 @@ void executorAtenLogSoftmax(const nncir::Node& op_node, StreamExecutor& stream_e
         assert(ori_dtype_iv.isInt());
         ori_dtype = ori_dtype_iv.toInt();
     }
-    auto dtype = convertDTypeToATScalarType(static_cast<nnrt::DataType>(ori_dtype));
+    auto dtype = at::ScalarType(ori_dtype);
 
     auto output = nnrt::atenLogSoftmax(tensor, dim, dtype);
     // update output
@@ -2142,7 +2153,15 @@ void executorAtenNe(const nncir::Node& op_node, StreamExecutor& stream_executor)
         auto output = nnrt::atenNe(self_scalar, other_scalar);
         // update output
         auto& out_edge = cast<nncir::DataEdge>(ne_node.getFirstOutEdge());
-        stream_executor.updateBlob(out_edge.getBlobId(), DataType::BOOL, scalarToIValue(output));
+        stream_executor.updateBlob(out_edge.getBlobId(), DataType::BOOL, boolToIValue(output));
+    } else if (iv_self.isString()) {
+        assert(iv_other.isString());
+        auto self_scalar = iv_self.toString()->string();
+        auto other_scalar = iv_other.toString()->string();
+        auto output = nnrt::atenNe(self_scalar, other_scalar);
+        // update output
+        auto& out_edge = cast<nncir::DataEdge>(ne_node.getFirstOutEdge());
+        stream_executor.updateBlob(out_edge.getBlobId(), DataType::BOOL, boolToIValue(output));
     } else {
         DLOG(ERROR) << "Unsupported input type for aten::ne";
     }

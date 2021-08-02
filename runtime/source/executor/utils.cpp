@@ -18,44 +18,6 @@ torch::jit::IValue tensorListToIValue(const torch::TensorList& tensor_list) { re
 
 torch::jit::IValue strToIValue(std::string str) { return torch::jit::IValue(str); }
 
-at::ScalarType convertDTypeToATScalarType(nnrt::DataType dtype)
-{
-    // according to: pytorch/c10/core/ScalarType.h
-    at::ScalarType scalar_type = at::ScalarType::Byte;
-    switch (dtype) {
-        case nnrt::DataType::UINT8:
-            scalar_type = at::ScalarType::Byte;
-            break;
-        case nnrt::DataType::INT8:
-            scalar_type = at::ScalarType::Char;
-            break;
-        case nnrt::DataType::INT16:
-            scalar_type = at::ScalarType::Short;
-            break;
-        case nnrt::DataType::INT32:
-            scalar_type = at::ScalarType::Int;
-            break;
-        case nnrt::DataType::INT64:
-            scalar_type = at::ScalarType::Long;
-            break;
-        case nnrt::DataType::FLOAT16:
-            scalar_type = at::ScalarType::Half;
-            break;
-        case nnrt::DataType::FLOAT32:
-            scalar_type = at::ScalarType::Float;
-            break;
-        case nnrt::DataType::FLOAT64:
-            scalar_type = at::ScalarType::Double;
-            break;
-        case nnrt::DataType::BOOL:
-            scalar_type = at::ScalarType::Bool;
-            break;
-        default:
-            DLOG(FATAL) << "Complex type has not been supported.";
-    }
-    return scalar_type;
-}
-
 nnrt::DataType convertATScalarTypeToDType(at::ScalarType dtype)
 {
     // according to: pytorch/c10/core/ScalarType.h

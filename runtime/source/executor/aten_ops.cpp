@@ -327,6 +327,8 @@ at::Tensor atenNe(const at::Tensor &self, const at::Tensor &other) { return at::
 
 at::Tensor atenNe(const at::Tensor &self, const at::Scalar &other) { return at::ne(self, other); }
 
+bool atenNe(const std::string a, const std::string b) { return a != b; }
+
 bool atenNe(const at::Scalar &self, const at::Scalar &other)
 {
     if (self.type() != other.type()) {

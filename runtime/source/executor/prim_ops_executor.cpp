@@ -594,7 +594,7 @@ void executePrimVariable(const nncir::Node& op_node, StreamExecutor& stream_exec
     auto node_data_type = variable_node.getDataType();
     auto tensor_data_type = variable_node.getTensorDataType();
     uint8_t* ptr = const_cast<uint8_t*>(data_arr.data());
-
+    at::ListTypePtr list_type = at::ListType::ofTensors();
     // list[scalar,scalar] list[tensor,tensor]
     if (node_data_type.find("List") != std::string::npos) {
         auto temp_shape = getDataShapeFromShape4D(tensor_shape[0]);
@@ -650,11 +650,13 @@ void executePrimVariable(const nncir::Node& op_node, StreamExecutor& stream_exec
             } else {
                 DLOG(ERROR) << "Element type do not support! ";
             }
+            list_type = inferTypeFromDataType(scalar_type);
             // is tensor type
-            if (size != 1 && (node_data_type.find("int") != std::string::npos ||
-                              node_data_type.find("float") != std::string::npos)) {
+            if (size != 1 && (tensor_data_type.at(idx).find("int") != std::string::npos ||
+                              tensor_data_type.at(idx).find("float") != std::string::npos)) {
                 auto tensor = primTensorConstant((void*)(ptr + total_size * sizeofnum), input_shape, scalar_type);
                 iv = tensorToIValue(tensor);
+                list_type = at::ListType::ofTensors();
             }
             inputs.push_back(iv);
             int temp_size = 1;
@@ -664,7 +666,7 @@ void executePrimVariable(const nncir::Node& op_node, StreamExecutor& stream_exec
             total_size += temp_size;
         }
 
-        primListConstruct(inputs, inputs.size(), inferTypeFromDataType(scalar_type));
+        primListConstruct(inputs, inputs.size(), list_type);
         auto& out_edge = cast<nncir::DataEdge>(variable_node.getFirstOutEdge());
         stream_executor.updateBlob(out_edge.getBlobId(), DataType::LIST, inputs.at(0));
     } else {
