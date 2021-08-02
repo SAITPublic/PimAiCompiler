@@ -36,6 +36,8 @@ export GRAPH_IR_FILE=path/to/your/graph_ir/file
 
 The NNRuntime Python extension is installed in `/opt/rocm/lib/`, named `Nnrt.cpython-3xm-x86_64-linux-gnu.so`, so set /opt/rocm/lib/ in `PYTHONPATH` first, then run python test script.
 
+- Run Python API in NNCompiler Project
+
 ```
 export PYTHONPATH=$PYTHONPATH:/opt/rocm/lib/
 
@@ -43,6 +45,15 @@ cd NNCompiler/example/runtime
 # here provides one sample input for RNNT model: example/runtime/resource/rnnt/input
 
 python3 simpleMain.py
+
+```
+
+- Run Python API outside of NNCompiler Project
+
+If integrate NNRuntime Python API into other Project, like `MLPerf`, there need to set env: `ME_PASS_CONFIG_PATH`
+
+```
+export ME_PASS_CONFIG_PATH=path/to/your/pass_config.json
 
 ```
 
