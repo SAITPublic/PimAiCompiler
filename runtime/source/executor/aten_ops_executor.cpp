@@ -619,7 +619,7 @@ void executorAtenCopy(const nncir::Node& op_node, StreamExecutor& stream_executo
     torch::jit::IValue iv_self = stream_executor.findBlob(input_self_blob_id).second;
     torch::jit::IValue iv_src = stream_executor.findBlob(input_src_blob_id).second;
     at::Tensor self_tensor = iv_self.toTensor();
-    at::Tensor src_tensor = iv_self.toTensor();
+    at::Tensor src_tensor = iv_src.toTensor();
 
     int non_blocking = copy_node.getNonBlocking();
     if (nncir::isDefaultValue<int>(non_blocking)) {

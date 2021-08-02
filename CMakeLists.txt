@@ -21,7 +21,8 @@ endif()
 add_definitions(-DC10_USE_GLOG)
 add_definitions(-D_GLIBCXX_USE_CXX11_ABI=1)
 
-# for debug, don't optimize variables
+# for debug, please set `-O0 -g`
+# for release, please set -O3
 add_definitions(-O0 -g -w)   # close warning
 
 #include(Torch.cmake)
