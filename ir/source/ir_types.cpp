@@ -196,6 +196,7 @@ NNIR_Node_Config_Type_ parseConfigType(IR_Node_Config_Type_& type) {
                 // FIXME : nn_ir and ir not aligned and need more type
                 // Removed with https://github.sec.samsung.net/SAIT-NPU-Compiler/npu_ir/pull/88
                 std::map<IR::Type::DataType, nn_ir::DataType> data_type_map = {
+                    {IR::Type::DataType_FP_64, nn_ir::DataType::FLOAT64},
                     {IR::Type::DataType_FP_32, nn_ir::DataType::FLOAT32},
                     {IR::Type::DataType_FP_16, nn_ir::DataType::FLOAT16},
                     {IR::Type::DataType_FIXED_64, nn_ir::DataType::INT64},
@@ -275,6 +276,7 @@ IR_Node_Config_Type_ parseConfigType(NNIR_Node_Config_Type_& type) {
                 ir_type = IR::Type::ShapeType(static_cast<int>(args));
             } else if constexpr (std::is_same_v<T, nn_ir::DataType>) {
                 std::map<nn_ir::DataType, IR::Type::DataType> data_type_map = {
+                    {nn_ir::DataType::FLOAT64, IR::Type::DataType_FP_64},
                     {nn_ir::DataType::FLOAT32, IR::Type::DataType_FP_32},
                     {nn_ir::DataType::FLOAT16, IR::Type::DataType_FP_16},
                     {nn_ir::DataType::INT64, IR::Type::DataType_FIXED_64},

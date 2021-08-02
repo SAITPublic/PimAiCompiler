@@ -154,6 +154,7 @@ std::unique_ptr<nn_ir::Blob> IRBlobBuilder::createBlob(const IR::Blob* blob, nn_
     }
 
     switch (ir_data_type) {
+        DATATYPE(FLOAT64, FP_64, double)
         DATATYPE(FLOAT32, FP_32, float)
         DATATYPE(FLOAT16, FP_16, float16)
         DATATYPE(INT16, FIXED_16, int16_t)
