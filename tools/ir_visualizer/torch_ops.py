@@ -6,7 +6,9 @@ import IR.NNNode.AtenAddNode
 import IR.NNNode.AtenAndNode
 import IR.NNNode.AtenAnyNode
 import IR.NNNode.AtenAppendNode
-import IR.NNNode.AtenArangeNode
+import IR.NNNode.AtenArange1Node
+import IR.NNNode.AtenArange2Node
+import IR.NNNode.AtenArange3Node
 import IR.NNNode.AtenAsTensorNode
 import IR.NNNode.AtenBitwiseNotNode
 import IR.NNNode.AtenBmmNode
@@ -129,7 +131,9 @@ def create_aten_ops_map():
         IR.NNNode.AnyType.AnyType().AtenAndNode : 'AtenAndNode',
         IR.NNNode.AnyType.AnyType().AtenAnyNode : 'AtenAnyNode',
         IR.NNNode.AnyType.AnyType().AtenAppendNode : 'AtenAppendNode',
-        IR.NNNode.AnyType.AnyType().AtenArangeNode : 'AtenArangeNode',
+        IR.NNNode.AnyType.AnyType().AtenArange1Node : 'AtenArange1Node',
+        IR.NNNode.AnyType.AnyType().AtenArange2Node : 'AtenArange2Node',
+        IR.NNNode.AnyType.AnyType().AtenArange3Node : 'AtenArange3Node',
         IR.NNNode.AnyType.AnyType().AtenAsTensorNode : 'AtenAsTensorNode',
         IR.NNNode.AnyType.AnyType().AtenBitwiseNotNode : 'AtenBitwiseNotNode',
         IR.NNNode.AnyType.AnyType().AtenBmmNode : 'AtenBmmNode',
@@ -221,7 +225,9 @@ aten_ops_no_attr_dict = {
     'AtenAndNode' : IR.NNNode.AtenAndNode.AtenAndNode(),
     'AtenAnyNode' : IR.NNNode.AtenAnyNode.AtenAnyNode(),
     'AtenAppendNode' : IR.NNNode.AtenAppendNode.AtenAppendNode(),
-    'AtenArangeNode' : IR.NNNode.AtenArangeNode.AtenArangeNode(),
+    'AtenArange1Node' : IR.NNNode.AtenArange1Node.AtenArange1Node(),
+    'AtenArange2Node' : IR.NNNode.AtenArange2Node.AtenArange2Node(),
+    'AtenArange3Node' : IR.NNNode.AtenArange3Node.AtenArange3Node(),
     'AtenBitwiseNotNode' : IR.NNNode.AtenBitwiseNotNode.AtenBitwiseNotNode(),
     'AtenBmmNode' : IR.NNNode.AtenBmmNode.AtenBmmNode(),
     'AtenBoolNode' : IR.NNNode.AtenBoolNode.AtenBoolNode(),

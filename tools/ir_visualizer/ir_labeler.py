@@ -33,7 +33,9 @@ import IR.NNNode.AtenAddNode
 import IR.NNNode.AtenAndNode
 import IR.NNNode.AtenAnyNode
 import IR.NNNode.AtenAppendNode
-import IR.NNNode.AtenArangeNode
+import IR.NNNode.AtenArange1Node
+import IR.NNNode.AtenArange2Node
+import IR.NNNode.AtenArange3Node
 import IR.NNNode.AtenAsTensorNode
 import IR.NNNode.AtenBitwiseNotNode
 import IR.NNNode.AtenBmmNode
@@ -330,10 +332,20 @@ def nn_node_label(nn_node: IR.NnNode.NnNode) -> (object, str):
         aten_set_item_node.Init(nn_node.NnNode().Bytes, nn_node.NnNode().Pos)
         return aten_set_item_node, aten_set_item_node_label(aten_set_item_node)
 
-    elif node_type == IR.NNNode.AnyType.AnyType().AtenArangeNode:
-        aten_arange_node = IR.NNNode.AtenArangeNode.AtenArangeNode()
+    elif node_type == IR.NNNode.AnyType.AnyType().AtenArange1Node:
+        aten_arange_node = IR.NNNode.AtenArange1Node.AtenArange1Node()
         aten_arange_node.Init(nn_node.NnNode().Bytes, nn_node.NnNode().Pos)
-        return aten_arange_node, aten_arange_node_label(aten_arange_node)
+        return aten_arange_node, aten_arange1_node_label(aten_arange_node)
+
+    elif node_type == IR.NNNode.AnyType.AnyType().AtenArange2Node:
+        aten_arange_node = IR.NNNode.AtenArange2Node.AtenArange2Node()
+        aten_arange_node.Init(nn_node.NnNode().Bytes, nn_node.NnNode().Pos)
+        return aten_arange_node, aten_arange2_node_label(aten_arange_node)
+
+    elif node_type == IR.NNNode.AnyType.AnyType().AtenArange3Node:
+        aten_arange_node = IR.NNNode.AtenArange3Node.AtenArange3Node()
+        aten_arange_node.Init(nn_node.NnNode().Bytes, nn_node.NnNode().Pos)
+        return aten_arange_node, aten_arange3_node_label(aten_arange_node)
 
     elif node_type == IR.NNNode.AnyType.AnyType().AtenAsTensorNode:
         aten_as_tensor_node = IR.NNNode.AtenAsTensorNode.AtenAsTensorNode()
@@ -894,10 +906,13 @@ def aten_pad_packed_sequence_node_label(aten_pad_packed_sequence_node: IR.NNNode
     retval = 'AtenPadPackedSequence Node<br/>'
     batch_first = aten_pad_packed_sequence_node.BatchFirst()
     padding_value = aten_pad_packed_sequence_node.PaddingValue()
+    total_length = aten_pad_packed_sequence_node.TotalLength()
     if batch_first is not None:
         retval += 'BatchFirst: {}<br/>'.format(batch_first)
     if padding_value is not None:
         retval += 'PaddingValue: {}<br/>'.format(padding_value)
+    if total_length is not None:
+        retval += 'TotalLength: {}<br/>'.format(total_length)
     return list_table([retval])
 
 
@@ -909,22 +924,81 @@ def aten_set_item_node_label(aten_set_item_node: IR.NNNode.AtenSetItemNode.AtenS
     return list_table([retval])
 
 
-def aten_arange_node_label(aten_arange_node: IR.NNNode.AtenArangeNode.AtenArangeNode) -> str:
-    retval = 'AtenArange Node<br/>'
-    start = aten_arange_node.Start()
-    step = aten_arange_node.Step()
+def aten_arange1_node_label(aten_arange_node: IR.NNNode.AtenArange1Node.AtenArange1Node) -> str:
+    retval = 'AtenArange1 Node<br/>'
+    end = aten_arange_node.End()
     dtype = aten_arange_node.Dtype()
     layout = aten_arange_node.Layout()
+    device = aten_arange_node.Device()
     pin_memory = aten_arange_node.PinMemory()
 
-    if start is not None:
-        retval += 'Start: {}<br/>'.format(start)
+    if end is not None:
+        retval += 'End: {}<br/>'.format(end)
     if step is not None:
         retval += 'Step: {}<br/>'.format(step)
     if dtype is not None:
         retval += 'Dtype: {}<br/>'.format(dtype)
     if layout is not None:
         retval += 'Layout: {}<br/>'.format(layout)
+    if device is not None:
+        retval += 'Device: {}<br/>'.format(device)
+    if pin_memory is not None:
+        retval += 'PinMemory: {}<br/>'.format(pin_memory)
+
+    return list_table([retval])
+
+
+def aten_arange2_node_label(aten_arange_node: IR.NNNode.AtenArange2Node.AtenArange2Node) -> str:
+    retval = 'AtenArange2 Node<br/>'
+    start = aten_arange_node.Start()
+    end = aten_arange_node.End()
+    dtype = aten_arange_node.Dtype()
+    layout = aten_arange_node.Layout()
+    device = aten_arange_node.Device()
+    pin_memory = aten_arange_node.PinMemory()
+
+    if start is not None:
+        retval += 'Start: {}<br/>'.format(start)
+    if end is not None:
+        retval += 'End: {}<br/>'.format(end)
+    if step is not None:
+        retval += 'Step: {}<br/>'.format(step)
+    if dtype is not None:
+        retval += 'Dtype: {}<br/>'.format(dtype)
+    if layout is not None:
+        retval += 'Layout: {}<br/>'.format(layout)
+    if device is not None:
+        retval += 'Device: {}<br/>'.format(device)
+    if pin_memory is not None:
+        retval += 'PinMemory: {}<br/>'.format(pin_memory)
+
+    return list_table([retval])
+
+
+def aten_arange3_node_label(aten_arange_node: IR.NNNode.AtenArange3Node.AtenArange3Node) -> str:
+    retval = 'AtenArange3 Node<br/>'
+    start = aten_arange_node.Start()
+    end = aten_arange_node.End()
+    step = aten_arange_node.Step()
+    dtype = aten_arange_node.Dtype()
+    layout = aten_arange_node.Layout()
+    device = aten_arange_node.Device()
+    pin_memory = aten_arange_node.PinMemory()
+
+    if start is not None:
+        retval += 'Start: {}<br/>'.format(start)
+    if end is not None:
+        retval += 'End: {}<br/>'.format(end)
+    if step is not None:
+        retval += 'Step: {}<br/>'.format(step)
+    if step is not None:
+        retval += 'Step: {}<br/>'.format(step)
+    if dtype is not None:
+        retval += 'Dtype: {}<br/>'.format(dtype)
+    if layout is not None:
+        retval += 'Layout: {}<br/>'.format(layout)
+    if device is not None:
+        retval += 'Device: {}<br/>'.format(device)
     if pin_memory is not None:
         retval += 'PinMemory: {}<br/>'.format(pin_memory)
 
@@ -1012,9 +1086,6 @@ def aten_log_softmax_node_label(aten_log_softmax_node: IR.NNNode.AtenLogSoftmaxN
 
 def aten_masked_fill_node_label(aten_masked_fill_node: IR.NNNode.AtenMaskedFillNode.AtenMaskedFillNode) -> str:
     retval = 'AtenMaskedFill Node<br/>'
-    value = aten_masked_fill_node.Value()
-    if value is not None:
-        retval += 'Value: {}<br/>'.format(value)
     return list_table([retval])
 
 
@@ -1145,17 +1216,17 @@ def aten_maxpool2d_node_label(aten_maxpool2d_node: IR.NNNode.AtenMaxPool2dNode.A
     pad = aten_maxpool2d_node.Pad()
     stride = aten_maxpool2d_node.Stride()
     dilation = aten_maxpool2d_node.Dilation()
-    return_indices = aten_maxpool2d_node.ReturnIndices()
+    ceil_mode = aten_maxpool2d_node.CeilMode()
     if kernel_size is not None:
         retval += 'KernelSize: {}<br/>'.format(dim2_label(kernel_size))
-    if pad is not None:
-        retval += 'Pad: {}<br/>'.format(pad4_label(pad))
     if stride is not None:
         retval += 'Stride: {}<br/>'.format(dim2_label(stride))
+    if pad is not None:
+        retval += 'Padding: {}<br/>'.format(pad4_label(pad))
     if dilation is not None:
         retval += 'Dialation: {}<br/>'.format(dim2_label(dilation))
-    if return_indices is not None:
-        retval += 'ReturnIndices: {}<br/>'.format(return_indices)
+    if ceil_mode is not None:
+        retval += 'CeilMode: {}<br/>'.format(ceil_mode)
     return list_table([retval])
 
 
