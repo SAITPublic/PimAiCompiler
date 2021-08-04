@@ -262,7 +262,7 @@ std::tuple<at::Tensor, at::Tensor, at::Tensor> atenLstm(const at::Tensor &input,
     return at::lstm(input, hx, params, has_biases, num_layers, dropout, train, bidirectional, batch_first);
 }
 
-std::tuple<at::Tensor, at::Tensor, at::Tensor> atenlstm(const at::Tensor &data, const at::Tensor &batch_sizes,
+std::tuple<at::Tensor, at::Tensor, at::Tensor> atenLstm(const at::Tensor &data, const at::Tensor &batch_sizes,
                                                         at::TensorList hx, at::TensorList params, bool has_biases,
                                                         int64_t num_layers, double dropout, bool train,
                                                         bool bidirectional)

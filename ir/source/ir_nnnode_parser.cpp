@@ -1023,7 +1023,7 @@ IRNNNodeParser::parseNNNode<IR::NNNode::AnyType_AtenLSTMNode>(const IR::NnNode* 
     auto aten_lstm_node = ir_node->nn_node_as_AtenLSTMNode();
     Log::IR::E_IF(aten_lstm_node == nullptr) << "IRNNNodeParser::parseNNNode<NN::AtenLSTMNode>() => wrong node type!";
 
-    float   has_biases     = aten_lstm_node->has_biases();
+    int   has_biases     = aten_lstm_node->has_biases();
     int64_t num_layer      = aten_lstm_node->num_layers();
     double  dropout        = aten_lstm_node->dropout();
     int train          = aten_lstm_node->train();
