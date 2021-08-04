@@ -203,6 +203,7 @@ class AtenArange2Node;
 class AtenArange3Node;
 class AtenAsTensorNode;
 class AtenBitwiseNotNode;
+class AtenBatchNorm2dNode;
 class AtenBmmNode;
 class AtenBoolNode;
 class AtenCatNode;
@@ -398,6 +399,7 @@ enum class NodeType {
     ATENARANGE2,
     ATENARANGE3,
     ATENASTENSOR,
+    ATENBATCHNORM2D,
     ATENBITWISENOT,
     ATENBMM,
     ATENBOOL,

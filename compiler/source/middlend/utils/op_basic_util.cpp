@@ -15,6 +15,7 @@ bool OpBasicUtil::isAtenOp(const nn_ir::Node& node) const {
                 nn_ir::AtenArange2Node,
                 nn_ir::AtenArange3Node,
                 nn_ir::AtenAsTensorNode,
+                nn_ir::AtenBatchNorm2dNode,
                 nn_ir::AtenBitwiseNotNode,
                 nn_ir::AtenBmmNode,
                 nn_ir::AtenBoolNode,

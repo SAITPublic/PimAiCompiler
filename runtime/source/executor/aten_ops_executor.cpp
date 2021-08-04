@@ -3497,4 +3497,9 @@ void executorAtenZerosLike(const nncir::Node& op_node, StreamExecutor& stream_ex
     stream_executor.updateBlob(out_edge.getBlobId(), DataType::TENSOR, tensorToIValue(output));
 }
 
+void executorAtenBatchNorm(const nncir::Node& op_node, StreamExecutor& stream_executor)
+{
+    // TODO
+}
+
 }  // namespace nnrt

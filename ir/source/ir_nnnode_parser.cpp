@@ -574,6 +574,25 @@ IRNNNodeParser::parseNNNode<IR::NNNode::AnyType_AtenBitwiseNotNode>(const IR::Nn
 }
 
 template <>
+std::unique_ptr<nn_ir::NNNode> IRNNNodeParser::parseNNNode<IR::NNNode::AnyType_AtenBatchNorm2dNode>(
+    const IR::NnNode* ir_node, const nn_ir::NodeInfo& node_info)
+{
+    auto aten_bn2d_node = ir_node->nn_node_as_AtenBatchNorm2dNode();
+    Log::IR::E_IF(aten_bn2d_node == nullptr)
+        << "IRNNNodeParser::parseNNNode<NN::AtenBatchNorm2dNode>() => wrong node type!";
+
+    auto training = aten_bn2d_node->training();
+    auto momentum = aten_bn2d_node->momentum();
+    auto eps = aten_bn2d_node->eps();
+
+    auto weight_blob_ids = makeDataArrFromVector<int64_t>(aten_bn2d_node->weight_blob_ids());
+    auto bias_blob_ids = makeDataArrFromVector<int64_t>(aten_bn2d_node->bias_blob_ids());
+
+    return std::make_unique<nn_ir::AtenBatchNorm2dNode>(node_info, weight_blob_ids, bias_blob_ids, training, momentum,
+                                                        eps);
+}
+
+template <>
 std::unique_ptr<nn_ir::NNNode>
 IRNNNodeParser::parseNNNode<IR::NNNode::AnyType_AtenBmmNode>(const IR::NnNode*      ir_node,
                                                              const nn_ir::NodeInfo& node_info) {

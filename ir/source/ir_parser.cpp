@@ -361,6 +361,7 @@ IRParser::IRParser() {
         {IR::NNNode::AnyType_AtenArange2Node, &IRNNNodeParser::parseNNNode<IR::NNNode::AnyType_AtenArange2Node>},
         {IR::NNNode::AnyType_AtenArange3Node, &IRNNNodeParser::parseNNNode<IR::NNNode::AnyType_AtenArange3Node>},
         {IR::NNNode::AnyType_AtenAsTensorNode, &IRNNNodeParser::parseNNNode<IR::NNNode::AnyType_AtenAsTensorNode>},
+        {IR::NNNode::AnyType_AtenBatchNorm2dNode, &IRNNNodeParser::parseNNNode<IR::NNNode::AnyType_AtenBatchNorm2dNode>},
         {IR::NNNode::AnyType_AtenBitwiseNotNode, &IRNNNodeParser::parseNNNode<IR::NNNode::AnyType_AtenBitwiseNotNode>},
         {IR::NNNode::AnyType_AtenBmmNode, &IRNNNodeParser::parseNNNode<IR::NNNode::AnyType_AtenBmmNode>},
         {IR::NNNode::AnyType_AtenBoolNode, &IRNNNodeParser::parseNNNode<IR::NNNode::AnyType_AtenBoolNode>},

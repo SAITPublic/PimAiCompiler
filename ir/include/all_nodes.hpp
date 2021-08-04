@@ -30,6 +30,7 @@
 #include "ir/include/nn_nodes/aten_arange3_node.hpp"
 #include "ir/include/nn_nodes/aten_as_tensor_node.hpp"
 #include "ir/include/nn_nodes/aten_bitwise_not_node.hpp"
+#include "ir/include/nn_nodes/aten_batchnorm2d_node.hpp"
 #include "ir/include/nn_nodes/aten_bmm_node.hpp"
 #include "ir/include/nn_nodes/aten_bool_node.hpp"
 #include "ir/include/nn_nodes/aten_cat_node.hpp"
