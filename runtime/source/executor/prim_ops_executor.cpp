@@ -610,51 +610,16 @@ void executePrimVariable(const nncir::Node& op_node, StreamExecutor& stream_exec
             std::vector<int64_t> input_shape = getDataShapeFromShape4D(tensor_shape.at(idx));
             torch::jit::IValue iv;
             scalar_type = DataType::NONE;
-            auto sizeofnum = 0;
-            if (tensor_data_type.at(idx) == "int64") {
-                scalar_type = DataType::INT64;
-                sizeofnum = sizeof(int64_t);
-                iv = scalarToIValue<int64_t>(*(int64_t*)(ptr + total_size * sizeofnum));
-            } else if (tensor_data_type.at(idx) == "int32") {
-                scalar_type = DataType::INT32;
-                sizeofnum = sizeof(int32_t);
-                iv = scalarToIValue<int32_t>(*(int32_t*)(ptr + total_size * sizeofnum));
-            } else if (tensor_data_type.at(idx) == "int16") {
-                scalar_type = DataType::INT16;
-                sizeofnum = sizeof(int16_t);
-                iv = scalarToIValue<int16_t>(*(int16_t*)(ptr + total_size * sizeofnum));
-            } else if (tensor_data_type.at(idx) == "uint16") {
-                scalar_type = DataType::UINT16;
-                sizeofnum = sizeof(uint16_t);
-                iv = scalarToIValue<uint16_t>(*(uint16_t*)(ptr + total_size * sizeofnum));
-            } else if (tensor_data_type.at(idx) == "int8") {
-                scalar_type = DataType::INT8;
-                sizeofnum = sizeof(int8_t);
-                iv = scalarToIValue<int8_t>(*(int8_t*)(ptr + total_size * sizeofnum));
-            } else if (tensor_data_type.at(idx) == "uint8") {
-                scalar_type = DataType::UINT8;
-                sizeofnum = sizeof(uint8_t);
-                iv = scalarToIValue<uint8_t>(*(uint8_t*)(ptr + total_size * sizeofnum));
-            } else if (tensor_data_type.at(idx) == "float32") {
-                scalar_type = DataType::FLOAT32;
-                sizeofnum = sizeof(float);
-                iv = scalarToIValue<float>(*(float*)(ptr + total_size * sizeofnum));
-            } else if (tensor_data_type.at(idx) == "float64") {
-                scalar_type = DataType::FLOAT64;
-                sizeofnum = sizeof(float) * 2;
-                iv = scalarToIValue<double>(*(double*)(ptr + total_size * sizeofnum));
-            } else if (tensor_data_type.at(idx) == "bool") {
-                scalar_type = DataType::BOOL;
-                sizeofnum = sizeof(int64_t);
-                iv = scalarToIValue<int64_t>(*(int64_t*)(ptr + total_size * sizeofnum));
-            } else {
-                DLOG(ERROR) << "Element type do not support! ";
-            }
+            auto bytenum = 0;
+            auto var_info = getVariableInfo(ptr, tensor_data_type.at(idx), total_size);
+            scalar_type = var_info.second.second;
+            bytenum = var_info.second.first;
+            iv = var_info.first;
             list_type = inferTypeFromDataType(scalar_type);
-            // is tensor type
+            // is tensor type: list[tensor, ...]
             if (size != 1 && (tensor_data_type.at(idx).find("int") != std::string::npos ||
                               tensor_data_type.at(idx).find("float") != std::string::npos)) {
-                auto tensor = primTensorConstant((void*)(ptr + total_size * sizeofnum), input_shape, scalar_type);
+                auto tensor = primTensorConstant((void*)(ptr + total_size * bytenum), input_shape, scalar_type);
                 iv = tensorToIValue(tensor);
                 list_type = at::ListType::ofTensors();
             }
@@ -665,12 +630,34 @@ void executePrimVariable(const nncir::Node& op_node, StreamExecutor& stream_exec
             }
             total_size += temp_size;
         }
+        //node_data_type = "List[Tuple[Tensor,Tensor]]" for variable op created by getattr or set attr;
+        if (node_data_type.length() > 4) {
+            torch::jit::IValue iv = primVariable(node_data_type, inputs);
+            auto& out_edge = cast<nncir::DataEdge>(variable_node.getFirstOutEdge());
+            stream_executor.updateBlob(out_edge.getBlobId(), DataType::LIST, iv);
+        } else {
+            primListConstruct(inputs, inputs.size(), list_type);
+            auto& out_edge = cast<nncir::DataEdge>(variable_node.getFirstOutEdge());
+            stream_executor.updateBlob(out_edge.getBlobId(), DataType::LIST, inputs.at(0));
+        }
 
-        primListConstruct(inputs, inputs.size(), list_type);
+    } else if (node_data_type.find("bool") != std::string::npos) {
+        auto var_info = getVariableInfo(ptr, tensor_data_type.at(0), 0);
+        torch::jit::IValue iv = var_info.first;
+
         auto& out_edge = cast<nncir::DataEdge>(variable_node.getFirstOutEdge());
-        stream_executor.updateBlob(out_edge.getBlobId(), DataType::LIST, inputs.at(0));
+        stream_executor.updateBlob(out_edge.getBlobId(), DataType::BOOL, iv);
+    } else if (node_data_type.find("Tensor") != std::string::npos) {
+        std::vector<int64_t> input_shape = getDataShapeFromShape4D(tensor_shape.at(0));
+        auto var_info = getVariableInfo(ptr, tensor_data_type.at(0), 0);
+        auto scalar_type = var_info.second.second;
+        torch::jit::IValue iv = var_info.first;
+        auto tensor = primTensorConstant((void*)ptr, input_shape, scalar_type);
+
+        auto& out_edge = cast<nncir::DataEdge>(variable_node.getFirstOutEdge());
+        stream_executor.updateBlob(out_edge.getBlobId(), DataType::TENSOR, iv);
     } else {
-        DLOG(ERROR) << "Variable op data type: "<< node_data_type <<"do not support! ";
+        DLOG(ERROR) << "Variable op data type: " << node_data_type << "do not support! ";
     }
 }
 

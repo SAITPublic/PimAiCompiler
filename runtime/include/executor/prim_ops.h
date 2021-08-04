@@ -27,6 +27,8 @@ bool primIf(bool cond);
 
 void primListConstruct(std::vector<torch::IValue>& stack, size_t num_inputs, at::ListTypePtr type);
 
+void primListConstruct(std::vector<torch::IValue>& stack);
+
 void primListUnpack(std::vector<torch::IValue>& stack, size_t num_outputs);
 
 void primLoop(int max_trip_cnt, torch::Tensor& cond, std::unordered_map<int, torch::Tensor>& blobs);
@@ -67,4 +69,7 @@ T& primUncheckedCast(T& inputs)
 }
 
 torch::IValue primUninitialized();
+
+at::IValue primVariable(std::string ntype, std::vector<torch::IValue> inputs);
+
 }  // namespace nnrt

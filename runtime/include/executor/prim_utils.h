@@ -1,10 +1,12 @@
 #pragma once
 
+#include "utils.h"
 #include <torch/script.h>
 #include <exception>
 #include <vector>
 #include "../nnrt_types.h"
 #include "ir/include/ir_types.hpp"
+#include <stack>
 
 namespace nnrt
 {
@@ -45,4 +47,8 @@ at::ListTypePtr inferTypeFromDataType(DataType type);
 std::vector<int64_t> getDataShapeFromShape4D(nn_compiler::nn_ir::Shape4D shape);
 
 torch::Tensor loadTensor(const std::string& bin_file, const std::vector<int64_t>& shape, DataType dtype);
+
+std::pair<torch::jit::IValue, std::pair<int, DataType>> getVariableInfo(uint8_t* ptr,
+                                                                        const std::string tensor_data_type,
+                                                                        int total_size);
 }  // namespace nnrt

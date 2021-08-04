@@ -146,4 +146,53 @@ torch::Tensor loadTensor(const std::string& bin_file, const std::vector<int64_t>
     return tensor;
 }
 
+std::pair<torch::jit::IValue, std::pair<int, DataType>> getVariableInfo(uint8_t* ptr,
+                                                                        const std::string tensor_data_type,
+                                                                        int total_size)
+{
+    DataType scalar_type = DataType::UNDEFINED;
+    torch::jit::IValue iv;
+    int bytenum = 0;
+    if (tensor_data_type == "int64") {
+        scalar_type = DataType::INT64;
+        bytenum = sizeof(int64_t);
+        iv = scalarToIValue<int64_t>(*(int64_t*)(ptr + total_size * bytenum));
+    } else if (tensor_data_type == "int32") {
+        scalar_type = DataType::INT32;
+        bytenum = sizeof(int32_t);
+        iv = scalarToIValue<int32_t>(*(int32_t*)(ptr + total_size * bytenum));
+    } else if (tensor_data_type == "int16") {
+        scalar_type = DataType::INT16;
+        bytenum = sizeof(int16_t);
+        iv = scalarToIValue<int16_t>(*(int16_t*)(ptr + total_size * bytenum));
+    } else if (tensor_data_type == "uint16") {
+        scalar_type = DataType::UINT16;
+        bytenum = sizeof(uint16_t);
+        iv = scalarToIValue<uint16_t>(*(uint16_t*)(ptr + total_size * bytenum));
+    } else if (tensor_data_type == "int8") {
+        scalar_type = DataType::INT8;
+        bytenum = sizeof(int8_t);
+        iv = scalarToIValue<int8_t>(*(int8_t*)(ptr + total_size * bytenum));
+    } else if (tensor_data_type == "uint8") {
+        scalar_type = DataType::UINT8;
+        bytenum = sizeof(uint8_t);
+        iv = scalarToIValue<uint8_t>(*(uint8_t*)(ptr + total_size * bytenum));
+    } else if (tensor_data_type == "float32") {
+        scalar_type = DataType::FLOAT32;
+        bytenum = sizeof(float);
+        iv = scalarToIValue<float>(*(float*)(ptr + total_size * bytenum));
+    } else if (tensor_data_type == "float64") {
+        scalar_type = DataType::FLOAT64;
+        bytenum = sizeof(float) * 2;
+        iv = scalarToIValue<double>(*(double*)(ptr + total_size * bytenum));
+    } else if (tensor_data_type == "bool") {
+        scalar_type = DataType::BOOL;
+        bytenum = sizeof(int64_t);
+        iv = scalarToIValue<int64_t>(*(int64_t*)(ptr + total_size * bytenum));
+    } else {
+        DLOG(ERROR) << "Element type do not support! ";
+    }
+    return {iv, {bytenum, scalar_type}};
+}
+
 }  // namespace nnrt

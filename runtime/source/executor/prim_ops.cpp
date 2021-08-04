@@ -54,6 +54,21 @@ void primListConstruct(std::vector<torch::IValue>& stack, size_t num_inputs, at:
     nnrt::push(stack, std::move(vals));
 }
 
+void primListConstruct(std::vector<torch::IValue>& stack)
+{
+    if (stack[0].isTuple()) {
+        auto items = c10::impl::GenericList(at::TupleType::create({}));
+        items.reserve(stack.size());
+        for (uint32_t idx = 0; idx < stack.size(); idx++) {
+            items.emplace_back(stack.at(idx).toTuple());
+        }
+        nnrt::drop(stack, stack.size());
+        nnrt::push(stack, std::move(items));
+    } else {
+        DLOG(FATAL) << "primListConstruct element type do not support!";
+    }
+}
+
 void primListUnpack(std::vector<torch::IValue>& stack, size_t num_outputs)
 {
     auto list = nnrt::pop(stack).toList();
@@ -117,4 +132,91 @@ torch::IValue primUninitialized()
     auto ret = torch::IValue::uninitialized();
     return ret;
 }
+
+at::IValue primVariable(std::string ntype, std::vector<torch::IValue> inputs)
+{
+    std::stack<std::string> ntype_stack;
+    std::stack<char> delimiter_stack;
+    std::stack<int> element_num_stack;
+    std::vector<torch::jit::IValue> iv;
+    int pos = 0;
+    int total_input_num = 0;
+    for (uint32_t idx = 0; idx < ntype.length(); idx++) {
+        if (ntype.at(idx) == '[' || ntype.at(idx) == ']' || ntype.at(idx) == ',') {
+            if (idx - pos != 0) {
+                ntype_stack.push(ntype.substr(pos, idx - pos));
+            }
+
+            pos = idx + 1;
+            if (ntype.at(idx) == ',') {
+                auto temp_num = element_num_stack.top() + 1;
+                element_num_stack.pop();
+                element_num_stack.push(temp_num);
+            }
+        }
+
+        if (ntype.at(idx) == '[') {
+            delimiter_stack.push('[');
+            element_num_stack.push(1);
+        } else if (ntype.at(idx) == ']') {
+            delimiter_stack.pop();
+            std::vector<torch::jit::IValue> temp_iv;
+            at::ListTypePtr list_type = at::ListType::ofTensors();
+            // list[[tensor, tensor], [scalar, scalar]]
+            if (ntype_stack.top() != "List" && ntype_stack.top() != "Tuple") {
+                for (uint32_t s_id = 0; s_id < element_num_stack.top(); s_id++) {
+                    temp_iv.push_back(inputs.at(total_input_num + s_id));
+                    ntype_stack.pop();
+                }
+                total_input_num += element_num_stack.top();
+                element_num_stack.pop();
+
+                // make temp_iv to tuple or list(the ivalue type in temp_iv must be not list or tuple)
+                if (ntype_stack.top() == "List") {
+                    ntype_stack.pop();
+                    list_type = inferTypeFromDataType(inferDataType(temp_iv.at(0)));
+                    primListConstruct(temp_iv, temp_iv.size(), list_type);  // list_type is what
+                    iv.push_back(temp_iv.at(0));
+                    temp_iv.clear();
+                } else if (ntype_stack.top() == "Tuple") {
+                    ntype_stack.pop();
+                    primTupleConstruct(temp_iv, temp_iv.size());
+                    iv.push_back(temp_iv.at(0));
+                    temp_iv.clear();
+                } else {
+                    DLOG(ERROR) << "Variable ntype: " << ntype_stack.top() << "is wrong!";
+                }
+            } else {
+                //list[tuple, tuple] tuple[tuple, tuple]
+                auto temp_num = element_num_stack.top();
+                element_num_stack.pop();
+                int total_iv_num = 0;
+                if (!element_num_stack.empty()) {
+                    total_iv_num = element_num_stack.top() - 1;
+                }
+                element_num_stack.push(temp_num);
+                for (uint32_t iv_id = 0; iv_id < element_num_stack.top(); iv_id++) {
+                    temp_iv.push_back(iv.at(total_iv_num));
+                    iv.erase(iv.begin() + total_iv_num);
+                }
+                element_num_stack.pop();
+                if (ntype_stack.top() == "List") {
+                    ntype_stack.pop();
+                    primListConstruct(temp_iv);
+                } else if (ntype_stack.top() == "Tuple") {
+                    ntype_stack.pop();
+                    primTupleConstruct(temp_iv, temp_iv.size());
+                } else {
+                    DLOG(ERROR) << "Variable ntype: " << ntype_stack.top() << "is wrong!";
+                }
+
+                // update output to iv
+                iv.insert(iv.begin() + total_iv_num, temp_iv.at(0));
+                temp_iv.clear();
+            }
+        }
+    }
+    return iv.at(0);
+}
+
 }  // namespace nnrt
