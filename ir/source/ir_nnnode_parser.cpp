@@ -1123,6 +1123,7 @@ std::unique_ptr<nn_ir::NNNode> IRNNNodeParser::parseNNNode<IR::NNNode::AnyType_A
 
     return std::make_unique<nn_ir::AtenMinNode>(node_info, dim_or_y, keep_dim);
 }
+
 template <>
 std::unique_ptr<nn_ir::NNNode> IRNNNodeParser::parseNNNode<IR::NNNode::AnyType_AtenMulNode>(
     const IR::NnNode* ir_node, const nn_ir::NodeInfo& node_info)
@@ -1130,9 +1131,7 @@ std::unique_ptr<nn_ir::NNNode> IRNNNodeParser::parseNNNode<IR::NNNode::AnyType_A
     auto aten_mul_node = ir_node->nn_node_as_AtenMulNode();
     Log::IR::E_IF(aten_mul_node == nullptr) << "IRNNNodeParser::parseNNNode<NN::AtenMulNode>() => wrong node type!";
 
-    auto other = aten_mul_node->other();
-
-    return std::make_unique<nn_ir::AtenMulNode>(node_info, other);
+    return std::make_unique<nn_ir::AtenMulNode>(node_info);
 }
 
 template <>

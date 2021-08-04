@@ -13,17 +13,9 @@ namespace nn_ir
 class AtenMulNode : public NodeMixin<AtenMulNode, NNNode>
 {
    public:
-    explicit AtenMulNode(const NodeInfo& node_info, float other)
-        : NodeMixin(node_info, NodeType::ATENMUL), other_(other)
-    {
-    }
+    explicit AtenMulNode(const NodeInfo& node_info) : NodeMixin(node_info, NodeType::ATENMUL) {}
 
     std::string getNodeTypeAsString() const override { return "AtenMul"; }
-
-    float getOther() const { return other_; }
-
-   private:
-    float other_;
 };  // class AtenMulNode
 
 }  // namespace nn_ir
