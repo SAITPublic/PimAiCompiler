@@ -550,6 +550,7 @@ inline std::ostream& operator<<(std::ostream& s, nn_ir::NodeType type) {
         ENUM_STR(ATENARANGE2)
         ENUM_STR(ATENARANGE3)
         ENUM_STR(ATENASTENSOR)
+        ENUM_STR(ATENBATCHNORM2D)
         ENUM_STR(ATENBITWISENOT)
         ENUM_STR(ATENBMM)
         ENUM_STR(ATENBOOL)

@@ -3497,9 +3497,63 @@ void executorAtenZerosLike(const nncir::Node& op_node, StreamExecutor& stream_ex
     stream_executor.updateBlob(out_edge.getBlobId(), DataType::TENSOR, tensorToIValue(output));
 }
 
-void executorAtenBatchNorm(const nncir::Node& op_node, StreamExecutor& stream_executor)
+void executorAtenBatchNorm2d(const nncir::Node& op_node, StreamExecutor& stream_executor)
 {
-    // TODO
+    auto bn_node = cast<nncir::AtenBatchNorm2dNode>(op_node);
+    auto in_blob_ids = getInBlobIds(op_node);
+    auto get_tensor = [&stream_executor](int id) {
+        auto blob = stream_executor.findBlob(id);
+        assert(blob.second.isTensor());
+        return blob.second.toTensor();
+    };
+    at::Tensor input = get_tensor(in_blob_ids[0]);
+    at::Tensor running_mean = get_tensor(in_blob_ids[1]);
+    at::Tensor running_var = get_tensor(in_blob_ids[2]);
+
+    auto weight_id = bn_node.getWeightBlobId();
+    auto bias_id = bn_node.getBiasBlobId();
+    assert(weight_id.size() == 1 && bias_id.size() == 1);
+    at::Tensor weight = get_tensor(weight_id[0]);
+    at::Tensor bias = get_tensor(bias_id[0]);
+
+    // Get input attrs
+    int training = bn_node.getTraining();
+    double monentum = bn_node.getMomentum();
+    double eps = bn_node.getEps();
+    int cudnn_enabled = bn_node.getCudnnEnable();
+
+    int offest = 3;
+    if (nncir::isDefaultValue<int>(training)) {
+        auto iv = stream_executor.findBlob(in_blob_ids[offest++]).second;
+        assert(iv.isInt());
+        training = static_cast<int>(iv.toInt());
+    }
+    if (nncir::isDefaultValue<double>(monentum)) {
+        auto iv = stream_executor.findBlob(in_blob_ids[offest++]).second;
+        assert(iv.isDouble());
+        monentum = iv.toDouble();
+    }
+    if (nncir::isDefaultValue<double>(eps)) {
+        auto iv = stream_executor.findBlob(in_blob_ids[offest++]).second;
+        assert(iv.isDouble());
+        eps = iv.toDouble();
+    }
+    if (nncir::isDefaultValue<int>(cudnn_enabled)) {
+        auto iv = stream_executor.findBlob(in_blob_ids[offest++]).second;
+        assert(iv.isInt());
+        cudnn_enabled = static_cast<int>(iv.toInt());
+    }
+
+    if (training == 1) {
+        DLOG(ERROR) << "Currently, NNRuntime only support inference !";
+    }
+
+    // Call kernel
+    auto output = atenBatchNorm2d(input, weight, bias, running_mean, running_var, static_cast<bool>(training), monentum,
+                                  eps, static_cast<bool>(cudnn_enabled));
+    // save outputs
+    auto out_blob_id = getUniqueOutBlobIds(op_node)[0];
+    stream_executor.updateBlob(out_blob_id, DataType::TENSOR, tensorToIValue(output));
 }
 
 }  // namespace nnrt

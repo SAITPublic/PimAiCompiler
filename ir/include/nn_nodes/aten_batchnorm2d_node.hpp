@@ -24,7 +24,8 @@ class AtenBatchNorm2dNode : public NodeMixin<AtenBatchNorm2dNode, NNNode>
 {
    public:
     explicit AtenBatchNorm2dNode(const NodeInfo& node_info, std::vector<int64_t> weight_blob_ids,
-                                 std::vector<int64_t> bias_blob_ids, int training, double momentum, double eps)
+                                 std::vector<int64_t> bias_blob_ids, int training, double momentum, double eps,
+                                 int cudnn_enable)
         :
 
           NodeMixin(node_info, NodeType::ATENBATCHNORM2D),
@@ -32,7 +33,8 @@ class AtenBatchNorm2dNode : public NodeMixin<AtenBatchNorm2dNode, NNNode>
           bias_blob_ids_(bias_blob_ids),
           training_(training),
           momentum_(momentum),
-          eps_(eps)
+          eps_(eps),
+          cudnn_enable_(cudnn_enable_)
     {
     }
 
@@ -72,9 +74,13 @@ class AtenBatchNorm2dNode : public NodeMixin<AtenBatchNorm2dNode, NNNode>
 
     double getMomentum() const { return momentum_; }
 
-    double setEps(double eps) { eps_ = eps; }
+    void setEps(double eps) { eps_ = eps; }
 
     double getEps() const { return eps_; }
+
+    void setCudnnEnable(int cudnn_enable) { cudnn_enable_ = cudnn_enable; }
+
+    int getCudnnEnable() { return cudnn_enable_; }
 
     std::vector<Shape4D> getPreprocessedWeightBlobDim() const override
     {
@@ -92,6 +98,7 @@ class AtenBatchNorm2dNode : public NodeMixin<AtenBatchNorm2dNode, NNNode>
     int training_;
     double momentum_;
     double eps_;
+    int cudnn_enable_;
 
 };  // class AtenBatchNorm2dNode
 

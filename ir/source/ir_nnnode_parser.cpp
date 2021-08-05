@@ -584,12 +584,13 @@ std::unique_ptr<nn_ir::NNNode> IRNNNodeParser::parseNNNode<IR::NNNode::AnyType_A
     auto training = aten_bn2d_node->training();
     auto momentum = aten_bn2d_node->momentum();
     auto eps = aten_bn2d_node->eps();
+    auto cudnn_enable = aten_bn2d_node->cudnn_enabled();
 
     auto weight_blob_ids = makeDataArrFromVector<int64_t>(aten_bn2d_node->weight_blob_ids());
     auto bias_blob_ids = makeDataArrFromVector<int64_t>(aten_bn2d_node->bias_blob_ids());
 
     return std::make_unique<nn_ir::AtenBatchNorm2dNode>(node_info, weight_blob_ids, bias_blob_ids, training, momentum,
-                                                        eps);
+                                                        eps, cudnn_enable);
 }
 
 template <>

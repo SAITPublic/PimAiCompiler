@@ -479,4 +479,13 @@ at::Tensor atenZeroslike(const at::Tensor &self, at::TensorOptions options,
 {
     return at::zeros_like(self, options, memory_format);
 }
+
+at::Tensor atenBatchNorm2d(const at::Tensor &input, const c10::optional<at::Tensor> &weight,
+                           const c10::optional<at::Tensor> &bias, const c10::optional<at::Tensor> &running_mean,
+                           const c10::optional<at::Tensor> &running_var, bool training, double momentum, double eps,
+                           bool cudnn_enabled)
+{
+    return at::batch_norm(input, weight, bias, running_mean, running_var, training, momentum, eps, cudnn_enabled);
+}
+
 }  // namespace nnrt

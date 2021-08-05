@@ -32,6 +32,11 @@ at::Tensor atenArange3(at::Scalar start, at::Scalar end, at::Scalar step, const 
 
 at::Tensor atenAsTensor(at::Tensor &self, at::ScalarType dtype, at::Device device);
 
+at::Tensor atenBatchNorm2d(const at::Tensor &input, const c10::optional<at::Tensor> &weight,
+                           const c10::optional<at::Tensor> &bias, const c10::optional<at::Tensor> &running_mean,
+                           const c10::optional<at::Tensor> &running_var, bool training, double momentum, double eps,
+                           bool cudnn_enabled);
+
 at::Tensor atenBitwiseNot(const at::Tensor &self);
 
 at::Tensor atenBmm(const at::Tensor &self, const at::Tensor &other);

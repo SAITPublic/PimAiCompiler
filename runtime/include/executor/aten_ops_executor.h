@@ -20,6 +20,7 @@ void executorAtenArange1(const nncir::Node& op_node, StreamExecutor& stream_exec
 void executorAtenArange2(const nncir::Node& op_node, StreamExecutor& stream_executor);
 void executorAtenArange3(const nncir::Node& op_node, StreamExecutor& stream_executor);
 void executorAtenAsTensor(const nncir::Node& op_node, StreamExecutor& stream_executor);
+void executorAtenBatchNorm2d(const nncir::Node& op_node, StreamExecutor& stream_executor);
 void executorAtenBitwiseNot(const nncir::Node& op_node, StreamExecutor& stream_executor);
 void executorAtenBmm(const nncir::Node& op_node, StreamExecutor& stream_executor);
 void executorAtenBool(const nncir::Node& op_node, StreamExecutor& stream_executor);
