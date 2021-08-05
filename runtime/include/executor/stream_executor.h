@@ -26,7 +26,7 @@ class StreamExecutor
    public:
     StreamExecutor(const std::shared_ptr<nncir::NNIR> ir_graph);
 
-    void loadWeightAndBias(nncir::Blob* blob, const std::string& kind, const std::string& device_type);
+    void loadWeightAndBias(nncir::Blob* blob);
 
     RetVal inferenceModel(const std::shared_ptr<nncir::NNIR> runnable_ir,
                           const std::vector<torch::Tensor>& input_tensors, std::vector<torch::Tensor>& output_tensors);

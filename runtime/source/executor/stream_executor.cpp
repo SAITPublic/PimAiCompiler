@@ -15,7 +15,12 @@ namespace nncir = nn_compiler::nn_ir;
 
 namespace nnrt
 {
-void StreamExecutor::loadWeightAndBias(nncir::Blob* blob, const std::string& kind, const std::string& device_type)
+/**
+ * @brief Pre-load weight & bias, the tensor are saved into GPU
+ *
+ * @param blob blob to be saved
+ */
+void StreamExecutor::loadWeightAndBias(nncir::Blob* blob)
 {
     nncir::Shape4D shape = blob->getShape();
     int64_t blob_id = blob->getId();
@@ -28,34 +33,25 @@ void StreamExecutor::loadWeightAndBias(nncir::Blob* blob, const std::string& kin
     auto bit_width = blob->getBitWidth();
     at::ScalarType scalar_type;
     torch::Tensor tensor_data;
-    if (kind == "weight") {
-        if (bit_width == 16) {
-            auto value_vec = data_blob->getBuf<float16>();
-            scalar_type = torch::kHalf;
-            tensor_data = at::from_blob(value_vec.data(), {shape.h, shape.w}, scalar_type).cuda();
-        } else if (bit_width == 32) {
-            auto value_vec = data_blob->getBuf<float>();
-            scalar_type = torch::kFloat;
-            tensor_data = at::from_blob(value_vec.data(), {shape.h, shape.w}, scalar_type).cuda();
-        } else {
-            DLOG(ERROR) << "Weight bit witgh Error!";
-        }
 
-    } else if (kind == "bias") {
-        if (bit_width == 16) {
-            auto value_vec = data_blob->getBuf<float16>();
-            scalar_type = torch::kHalf;
-            tensor_data = at::from_blob(value_vec.data(), {shape.w}, scalar_type).cuda();
-        } else if (bit_width == 32) {
-            auto value_vec = data_blob->getBuf<float>();
-            scalar_type = torch::kFloat;
-            tensor_data = at::from_blob(value_vec.data(), {shape.w}, scalar_type).cuda();
-        } else {
-            DLOG(ERROR) << "Weight bit witgh Error!";
-        }
+    std::vector<int64_t> shape_arr;
+    if (shape.n > 0) shape_arr.push_back(shape.n);
+    if (shape.c > 0) shape_arr.push_back(shape.c);
+    if (shape.h > 0) shape_arr.push_back(shape.h);
+    if (shape.w > 0) shape_arr.push_back(shape.w);
+
+    if (bit_width == 16) {
+        auto value_vec = data_blob->getBuf<float16>();
+        scalar_type = torch::kHalf;
+        tensor_data = at::from_blob(value_vec.data(), shape_arr, scalar_type).cuda();
+    } else if (bit_width == 32) {
+        auto value_vec = data_blob->getBuf<float>();
+        scalar_type = torch::kFloat;
+        tensor_data = at::from_blob(value_vec.data(), shape_arr, scalar_type).cuda();
     } else {
-        DLOG(ERROR) << "Kind Error, blob kind is" << kind;
+        DLOG(ERROR) << "bit witgh Error!";
     }
+
     torch::jit::IValue iv = tensorToIValue(tensor_data);
     this->global_blobs_.insert({blob_id, {DataType::TENSOR, iv}});
 }
@@ -75,31 +71,36 @@ StreamExecutor::StreamExecutor(const std::shared_ptr<nncir::NNIR> ir_graph)
         } else if (op_node.getNodeType() == nncir::NodeType::PRIMOUTPUT) {
             auto& data_edge = cast<nncir::DataEdge>(op_node.getInEdge(0));
             this->output_blob_ids_.push_back(data_edge.getBlobId());
-        } else if (op_node.getNodeType() == nncir::NodeType::ATENLSTM1) {
+        } else if (op_node.getNodeType() == nncir::NodeType::ATENLSTM1 ||
+                   op_node.getNodeType() == nncir::NodeType::ATENLSTM2 ||
+                   op_node.getNodeType() == nncir::NodeType::ATENCONV2D ||
+                   op_node.getNodeType() == nncir::NodeType::ATENBATCHNORM2D) {
             // For Ops' with weight/bias, firstly save to global_blobs_ once
-            auto lstm1_node = cast<nncir::AtenLSTM1Node>(op_node);
-            auto weight_blobs = lstm1_node.getWeightBlob();
-            auto bias_blobs = lstm1_node.getBiasBlob();
+            std::vector<nncir::Blob*> weight_blobs;
+            std::vector<nncir::Blob*> bias_blobs;
 
+            if (op_node.getNodeType() == nncir::NodeType::ATENLSTM1) {
+                auto lstm_node = cast<nncir::AtenLSTM1Node>(op_node);
+                weight_blobs = lstm_node.getWeightBlob();
+                bias_blobs = lstm_node.getBiasBlob();
+            } else if (op_node.getNodeType() == nncir::NodeType::ATENLSTM2) {
+                auto lstm_node = cast<nncir::AtenLSTM2Node>(op_node);
+                weight_blobs = lstm_node.getWeightBlob();
+                bias_blobs = lstm_node.getBiasBlob();
+            } else if (op_node.getNodeType() == nncir::NodeType::ATENCONV2D) {
+                auto conv2d_node = cast<nncir::AtenConv2dNode>(op_node);
+                weight_blobs = conv2d_node.getWeightBlob();
+                bias_blobs = conv2d_node.getBiasBlob();
+            } else if (op_node.getNodeType() == nncir::NodeType::ATENBATCHNORM2D) {
+                auto bn2d_node = cast<nncir::AtenBatchNorm2dNode>(op_node);
+                weight_blobs = bn2d_node.getWeightBlob();
+                bias_blobs = bn2d_node.getBiasBlob();
+            }
             for (auto blob : weight_blobs) {
-                this->loadWeightAndBias(blob, "weight", "gpu");
+                this->loadWeightAndBias(blob);
             }
-
             for (auto blob : bias_blobs) {
-                this->loadWeightAndBias(blob, "bias", "gpu");
-            }
-        } else if (op_node.getNodeType() == nncir::NodeType::ATENLSTM2) {
-            // For Ops' with weight/bias, firstly save to global_blobs_ once
-            auto lstm2_node = cast<nncir::AtenLSTM2Node>(op_node);
-            auto weight_blobs = lstm2_node.getWeightBlob();
-            auto bias_blobs = lstm2_node.getBiasBlob();
-
-            for (auto blob : weight_blobs) {
-                this->loadWeightAndBias(blob, "weight", "gpu");
-            }
-
-            for (auto blob : bias_blobs) {
-                this->loadWeightAndBias(blob, "bias", "gpu");
+                this->loadWeightAndBias(blob);
             }
         } else if (op_node.getNodeType() == nncir::NodeType::PRIMCONSTANT) {
             // to speed up, runtime only load Constant data once, all constants are reused

@@ -728,8 +728,7 @@ void executorAtenConv2d(const nncir::Node& op_node, StreamExecutor& stream_execu
     auto groups = node.getGroups();
 
     std::vector<int64_t> stride_vec = {static_cast<int64_t>(stride.h), static_cast<int64_t>(stride.w)};
-    std::vector<int64_t> padding_vec = {static_cast<int64_t>(padding.t), static_cast<int64_t>(padding.b),
-                                        static_cast<int64_t>(padding.l), static_cast<int64_t>(padding.r)};
+    std::vector<int64_t> padding_vec = {static_cast<int64_t>(padding.l), static_cast<int64_t>(padding.r)};
     std::vector<int64_t> dilation_vec = {static_cast<int64_t>(dilation.h), static_cast<int64_t>(dilation.w)};
 
     auto output = nnrt::atenConv2d(self_tensor, weight_tensor, bias_tensor, at::ArrayRef<int64_t>(stride_vec),

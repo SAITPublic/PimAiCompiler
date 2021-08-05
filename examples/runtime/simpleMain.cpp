@@ -11,6 +11,9 @@
 
 using namespace nnrt;
 
+#define RUN_RNNT 0
+#define RUN_HWR 1
+
 void run_rnnt_from_file(std::string ir_file)
 {
     std::string feature_len_file = "examples/runtime/resource/rnnt/inputs/feature_len.bin";
@@ -40,6 +43,31 @@ void run_rnnt_from_file(std::string ir_file)
     auto output_tensors = runtime.inferenceModel(input_tensors);
 }
 
+void run_hwr_from_file(std::string ir_file)
+{
+    std::string input_file = "examples/runtime/resource/hwr/inputs/input_hwr_16_1_1024_128.bin";
+    std::string current_path = std::experimental::filesystem::current_path();
+    if (current_path.find("/build") != std::string::npos) {
+        input_file = "../" + input_file;
+    }
+    if (access(input_file.c_str(), F_OK) == -1) {
+        DLOG(ERROR) << "Please run at base or build directory.";
+    }
+
+    NNRuntime runtime(ir_file);
+    std::vector<torch::Tensor> input_tensors;
+    // load inputs from files
+    auto tensor_ = loadTensor(input_file, {16, 1, 1024, 128}, DataType::FLOAT16).cuda();
+    input_tensors.push_back(tensor_);
+
+    for (auto item : input_tensors) {
+        DLOG(INFO) << "Input: "
+                   << "size: " << item.sizes() << " dtype:" << item.dtype() << " device:" << item.device();
+    }
+    // Inference
+    auto output_tensors = runtime.inferenceModel(input_tensors);
+}
+
 int main(int argc, const char* argv[])
 {
     LOG(INFO) << "start runtime! ";
@@ -59,6 +87,11 @@ int main(int argc, const char* argv[])
     } else {
         return print_error();
     }
+
+#if RUN_RNNT
     run_rnnt_from_file(ir_file);
+#elif RUN_HWR
+    run_hwr_from_file(ir_file);
+#endif
     return 0;
 }
