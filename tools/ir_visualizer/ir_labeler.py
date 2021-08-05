@@ -37,6 +37,7 @@ import IR.NNNode.AtenArange1Node
 import IR.NNNode.AtenArange2Node
 import IR.NNNode.AtenArange3Node
 import IR.NNNode.AtenAsTensorNode
+import IR.NNNode.AtenBatchNorm2dNode
 import IR.NNNode.AtenBitwiseNotNode
 import IR.NNNode.AtenBmmNode
 import IR.NNNode.AtenBoolNode
@@ -446,6 +447,11 @@ def nn_node_label(nn_node: IR.NnNode.NnNode) -> (object, str):
         aten_index_select_node = IR.NNNode.AtenIndexSelectNode.AtenIndexSelectNode()
         aten_index_select_node.Init(nn_node.NnNode().Bytes, nn_node.NnNode().Pos)
         return aten_index_select_node, aten_index_select_node_label(aten_index_select_node) 
+    
+    elif node_type == IR.NNNode.AnyType.AnyType().AtenBatchNorm2dNode:
+        aten_bn2d_node = IR.NNNode.AtenBatchNorm2dNode.AtenBatchNorm2dNode()
+        aten_bn2d_node.Init(nn_node.NnNode().Bytes, nn_node.NnNode().Pos)
+        return aten_bn2d_node, aten_batchnorm2d_node_label(aten_bn2d_node)
 
     # aten Ops without attribute, lookup table
     op_name = torch_ops.aten_ops_dict[node_type]
@@ -1210,10 +1216,27 @@ def aten_conv2d_node_label(aten_conv2d_node: IR.NNNode.AtenConv2dNode.AtenConv2d
     return list_table([retval])
 
 
+def aten_batchnorm2d_node_label(aten_bn2d_node: IR.NNNode.AtenBatchNorm2dNode.AtenBatchNorm2dNode) -> str:
+    retval = 'AtenBatchNorm2d Node<br/>'
+    training = aten_bn2d_node.Training()
+    momentum = aten_bn2d_node.Momentum()
+    eps = aten_bn2d_node.Eps()
+    cudnn_enabled = aten_bn2d_node.CudnnEnabled()
+    if training is not None:
+        retval += 'Training: {}<br/>'.format(training)
+    if momentum is not None:
+        retval += 'Momentum: {}<br/>'.format(momentum)
+    if eps is not None:
+        retval += 'Eps: {}<br/>'.format(eps)
+    if cudnn_enabled is not None:
+        retval += 'CudnnEnabled: {}<br/>'.format(cudnn_enabled)
+    return list_table([retval])
+
+
 def aten_maxpool2d_node_label(aten_maxpool2d_node: IR.NNNode.AtenMaxPool2dNode.AtenMaxPool2dNode) -> str:
     retval = 'AtenMaxPool2d Node<br/>'
     kernel_size = aten_maxpool2d_node.KernelSize()
-    pad = aten_maxpool2d_node.Pad()
+    pad = aten_maxpool2d_node.Padding()
     stride = aten_maxpool2d_node.Stride()
     dilation = aten_maxpool2d_node.Dilation()
     ceil_mode = aten_maxpool2d_node.CeilMode()
@@ -1249,6 +1272,9 @@ def prim_constant_node_label(prim_constant_node: IR.CONTROLNode.PrimConstantNode
     ScalarValueType = ['INT8','UINT8','INT16','UINT16','INT32','INT64','FLOAT16','FLOAT32','FLOAT64','BOOL']
     numpy_data = prim_constant_node.DataAsNumpy()
     if named_datatype[data_type] in ScalarValueType:
+        dtype = named_datatype[data_type]
+        type_map = {'INT8':np.int8,'UINT8':np.uint8,'INT16':np.int16,'UINT16':np.uint16,'INT32':np.int32,'INT64':np.int64,'FLOAT16':np.float16,'FLOAT32':np.float32,'FLOAT64':np.float64,'BOOL':np.bool}
+        numpy_data = numpy_data.astype(type_map[dtype])
         retval += 'Value: {}<br/>'.format(numpy_data[0])
     return list_table([retval])
 

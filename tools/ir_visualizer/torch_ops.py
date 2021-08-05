@@ -10,6 +10,7 @@ import IR.NNNode.AtenArange1Node
 import IR.NNNode.AtenArange2Node
 import IR.NNNode.AtenArange3Node
 import IR.NNNode.AtenAsTensorNode
+import IR.NNNode.AtenBatchNorm2dNode
 import IR.NNNode.AtenBitwiseNotNode
 import IR.NNNode.AtenBmmNode
 import IR.NNNode.AtenBoolNode
@@ -123,7 +124,7 @@ Not all Ops have attributes, the table should be updated when add new torch Ops
 
 def create_aten_ops_map():
     '''
-    create a dict that contains all torch::aten Ops of RNNT
+    create a dict that contains all torch::aten Ops 
     '''
     op_dict = {
         IR.NNNode.AnyType.AnyType().AtenAddNode : 'AtenAddNode',
@@ -135,6 +136,7 @@ def create_aten_ops_map():
         IR.NNNode.AnyType.AnyType().AtenArange2Node : 'AtenArange2Node',
         IR.NNNode.AnyType.AnyType().AtenArange3Node : 'AtenArange3Node',
         IR.NNNode.AnyType.AnyType().AtenAsTensorNode : 'AtenAsTensorNode',
+        IR.NNNode.AnyType.AnyType().AtenBatchNorm2dNode : 'AtenBatchNorm2dNode',
         IR.NNNode.AnyType.AnyType().AtenBitwiseNotNode : 'AtenBitwiseNotNode',
         IR.NNNode.AnyType.AnyType().AtenBmmNode : 'AtenBmmNode',
         IR.NNNode.AnyType.AnyType().AtenBoolNode : 'AtenBoolNode',
