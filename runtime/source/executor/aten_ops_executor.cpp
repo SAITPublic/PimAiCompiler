@@ -577,7 +577,7 @@ void executorAtenConv2d(const nncir::Node& op_node, StreamExecutor& stream_execu
     auto bias_blob_id = (node.getBiasBlobId())[0];
     std::vector<at::Tensor> weights;
     auto weight_iv = stream_executor.findBlob(weight_blob_id).second;
-    auto bias_iv = stream_executor.findBlob(weight_blob_id).second;
+    auto bias_iv = stream_executor.findBlob(bias_blob_id).second;
     assert(weight_iv.isTensor() && bias_iv.isTensor());
     auto weight_tensor = weight_iv.toTensor();
     auto bias_tensor = bias_iv.toTensor();
