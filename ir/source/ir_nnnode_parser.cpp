@@ -505,7 +505,7 @@ IRNNNodeParser::parseNNNode<IR::NNNode::AnyType_AtenArange1Node>(const IR::NnNod
     auto end = aten_arange_node->end();
     auto dtype = aten_arange_node->dtype();
     auto layout = aten_arange_node->layout();
-    auto device = aten_arange_node->device();
+    auto device = aten_arange_node->device()->c_str();
     auto pim_memory = aten_arange_node->pin_memory();
 
     return std::make_unique<nn_ir::AtenArange1Node>(node_info, end, dtype, layout, device, pim_memory);
@@ -523,7 +523,7 @@ IRNNNodeParser::parseNNNode<IR::NNNode::AnyType_AtenArange2Node>(const IR::NnNod
     auto end = aten_arange_node->end();
     auto dtype = aten_arange_node->dtype();
     auto layout = aten_arange_node->layout();
-    auto device = aten_arange_node->device();
+    auto device = aten_arange_node->device()->c_str();
     auto pim_memory = aten_arange_node->pin_memory();
 
     return std::make_unique<nn_ir::AtenArange2Node>(node_info, start, end, dtype, layout, device, pim_memory);
@@ -542,7 +542,7 @@ IRNNNodeParser::parseNNNode<IR::NNNode::AnyType_AtenArange3Node>(const IR::NnNod
     auto step = aten_arange_node->step();
     auto dtype = aten_arange_node->dtype();
     auto layout = aten_arange_node->layout();
-    auto device = aten_arange_node->device();
+    auto device = aten_arange_node->device()->c_str();
     auto pim_memory = aten_arange_node->pin_memory();
 
     return std::make_unique<nn_ir::AtenArange3Node>(node_info, start, end, step, dtype, layout, device, pim_memory);
@@ -557,7 +557,7 @@ IRNNNodeParser::parseNNNode<IR::NNNode::AnyType_AtenAsTensorNode>(const IR::NnNo
             << "IRNNNodeParser::parseNNNode<NN::AtenAsTensorNode>() => wrong node type!";
 
     auto dtype = aten_as_tensor_node->dtype();
-    auto device = aten_as_tensor_node->device();
+    auto device = aten_as_tensor_node->device()->c_str();
 
     return std::make_unique<nn_ir::AtenAsTensorNode>(node_info, dtype, device);
 }
@@ -1171,12 +1171,12 @@ std::unique_ptr<nn_ir::NNNode> IRNNNodeParser::parseNNNode<IR::NNNode::AnyType_A
 {
     auto aten_ones_node = ir_node->nn_node_as_AtenOnesNode();
     Log::IR::E_IF(aten_ones_node == nullptr) << "IRNNNodeParser::parseNNNode<NN::AtenOnesNode>() => wrong node type!";
-    auto size = aten_ones_node->size();
     auto dtype = aten_ones_node->dtype();
     auto layout = aten_ones_node->layout();
-    auto device = aten_ones_node->device();
+    auto device = aten_ones_node->device()->c_str();
+    auto pin_memory = aten_ones_node->pin_memory();
 
-    return std::make_unique<nn_ir::AtenOnesNode>(node_info, size, dtype, layout, device);
+    return std::make_unique<nn_ir::AtenOnesNode>(node_info, dtype, layout, device, pin_memory);
 }
 
 template <>

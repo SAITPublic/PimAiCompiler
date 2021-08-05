@@ -18,7 +18,6 @@ torch::Tensor primData(const torch::Tensor& input_tensor)
 
 c10::Device primDevice(const torch::Tensor& input_tensor)
 {
-    // int device_idx = input_tensor.get_device();
     c10::Device device = input_tensor.device();
     return device;
 }

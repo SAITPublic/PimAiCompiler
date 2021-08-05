@@ -21,7 +21,7 @@ namespace nn_ir {
 
 class AtenArange1Node : public NodeMixin<AtenArange1Node, NNNode> {
  public:
-    explicit AtenArange1Node(const NodeInfo& node_info, int64_t end, int64_t dtype, int layout, int device, int pin_memory) :
+    explicit AtenArange1Node(const NodeInfo& node_info, int64_t end, int64_t dtype, int64_t layout, std::string device, int pin_memory) :
             NodeMixin(node_info, NodeType::ATENARANGE1), end_(end),
             dtype_(dtype), layout_(layout), device_(device), pin_memory_(pin_memory) {}
 
@@ -39,20 +39,20 @@ class AtenArange1Node : public NodeMixin<AtenArange1Node, NNNode> {
 
     int getLayout() const { return layout_; }
 
-    void setDevice(int device) { device_ = device; }
+    void setDevice(std::string device) { device_ = device; }
 
-    int getDevice() const { return device_; }
+    std::string getDevice() const { return device_; }
 
     void setPinMemory(int pin_memory) { pin_memory_ = pin_memory; }
 
     int getPinMemory() const { return pin_memory_; }
     
  private:
-    int64_t end_    = INT64_MIN;
-    int64_t dtype_  = INT32_MIN;
-    int layout_     = INT32_MIN;
-    int device_     = INT32_MIN;
-    int pin_memory_ = INT32_MIN;
+    int64_t end_           = INT64_MIN;
+    int64_t dtype_         = INT64_MIN;
+    int64_t layout_        = INT64_MIN;
+    std::string device_    = "";
+    int pin_memory_        = INT32_MIN;
 
 }; // class AtenArange1Node
 

@@ -400,7 +400,7 @@ void executePrimLoopIndex(const nncir::Node& op_node, StreamExecutor& stream_exe
     }
 
     // check LoopIndex != INT64_MAX,  INT64_MAX is a default value, so LoopIndex need to be re-initialize
-    if (nncir::isDefaultValue<int64_t>(loop_index)) {
+    if (nncir::isDefaultValue(loop_index)) {
         loop_index = 0;
     }
 
@@ -430,7 +430,7 @@ void executePrimSetAttr(const nncir::Node& op_node, StreamExecutor& stream_execu
     // cast Node -> PrimSetAttrNode
     auto set_attr_node = cast<nncir::PrimSetAttrNode>(op_node);
 
-    // first edge is variable node, second edge is the data saved to the variable node. 
+    // first edge is variable node, second edge is the data saved to the variable node.
     auto& variable_node_data_edge = cast<nncir::DataEdge>(set_attr_node.getInEdge(0));
     int variable_blob_id = variable_node_data_edge.getBlobId();
 
@@ -483,7 +483,7 @@ void executePrimTupleIndex(const nncir::Node& op_node, StreamExecutor& stream_ex
         inputs.push_back(tensor.toTensor());
     }
     int64_t index = tuple_index_node.getIndex();
-    if (nncir::isDefaultValue<int64_t>(index)) {
+    if (nncir::isDefaultValue(index)) {
         auto& index_edge = cast<nncir::DataEdge>(tuple_index_node.getInEdge(1));
         int input_index_blob_id = index_edge.getBlobId();
         // Find the input index blob
@@ -531,12 +531,12 @@ void executePrimType(const nncir::Node& op_node, StreamExecutor& stream_executor
     int input_blob_id = in_data_edge.getBlobId();
     auto map_value = stream_executor.findBlob(input_blob_id);
     torch::jit::IValue iv = map_value.second;
-    std:: string device_type = "cpu";
+    std::string device_type = "cpu";
     // FIXME: need to ensure PrimType op how to executor
     if (iv.isDevice()) {
         device_type = iv.toDevice().str();
     } else {
-         DLOG(ERROR) << "PrimType op's input data is incorrect!";
+        DLOG(ERROR) << "PrimType op's input data is incorrect!";
     }
     // update output
     auto& out_data_edge = cast<nncir::DataEdge>(type_node.getFirstOutEdge());
@@ -667,8 +667,8 @@ static bool loopHasExtraInputs(const nncir::PrimLoopNode* loop_node)
 {
     int64_t loop_cond = loop_node->getCond();
     int64_t max_trip_cnt = loop_node->getTripCount();
-    bool trip_cnt_invalid = nncir::isDefaultValue<int64_t>(max_trip_cnt);
-    bool loop_cond_invalid = nncir::isDefaultValue<int64_t>(loop_cond);
+    bool trip_cnt_invalid = nncir::isDefaultValue(max_trip_cnt);
+    bool loop_cond_invalid = nncir::isDefaultValue(loop_cond);
 
     int64_t num_inputs = loop_node->getNumInputs();
 
@@ -708,11 +708,11 @@ std::unordered_map<std::string, int64_t> getMatchedLoopInfo(int64_t loop_block_i
 
     // check default
 
-    if (nncir::isDefaultValue<int64_t>(max_trip_cnt)) {
+    if (nncir::isDefaultValue(max_trip_cnt)) {
         // Get from loop's input[0]
         max_trip_cnt = stream_executor.findBlob(getInBlobIds(*loop_node)[0]).second.toInt();
     }
-    if (nncir::isDefaultValue<int64_t>(cond)) {
+    if (nncir::isDefaultValue(cond)) {
         // Get from loop's input[1]
         cond = stream_executor.findBlob(getInBlobIds(*loop_node)[1]).second.toInt();
     }
@@ -825,11 +825,11 @@ void executePrimLoop(const nncir::Node& op_node, StreamExecutor& stream_executor
 
     int edge_id = 0;
     // check default
-    if (nncir::isDefaultValue<int64_t>(max_trip_cnt)) {
+    if (nncir::isDefaultValue(max_trip_cnt)) {
         // Get from loop's input[0]
         max_trip_cnt = stream_executor.findBlob(getInBlobIds(op_node)[edge_id++]).second.toInt();
     }
-    if (nncir::isDefaultValue<int64_t>(loop_cond)) {
+    if (nncir::isDefaultValue(loop_cond)) {
         // Get from loop's input[1]
         loop_cond = stream_executor.findBlob(getInBlobIds(op_node)[edge_id++]).second.toInt();
     }
