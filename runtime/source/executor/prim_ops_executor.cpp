@@ -143,7 +143,7 @@ void executePrimDevice(const nncir::Node& op_node, StreamExecutor& stream_execut
     c10::Device device_value = primDevice(tensor);
     // update output
     auto& out_edge = cast<nncir::DataEdge>(device_node.getFirstOutEdge());
-    stream_executor.updateBlob(out_edge.getBlobId(), DataType::STRING, strToIValue(device_value.str()));
+    stream_executor.updateBlob(out_edge.getBlobId(), DataType::DEVICE, deviceToIValue(device_value));
 }
 
 void executePrimDtype(const nncir::Node& op_node, StreamExecutor& stream_executor)
@@ -533,14 +533,8 @@ void executePrimType(const nncir::Node& op_node, StreamExecutor& stream_executor
     torch::jit::IValue iv = map_value.second;
     std:: string device_type = "cpu";
     // FIXME: need to ensure PrimType op how to executor
-    if (iv.isString()) {
-        if (iv.toString()->string().find("cpu") != std::string::npos) {
-            device_type = "cpu";
-        } else if (iv.toString()->string().find("cuda") != std::string::npos) {
-            device_type = "cuda";
-        } else {
-             DLOG(ERROR) << "Device type is not support!";
-        }
+    if (iv.isDevice()) {
+        device_type = iv.toDevice().str();
     } else {
          DLOG(ERROR) << "PrimType op's input data is incorrect!";
     }

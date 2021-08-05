@@ -17,6 +17,8 @@ torch::jit::IValue scalarToIValue(const T& scalar)
     return torch::jit::IValue(scalar);
 }
 
+torch::jit::IValue deviceToIValue(const c10::Device& device );
+
 torch::jit::IValue tensorToIValue(const torch::Tensor& tensor);
 
 torch::jit::IValue tensorListToIValue(const torch::TensorList& tensor_list);
@@ -85,27 +87,35 @@ std::vector<T> parseIValueVector(const at::ArrayRef<at::IValue>& ivalue_array)
 template <typename T>
 void parseIValueList(at::IValue& list_iv, std::vector<T>& value_vec, std::vector<int64_t>& dim, int dim_idx)
 {
-    c10::ArrayRef<at::IValue> ivs = list_iv.toListRef();
-    if (!ivs[0].isList()) {
-        if (ivs[0].isInt()) {
-            for (auto iv : ivs) {
-                value_vec.push_back(iv.toInt());
-                dim[dim_idx]++;
-            }
-        } else if (ivs[0].isDouble()) {
-            for (auto iv : ivs) {
-                value_vec.push_back(iv.toDouble());
-                dim[dim_idx]++;
+    if (list_iv.isList()) {
+        c10::ArrayRef<at::IValue> ivs = list_iv.toListRef();
+        if (!ivs[0].isList()) {
+            if (ivs[0].isInt()) {
+                for (auto iv : ivs) {
+                    value_vec.push_back(iv.toInt());
+                    dim[dim_idx]++;
+                }
+            } else if (ivs[0].isDouble()) {
+                for (auto iv : ivs) {
+                    value_vec.push_back(iv.toDouble());
+                    dim[dim_idx]++;
+                }
+            } else {
+                DLOG(ERROR) << "Unsupported data type occurs in parseIValueList().";
             }
         } else {
-            DLOG(ERROR) << "Unsupported data type occurs in parseIValueList().";
+            dim.push_back(1);
+            dim_idx++;
+            for (auto nested_list : ivs) {
+                parseIValueList(nested_list, value_vec, dim, dim_idx);
+            }
         }
+    } else if (list_iv.isInt()) {
+        value_vec.push_back(list_iv.toInt());
+    } else if (list_iv.isDouble()) {
+        value_vec.push_back(list_iv.toDouble());
     } else {
-        dim.push_back(1);
-        dim_idx++;
-        for (auto nested_list : ivs) {
-            parseIValueList(nested_list, value_vec, dim, dim_idx);
-        }
+        DLOG(ERROR) << "Unsupported data type occurs in parseIValueList().";
     }
 }
 

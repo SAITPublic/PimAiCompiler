@@ -12,6 +12,8 @@ namespace nnrt
 {
 namespace nncir = nn_compiler::nn_ir;
 
+torch::jit::IValue deviceToIValue(const c10::Device& device) { return torch::jit::IValue(device); }
+
 torch::jit::IValue tensorToIValue(const torch::Tensor& tensor) { return torch::jit::IValue(tensor); }
 
 torch::jit::IValue tensorListToIValue(const torch::TensorList& tensor_list) { return torch::jit::IValue(tensor_list); }

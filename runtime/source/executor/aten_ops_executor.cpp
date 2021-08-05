@@ -2773,26 +2773,25 @@ void executorAtenTensor(const nncir::Node& op_node, StreamExecutor& stream_execu
     auto& input_self = cast<nncir::DataEdge>(tensor_node.getInEdge(0));
     int input_self_blob_id = input_self.getBlobId();
     torch::jit::IValue iv_self = stream_executor.findBlob(input_self_blob_id).second;
-    assert(iv_self.isList());
 
     at::TensorOptions options;
     auto& edge_dtype = cast<nncir::DataEdge>(tensor_node.getInEdge(1));
-    auto& edge_layout = cast<nncir::DataEdge>(tensor_node.getInEdge(2));
+    auto& edge_device = cast<nncir::DataEdge>(tensor_node.getInEdge(2));
     // Fixme(SRCX): device may also be an input for aten::tensor
     // auto& edge_device     = cast<nncir::DataEdge>(tensor_node.getInEdge(3));
     auto& edge_pin_memory = cast<nncir::DataEdge>(tensor_node.getInEdge(3));
     auto dtype_id = edge_dtype.getBlobId();
-    auto layout_id = edge_layout.getBlobId();
+    auto device_id = edge_device.getBlobId();
     auto pin_memory_id = edge_pin_memory.getBlobId();
     auto iv_dtype = stream_executor.findBlob(dtype_id).second;
-    auto iv_layout = stream_executor.findBlob(layout_id).second;
+    auto iv_device = stream_executor.findBlob(device_id).second;
     auto iv_pin_memory = stream_executor.findBlob(pin_memory_id).second;
 
     if (!iv_dtype.isNone()) {
         options = options.dtype(iv_dtype.toScalarType());
     }
-    if (!iv_layout.isNone()) {
-        options = options.layout(iv_layout.toLayout());
+    if (!iv_device.isNone()) {
+        options = options.device(iv_device.toDevice());
     }
     if (!iv_pin_memory.isNone()) {
         if (iv_pin_memory.isInt()) {
@@ -2805,13 +2804,19 @@ void executorAtenTensor(const nncir::Node& op_node, StreamExecutor& stream_execu
     }
     // FIXME(SRCX): To get list item type, is there a better way?
     torch::jit::IValue value_item;
-    while(iv_self.isList()){
-        if(!iv_self.toListRef()[0].isList()){
-            value_item = iv_self.toListRef()[0];
+    if (iv_self.isList()) {
+        while (iv_self.isList()) {
+            if (!iv_self.toListRef()[0].isList()) {
+                value_item = iv_self.toListRef()[0];
+            }
+            iv_self = iv_self.toListRef()[0];
         }
-        iv_self = iv_self.toListRef()[0];
+    } else if (iv_self.isScalar()) {
+        value_item = iv_self;
+    } else {
+        DLOG(ERROR) << "Unsupported data type to IValue.";
     }
-    
+
     at::Tensor output;
     if (value_item.isInt()) {
         std::vector<int64_t> value_vec;
