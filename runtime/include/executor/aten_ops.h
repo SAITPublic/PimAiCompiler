@@ -271,12 +271,15 @@ at::Tensor atenPow(const at::Tensor &self, at::Scalar exponent);
 
 at::Tensor atenRelu(const at::Tensor &self);
 
+at::Tensor atenReshape(const at::Tensor & self, at::IntArrayRef shape);
+
 at::Tensor atenSelect(const at::Tensor &self, at::Dimname dim, int64_t index);
 
 at::Tensor atenSelect(const at::Tensor &self, int64_t dim, int64_t index);
 
 template<typename T>
-at::List<T> atenSetItem(at::List<T> list, int indice, T item) {
+at::List<T> atenSetItem(at::List<T> list, int indice, T item) 
+{
     list[indice] = item;
     return list;
 }

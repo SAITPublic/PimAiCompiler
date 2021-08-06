@@ -79,6 +79,7 @@ void executorAtenPackPaddedSequence(const nncir::Node& op_node, StreamExecutor& 
 void executorAtenPadPackedSequence(const nncir::Node& op_node, StreamExecutor& stream_executor);
 void executorAtenPow(const nncir::Node& op_node, StreamExecutor& stream_executor);
 void executorAtenRelu(const nncir::Node& op_node, StreamExecutor& stream_executor);
+void executorAtenReshape(const nncir::Node& op_node, StreamExecutor& stream_executor);
 void executorAtenSelect(const nncir::Node& op_node, StreamExecutor& stream_executor);
 void executorAtenSetItem(const nncir::Node& op_node, StreamExecutor& stream_executor);
 void executorAtenSize(const nncir::Node& op_node, StreamExecutor& stream_executor);

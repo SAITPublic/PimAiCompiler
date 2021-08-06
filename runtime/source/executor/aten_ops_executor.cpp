@@ -14,6 +14,7 @@
 #include "ir/include/nn_ir.hpp"
 #include "executor/aten_ops_executor.h"
 
+
 namespace nnrt
 {
 void executorAtenAdd(const nncir::Node& op_node, StreamExecutor& stream_executor)
@@ -3553,6 +3554,35 @@ void executorAtenBatchNorm2d(const nncir::Node& op_node, StreamExecutor& stream_
     // save outputs
     auto out_blob_id = getUniqueOutBlobIds(op_node)[0];
     stream_executor.updateBlob(out_blob_id, DataType::TENSOR, tensorToIValue(output));
+}
+
+void executorAtenReshape(const nncir::Node& op_node, StreamExecutor& stream_executor)
+{
+    DLOG(INFO) << "execute Aten Reshape node";
+    auto bn_node = cast<nncir::AtenReshapeNode>(op_node);
+    auto in_blob_ids = getInBlobIds(op_node);
+    auto get_tensor = [&stream_executor](int id) {
+        auto blob = stream_executor.findBlob(id);
+        assert(blob.second.isTensor());
+        return blob.second.toTensor();
+    };
+    at::Tensor input_tensor = get_tensor(in_blob_ids[0]);
+
+    // Get shape
+    auto iv = stream_executor.findBlob(in_blob_ids[1]).second;
+    assert(iv.isList());
+    std::vector<int64_t> shape;
+    int size = 1;
+    for (auto item : iv.toList().vec()) {
+        int64_t val = item.toInt();
+        shape.push_back(val);
+        size *= val;
+    }
+    assert(input_tensor.numel() == size && "Invalid shape !");
+    auto output_tensor = atenReshape(input_tensor, at::IntArrayRef(shape));
+    // save outputs
+    auto out_blob_id = getUniqueOutBlobIds(op_node)[0];
+    stream_executor.updateBlob(out_blob_id, DataType::TENSOR, tensorToIValue(output_tensor));
 }
 
 }  // namespace nnrt

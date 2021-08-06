@@ -266,6 +266,7 @@ void StreamExecutor::registerOp()
     this->global_op_register_.insert({nncir::NodeType::ATENPADPACKEDSEQUENCE, executorAtenPadPackedSequence});
     this->global_op_register_.insert({nncir::NodeType::ATENPOW, executorAtenPow});
     this->global_op_register_.insert({nncir::NodeType::ATENRELU, executorAtenRelu});
+    this->global_op_register_.insert({nncir::NodeType::ATENRESHAPE, executorAtenReshape});
     this->global_op_register_.insert({nncir::NodeType::ATENSELECT, executorAtenSelect});
     this->global_op_register_.insert({nncir::NodeType::ATENSETITEM, executorAtenSetItem});
     this->global_op_register_.insert({nncir::NodeType::ATENSIZE, executorAtenSize});

@@ -488,4 +488,9 @@ at::Tensor atenBatchNorm2d(const at::Tensor &input, const c10::optional<at::Tens
     return at::batch_norm(input, weight, bias, running_mean, running_var, training, momentum, eps, cudnn_enabled);
 }
 
+at::Tensor atenReshape(const at::Tensor & self, at::IntArrayRef shape) 
+{
+    return at::reshape(self, shape);
+}
+
 }  // namespace nnrt
