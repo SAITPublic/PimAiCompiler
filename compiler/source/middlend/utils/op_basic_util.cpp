@@ -74,6 +74,7 @@ bool OpBasicUtil::isAtenOp(const nn_ir::Node& node) const {
                 nn_ir::AtenPadPackedSequenceNode,
                 nn_ir::AtenPowNode,
                 nn_ir::AtenReluNode,
+                nn_ir::AtenReshapeNode,
                 nn_ir::AtenSelectNode,
                 nn_ir::AtenSetItemNode,
                 nn_ir::AtenSizeNode,

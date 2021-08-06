@@ -1266,6 +1266,16 @@ IRNNNodeParser::parseNNNode<IR::NNNode::AnyType_AtenReluNode>(const IR::NnNode* 
 
 template <>
 std::unique_ptr<nn_ir::NNNode>
+IRNNNodeParser::parseNNNode<IR::NNNode::AnyType_AtenReshapeNode>(const IR::NnNode*      ir_node,
+                                                              const nn_ir::NodeInfo& node_info) {
+    auto aten_reshape_node = ir_node->nn_node_as_AtenReshapeNode();
+    Log::IR::E_IF(aten_reshape_node == nullptr) << "IRNNNodeParser::parseNNNode<NN::AtenReshapeNode>() => wrong node type!";
+
+    return std::make_unique<nn_ir::AtenReshapeNode>(node_info);
+}
+
+template <>
+std::unique_ptr<nn_ir::NNNode>
 IRNNNodeParser::parseNNNode<IR::NNNode::AnyType_AtenSelectNode>(const IR::NnNode*      ir_node,
                                                                 const nn_ir::NodeInfo& node_info) {
     auto aten_select_node = ir_node->nn_node_as_AtenSelectNode();

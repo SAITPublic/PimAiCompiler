@@ -88,6 +88,7 @@
 #include "ir/include/nn_nodes/aten_pad_packed_sequence_node.hpp"
 #include "ir/include/nn_nodes/aten_pow_node.hpp"
 #include "ir/include/nn_nodes/aten_relu_node.hpp"
+#include "ir/include/nn_nodes/aten_reshape_node.hpp"
 #include "ir/include/nn_nodes/aten_select_node.hpp"
 #include "ir/include/nn_nodes/aten_set_item_node.hpp"
 #include "ir/include/nn_nodes/aten_size_node.hpp"

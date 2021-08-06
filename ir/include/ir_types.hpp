@@ -261,6 +261,7 @@ class AtenPackPaddedSequenceNode;
 class AtenPadPackedSequenceNode;
 class AtenPowNode;
 class AtenReluNode;
+class AtenReshapeNode;
 class AtenSelectNode;
 class AtenSetItemNode;
 class AtenSizeNode;
@@ -458,6 +459,7 @@ enum class NodeType {
     ATENPADPACKEDSEQUENCE,
     ATENPOW,
     ATENRELU,
+    ATENRESHAPE,
     ATENSELECT,
     ATENSETITEM,
     ATENSIZE,
@@ -609,6 +611,7 @@ inline std::ostream& operator<<(std::ostream& s, nn_ir::NodeType type) {
         ENUM_STR(ATENPADPACKEDSEQUENCE)
         ENUM_STR(ATENPOW)
         ENUM_STR(ATENRELU)
+        ENUM_STR(ATENRESHAPE)
         ENUM_STR(ATENSELECT)
         ENUM_STR(ATENSETITEM)
         ENUM_STR(ATENSIZE)
