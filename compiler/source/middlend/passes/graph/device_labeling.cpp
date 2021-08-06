@@ -29,10 +29,14 @@ RetVal DeviceLabelingPass::run(nn_ir::NNIR& graph, CompilationContext& context) 
     device_labeling_info_ = context.getData<DeviceLabelInfo, decltype(this)>();
     for (auto&& node : graph.getNodes()) {
         if (op_basic_util_->isAtenOp(node)) {
-            if (auto aten_lstm_node = cast_if<nn_ir::AtenLSTMNode>(node)) {
+            if (auto aten_lstm1_node = cast_if<nn_ir::AtenLSTM1Node>(node)) {
                 device_labeling_info_->addOpDeviceLabel(op_basic_util_->getAtenOpName(node),
                                                         DeviceLabelInfo::DeviceType::PIM);
-                aten_lstm_node->setTargetDevice("PIM");
+                aten_lstm1_node->setTargetDevice("PIM");
+            } else if(auto aten_lstm2_node = cast_if<nn_ir::AtenLSTM2Node>(node)) {
+                device_labeling_info_->addOpDeviceLabel(op_basic_util_->getAtenOpName(node),
+                                                        DeviceLabelInfo::DeviceType::PIM);
+                aten_lstm2_node->setTargetDevice("PIM");
             } else if (auto aten_matmul_node = cast_if<nn_ir::AtenMatmulNode>(node)) {
                 // TODO(SRCX) : for aten::matmul, only GEMV runs on PIM. Need to fix when Op shapes are fixed.
                 device_labeling_info_->addOpDeviceLabel(op_basic_util_->getAtenOpName(node),

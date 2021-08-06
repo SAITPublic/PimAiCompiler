@@ -60,7 +60,8 @@ void executorAtenLinear(const nncir::Node& op_node, StreamExecutor& stream_execu
 void executorAtenList(const nncir::Node& op_node, StreamExecutor& stream_executor);
 void executorAtenLog(const nncir::Node& op_node, StreamExecutor& stream_executor);
 void executorAtenLogSoftmax(const nncir::Node& op_node, StreamExecutor& stream_executor);
-void executorAtenLSTM(const nncir::Node& op_node, StreamExecutor& stream_executor);
+void executorAtenLSTM1(const nncir::Node& op_node, StreamExecutor& stream_executor);
+void executorAtenLSTM2(const nncir::Node& op_node, StreamExecutor& stream_executor);
 void executorAtenLt(const nncir::Node& op_node, StreamExecutor& stream_executor);
 void executorAtenMaskedFill(const nncir::Node& op_node, StreamExecutor& stream_executor);
 void executorAtenMatmul(const nncir::Node& op_node, StreamExecutor& stream_executor);

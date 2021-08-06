@@ -1712,37 +1712,23 @@ void executorAtenLogSoftmax(const nncir::Node& op_node, StreamExecutor& stream_e
     stream_executor.updateBlob(out_edge.getBlobId(), DataType::TENSOR, tensorToIValue(output));
 }
 
-void executorAtenLSTM(const nncir::Node& op_node, StreamExecutor& stream_executor)
+void executorAtenLSTM1(const nncir::Node& op_node, StreamExecutor& stream_executor)
 {
-    DLOG(INFO) << "execute Aten LSTM node";
+    DLOG(INFO) << "execute Aten LSTM1 node";
 
-    auto lstm_node = cast<nncir::AtenLSTMNode>(op_node);
+    auto lstm1_node = cast<nncir::AtenLSTM1Node>(op_node);
     int edge_idx = 0;
-    int lstm_api_type = 0;
-    if ((stream_executor.findBlob(cast<nncir::DataEdge>(lstm_node.getInEdge(1)).getBlobId()).second).isTensor()) {
-        lstm_api_type = 1;
-    }
+
     // const at::Tensor &input
-    auto& input_edge = cast<nncir::DataEdge>(lstm_node.getInEdge(edge_idx));
+    auto& input_edge = cast<nncir::DataEdge>(lstm1_node.getInEdge(edge_idx));
     int input_blob_id = input_edge.getBlobId();
     auto input_iv = stream_executor.findBlob(input_blob_id).second;
     assert(input_iv.isTensor());
     auto input = input_iv.toTensor();
     edge_idx++;
 
-    // const at::Tensor &batch_sizes,
-    at::Tensor batch_sizes;
-    if (lstm_api_type == 1) {
-        auto& batch_sizes_edge = cast<nncir::DataEdge>(lstm_node.getInEdge(edge_idx));
-        int batch_sizes_blob_id = batch_sizes_edge.getBlobId();
-        auto batch_sizes_iv = stream_executor.findBlob(batch_sizes_blob_id).second;
-        assert(batch_sizes_iv.isTensor());
-        batch_sizes = batch_sizes_iv.toTensor();
-        edge_idx++;
-    }
-
     // at::TensorList hx
-    auto& hx_edge = cast<nncir::DataEdge>(lstm_node.getInEdge(edge_idx));
+    auto& hx_edge = cast<nncir::DataEdge>(lstm1_node.getInEdge(edge_idx));
     int hx_blob_id = hx_edge.getBlobId();
     auto hx_iv = stream_executor.findBlob(hx_blob_id).second;
     assert(hx_iv.isTensorList());
@@ -1755,13 +1741,20 @@ void executorAtenLSTM(const nncir::Node& op_node, StreamExecutor& stream_executo
     edge_idx++;
 
     // at::TensorList params
-    // Skip for now, will handle params after getting all arguments
-    edge_idx++;
+    // Check and skip, will handle params after getting all arguments
+    if (lstm1_node.getNumInputs() >= edge_idx) {
+        auto& params_edge = cast<nncir::DataEdge>(lstm1_node.getInEdge(edge_idx));
+        int params_blob_id = params_edge.getBlobId();
+        auto params_iv = stream_executor.findBlob(params_blob_id).second;
+        if (params_iv.isTensorList()) {
+            edge_idx++;
+        }
+    }
 
     // bool has_biases
-    int has_biases = lstm_node.getHasBiases();
+    int has_biases = lstm1_node.getHasBiases();
     if (nncir::isDefaultValue(has_biases)) {
-        auto& has_biases_edge = cast<nncir::DataEdge>(lstm_node.getInEdge(edge_idx));
+        auto& has_biases_edge = cast<nncir::DataEdge>(lstm1_node.getInEdge(edge_idx));
         int has_biases_blob_id = has_biases_edge.getBlobId();
         auto has_biases_iv = stream_executor.findBlob(has_biases_blob_id).second;
         assert(has_biases_iv.isInt());
@@ -1770,9 +1763,9 @@ void executorAtenLSTM(const nncir::Node& op_node, StreamExecutor& stream_executo
     }
 
     // int64_t num_layers
-    int64_t num_layers = lstm_node.getNumLayers();
+    int64_t num_layers = lstm1_node.getNumLayers();
     if (nncir::isDefaultValue(num_layers)) {
-        auto& num_layers_edge = cast<nncir::DataEdge>(lstm_node.getInEdge(edge_idx));
+        auto& num_layers_edge = cast<nncir::DataEdge>(lstm1_node.getInEdge(edge_idx));
         int num_layers_blob_id = num_layers_edge.getBlobId();
         auto num_layers_iv = stream_executor.findBlob(num_layers_blob_id).second;
         assert(num_layers_iv.isInt());
@@ -1781,9 +1774,9 @@ void executorAtenLSTM(const nncir::Node& op_node, StreamExecutor& stream_executo
     }
 
     // double dropout
-    double dropout = lstm_node.getDropout();
+    double dropout = lstm1_node.getDropout();
     if (nncir::isDefaultValue(dropout)) {
-        auto& dropout_edge = cast<nncir::DataEdge>(lstm_node.getInEdge(edge_idx));
+        auto& dropout_edge = cast<nncir::DataEdge>(lstm1_node.getInEdge(edge_idx));
         int dropout_blob_id = dropout_edge.getBlobId();
         auto dropout_iv = stream_executor.findBlob(dropout_blob_id).second;
         assert(dropout_iv.isDouble());
@@ -1792,9 +1785,9 @@ void executorAtenLSTM(const nncir::Node& op_node, StreamExecutor& stream_executo
     }
 
     // bool train
-    int train = lstm_node.getTrain();
+    int train = lstm1_node.getTrain();
     if (nncir::isDefaultValue(train)) {
-        auto& train_edge = cast<nncir::DataEdge>(lstm_node.getInEdge(edge_idx));
+        auto& train_edge = cast<nncir::DataEdge>(lstm1_node.getInEdge(edge_idx));
         int train_blob_id = train_edge.getBlobId();
         auto train_iv = stream_executor.findBlob(train_blob_id).second;
         assert(train_iv.isInt());
@@ -1803,9 +1796,9 @@ void executorAtenLSTM(const nncir::Node& op_node, StreamExecutor& stream_executo
     }
 
     // bool bidirectional
-    int bidirectional = lstm_node.getBidirectional();
+    int bidirectional = lstm1_node.getBidirectional();
     if (nncir::isDefaultValue(bidirectional)) {
-        auto& bidirectional_edge = cast<nncir::DataEdge>(lstm_node.getInEdge(edge_idx));
+        auto& bidirectional_edge = cast<nncir::DataEdge>(lstm1_node.getInEdge(edge_idx));
         int bidirectional_blob_id = bidirectional_edge.getBlobId();
         auto bidirectional_iv = stream_executor.findBlob(bidirectional_blob_id).second;
         assert(bidirectional_iv.isInt());
@@ -1814,16 +1807,14 @@ void executorAtenLSTM(const nncir::Node& op_node, StreamExecutor& stream_executo
     }
 
     // bool batch_first
-    int batch_first = lstm_node.getBatchFirst();
-    if (lstm_api_type == 0) {
-        if (nncir::isDefaultValue(batch_first)) {
-            auto& batch_first_edge = cast<nncir::DataEdge>(lstm_node.getInEdge(edge_idx));
-            int batch_first_blob_id = batch_first_edge.getBlobId();
-            auto batch_first_iv = stream_executor.findBlob(batch_first_blob_id).second;
-            assert(batch_first_iv.isInt());
-            batch_first = batch_first_iv.toInt();
-            edge_idx++;
-        }
+    int batch_first = lstm1_node.getBatchFirst();
+    if (nncir::isDefaultValue(batch_first)) {
+        auto& batch_first_edge = cast<nncir::DataEdge>(lstm1_node.getInEdge(edge_idx));
+        int batch_first_blob_id = batch_first_edge.getBlobId();
+        auto batch_first_iv = stream_executor.findBlob(batch_first_blob_id).second;
+        assert(batch_first_iv.isInt());
+        batch_first = batch_first_iv.toInt();
+        edge_idx++;
     }
 
     // at::TensorList params
@@ -1831,8 +1822,8 @@ void executorAtenLSTM(const nncir::Node& op_node, StreamExecutor& stream_executo
     // param layerout (bidirctional) --> (fw_w_ih, fw_w_hh, fw_b_ih?, fw_b_hh?, bw_w_ih, bw_w_hh, bw_b_ih?, bw_b_hh?) *
     // layers
 
-    auto weight_blob_ids = lstm_node.getWeightBlobId();
-    auto bias_blob_ids = lstm_node.getBiasBlobId();
+    auto weight_blob_ids = lstm1_node.getWeightBlobId();
+    auto bias_blob_ids = lstm1_node.getBiasBlobId();
     std::vector<at::Tensor> param_vector;
     assert((bidirectional == 0 || bidirectional == 1));
     for (int i = 0; i < num_layers * (bidirectional + 1); i++) {
@@ -1860,15 +1851,159 @@ void executorAtenLSTM(const nncir::Node& op_node, StreamExecutor& stream_executo
         }
     }
     at::TensorList params(param_vector);
-    std::tuple<at::Tensor, at::Tensor, at::Tensor> output;
-    if (lstm_api_type == 0) {
-        output =
-            nnrt::atenLstm(input, hx, params, static_cast<bool>(has_biases), num_layers, dropout,
-                           static_cast<bool>(train), static_cast<bool>(bidirectional), static_cast<bool>(batch_first));
-    } else if (lstm_api_type == 1) {
-        output = nnrt::atenLstm(input, batch_sizes, hx, params, static_cast<bool>(has_biases), num_layers, dropout,
-                                static_cast<bool>(train), static_cast<bool>(bidirectional));
+    auto output =
+        nnrt::atenLstm1(input, hx, params, static_cast<bool>(has_biases), num_layers, dropout, static_cast<bool>(train),
+                       static_cast<bool>(bidirectional), static_cast<bool>(batch_first));
+
+    auto out_blob_ids = getOutBlobIds(op_node);
+    auto pos = std::unique(out_blob_ids.begin(), out_blob_ids.end());
+    out_blob_ids.erase(pos, out_blob_ids.end());
+    assert(out_blob_ids.size() == 3);
+    stream_executor.updateBlob(out_blob_ids[0], DataType::TENSOR, tensorToIValue(std::get<0>(output)));
+    stream_executor.updateBlob(out_blob_ids[1], DataType::TENSOR, tensorToIValue(std::get<1>(output)));
+    stream_executor.updateBlob(out_blob_ids[2], DataType::TENSOR, tensorToIValue(std::get<2>(output)));
+}
+
+void executorAtenLSTM2(const nncir::Node& op_node, StreamExecutor& stream_executor)
+{
+    DLOG(INFO) << "execute Aten LSTM2 node";
+
+    auto lstm2_node = cast<nncir::AtenLSTM2Node>(op_node);
+    int edge_idx = 0;
+
+    // const at::Tensor &input
+    auto& input_edge = cast<nncir::DataEdge>(lstm2_node.getInEdge(edge_idx));
+    int input_blob_id = input_edge.getBlobId();
+    auto input_iv = stream_executor.findBlob(input_blob_id).second;
+    assert(input_iv.isTensor());
+    auto input = input_iv.toTensor();
+    edge_idx++;
+
+    // const at::Tensor &batch_sizes,
+    at::Tensor batch_sizes;
+    auto& batch_sizes_edge = cast<nncir::DataEdge>(lstm2_node.getInEdge(edge_idx));
+    int batch_sizes_blob_id = batch_sizes_edge.getBlobId();
+    auto batch_sizes_iv = stream_executor.findBlob(batch_sizes_blob_id).second;
+    assert(batch_sizes_iv.isTensor());
+    batch_sizes = batch_sizes_iv.toTensor();
+    edge_idx++;
+
+    // at::TensorList hx
+    auto& hx_edge = cast<nncir::DataEdge>(lstm2_node.getInEdge(edge_idx));
+    int hx_blob_id = hx_edge.getBlobId();
+    auto hx_iv = stream_executor.findBlob(hx_blob_id).second;
+    assert(hx_iv.isTensorList());
+    auto hx_list_tensor = hx_iv.toTensorList();
+    std::vector<at::Tensor> hx_list_tensor_vector;
+    for (auto tensor : hx_list_tensor) {
+        hx_list_tensor_vector.push_back(tensor);
     }
+    at::TensorList hx(hx_list_tensor_vector);
+    edge_idx++;
+
+    // at::TensorList params
+    // Check and skip, will handle params after getting all arguments
+    if (lstm2_node.getNumInputs() >= edge_idx) {
+        auto& params_edge = cast<nncir::DataEdge>(lstm2_node.getInEdge(edge_idx));
+        int params_blob_id = params_edge.getBlobId();
+        auto params_iv = stream_executor.findBlob(params_blob_id).second;
+        if (params_iv.isTensorList()) {
+            edge_idx++;
+        }
+    }
+
+    // bool has_biases
+    int has_biases = lstm2_node.getHasBiases();
+    if (nncir::isDefaultValue(has_biases)) {
+        auto& has_biases_edge = cast<nncir::DataEdge>(lstm2_node.getInEdge(edge_idx));
+        int has_biases_blob_id = has_biases_edge.getBlobId();
+        auto has_biases_iv = stream_executor.findBlob(has_biases_blob_id).second;
+        assert(has_biases_iv.isInt());
+        has_biases = has_biases_iv.toInt();
+        edge_idx++;
+    }
+
+    // int64_t num_layers
+    int64_t num_layers = lstm2_node.getNumLayers();
+    if (nncir::isDefaultValue(num_layers)) {
+        auto& num_layers_edge = cast<nncir::DataEdge>(lstm2_node.getInEdge(edge_idx));
+        int num_layers_blob_id = num_layers_edge.getBlobId();
+        auto num_layers_iv = stream_executor.findBlob(num_layers_blob_id).second;
+        assert(num_layers_iv.isInt());
+        num_layers = num_layers_iv.toInt();
+        edge_idx++;
+    }
+
+    // double dropout
+    double dropout = lstm2_node.getDropout();
+    if (nncir::isDefaultValue(dropout)) {
+        auto& dropout_edge = cast<nncir::DataEdge>(lstm2_node.getInEdge(edge_idx));
+        int dropout_blob_id = dropout_edge.getBlobId();
+        auto dropout_iv = stream_executor.findBlob(dropout_blob_id).second;
+        assert(dropout_iv.isDouble());
+        dropout = dropout_iv.toDouble();
+        edge_idx++;
+    }
+
+    // bool train
+    int train = lstm2_node.getTrain();
+    if (nncir::isDefaultValue(train)) {
+        auto& train_edge = cast<nncir::DataEdge>(lstm2_node.getInEdge(edge_idx));
+        int train_blob_id = train_edge.getBlobId();
+        auto train_iv = stream_executor.findBlob(train_blob_id).second;
+        assert(train_iv.isInt());
+        train = train_iv.toInt();
+        edge_idx++;
+    }
+
+    // bool bidirectional
+    int bidirectional = lstm2_node.getBidirectional();
+    if (nncir::isDefaultValue(bidirectional)) {
+        auto& bidirectional_edge = cast<nncir::DataEdge>(lstm2_node.getInEdge(edge_idx));
+        int bidirectional_blob_id = bidirectional_edge.getBlobId();
+        auto bidirectional_iv = stream_executor.findBlob(bidirectional_blob_id).second;
+        assert(bidirectional_iv.isInt());
+        bidirectional = bidirectional_iv.toInt();
+        edge_idx++;
+    }
+
+    // at::TensorList params
+    // param layerout                --> (fw_w_ih, fw_w_hh, fw_b_ih?, fw_b_hh?) * layers
+    // param layerout (bidirctional) --> (fw_w_ih, fw_w_hh, fw_b_ih?, fw_b_hh?, bw_w_ih, bw_w_hh, bw_b_ih?, bw_b_hh?) *
+    // layers
+
+    auto weight_blob_ids = lstm2_node.getWeightBlobId();
+    auto bias_blob_ids = lstm2_node.getBiasBlobId();
+    std::vector<at::Tensor> param_vector;
+    assert((bidirectional == 0 || bidirectional == 1));
+    for (int i = 0; i < num_layers * (bidirectional + 1); i++) {
+        // w_ih
+        auto w_ih_iv = stream_executor.findBlob(weight_blob_ids[i * 2]).second;
+        if (w_ih_iv.isTensor()) {
+            param_vector.push_back(w_ih_iv.toTensor());
+        }
+        // w_hh
+        auto w_hh_iv = stream_executor.findBlob(weight_blob_ids[i * 2 + 1]).second;
+        if (w_hh_iv.isTensor()) {
+            param_vector.push_back(w_hh_iv.toTensor());
+        }
+        if (has_biases) {
+            // b_ih? (optional)
+            auto b_ih_iv = stream_executor.findBlob(bias_blob_ids[i * 2]).second;
+            if (b_ih_iv.isTensor()) {
+                param_vector.push_back(b_ih_iv.toTensor());
+            }
+            // b_hh? (optional)
+            auto b_hh_iv = stream_executor.findBlob(bias_blob_ids[i * 2 + 1]).second;
+            if (b_hh_iv.isTensor()) {
+                param_vector.push_back(b_hh_iv.toTensor());
+            }
+        }
+    }
+    at::TensorList params(param_vector);
+
+    auto output = nnrt::atenLstm2(input, batch_sizes, hx, params, static_cast<bool>(has_biases), num_layers, dropout,
+                                static_cast<bool>(train), static_cast<bool>(bidirectional));
 
     auto out_blob_ids = getOutBlobIds(op_node);
     auto pos = std::unique(out_blob_ids.begin(), out_blob_ids.end());

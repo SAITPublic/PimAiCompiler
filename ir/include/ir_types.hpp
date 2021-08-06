@@ -242,7 +242,8 @@ class AtenLinearNode;
 class AtenListNode;
 class AtenLogNode;
 class AtenLogSoftmaxNode;
-class AtenLSTMNode;
+class AtenLSTM1Node;
+class AtenLSTM2Node;
 class AtenLtNode;
 class AtenMaskedFillNode;
 class AtenMaskedSelectNode;
@@ -437,7 +438,8 @@ enum class NodeType {
     ATENLIST,
     ATENLOG,
     ATENLOGSOFTMAX,
-    ATENLSTM,
+    ATENLSTM1,
+    ATENLSTM2,
     ATENLT,
     ATENMASKEDFILL,
     ATENMASKEDSELECT,
@@ -586,7 +588,8 @@ inline std::ostream& operator<<(std::ostream& s, nn_ir::NodeType type) {
         ENUM_STR(ATENLIST)
         ENUM_STR(ATENLOG)
         ENUM_STR(ATENLOGSOFTMAX)
-        ENUM_STR(ATENLSTM)
+        ENUM_STR(ATENLSTM1)
+        ENUM_STR(ATENLSTM2)
         ENUM_STR(ATENLT)
         ENUM_STR(ATENMASKEDFILL)
         ENUM_STR(ATENMASKEDSELECT)

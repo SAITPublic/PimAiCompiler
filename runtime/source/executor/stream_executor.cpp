@@ -75,11 +75,24 @@ StreamExecutor::StreamExecutor(const std::shared_ptr<nncir::NNIR> ir_graph)
         } else if (op_node.getNodeType() == nncir::NodeType::PRIMOUTPUT) {
             auto& data_edge = cast<nncir::DataEdge>(op_node.getInEdge(0));
             this->output_blob_ids_.push_back(data_edge.getBlobId());
-        } else if (op_node.getNodeType() == nncir::NodeType::ATENLSTM) {
+        } else if (op_node.getNodeType() == nncir::NodeType::ATENLSTM1) {
             // For Ops' with weight/bias, firstly save to global_blobs_ once
-            auto lstm_node = cast<nncir::AtenLSTMNode>(op_node);
-            auto weight_blobs = lstm_node.getWeightBlob();
-            auto bias_blobs = lstm_node.getBiasBlob();
+            auto lstm1_node = cast<nncir::AtenLSTM1Node>(op_node);
+            auto weight_blobs = lstm1_node.getWeightBlob();
+            auto bias_blobs = lstm1_node.getBiasBlob();
+
+            for (auto blob : weight_blobs) {
+                this->loadWeightAndBias(blob, "weight", "gpu");
+            }
+
+            for (auto blob : bias_blobs) {
+                this->loadWeightAndBias(blob, "bias", "gpu");
+            }
+        } else if (op_node.getNodeType() == nncir::NodeType::ATENLSTM2) {
+            // For Ops' with weight/bias, firstly save to global_blobs_ once
+            auto lstm2_node = cast<nncir::AtenLSTM2Node>(op_node);
+            auto weight_blobs = lstm2_node.getWeightBlob();
+            auto bias_blobs = lstm2_node.getBiasBlob();
 
             for (auto blob : weight_blobs) {
                 this->loadWeightAndBias(blob, "weight", "gpu");
@@ -234,7 +247,8 @@ void StreamExecutor::registerOp()
     this->global_op_register_.insert({nncir::NodeType::ATENLIST, executorAtenList});
     this->global_op_register_.insert({nncir::NodeType::ATENLOG, executorAtenLog});
     this->global_op_register_.insert({nncir::NodeType::ATENLOGSOFTMAX, executorAtenLogSoftmax});
-    this->global_op_register_.insert({nncir::NodeType::ATENLSTM, executorAtenLSTM});
+    this->global_op_register_.insert({nncir::NodeType::ATENLSTM1, executorAtenLSTM1});
+    this->global_op_register_.insert({nncir::NodeType::ATENLSTM2, executorAtenLSTM2});
     this->global_op_register_.insert({nncir::NodeType::ATENLT, executorAtenLt});
     this->global_op_register_.insert({nncir::NodeType::ATENMASKEDFILL, executorAtenMaskedFill});
     this->global_op_register_.insert({nncir::NodeType::ATENMATMUL, executorAtenMatmul});
