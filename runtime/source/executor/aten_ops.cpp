@@ -145,6 +145,8 @@ at::Tensor atenExpand(const at::Tensor &self, at::IntArrayRef size, bool implici
 
 at::Tensor atenEq(const at::Tensor &self, const at::Tensor &other) { return at::eq(self, other); }
 
+at::Tensor atenEq(const at::Tensor &self, const at::Scalar other) { return at::eq(self, other); }
+
 bool atenEqual(const at::Tensor &self, const at::Tensor &other) { return at::equal(self, other); }
 
 at::Tensor &atenFill(at::Tensor &self, at::Scalar value) {
@@ -231,6 +233,8 @@ at::Tensor atenLeakyRelu(const at::Tensor &self, at::Scalar negative_slope) {
 }
 
 int64_t atenLen(const c10::List<at::IValue> &list) { return list.size(); }
+
+int64_t atenLen(const at::Tensor &input) { return input.dim(); }
 
 at::Tensor atenLinear(const at::Tensor &input, const at::Tensor &weight, const at::Tensor &bias) {
     return at::linear(input, weight, bias);
@@ -346,6 +350,8 @@ bool atenNe(const at::Scalar &self, const at::Scalar &other)
 at::Tensor atenNeg(const at::Tensor &self) { return at::neg(self); }
 
 at::Tensor atenNot(const at::Tensor &self) { return at::logical_not(self); }
+
+bool atenNot(const bool &input) { return !input; };
 
 at::Tensor atenOnes(at::IntArrayRef size, const at::TensorOptions &options) { return at::ones(size, options); }
 

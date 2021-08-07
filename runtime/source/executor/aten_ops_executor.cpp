@@ -28,10 +28,17 @@ void executorAtenAdd(const nncir::Node& op_node, StreamExecutor& stream_executor
     if (nncir::isDefaultValue(alpha)) {
         if (add_node.getInEdgeIds().size() == 3) {
             auto& alpha_edge = cast<nncir::DataEdge>(add_node.getInEdge(2));
-            int alpha_blob_id = alpha_edge.getBlobId();
-            auto alpha_iv = stream_executor.findBlob(alpha_blob_id).second;
-            assert(alpha_iv.isInt());
-            alpha = alpha_iv.toInt();
+            auto edge_name = alpha_edge.getName();
+            //if "prim::if" layer linked to current, this edge has no practical meaning 
+            if (edge_name.find("prim::If") == std::string::npos) {
+                int alpha_blob_id = alpha_edge.getBlobId();
+                auto alpha_iv = stream_executor.findBlob(alpha_blob_id).second;
+                assert(alpha_iv.isInt());
+                alpha = alpha_iv.toInt();
+            } else {
+                alpha = 1;
+            }
+
         } else {
             alpha = 1;
         }
@@ -1015,10 +1022,17 @@ void executorAtenEq(const nncir::Node& op_node, StreamExecutor& stream_executor)
     torch::jit::IValue iv_other = stream_executor.findBlob(input_other_blob_id).second;
 
     if (iv_self.isTensor()) {
-        assert(iv_other.isTensor());
         at::Tensor self_tensor = iv_self.toTensor();
-        at::Tensor other_tensor = iv_other.toTensor();
-        auto output = nnrt::atenEq(self_tensor, other_tensor);
+        at::Tensor output;
+        if (iv_other.isTensor()) {
+            at::Tensor other_tensor = iv_other.toTensor();
+            output = nnrt::atenEq(self_tensor, other_tensor);
+        } else if (iv_other.isScalar()) {
+            at::Scalar other = iv_other.toScalar();
+            output = nnrt::atenEq(self_tensor, other);
+        } else {
+            DLOG(FATAL) << "Aten eq op's data type do not support!";
+        }
         // update output
         auto& out_edge = cast<nncir::DataEdge>(eq_node.getFirstOutEdge());
         stream_executor.updateBlob(out_edge.getBlobId(), DataType::TENSOR, tensorToIValue(output));
@@ -1602,11 +1616,17 @@ void executorAtenLen(const nncir::Node& op_node, StreamExecutor& stream_executor
     int input_list_blob_id = input_list.getBlobId();
 
     // Find the input blob
-    torch::jit::IValue iv_list = stream_executor.findBlob(input_list_blob_id).second;
+    torch::jit::IValue iv = stream_executor.findBlob(input_list_blob_id).second;
 
-    assert(iv_list.isList());
-
-    auto output = nnrt::atenLen(iv_list.toList());
+    int64_t output = -1;
+    if (iv.isList()) {
+        output = nnrt::atenLen(iv.toList());
+    } else if (iv.isTensor()) {
+        output = nnrt::atenLen(iv.toTensor());
+    } else {
+        DLOG(FATAL) << "Aten len op's data type do not support!";
+    }
+ 
     // update output
     auto& out_edge = cast<nncir::DataEdge>(node.getFirstOutEdge());
     stream_executor.updateBlob(out_edge.getBlobId(), DataType::INT64, intToIValue(output));
@@ -2492,12 +2512,18 @@ void executorAtenNot(const nncir::Node& op_node, StreamExecutor& stream_executor
     auto& input_tensor = cast<nncir::DataEdge>(node.getInEdge(0));
     int input_tensor_blob_id = input_tensor.getBlobId();
     auto iv = stream_executor.findBlob(input_tensor_blob_id).second;
-    assert(iv.isTensor());
-    auto tensor = iv.toTensor();
-
-    auto output = nnrt::atenNot(tensor);
     auto& out_edge = cast<nncir::DataEdge>(node.getFirstOutEdge());
-    stream_executor.updateBlob(out_edge.getBlobId(), DataType::TENSOR, tensorToIValue(output));
+    if (iv.isTensor()) {
+        auto tensor = iv.toTensor();
+        auto output = nnrt::atenNot(tensor);
+        stream_executor.updateBlob(out_edge.getBlobId(), DataType::TENSOR, tensorToIValue(output));
+    } else if (iv.isBool()) {
+        auto input = iv.toBool();
+        auto output = nnrt::atenNot(input);
+        stream_executor.updateBlob(out_edge.getBlobId(), DataType::BOOL, boolToIValue(output));
+    } else {
+        DLOG(FATAL) << "Aten not op's data type do not support!";
+    }
 }
 
 void executorAtenOnes(const nncir::Node& op_node, StreamExecutor& stream_executor)

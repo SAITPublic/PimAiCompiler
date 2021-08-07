@@ -168,6 +168,8 @@ at::Tensor atenLeakyRelu(const at::Tensor &self, at::Scalar negative_slope);
 
 int64_t atenLen(const c10::List<at::IValue> &list);
 
+int64_t atenLen(const at::Tensor &input);
+
 at::Tensor atenLinear(const at::Tensor &input, const at::Tensor &weight, const at::Tensor &bias);
 
 c10::List<std::string> atenList(std::string &str);
@@ -242,6 +244,8 @@ bool atenNe(const at::Scalar &self, const at::Scalar &other);
 at::Tensor atenNeg(const at::Tensor &self);
 
 at::Tensor atenNot(const at::Tensor &self);
+
+bool atenNot(const bool &input);
 
 at::Tensor atenOnes(at::IntArrayRef size, const at::TensorOptions &options);
 
