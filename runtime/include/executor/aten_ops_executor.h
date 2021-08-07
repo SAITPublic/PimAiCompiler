@@ -5,6 +5,7 @@
 #include "executor/stream_executor.h"
 #include "glog/logging.h"
 #include "ir/include/nn_ir.hpp"
+#include "executor/prim_ops.h"
 
 // class ExecutorContext;
 

@@ -12,6 +12,7 @@
 #include "ir/include/edge.hpp"
 #include "ir/include/ir_types.hpp"
 #include "ir/include/nn_ir.hpp"
+#include "executor/aten_ops_executor.h"
 
 namespace nnrt
 {
@@ -1345,6 +1346,7 @@ void executorAtenGetItem(const nncir::Node& op_node, StreamExecutor& stream_exec
     auto output = nnrt::atenGetItem(self_list, idx);
     // update output
     auto& out_edge = cast<nncir::DataEdge>(get_item_node.getFirstOutEdge());
+    stream_executor.releation_blob_ids_map_.insert({out_edge.getBlobId(),{input_self_blob_id, idx}});
     stream_executor.updateBlob(out_edge.getBlobId(), DataType::IVALUE, output);
 }
 
@@ -3300,10 +3302,32 @@ void executorAtenUnsqueeze(const nncir::Node& op_node, StreamExecutor& stream_ex
         assert(dim_iv.isInt());
         dim = dim_iv.toInt();
     }
-
+    auto is_inplace = unsqueeze_node.getIsInplace();
     at::Tensor output = nnrt::atenUnsqueeze(tensor, dim);
-    auto& out_edge = cast<nncir::DataEdge>(unsqueeze_node.getFirstOutEdge());
-    stream_executor.updateBlob(out_edge.getBlobId(), DataType::TENSOR, tensorToIValue(output));
+    // If Unsqueeze op is in-place op, it need change origin data
+    if (is_inplace) {
+        auto releation_blob_id = stream_executor.releation_blob_ids_map_.find(input_tensor_blob_id);
+        assert(releation_blob_id != stream_executor.releation_blob_ids_map_.end());
+        auto list_blob_id = releation_blob_id->second.first;
+        auto in_list_pos = releation_blob_id->second.second;
+
+        auto list_blob_iv = stream_executor.findBlob(list_blob_id).second;
+        std::vector<torch::IValue> inputs;
+        auto datas = list_blob_iv.toListRef();
+        for (uint32_t idx = 0; idx < datas.size(); idx++) {
+            if (idx == in_list_pos) {
+                inputs.push_back(tensorToIValue(output));
+            } else {
+                inputs.push_back(datas[idx]);
+            }
+        }
+        at::ListTypePtr type = inferTypeFromDataType(inferDataType(output));
+        primListConstruct(inputs, inputs.size(), type);
+        stream_executor.updateBlob(list_blob_id, DataType::LIST, inputs.at(0));
+    } else {
+        auto& out_edge = cast<nncir::DataEdge>(unsqueeze_node.getFirstOutEdge());
+        stream_executor.updateBlob(out_edge.getBlobId(), DataType::TENSOR, tensorToIValue(output));
+    }
 }
 
 void executorAtenView(const nncir::Node& op_node, StreamExecutor& stream_executor)

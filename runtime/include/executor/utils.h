@@ -135,6 +135,10 @@ std::vector<int64_t> getUniqueOutBlobIds(const nncir::Node& node);
 
 std::string getDataTypeStr(DataType dtype);
 
+DataType inferDataType(torch::jit::IValue ival);
+
+at::ListTypePtr inferTypeFromDataType(DataType type);
+
 std::string showOpNodeInfo(const nncir::Node& node, bool show_in_blobs, bool show_out_blobs);
 #define SHOW_OP_INFO(op_node)
 // #define SHOW_OP_INFO(op_node) showOpNodeInfo(op_node, true, true)

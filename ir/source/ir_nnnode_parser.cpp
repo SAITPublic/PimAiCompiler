@@ -1415,7 +1415,8 @@ IRNNNodeParser::parseNNNode<IR::NNNode::AnyType_AtenUnsqueezeNode>(const IR::NnN
         << "IRNNNodeParser::parseNNNode<NN::AtenUnsqueezeNode>() => wrong node type!";
 
     int64_t dim = aten_unsqueeze_node->dim();
-    return std::make_unique<nn_ir::AtenUnsqueezeNode>(node_info, dim);
+    bool is_inplace = aten_unsqueeze_node->is_inplace();
+    return std::make_unique<nn_ir::AtenUnsqueezeNode>(node_info, dim, is_inplace);
 }
 
 template <>

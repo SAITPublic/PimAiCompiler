@@ -43,64 +43,6 @@ torch::Tensor createPtTensor(void* data_ptr, const std::vector<int64_t>& shape, 
     return torch::from_blob(data_ptr, sizes, c10::TensorOptions().dtype(scalar_type));
 }
 
-DataType inferDataType(torch::jit::IValue ival)
-{
-    DataType type = DataType::UNDEFINED;
-    if (ival.isList()) {
-        type = DataType::LIST;
-    } else if (ival.isBool()) {
-        type = DataType::BOOL;
-    } else if (ival.isInt()) {
-        type = DataType::INT64;
-    } else if (ival.isString()) {
-        type = DataType::STRING;
-    } else if (ival.isNone()) {
-        type = DataType::NONE;
-    } else if (ival.isDouble()) {
-        type = DataType::FLOAT64;
-    } else if (ival.isDevice()) {
-        type = DataType::DEVICE;
-    } else if (ival.isTensor()) {
-        type = DataType::TENSOR;
-    } else if (ival.isTuple()) {
-        type = DataType::TUPLE;
-    } else {
-        DLOG(INFO) << ival.type()->repr_str() << " is not supported yet.";
-    }
-    return type;
-}
-
-at::ListTypePtr inferTypeFromDataType(DataType type)
-{
-    at::ListTypePtr list_type = at::ListType::ofTensors();
-    switch (type) {
-        case DataType::INT8:
-        case DataType::INT16:
-        case DataType::INT32:
-        case DataType::INT64:
-            list_type = at::ListType::ofInts();
-            break;
-        case DataType::FLOAT16:
-        case DataType::FLOAT32:
-        case DataType::FLOAT64:
-            list_type = at::ListType::ofFloats();
-            break;
-        case DataType::BOOL:
-            list_type = at::ListType::ofBools();
-            break;
-        case DataType::STRING:
-            list_type = at::ListType::ofStrings();
-            break;
-        case DataType::TENSOR:
-            list_type = at::ListType::ofTensors();
-            break;
-        default:
-            DLOG(INFO) << "DataType do not support! ";
-            break;
-    }
-    return list_type;
-}
-
 std::vector<int64_t> getDataShapeFromShape4D(nn_compiler::nn_ir::Shape4D shape)
 {
     std::vector<int64_t> temp_shape;

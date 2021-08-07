@@ -40,10 +40,6 @@ void push(std::vector<torch::jit::IValue>& stack, Types&&... args)
 
 torch::Tensor createPtTensor(void* data_ptr, const std::vector<int64_t>& shape, DataType dtype);
 
-DataType inferDataType(torch::jit::IValue ival);
-
-at::ListTypePtr inferTypeFromDataType(DataType type);
-
 std::vector<int64_t> getDataShapeFromShape4D(nn_compiler::nn_ir::Shape4D shape);
 
 torch::Tensor loadTensor(const std::string& bin_file, const std::vector<int64_t>& shape, DataType dtype);

@@ -21,15 +21,18 @@ namespace nn_ir {
 
 class AtenUnsqueezeNode : public NodeMixin<AtenUnsqueezeNode, NNNode> {
  public:
-    explicit AtenUnsqueezeNode(const NodeInfo& node_info, int64_t dim)
-        : NodeMixin(node_info, NodeType::ATENUNSQUEEZE), dim_(dim) {}
+    explicit AtenUnsqueezeNode(const NodeInfo& node_info, int64_t dim, bool is_inplace)
+        : NodeMixin(node_info, NodeType::ATENUNSQUEEZE), dim_(dim), is_inplace_(is_inplace) {}
 
     std::string getNodeTypeAsString() const override { return "AtenUnsqueeze"; }
 
     int64_t getDim() const { return dim_; }
 
+    bool getIsInplace() const { return is_inplace_; }
+
  private:
     int64_t dim_;
+    bool is_inplace_ = false;
 
 }; // class AtenUnsqueezeNode
 

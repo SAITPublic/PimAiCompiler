@@ -81,6 +81,7 @@ class StreamExecutor
     std::shared_ptr<nncir::NNIR> ir_graph_;
     int64_t cursor_ = 0;  // like the program counter
     std::stack<int64_t> loop_condition_stack_;
+    std::unordered_map<int, std::pair<int, int>> releation_blob_ids_map_;
 };
 
 }  // namespace nnrt
