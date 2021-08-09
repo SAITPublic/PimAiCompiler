@@ -28,9 +28,16 @@ add_subdirectory(${CMAKE_CURRENT_BINARY_DIR}/flatbuffers-src
 set(FLATBUFFERS_INCLUDE_DIR ${CMAKE_CURRENT_BINARY_DIR}/flatbuffers-src/include PARENT_SCOPE)
 set(FLATC_GENERATOR_DEPENDENCY flatc)
 
+set(IR_HEADER_FILE ${COMPILER_ROOT_DIR}/ir/include/generated/ir_generated.h)
+add_custom_command(OUTPUT ${IR_HEADER_FILE}
+		           COMMAND flatc -o ${COMPILER_ROOT_DIR}/ir/include/generated -I ${SCHEMA_DIR}/npu_schema -c ${SCHEMA_DIR}/ir.fbs --gen-all
+		           WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
+		           DEPENDS ${FLATC_GENERATOR_DEPENDENCY}
+		           COMMENT "Generate ir header file"
+		           VERBATIM)
+
 add_custom_target(flatc_cpp_generator
-                  COMMAND flatc -o ${COMPILER_ROOT_DIR}/ir/include/generated -I ${SCHEMA_DIR}/npu_schema -c ${SCHEMA_DIR}/ir.fbs --gen-all
-                  DEPENDS ${FLATC_GENERATOR_DEPENDENCY})
+		          DEPENDS ${IR_HEADER_FILE})
 set_target_properties(flatc_cpp_generator
     PROPERTIES ADDITIONAL_CLEAN_FILES ${COMPILER_ROOT_DIR}/ir/include/generated)
 
