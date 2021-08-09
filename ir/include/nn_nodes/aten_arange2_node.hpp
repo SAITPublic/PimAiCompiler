@@ -40,9 +40,9 @@ class AtenArange2Node : public NodeMixin<AtenArange2Node, NNNode> {
 
     int64_t getDtype() const { return dtype_; }
 
-    void setLayout(int layout) { layout_ = layout; }
+    void setLayout(int64_t layout) { layout_ = layout; }
 
-    int getLayout() const { return layout_; }
+    int64_t getLayout() const { return layout_; }
 
     void setDevice(std::string device) { device_ = device; }
 

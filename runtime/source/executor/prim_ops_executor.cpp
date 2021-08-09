@@ -151,7 +151,6 @@ void executePrimDtype(const nncir::Node& op_node, StreamExecutor& stream_executo
 
     // cast Node -> PrimDtypeNode
     auto dtype_node = cast<nncir::PrimDtypeNode>(op_node);
-    assert(dtype_node.getNumInputs() == 1);
 
     // Find input edge, primDtype only have one input & output
     auto& data_edge = cast<nncir::DataEdge>(dtype_node.getFirstInEdge());
@@ -476,25 +475,31 @@ void executePrimTupleIndex(const nncir::Node& op_node, StreamExecutor& stream_ex
 
     // Find the input data blob
     torch::jit::IValue data_iv = stream_executor.findBlob(input_data_blob_id).second;
-    std::vector<torch::Tensor> inputs;
-    auto tensors = data_iv.toTuple()->elements();
-    for (auto tensor : tensors) {
-        inputs.push_back(tensor.toTensor());
-    }
-    int64_t index = tuple_index_node.getIndex();
-    if (nncir::isDefaultValue(index)) {
-        auto& index_edge = cast<nncir::DataEdge>(tuple_index_node.getInEdge(1));
-        int input_index_blob_id = index_edge.getBlobId();
-        // Find the input index blob
-        torch::jit::IValue index_iv = stream_executor.findBlob(input_index_blob_id).second;
-        index = index_iv.toInt();
-    }
-
-    // Call OpKernel
-    auto output = primTupleIndex(inputs, index);
-    // update output
     auto& out_edge = cast<nncir::DataEdge>(tuple_index_node.getFirstOutEdge());
-    stream_executor.updateBlob(out_edge.getBlobId(), DataType::TENSOR, tensorToIValue(output));
+    std::vector<torch::Tensor> inputs;
+    if (data_iv.isNone()) {
+        torch::jit::IValue iv;
+        stream_executor.updateBlob(out_edge.getBlobId(), DataType::NONE, iv);
+    } else {
+        auto tensors = data_iv.toTuple()->elements();
+        for (auto tensor : tensors) {
+            inputs.push_back(tensor.toTensor());
+        }
+        int64_t index = tuple_index_node.getIndex();
+        if (nncir::isDefaultValue(index)) {
+            auto& index_edge = cast<nncir::DataEdge>(tuple_index_node.getInEdge(1));
+            int input_index_blob_id = index_edge.getBlobId();
+            // Find the input index blob
+            torch::jit::IValue index_iv = stream_executor.findBlob(input_index_blob_id).second;
+            index = index_iv.toInt();
+        }
+
+        // Call OpKernel
+        auto output = primTupleIndex(inputs, index);
+        // update output
+
+        stream_executor.updateBlob(out_edge.getBlobId(), DataType::TENSOR, tensorToIValue(output));
+    }
 }
 
 void executePrimTupleUnpack(const nncir::Node& op_node, StreamExecutor& stream_executor)
