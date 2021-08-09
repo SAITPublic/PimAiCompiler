@@ -18,6 +18,8 @@ NNRuntime::NNRuntime(const std::string torch_model_path)
     this->mbuilder_ = std::make_shared<ModelBuilder>(builder);
 
     this->executor_ = std::make_shared<StreamExecutor>(this->mbuilder_->get_runnable_ir());
+
+    rocblas_init();
 }
 
 std::vector<torch::Tensor> NNRuntime::inferenceModel(const std::vector<torch::Tensor>& input_tensors)
@@ -41,9 +43,23 @@ std::vector<torch::Tensor> NNRuntime::inferenceModel(const std::vector<torch::Te
     return output_tensors;
 }
 
+int NNRuntime::rocblas_init(void)
+{
+    int M = 1;
+    int N = 240;
+    int K = 4096;
+    auto l_gpu = at::randn({M, K}, at::kCUDA);
+    auto r_gpu = at::randn({K, N}, at::kCUDA);
+    auto result = nnrt::atenMatmul(l_gpu, r_gpu);
+    at::hip::device_synchronize();
+
+    return 0;
+}
+
 int NNRuntime::test(void)
 {
-    LOG(INFO) << "hello NNRuntime::test!";
+    DLOG(INFO) << "hello NNRuntime::test!";
+
     return 0;
 }
 

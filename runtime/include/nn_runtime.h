@@ -5,6 +5,7 @@
 #include <vector>
 #include "builder/model_builder.h"
 #include "executor/stream_executor.h"
+#include "executor/aten_ops.h"
 #include "nnrt_types.h"
 
 namespace nnrt
@@ -18,6 +19,8 @@ class NNRuntime
 
     std::vector<torch::Tensor> inferenceModel(const std::vector<torch::Tensor>& input_tensors);
 
+    int rocblas_init(void);
+    
     int test(void);
 
    private:

@@ -2,6 +2,7 @@
 #define NNCOMPILER_ATEN_OP_H
 #include "ATen/ATen.h"
 #include "glog/logging.h"
+#include "c10/hip/HIPFunctions.h"
 
 namespace nnrt
 {
