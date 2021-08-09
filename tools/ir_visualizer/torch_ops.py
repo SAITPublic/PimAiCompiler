@@ -68,6 +68,7 @@ import IR.NNNode.AtenPackPaddedSequenceNode
 import IR.NNNode.AtenPadPackedSequenceNode
 import IR.NNNode.AtenPowNode
 import IR.NNNode.AtenReluNode
+import IR.NNNode.AtenReshapeNode
 import IR.NNNode.AtenSelectNode
 import IR.NNNode.AtenSetItemNode
 import IR.NNNode.AtenSizeNode
@@ -194,6 +195,7 @@ def create_aten_ops_map():
         IR.NNNode.AnyType.AnyType().AtenPadPackedSequenceNode : 'AtenPadPackedSequenceNode',
         IR.NNNode.AnyType.AnyType().AtenPowNode : 'AtenPowNode',
         IR.NNNode.AnyType.AnyType().AtenReluNode : 'AtenReluNode',
+        IR.NNNode.AnyType.AnyType().AtenReshapeNode : 'AtenReshapeNode',
         IR.NNNode.AnyType.AnyType().AtenSelectNode : 'AtenSelectNode',
         IR.NNNode.AnyType.AnyType().AtenSetItemNode : 'AtenSetItemNode',
         IR.NNNode.AnyType.AnyType().AtenSizeNode : 'AtenSizeNode',
@@ -263,6 +265,7 @@ aten_ops_no_attr_dict = {
     'AtenNotNode' : IR.NNNode.AtenNotNode.AtenNotNode(),
     'AtenPowNode' : IR.NNNode.AtenPowNode.AtenPowNode(),
     'AtenReluNode' : IR.NNNode.AtenReluNode.AtenReluNode(),
+    'AtenReshapeNode' : IR.NNNode.AtenReshapeNode.AtenReshapeNode(),
     'AtenSubNode' : IR.NNNode.AtenSubNode.AtenSubNode(),
     'AtenTanhNode' : IR.NNNode.AtenTanhNode.AtenTanhNode(),
     'AtenTensorNode' : IR.NNNode.AtenTensorNode.AtenTensorNode(),
