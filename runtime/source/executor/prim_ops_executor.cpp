@@ -79,7 +79,6 @@ void executePrimConstant(const nncir::Node& op_node, StreamExecutor& stream_exec
         tensor = tensor.cuda();
         iv = tensorToIValue(tensor);
         dtype = DataType::TENSOR;
-
     } else if (ntype == "(int, int, int)") {
         std::vector<torch::IValue> inputs;
         int64_t tmp = 0;

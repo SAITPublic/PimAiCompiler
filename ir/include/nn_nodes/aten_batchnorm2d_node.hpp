@@ -34,7 +34,7 @@ class AtenBatchNorm2dNode : public NodeMixin<AtenBatchNorm2dNode, NNNode>
           training_(training),
           momentum_(momentum),
           eps_(eps),
-          cudnn_enable_(cudnn_enable_)
+          cudnn_enable_(cudnn_enable)
     {
     }
 
@@ -95,10 +95,10 @@ class AtenBatchNorm2dNode : public NodeMixin<AtenBatchNorm2dNode, NNNode>
    private:
     std::vector<int64_t> weight_blob_ids_;
     std::vector<int64_t> bias_blob_ids_;
-    int training_;
+    int32_t training_;
     double momentum_;
     double eps_;
-    int cudnn_enable_;
+    int32_t cudnn_enable_;
 
 };  // class AtenBatchNorm2dNode
 

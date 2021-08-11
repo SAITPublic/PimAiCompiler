@@ -20,6 +20,7 @@ after build, test APP executable file are generated in /build/example/runtime
 ```
 # set GraphIR file into ENV, the APP will load IR file based on `GRAPH_IR_FILE` ENV
 export GRAPH_IR_FILE=path/to/your/graph_ir/file
+export MODEL_KIND=RNNT/HWR/GNMT
 
 # Run
 ./simpleMain

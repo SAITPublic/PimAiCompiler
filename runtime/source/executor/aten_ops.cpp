@@ -254,7 +254,7 @@ c10::List<at::IValue> atenList(const c10::List<at::IValue> &list) { return list.
 
 at::Tensor atenLog(const at::Tensor &self) { return at::log(self); }
 
-at::Tensor atenLogSoftmax(const at::Tensor &self, int64_t dim, at::ScalarType dtype) {
+at::Tensor atenLogSoftmax(const at::Tensor &self, int64_t dim, c10::optional<at::ScalarType> dtype) {
     return at::log_softmax(self, dim, dtype);
 }
 

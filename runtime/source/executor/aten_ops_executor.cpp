@@ -1,9 +1,10 @@
 #include <algorithm>
 #include <vector>
+#include "c10/hip/HIPFunctions.h"
 #include "common/include/cast.hpp"
 #include "executor/aten_ops.h"
 #include "executor/stream_executor.h"
-#include "executor/tv_tools.h"
+#include "tv_tools.h"
 #include "executor/utils.h"
 #include "glog/logging.h"
 #include "ir/include/all_nodes.hpp"
@@ -731,6 +732,10 @@ void executorAtenConv2d(const nncir::Node& op_node, StreamExecutor& stream_execu
     std::vector<int64_t> stride_vec = {static_cast<int64_t>(stride.h), static_cast<int64_t>(stride.w)};
     std::vector<int64_t> padding_vec = {static_cast<int64_t>(padding.l), static_cast<int64_t>(padding.r)};
     std::vector<int64_t> dilation_vec = {static_cast<int64_t>(dilation.h), static_cast<int64_t>(dilation.w)};
+
+    // DLOG(INFO) << "weight: " << weight_tensor;
+    // DLOG(INFO) << "bias: " << bias_tensor;
+
 
     auto output = nnrt::atenConv2d(self_tensor, weight_tensor, bias_tensor, at::ArrayRef<int64_t>(stride_vec),
                                    at::ArrayRef<int64_t>(padding_vec), at::ArrayRef<int64_t>(dilation_vec), groups);
@@ -1719,19 +1724,29 @@ void executorAtenLogSoftmax(const nncir::Node& op_node, StreamExecutor& stream_e
     }
 
     auto ori_dtype = node.getDtype();
+    bool dtype_is_none = false;
     if (nncir::isDefaultValue(ori_dtype)) {
         auto& ori_dtype_edge = cast<nncir::DataEdge>(node.getInEdge(edge_id++));
         int ori_dtype_blob_id = ori_dtype_edge.getBlobId();
         auto ori_dtype_iv = stream_executor.findBlob(ori_dtype_blob_id).second;
-        assert(ori_dtype_iv.isInt());
-        ori_dtype = ori_dtype_iv.toInt();
+        if (ori_dtype_iv.isInt())
+            ori_dtype = ori_dtype_iv.toInt();
+        else if (ori_dtype_iv.isNone()) {
+            dtype_is_none = true;
+        }
     }
-    auto dtype = at::ScalarType(ori_dtype);
 
-    auto output = nnrt::atenLogSoftmax(tensor, dim, dtype);
+    torch::Tensor output;
+    if (dtype_is_none) {
+        output = nnrt::atenLogSoftmax(tensor, dim);
+    } else {
+        output = nnrt::atenLogSoftmax(tensor, dim, at::ScalarType(ori_dtype));
+    }
+
     // update output
     auto& out_edge = cast<nncir::DataEdge>(node.getFirstOutEdge());
     stream_executor.updateBlob(out_edge.getBlobId(), DataType::TENSOR, tensorToIValue(output));
+
 }
 
 void executorAtenLSTM1(const nncir::Node& op_node, StreamExecutor& stream_executor)
@@ -1762,7 +1777,6 @@ void executorAtenLSTM1(const nncir::Node& op_node, StreamExecutor& stream_execut
     at::TensorList hx(hx_list_tensor_vector);
     edge_idx++;
 
-    // at::TensorList params
     // Check and skip, will handle params after getting all arguments
     if (lstm1_node.getNumInputs() >= edge_idx) {
         auto& params_edge = cast<nncir::DataEdge>(lstm1_node.getInEdge(edge_idx));
@@ -1884,6 +1898,7 @@ void executorAtenLSTM1(const nncir::Node& op_node, StreamExecutor& stream_execut
     stream_executor.updateBlob(out_blob_ids[0], DataType::TENSOR, tensorToIValue(std::get<0>(output)));
     stream_executor.updateBlob(out_blob_ids[1], DataType::TENSOR, tensorToIValue(std::get<1>(output)));
     stream_executor.updateBlob(out_blob_ids[2], DataType::TENSOR, tensorToIValue(std::get<2>(output)));
+
 }
 
 void executorAtenLSTM2(const nncir::Node& op_node, StreamExecutor& stream_executor)
@@ -2262,9 +2277,10 @@ void executorAtenMaxPool2d(const nncir::Node& op_node, StreamExecutor& stream_ex
         stride_vec.push_back(stride.w);
     }
 
+    // In PyTorch, Pad is a tuple(int, int)
     auto padding = node.getPad();
     std::vector<int64_t> padding_vec;
-    if (padding.t == INT64_MIN && padding.b == INT64_MIN && padding.l == INT64_MIN && padding.r == INT64_MIN) {
+    if (padding.l == INT64_MIN && padding.r == INT64_MIN) {
         auto& data_edge = cast<nncir::DataEdge>(node.getInEdge(edge_id++));
         int data_blob_id = data_edge.getBlobId();
         auto data_iv = stream_executor.findBlob(data_blob_id).second;
@@ -2272,8 +2288,6 @@ void executorAtenMaxPool2d(const nncir::Node& op_node, StreamExecutor& stream_ex
         auto data_list = data_iv.toListRef();
         padding_vec = parseIValueVector<int64_t>(data_list);
     } else {
-        padding_vec.push_back(padding.t);
-        padding_vec.push_back(padding.b);
         padding_vec.push_back(padding.l);
         padding_vec.push_back(padding.r);
     }
@@ -3499,6 +3513,7 @@ void executorAtenZerosLike(const nncir::Node& op_node, StreamExecutor& stream_ex
 
 void executorAtenBatchNorm2d(const nncir::Node& op_node, StreamExecutor& stream_executor)
 {
+    DLOG(INFO) << "execute Aten BN2d node";
     auto bn_node = cast<nncir::AtenBatchNorm2dNode>(op_node);
     auto in_blob_ids = getInBlobIds(op_node);
     auto get_tensor = [&stream_executor](int id) {
@@ -3523,29 +3538,29 @@ void executorAtenBatchNorm2d(const nncir::Node& op_node, StreamExecutor& stream_
     int cudnn_enabled = bn_node.getCudnnEnable();
 
     int offest = 3;
-    if (nncir::isDefaultValue<int>(training)) {
+    if (nncir::isDefaultValue(training)) {
         auto iv = stream_executor.findBlob(in_blob_ids[offest++]).second;
         assert(iv.isInt());
         training = static_cast<int>(iv.toInt());
     }
-    if (nncir::isDefaultValue<double>(monentum)) {
+    if (nncir::isDefaultValue(monentum)) {
         auto iv = stream_executor.findBlob(in_blob_ids[offest++]).second;
         assert(iv.isDouble());
         monentum = iv.toDouble();
     }
-    if (nncir::isDefaultValue<double>(eps)) {
+    if (nncir::isDefaultValue(eps)) {
         auto iv = stream_executor.findBlob(in_blob_ids[offest++]).second;
         assert(iv.isDouble());
         eps = iv.toDouble();
     }
-    if (nncir::isDefaultValue<int>(cudnn_enabled)) {
+    if (nncir::isDefaultValue(cudnn_enabled)) {
         auto iv = stream_executor.findBlob(in_blob_ids[offest++]).second;
         assert(iv.isInt());
         cudnn_enabled = static_cast<int>(iv.toInt());
     }
 
     if (training == 1) {
-        DLOG(ERROR) << "Currently, NNRuntime only support inference !";
+        DLOG(FATAL) << "Currently, NNRuntime only support inference !";
     }
 
     // Call kernel
@@ -3554,6 +3569,7 @@ void executorAtenBatchNorm2d(const nncir::Node& op_node, StreamExecutor& stream_
     // save outputs
     auto out_blob_id = getUniqueOutBlobIds(op_node)[0];
     stream_executor.updateBlob(out_blob_id, DataType::TENSOR, tensorToIValue(output));
+
 }
 
 void executorAtenReshape(const nncir::Node& op_node, StreamExecutor& stream_executor)
@@ -3578,7 +3594,6 @@ void executorAtenReshape(const nncir::Node& op_node, StreamExecutor& stream_exec
         shape.push_back(val);
         size *= val;
     }
-    assert(input_tensor.numel() == size && "Invalid shape !");
     auto output_tensor = atenReshape(input_tensor, at::IntArrayRef(shape));
     // save outputs
     auto out_blob_id = getUniqueOutBlobIds(op_node)[0];

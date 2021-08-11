@@ -10,6 +10,7 @@
 #include "ir/include/ir_types.hpp"
 #include "ir/include/nn_ir.hpp"
 #include "nnrt_types.h"
+#include "tv_tools.h"
 
 namespace nncir = nn_compiler::nn_ir;
 
@@ -32,7 +33,7 @@ void StreamExecutor::loadWeightAndBias(nncir::Blob* blob)
 
     auto bit_width = blob->getBitWidth();
     at::ScalarType scalar_type;
-    torch::Tensor tensor_data;
+    // torch::Tensor tensor_data;
 
     std::vector<int64_t> shape_arr;
     if (shape.n > 0) shape_arr.push_back(shape.n);
@@ -43,24 +44,25 @@ void StreamExecutor::loadWeightAndBias(nncir::Blob* blob)
     if (bit_width == 16) {
         auto value_vec = data_blob->getBuf<float16>();
         scalar_type = torch::kHalf;
-        tensor_data = at::from_blob(value_vec.data(), shape_arr, scalar_type).cuda();
+        auto tensor_data = at::from_blob(value_vec.data(), shape_arr, scalar_type).cuda();
+        // DLOG(INFO) << tensor_data;
+        torch::jit::IValue iv = tensorToIValue(tensor_data);
+        this->global_blobs_.insert({blob_id, {DataType::TENSOR, iv}});
     } else if (bit_width == 32) {
         auto value_vec = data_blob->getBuf<float>();
         scalar_type = torch::kFloat;
-        tensor_data = at::from_blob(value_vec.data(), shape_arr, scalar_type).cuda();
+        auto tensor_data = at::from_blob(value_vec.data(), shape_arr, scalar_type).cuda();
+        torch::jit::IValue iv = tensorToIValue(tensor_data);
+        this->global_blobs_.insert({blob_id, {DataType::TENSOR, iv}});
     } else {
-        DLOG(ERROR) << "bit witgh Error!";
+        DLOG(FATAL) << "bit witgh Error!";
     }
-
-    torch::jit::IValue iv = tensorToIValue(tensor_data);
-    this->global_blobs_.insert({blob_id, {DataType::TENSOR, iv}});
 }
 
 StreamExecutor::StreamExecutor(const std::shared_ptr<nncir::NNIR> ir_graph)
 {
     this->ir_graph_ = ir_graph;
     this->registerOp();
-
     // Get the output & input node from ir_graph at once
     this->input_blob_ids_.clear();
     this->output_blob_ids_.clear();
@@ -113,7 +115,7 @@ StreamExecutor::StreamExecutor(const std::shared_ptr<nncir::NNIR> ir_graph)
     DLOG(INFO) << "Num outputs of Graph:" << this->output_blob_ids_.size();
 
     if (this->input_blob_ids_.size() == 0 || this->output_blob_ids_.size() == 0) {
-        DLOG(ERROR) << "The Graph must have >= 1 inputs and outputs!";
+        DLOG(FATAL) << "The Graph must have >= 1 inputs and outputs!";
     }
 }
 
@@ -196,6 +198,86 @@ OpExecutorFn StreamExecutor::findOpExecutor(nncir::NodeType op_type)
     assert(it != this->global_op_register_.end());
     return it->second;
 }
+
+void StreamExecutor::setInputTensors(const std::vector<torch::Tensor>& input_tensors)
+{
+    if (input_tensors.size() != this->input_blob_ids_.size()) {
+        DLOG(ERROR) << "Num tensors must match the num inputs of Graph,"
+                    << "the Graph needs " << this->input_blob_ids_.size() << "inputs !";
+    }
+    // Set the input tensors to placeholder, assume all inputs & outputs are Tensor type
+    int k = 0;
+    for (auto& id_ : this->input_blob_ids_) {
+        this->updateBlob(id_, DataType::TENSOR, tensorToIValue(input_tensors.at(k)));
+        k++;
+    }
+}
+
+void StreamExecutor::getOutputTensors(std::vector<torch::Tensor>& output_tensors)
+{
+    output_tensors.clear();
+    std::vector<std::vector<int64_t>> out_list;
+
+    // checkout the dtype of outpus
+    bool is_all_tensor = true;
+    for (auto& id_ : this->output_blob_ids_) {
+        auto iv = this->findBlob(id_).second;
+        if (!iv.isTensor()) {
+            is_all_tensor = false;
+            break;
+        }
+    }
+
+    if (is_all_tensor) {
+        for (auto& id_ : this->output_blob_ids_) {
+            auto blob = this->findBlob(id_);
+            output_tensors.push_back(blob.second.toTensor());
+        }
+    } else {
+        // For RNNT, there's only one output with Tuple dtype
+        //  %774 : (Tensor, Tensor, int[][]) = prim::TupleConstruct(%x_padded3.1, %x_lens.1, %output.1)
+        //  return (%774)
+        if (this->output_blob_ids_.size() == 1) {
+            auto blob = this->findBlob(output_blob_ids_.at(0));
+            if (blob.second.isTuple()) {
+                auto tuple_ = blob.second.toTuple();
+                auto ivs = primTupleUnpack(tuple_);
+                for (auto& iv_ : ivs) {
+                    if (iv_.isTensor()) {
+                        auto tensor = iv_.toTensor();
+                        output_tensors.push_back(tensor);
+                    } else if (iv_.isList()) {
+                        // list[list]
+                        auto lst = iv_.toList().vec();
+                        for (auto item : iv_.toList().vec()) {
+                            std::vector<int64_t> vals;
+                            for (auto val : item.toList().vec()) {
+                                vals.push_back(val.toInt());
+                            }
+                            out_list.push_back(vals);
+                        }
+                    }
+                }
+            }
+            // print RNNT result
+            // logits, logits_lens, output
+            // _, _, transcript = self.greedy_decoder.forward(feature, feature_length)
+            std::stringstream ss;
+            for (auto& item : out_list.at(0)) {
+                ss << item << " ";
+            }
+            DLOG(INFO) << "RNNT_output: " << ss.str();
+            // convert list[list[int]] to tensor
+            torch::Tensor out_ =
+                torch::from_blob(out_list.at(0).data(), {1, static_cast<int64_t>(out_list.at(0).size())}, torch::kLong)
+                    .clone();
+            output_tensors.push_back(std::move(out_));
+            DLOG(INFO) << "Inference output: " << output_tensors.at(2);
+        }
+    }
+}
+
+const std::shared_ptr<nncir::NNIR> StreamExecutor::getGraph() { return this->ir_graph_; }
 
 void StreamExecutor::registerOp()
 {
@@ -309,85 +391,5 @@ void StreamExecutor::registerOp()
     this->global_op_register_.insert({nncir::NodeType::PRIMUNINITIALIZED, executePrimUninitialized});
     this->global_op_register_.insert({nncir::NodeType::PRIMVARIABLE, executePrimVariable});
 }
-
-void StreamExecutor::setInputTensors(const std::vector<torch::Tensor>& input_tensors)
-{
-    if (input_tensors.size() != this->input_blob_ids_.size()) {
-        DLOG(ERROR) << "Num tensors must match the num inputs of Graph,"
-                    << "the Graph needs " << this->input_blob_ids_.size() << "inputs !";
-    }
-    // Set the input tensors to placeholder, assume all inputs & outputs are Tensor type
-    int k = 0;
-    for (auto& id_ : this->input_blob_ids_) {
-        this->updateBlob(id_, DataType::TENSOR, tensorToIValue(input_tensors.at(k)));
-        k++;
-    }
-}
-
-void StreamExecutor::getOutputTensors(std::vector<torch::Tensor>& output_tensors)
-{
-    output_tensors.clear();
-    std::vector<std::vector<int64_t>> out_list;
-
-    // checkout the dtype of outpus
-    bool is_all_tensor = true;
-    for (auto& id_ : this->output_blob_ids_) {
-        auto iv = this->findBlob(id_).second;
-        if (!iv.isTensor()) {
-            is_all_tensor = false;
-            break;
-        }
-    }
-
-    if (is_all_tensor) {
-        for (auto& id_ : this->output_blob_ids_) {
-            auto blob = this->findBlob(id_);
-            output_tensors.push_back(blob.second.toTensor());
-        }
-    } else {
-        // For RNNT, there's only one output with Tuple dtype
-        //  %774 : (Tensor, Tensor, int[][]) = prim::TupleConstruct(%x_padded3.1, %x_lens.1, %output.1)
-        //  return (%774)
-        if (this->output_blob_ids_.size() == 1) {
-            auto blob = this->findBlob(output_blob_ids_.at(0));
-            if (blob.second.isTuple()) {
-                auto tuple_ = blob.second.toTuple();
-                auto ivs = primTupleUnpack(tuple_);
-                for (auto& iv_ : ivs) {
-                    if (iv_.isTensor()) {
-                        auto tensor = iv_.toTensor();
-                        output_tensors.push_back(tensor);
-                    } else if (iv_.isList()) {
-                        // list[list]
-                        auto lst = iv_.toList().vec();
-                        for (auto item : iv_.toList().vec()) {
-                            std::vector<int64_t> vals;
-                            for (auto val : item.toList().vec()) {
-                                vals.push_back(val.toInt());
-                            }
-                            out_list.push_back(vals);
-                        }
-                    }
-                }
-            }
-            // print RNNT result
-            // logits, logits_lens, output
-            // _, _, transcript = self.greedy_decoder.forward(feature, feature_length)
-            std::stringstream ss;
-            for (auto& item : out_list.at(0)) {
-                ss << item << " ";
-            }
-            DLOG(INFO) << "RNNT_output: " << ss.str();
-            // convert list[list[int]] to tensor
-            torch::Tensor out_ =
-                torch::from_blob(out_list.at(0).data(), {1, static_cast<int64_t>(out_list.at(0).size())}, torch::kLong)
-                    .clone();
-            output_tensors.push_back(std::move(out_));
-            DLOG(INFO) << "Inference output: " << output_tensors.at(2);
-        }
-    }
-}
-
-const std::shared_ptr<nncir::NNIR> StreamExecutor::getGraph() { return this->ir_graph_; }
 
 }  // namespace nnrt

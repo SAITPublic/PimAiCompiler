@@ -183,7 +183,7 @@ c10::List<at::IValue> atenList(const c10::List<at::IValue> &list);
 
 at::Tensor atenLog(const at::Tensor &self);
 
-at::Tensor atenLogSoftmax(const at::Tensor &self, int64_t dim, at::ScalarType dtype);
+at::Tensor atenLogSoftmax(const at::Tensor &self, int64_t dim, c10::optional<at::ScalarType> dtype=c10::nullopt);
 
 std::tuple<at::Tensor, at::Tensor, at::Tensor> atenLstm1(const at::Tensor &input, at::TensorList hx,
                                                          at::TensorList params, bool has_biases, int64_t num_layers,

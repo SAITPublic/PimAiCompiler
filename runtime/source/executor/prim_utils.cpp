@@ -4,7 +4,9 @@
 #include <vector>
 #include "glog/logging.h"
 #include "nnrt_types.h"
+#include <experimental/filesystem>
 
+namespace fs = std::experimental::filesystem;
 namespace nnrt
 {
 torch::jit::IValue pop(std::vector<torch::jit::IValue>& stack)
@@ -63,6 +65,9 @@ std::vector<int64_t> getDataShapeFromShape4D(nn_compiler::nn_ir::Shape4D shape)
 
 torch::Tensor loadTensor(const std::string& bin_file, const std::vector<int64_t>& shape, DataType dtype)
 {
+    if(!fs::is_regular_file(fs::path(bin_file))) {
+        std::runtime_error("Input file not exist!");
+    }
     int num_elements = 1;
     for (auto item : shape) {
         num_elements *= item;
