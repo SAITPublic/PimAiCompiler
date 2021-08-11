@@ -2940,15 +2940,19 @@ void executorAtenSoftmax(const nncir::Node& op_node, StreamExecutor& stream_exec
     }
 
     auto dtype = node.getDtype();
+    at::Tensor output;
     if (nncir::isDefaultValue(dtype)) {
         auto& data_edge = cast<nncir::DataEdge>(node.getInEdge(edge_id++));
         int data_blob_id = data_edge.getBlobId();
         auto data_iv = stream_executor.findBlob(data_blob_id).second;
-        assert(data_iv.isInt());
-        dtype = data_iv.toInt();
+        if (!data_iv.isNone()) {
+            dtype = data_iv.toInt();
+            output = nnrt::atenSoftmax(self_tensor, dim, at::ScalarType(dtype));
+        } else {
+            output = nnrt::atenSoftmax(self_tensor, dim);
+        }
     }
 
-    auto output = nnrt::atenSoftmax(self_tensor, dim, at::ScalarType(dtype));
     auto& out_edge = cast<nncir::DataEdge>(node.getFirstOutEdge());
     stream_executor.updateBlob(out_edge.getBlobId(), DataType::TENSOR, tensorToIValue(output));
 }

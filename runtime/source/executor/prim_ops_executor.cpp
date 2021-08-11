@@ -278,7 +278,7 @@ void executePrimGetAttr(const nncir::Node& op_node, StreamExecutor& stream_execu
     }
 
     // update output
-    for (int i = 0; i < in_blob_ids.size(); i++) {
+    for (int i = 0; i < out_blob_ids.size(); i++) {
         auto map_value = stream_executor.findBlob(in_blob_ids.at(i));
         torch::jit::IValue iv = map_value.second;
         auto type = map_value.first;

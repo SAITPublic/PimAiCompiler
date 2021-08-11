@@ -391,7 +391,7 @@ at::Tensor atenSlice(const at::Tensor &self, int64_t dim, int64_t start, int64_t
     return at::slice(self, dim, start, end, step);
 }
 
-at::Tensor atenSoftmax(const at::Tensor &self, int64_t dim, at::ScalarType dtype) {
+at::Tensor atenSoftmax(const at::Tensor &self, int64_t dim, c10::optional<at::ScalarType> dtype) {
     return at::softmax(self, dim, dtype);
 }
 
