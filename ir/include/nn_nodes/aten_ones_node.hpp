@@ -37,10 +37,10 @@ class AtenOnesNode : public NodeMixin<AtenOnesNode, NNNode>
     int getPinMemory() const { return pin_memory_; }
 
    private:
-    int64_t dtype_         = INT64_MIN;
-    int64_t layout_        = INT64_MIN;
-    std::string device_    = "";
-    int pin_memory_        = INT32_MIN;
+    int64_t dtype_      = INT64_MIN;
+    int64_t layout_     = INT64_MIN;
+    std::string device_ = "";
+    int pin_memory_     = INT32_MIN;
 };  // class AtenOnesNode
 
 }  // namespace nn_ir

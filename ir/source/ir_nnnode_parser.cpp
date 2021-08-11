@@ -1023,9 +1023,9 @@ IRNNNodeParser::parseNNNode<IR::NNNode::AnyType_AtenLSTM1Node>(const IR::NnNode*
     auto aten_lstm1_node = ir_node->nn_node_as_AtenLSTM1Node();
     Log::IR::E_IF(aten_lstm1_node == nullptr) << "IRNNNodeParser::parseNNNode<NN::AtenLSTM1Node>() => wrong node type!";
 
-    int   has_biases     = aten_lstm1_node->has_biases();
-    int64_t num_layer      = aten_lstm1_node->num_layers();
-    double  dropout        = aten_lstm1_node->dropout();
+    int   has_biases   = aten_lstm1_node->has_biases();
+    int64_t num_layer  = aten_lstm1_node->num_layers();
+    double  dropout    = aten_lstm1_node->dropout();
     int train          = aten_lstm1_node->train();
     int bidirectional  = aten_lstm1_node->bidirectional();
     int batch_first    = aten_lstm1_node->batch_first();
@@ -1034,7 +1034,7 @@ IRNNNodeParser::parseNNNode<IR::NNNode::AnyType_AtenLSTM1Node>(const IR::NnNode*
     auto bias_blob_id   = makeDataArrFromVector<int64_t>(aten_lstm1_node->bias_blob_ids());
 
     return std::make_unique<nn_ir::AtenLSTM1Node>(node_info, has_biases, num_layer, dropout, train,
-                                              bidirectional, batch_first, weight_blob_id, bias_blob_id);
+                                                  bidirectional, batch_first, weight_blob_id, bias_blob_id);
 }
 
 template <>
@@ -1044,9 +1044,9 @@ IRNNNodeParser::parseNNNode<IR::NNNode::AnyType_AtenLSTM2Node>(const IR::NnNode*
     auto aten_lstm2_node = ir_node->nn_node_as_AtenLSTM2Node();
     Log::IR::E_IF(aten_lstm2_node == nullptr) << "IRNNNodeParser::parseNNNode<NN::AtenLSTM2Node>() => wrong node type!";
 
-    int   has_biases     = aten_lstm2_node->has_biases();
-    int64_t num_layer      = aten_lstm2_node->num_layers();
-    double  dropout        = aten_lstm2_node->dropout();
+    int   has_biases   = aten_lstm2_node->has_biases();
+    int64_t num_layer  = aten_lstm2_node->num_layers();
+    double  dropout    = aten_lstm2_node->dropout();
     int train          = aten_lstm2_node->train();
     int bidirectional  = aten_lstm2_node->bidirectional();
 
@@ -1054,7 +1054,7 @@ IRNNNodeParser::parseNNNode<IR::NNNode::AnyType_AtenLSTM2Node>(const IR::NnNode*
     auto bias_blob_id   = makeDataArrFromVector<int64_t>(aten_lstm2_node->bias_blob_ids());
 
     return std::make_unique<nn_ir::AtenLSTM2Node>(node_info, has_biases, num_layer, dropout, train,
-                                              bidirectional, weight_blob_id, bias_blob_id);
+                                                  bidirectional, weight_blob_id, bias_blob_id);
 }
 template <>
 std::unique_ptr<nn_ir::NNNode>

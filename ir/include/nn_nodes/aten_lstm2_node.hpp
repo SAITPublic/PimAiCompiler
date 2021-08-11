@@ -85,14 +85,14 @@ class AtenLSTM2Node : public NodeMixin<AtenLSTM2Node, NNNode> {
     }
 
  private:
-    int             has_biases_;
-    int64_t         num_layers_;
-    double             dropout_;
-    int                  train_;
-    int          bidirectional_;
+    int     has_biases_;
+    int64_t num_layers_;
+    double  dropout_;
+    int     train_;
+    int     bidirectional_;
 
-    std::vector<int64_t>       weight_blob_ids_;
-    std::vector<int64_t>         bias_blob_ids_;
+    std::vector<int64_t> weight_blob_ids_;
+    std::vector<int64_t> bias_blob_ids_;
 }; // class AtenLSTM2Node
 
 } // namespace nn_ir

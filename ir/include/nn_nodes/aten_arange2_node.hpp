@@ -53,12 +53,12 @@ class AtenArange2Node : public NodeMixin<AtenArange2Node, NNNode> {
     int getPinMemory() const { return pin_memory_; }
     
  private:
-    int64_t start_         = INT64_MIN;
-    int64_t end_           = INT64_MIN;
-    int64_t dtype_         = INT64_MIN;
-    int64_t layout_        = INT64_MIN;
-    std::string device_    = "";
-    int pin_memory_        = INT32_MIN;
+    int64_t start_      = INT64_MIN;
+    int64_t end_        = INT64_MIN;
+    int64_t dtype_      = INT64_MIN;
+    int64_t layout_     = INT64_MIN;
+    std::string device_ = "";
+    int pin_memory_     = INT32_MIN;
 
 }; // class AtenArange2Node
 
