@@ -475,14 +475,14 @@ void executePrimTupleIndex(const nncir::Node& op_node, StreamExecutor& stream_ex
     // Find the input data blob
     torch::jit::IValue data_iv = stream_executor.findBlob(input_data_blob_id).second;
     auto& out_edge = cast<nncir::DataEdge>(tuple_index_node.getFirstOutEdge());
-    std::vector<torch::Tensor> inputs;
+    std::vector<torch::IValue> inputs;
     if (data_iv.isNone()) {
         torch::jit::IValue iv;
         stream_executor.updateBlob(out_edge.getBlobId(), DataType::NONE, iv);
     } else {
-        auto tensors = data_iv.toTuple()->elements();
-        for (auto tensor : tensors) {
-            inputs.push_back(tensor.toTensor());
+        auto ivalues = data_iv.toTuple()->elements();
+        for (auto iv : ivalues) {
+            inputs.push_back(iv);
         }
         int64_t index = tuple_index_node.getIndex();
         if (nncir::isDefaultValue(index)) {
@@ -494,10 +494,15 @@ void executePrimTupleIndex(const nncir::Node& op_node, StreamExecutor& stream_ex
         }
 
         // Call OpKernel
-        auto output = primTupleIndex(inputs, index);
+        auto output_iv = primTupleIndex(inputs, index);
         // update output
-
-        stream_executor.updateBlob(out_edge.getBlobId(), DataType::TENSOR, tensorToIValue(output));
+        if(output_iv.isTensor()){
+            stream_executor.updateBlob(out_edge.getBlobId(), DataType::TENSOR, output_iv);
+        }else if(output_iv.isTuple()){
+            stream_executor.updateBlob(out_edge.getBlobId(), DataType::TUPLE, output_iv);
+        }else{
+            DLOG(ERROR) << "Unsupported input for PrimTupleIndex.";
+        }
     }
 }
 

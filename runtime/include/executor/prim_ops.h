@@ -57,7 +57,7 @@ torch::Tensor primTensorConstant(void* data_ptr, std::vector<int64_t>& shape, Da
 
 void primTupleConstruct(std::vector<torch::IValue>& stack, size_t num_inputs);
 
-torch::Tensor primTupleIndex(const std::vector<torch::Tensor>& inputs, int64_t index);
+torch::IValue primTupleIndex(const std::vector<torch::IValue>& inputs, int64_t index);
 
 std::vector<torch::IValue> primTupleUnpack(c10::intrusive_ptr<c10::ivalue::Tuple> tuple);
 

@@ -99,7 +99,7 @@ void primTupleConstruct(std::vector<torch::IValue>& stack, size_t num_inputs)
     nnrt::push(stack, c10::ivalue::Tuple::create(std::move(elems)));
 }
 
-torch::Tensor primTupleIndex(const std::vector<torch::Tensor>& inputs, int64_t index)
+torch::IValue primTupleIndex(const std::vector<torch::IValue>& inputs, int64_t index)
 {
     // Convert an python index (which may be negative) into an index usable for a
     // C++ container

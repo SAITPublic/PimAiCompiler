@@ -133,9 +133,17 @@ void executorAtenAnd(const nncir::Node& op_node, StreamExecutor& stream_executor
     torch::jit::IValue iv_a = stream_executor.findBlob(input_a_blob_id).second;
     torch::jit::IValue iv_b = stream_executor.findBlob(input_b_blob_id).second;
 
-    assert(iv_a.isBool() && iv_b.isBool());
-    auto value_a = iv_a.toBool();
-    auto value_b = iv_b.toBool();
+    bool value_a;
+    bool value_b;
+    if(iv_a.isBool() && iv_b.isBool()){
+        value_a = iv_a.toBool();
+        value_b = iv_b.toBool();
+    }else if (iv_a.isInt() && iv_b.isInt()){
+        value_a = iv_a.toInt();
+        value_b = iv_b.toInt();
+    }else{
+        DLOG(ERROR) << "Wrong input type for AtenAdd.";
+    }
 
     auto output = nnrt::atenAnd(value_a, value_b);
     auto& out_edge = cast<nncir::DataEdge>(node.getFirstOutEdge());
@@ -1122,7 +1130,7 @@ void executorAtenFill(const nncir::Node& op_node, StreamExecutor& stream_executo
 {
     DLOG(INFO) << "execute Aten Fill node";
 
-    auto node = cast<nncir::AtenEqNode>(op_node);
+    auto node = cast<nncir::AtenFillNode>(op_node);
 
     auto& input_self = cast<nncir::DataEdge>(node.getInEdge(0));
     auto& input_other = cast<nncir::DataEdge>(node.getInEdge(1));
@@ -1266,7 +1274,7 @@ void executorAtenGather(const nncir::Node& op_node, StreamExecutor& stream_execu
     auto node = cast<nncir::AtenGatherNode>(op_node);
     int edge_id = 0;
 
-    auto& input_self = cast<nncir::DataEdge>(node.getInEdge(0));
+    auto& input_self = cast<nncir::DataEdge>(node.getInEdge(edge_id++));
     int input_self_blob_id = input_self.getBlobId();
 
     torch::jit::IValue iv_self = stream_executor.findBlob(input_self_blob_id).second;
@@ -1481,8 +1489,8 @@ void executorAtenIndexSelect(const nncir::Node& op_node, StreamExecutor& stream_
     DLOG(INFO) << "execute Aten IndexSelect node";
 
     auto node = cast<nncir::AtenIndexSelectNode>(op_node);
-
-    auto& input_self = cast<nncir::DataEdge>(node.getInEdge(0));
+    int edge_id = 0;
+    auto& input_self = cast<nncir::DataEdge>(node.getInEdge(edge_id++));
     int input_self_blob_id = input_self.getBlobId();
     torch::jit::IValue iv_self = stream_executor.findBlob(input_self_blob_id).second;
     assert(iv_self.isTensor());
@@ -1490,14 +1498,14 @@ void executorAtenIndexSelect(const nncir::Node& op_node, StreamExecutor& stream_
 
     auto dim = node.getDim();
     if (nncir::isDefaultValue(dim)) {
-        auto& dim_edge = cast<nncir::DataEdge>(node.getInEdge(1));
+        auto& dim_edge = cast<nncir::DataEdge>(node.getInEdge(edge_id++));
         int dim_blob_id = dim_edge.getBlobId();
         auto dim_iv = stream_executor.findBlob(dim_blob_id).second;
         assert(dim_iv.isInt());
         dim = dim_iv.toInt();
     }
 
-    auto& input_other = cast<nncir::DataEdge>(node.getInEdge(2));
+    auto& input_other = cast<nncir::DataEdge>(node.getInEdge(edge_id++));
     int input_other_blob_id = input_other.getBlobId();
     torch::jit::IValue iv_other = stream_executor.findBlob(input_other_blob_id).second;
     assert(iv_other.isTensor());
