@@ -20,6 +20,7 @@ endif()
 
 add_definitions(-DC10_USE_GLOG)
 add_definitions(-D_GLIBCXX_USE_CXX11_ABI=1)
+add_definitions(-DPIM_SUPPORT)
 
 # for debug, set `-O0 -g`
 # for release, set -O3 for optimize

@@ -3,6 +3,8 @@
 #include "compiler/include/common/log.hpp"
 #include "ir/include/nn_ir.hpp"
 
+#include "graphgen_core.h"
+
 namespace nn_compiler {
 namespace frontend {
 
@@ -49,11 +51,11 @@ class FrontendDriver {
  private:
     std::string in_file_path_ = "";
 
-    std:: string graphgen_path_ = "";
+    std::string graphgen_path_ = "";
 
     std::vector<std::shared_ptr<nn_compiler::nn_ir::NNIR>> graphs_;
 
-    std::string createRunningCommand();
+    std::shared_ptr<graphgen::GraphGenCore> graphgen_core_ = nullptr;
 
     void importFrontendIR();
 
