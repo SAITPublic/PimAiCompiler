@@ -16,7 +16,7 @@ input_file_path(std::vector<std::string>{"-i", "--input"}, "<file>", "Input file
 
 static cl_opt::Option<int> compile_level("-l",
                                          "<compile level>",
-                                         "compile level. Possible values: 0 (frontend->middlend->backend),\
+                                         "compile level. Possible values: 0 (frontend->middlend->backend),\n\
                                           1 (middlend->backend), 2 (backend) (default: 0)",
                                          cl_opt::Required::YES,
                                          cl_opt::Hidden::NO);

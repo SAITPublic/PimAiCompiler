@@ -13,7 +13,7 @@ static cl_opt::Option<int> verify_level("-v",
                                         "<level>",
                                         "verification level. Possible values: 0, 1, 2 (default: 0)",
                                         cl_opt::Required::NO,
-                                        cl_opt::Hidden::NO,
+                                        cl_opt::Hidden::YES,
                                         static_cast<int>(nn_compiler::PassManager<>::VerificationLevelType::NONE),
                                         std::vector<std::string>{"0", "1", "2"});
 
@@ -22,7 +22,7 @@ static cl_opt::Option<std::string>
                               "<configuration file>",
                               "pass config file path, please set in environment path ${ME_PASS_CONFIG_PATH}",
                               cl_opt::Required::NO,
-                              cl_opt::Hidden::NO,
+                              cl_opt::Hidden::YES,
                               "compiler/include/middlend/passes/pass_config.json");
 
 namespace nn_compiler {
