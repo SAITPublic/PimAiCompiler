@@ -211,10 +211,10 @@ void executorAtenArange1(const nncir::Node& op_node, StreamExecutor& stream_exec
         auto dtype_id = edge_dtype.getBlobId();
         auto iv_dtype = stream_executor.findBlob(dtype_id).second;
         if (!iv_dtype.isNone()) {
-            options.dtype(iv_dtype.toScalarType());
+            options = options.dtype(iv_dtype.toScalarType());
         }
     } else {
-        options.dtype(at::ScalarType(dtype));
+        options = options.dtype(at::ScalarType(dtype));
     }
 
     auto layout = node.getLayout();
@@ -223,10 +223,10 @@ void executorAtenArange1(const nncir::Node& op_node, StreamExecutor& stream_exec
         auto layout_id = edge_layout.getBlobId();
         auto iv_layout = stream_executor.findBlob(layout_id).second;
         if (!iv_layout.isNone()) {
-            options.layout(iv_layout.toLayout());
+            options = options.layout(iv_layout.toLayout());
         }
     } else {
-        options.layout(at::Layout(layout));
+        options = options.layout(at::Layout(layout));
     }
 
     auto device = node.getDevice();
@@ -235,10 +235,10 @@ void executorAtenArange1(const nncir::Node& op_node, StreamExecutor& stream_exec
         auto device_id = edge_device.getBlobId();
         auto iv_device = stream_executor.findBlob(device_id).second;
         if (!iv_device.isNone()) {
-            options.device(iv_device.toDevice());
+            options = options.device(iv_device.toDevice());
         }
     } else {
-        options.device(device);
+        options = options.device(device);
     }
 
     auto pin_memory = node.getPinMemory();
@@ -247,10 +247,10 @@ void executorAtenArange1(const nncir::Node& op_node, StreamExecutor& stream_exec
         auto pin_memory_id = edge_pin_memory.getBlobId();
         auto iv_pin_memory = stream_executor.findBlob(pin_memory_id).second;
         if (!iv_pin_memory.isNone()) {
-            options.pinned_memory(iv_pin_memory.toBool());
+            options = options.pinned_memory(iv_pin_memory.toBool());
         }
     } else {
-        options.pinned_memory(static_cast<bool>(pin_memory));
+        options = options.pinned_memory(static_cast<bool>(pin_memory));
     }
 
     auto output = nnrt::atenArange1(end, options);
@@ -288,10 +288,10 @@ void executorAtenArange2(const nncir::Node& op_node, StreamExecutor& stream_exec
         auto dtype_id = edge_dtype.getBlobId();
         auto iv_dtype = stream_executor.findBlob(dtype_id).second;
         if (!iv_dtype.isNone()) {
-            options.dtype(iv_dtype.toScalarType());
+            options = options.dtype(iv_dtype.toScalarType());
         }
     } else {
-        options.dtype(at::ScalarType(dtype));
+        options = options.dtype(at::ScalarType(dtype));
     }
 
     auto layout = node.getLayout();
@@ -300,10 +300,10 @@ void executorAtenArange2(const nncir::Node& op_node, StreamExecutor& stream_exec
         auto layout_id = edge_layout.getBlobId();
         auto iv_layout = stream_executor.findBlob(layout_id).second;
         if (!iv_layout.isNone()) {
-            options.layout(iv_layout.toLayout());
+            options = options.layout(iv_layout.toLayout());
         }
     } else {
-        options.layout(at::Layout(layout));
+        options = options.layout(at::Layout(layout));
     }
 
     auto device = node.getDevice();
@@ -312,10 +312,10 @@ void executorAtenArange2(const nncir::Node& op_node, StreamExecutor& stream_exec
         auto device_id = edge_device.getBlobId();
         auto iv_device = stream_executor.findBlob(device_id).second;
         if (!iv_device.isNone()) {
-            options.device(iv_device.toDevice());
+            options = options.device(iv_device.toDevice());
         }
     } else {
-        options.device(device);
+        options = options.device(device);
     }
 
     auto pin_memory = node.getPinMemory();
@@ -324,10 +324,10 @@ void executorAtenArange2(const nncir::Node& op_node, StreamExecutor& stream_exec
         auto pin_memory_id = edge_pin_memory.getBlobId();
         auto iv_pin_memory = stream_executor.findBlob(pin_memory_id).second;
         if (!iv_pin_memory.isNone()) {
-            options.pinned_memory(iv_pin_memory.toBool());
+            options = options.pinned_memory(iv_pin_memory.toBool());
         }
     } else {
-        options.pinned_memory(static_cast<bool>(pin_memory));
+        options = options.pinned_memory(static_cast<bool>(pin_memory));
     }
 
     auto output = nnrt::atenArange2(start, end, options);
@@ -373,10 +373,10 @@ void executorAtenArange3(const nncir::Node& op_node, StreamExecutor& stream_exec
         auto dtype_id = edge_dtype.getBlobId();
         auto iv_dtype = stream_executor.findBlob(dtype_id).second;
         if (!iv_dtype.isNone()) {
-            options.dtype(iv_dtype.toScalarType());
+            options = options.dtype(iv_dtype.toScalarType());
         }
     } else {
-        options.dtype(at::ScalarType(dtype));
+        options = options.dtype(at::ScalarType(dtype));
     }
 
     auto layout = node.getLayout();
@@ -385,10 +385,10 @@ void executorAtenArange3(const nncir::Node& op_node, StreamExecutor& stream_exec
         auto layout_id = edge_layout.getBlobId();
         auto iv_layout = stream_executor.findBlob(layout_id).second;
         if (!iv_layout.isNone()) {
-            options.layout(iv_layout.toLayout());
+           options = options.layout(iv_layout.toLayout());
         }
     } else {
-        options.layout(at::Layout(layout));
+        options = options.layout(at::Layout(layout));
     }
 
     auto device = node.getDevice();
@@ -397,10 +397,10 @@ void executorAtenArange3(const nncir::Node& op_node, StreamExecutor& stream_exec
         auto device_id = edge_device.getBlobId();
         auto iv_device = stream_executor.findBlob(device_id).second;
         if (!iv_device.isNone()) {
-            options.device(iv_device.toDevice());
+            options = options.device(iv_device.toDevice());
         }
     } else {
-        options.device(device);
+        options = options.device(device);
     }
 
     auto pin_memory = node.getPinMemory();
@@ -409,10 +409,10 @@ void executorAtenArange3(const nncir::Node& op_node, StreamExecutor& stream_exec
         auto pin_memory_id = edge_pin_memory.getBlobId();
         auto iv_pin_memory = stream_executor.findBlob(pin_memory_id).second;
         if (!iv_pin_memory.isNone()) {
-            options.pinned_memory(iv_pin_memory.toBool());
+            options = options.pinned_memory(iv_pin_memory.toBool());
         }
     } else {
-        options.pinned_memory(static_cast<bool>(pin_memory));
+        options = options.pinned_memory(static_cast<bool>(pin_memory));
     }
 
     auto output = nnrt::atenArange3(start, end, step, options);
@@ -1778,7 +1778,7 @@ void executorAtenLSTM1(const nncir::Node& op_node, StreamExecutor& stream_execut
     edge_idx++;
 
     // Check and skip, will handle params after getting all arguments
-    if (lstm1_node.getNumInputs() >= edge_idx) {
+    if (lstm1_node.getNumInputs() > edge_idx) {
         auto& params_edge = cast<nncir::DataEdge>(lstm1_node.getInEdge(edge_idx));
         int params_blob_id = params_edge.getBlobId();
         auto params_iv = stream_executor.findBlob(params_blob_id).second;
@@ -1895,6 +1895,7 @@ void executorAtenLSTM1(const nncir::Node& op_node, StreamExecutor& stream_execut
     auto pos = std::unique(out_blob_ids.begin(), out_blob_ids.end());
     out_blob_ids.erase(pos, out_blob_ids.end());
     assert(out_blob_ids.size() == 3);
+    auto xxx = std::get<0>(output);
     stream_executor.updateBlob(out_blob_ids[0], DataType::TENSOR, tensorToIValue(std::get<0>(output)));
     stream_executor.updateBlob(out_blob_ids[1], DataType::TENSOR, tensorToIValue(std::get<1>(output)));
     stream_executor.updateBlob(out_blob_ids[2], DataType::TENSOR, tensorToIValue(std::get<2>(output)));
@@ -1940,7 +1941,7 @@ void executorAtenLSTM2(const nncir::Node& op_node, StreamExecutor& stream_execut
 
     // at::TensorList params
     // Check and skip, will handle params after getting all arguments
-    if (lstm2_node.getNumInputs() >= edge_idx) {
+    if (lstm2_node.getNumInputs() > edge_idx) {
         auto& params_edge = cast<nncir::DataEdge>(lstm2_node.getInEdge(edge_idx));
         int params_blob_id = params_edge.getBlobId();
         auto params_iv = stream_executor.findBlob(params_blob_id).second;
@@ -2088,7 +2089,7 @@ void executorAtenMaskedFill(const nncir::Node& op_node, StreamExecutor& stream_e
 {
     DLOG(INFO) << "execute Aten MaskedFill node";
 
-    auto node = cast<nncir::AtenEqNode>(op_node);
+    auto node = cast<nncir::AtenMaskedFillNode>(op_node);
 
     auto& input_self = cast<nncir::DataEdge>(node.getInEdge(0));
     auto& input_other = cast<nncir::DataEdge>(node.getInEdge(1));
@@ -2560,10 +2561,10 @@ void executorAtenOnes(const nncir::Node& op_node, StreamExecutor& stream_executo
         auto dtype_id = edge_dtype.getBlobId();
         auto iv_dtype = stream_executor.findBlob(dtype_id).second;
         if (!iv_dtype.isNone()) {
-            options.dtype(iv_dtype.toScalarType());
+            options = options.dtype(iv_dtype.toScalarType());
         }
     } else {
-        options.dtype(at::ScalarType(dtype));
+        options = options.dtype(at::ScalarType(dtype));
     }
 
     auto layout = node.getLayout();
@@ -2572,10 +2573,10 @@ void executorAtenOnes(const nncir::Node& op_node, StreamExecutor& stream_executo
         auto layout_id = edge_layout.getBlobId();
         auto iv_layout = stream_executor.findBlob(layout_id).second;
         if (!iv_layout.isNone()) {
-            options.layout(iv_layout.toLayout());
+            options = options.layout(iv_layout.toLayout());
         }
     } else {
-        options.layout(at::Layout(layout));
+        options = options.layout(at::Layout(layout));
     }
 
     auto device = node.getDevice();
@@ -2584,10 +2585,10 @@ void executorAtenOnes(const nncir::Node& op_node, StreamExecutor& stream_executo
         auto device_id = edge_device.getBlobId();
         auto iv_device = stream_executor.findBlob(device_id).second;
         if (!iv_device.isNone()) {
-            options.device(iv_device.toDevice());
+            options = options.device(iv_device.toDevice());
         }
     } else {
-        options.device(device);
+        options = options.device(device);
     }
 
     auto pin_memory = node.getPinMemory();
@@ -2596,10 +2597,10 @@ void executorAtenOnes(const nncir::Node& op_node, StreamExecutor& stream_executo
         auto pin_memory_id = edge_pin_memory.getBlobId();
         auto iv_pin_memory = stream_executor.findBlob(pin_memory_id).second;
         if (!iv_pin_memory.isNone()) {
-            options.pinned_memory(iv_pin_memory.toBool());
+            options = options.pinned_memory(iv_pin_memory.toBool());
         }
     } else {
-        options.pinned_memory(static_cast<bool>(pin_memory));
+        options = options.pinned_memory(static_cast<bool>(pin_memory));
     }
 
     auto output = nnrt::atenOnes(at::ArrayRef<int64_t>(array_ref), options);
@@ -2828,6 +2829,7 @@ void executorAtenSetItem(const nncir::Node& op_node, StreamExecutor& stream_exec
     // update output
     auto& out_edge = cast<nncir::DataEdge>(node.getFirstOutEdge());
     stream_executor.updateBlob(out_edge.getBlobId(), DataType::LIST, listToIValue(output));
+    stream_executor.updateBlob(input_self_blob_id, DataType::LIST, listToIValue(output));
 }
 
 void executorAtenSize(const nncir::Node& op_node, StreamExecutor& stream_executor)

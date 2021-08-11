@@ -85,7 +85,7 @@ void primRaiseException(std::string msg)
 
 torch::Tensor primTensorConstant(void* data_ptr, std::vector<int64_t>& shape, DataType dtype)
 {
-    return createPtTensor(data_ptr, shape, dtype);
+    return createPtTensor(data_ptr, shape, dtype).cuda();
 }
 
 // the unpacked tensors will append to stack

@@ -76,7 +76,6 @@ void executePrimConstant(const nncir::Node& op_node, StreamExecutor& stream_exec
         uint8_t* ptr = const_cast<uint8_t*>(temp_data.data());
         std::vector<int64_t> input_shape = getDataShapeFromShape4D(shape_);
         auto tensor = primTensorConstant((void*)ptr, input_shape, scalar_type);
-        tensor = tensor.cuda();
         iv = tensorToIValue(tensor);
         dtype = DataType::TENSOR;
     } else if (ntype == "(int, int, int)") {
