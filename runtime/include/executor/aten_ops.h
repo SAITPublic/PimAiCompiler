@@ -249,6 +249,8 @@ bool atenNe(const at::Scalar &self, const at::Scalar &other);
 
 at::Tensor atenNeg(const at::Tensor &self);
 
+at::Tensor atenNorm(const at::Tensor &self, at::Scalar p);
+
 at::Tensor atenNot(const at::Tensor &self);
 
 bool atenNot(const bool &input);

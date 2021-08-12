@@ -424,6 +424,7 @@ IRParser::IRParser() {
         {IR::NNNode::AnyType_AtenPadPackedSequenceNode,
          &IRNNNodeParser::parseNNNode<IR::NNNode::AnyType_AtenPadPackedSequenceNode>},
         {IR::NNNode::AnyType_AtenPowNode, &IRNNNodeParser::parseNNNode<IR::NNNode::AnyType_AtenPowNode>},
+        {IR::NNNode::AnyType_AtenNormNode, &IRNNNodeParser::parseNNNode<IR::NNNode::AnyType_AtenNormNode>},
         {IR::NNNode::AnyType_AtenNotNode, &IRNNNodeParser::parseNNNode<IR::NNNode::AnyType_AtenNotNode>},
         {IR::NNNode::AnyType_AtenOnesNode, &IRNNNodeParser::parseNNNode<IR::NNNode::AnyType_AtenOnesNode>},
         {IR::NNNode::AnyType_AtenReluNode, &IRNNNodeParser::parseNNNode<IR::NNNode::AnyType_AtenReluNode>},

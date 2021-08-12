@@ -73,6 +73,7 @@ void executorAtenMin(const nncir::Node& op_node, StreamExecutor& stream_executor
 void executorAtenMul(const nncir::Node& op_node, StreamExecutor& stream_executor);
 void executorAtenNe(const nncir::Node& op_node, StreamExecutor& stream_executor);
 void executorAtenNeg(const nncir::Node& op_node, StreamExecutor& stream_executor);
+void executorAtenNorm(const nncir::Node& op_node, StreamExecutor& stream_executor);
 void executorAtenNot(const nncir::Node& op_node, StreamExecutor& stream_executor);
 void executorAtenOnes(const nncir::Node& op_node, StreamExecutor& stream_executor);
 void executorAtenPackPaddedSequence(const nncir::Node& op_node, StreamExecutor& stream_executor);

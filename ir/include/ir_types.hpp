@@ -255,6 +255,7 @@ class AtenMinNode;
 class AtenMulNode;
 class AtenNeNode;
 class AtenNegNode;
+class AtenNormNode;
 class AtenNotNode;
 class AtenOnesNode;
 class AtenPackPaddedSequenceNode;
@@ -453,6 +454,7 @@ enum class NodeType {
     ATENMUL,
     ATENNE,
     ATENNEG,
+    ATENNORM,
     ATENNOT,
     ATENONES,
     ATENPACKPADDEDSEQUENCE,
@@ -605,6 +607,7 @@ inline std::ostream& operator<<(std::ostream& s, nn_ir::NodeType type) {
         ENUM_STR(ATENMUL)
         ENUM_STR(ATENNE)
         ENUM_STR(ATENNEG)
+        ENUM_STR(ATENNORM)
         ENUM_STR(ATENNOT)
         ENUM_STR(ATENONES)
         ENUM_STR(ATENPACKPADDEDSEQUENCE)

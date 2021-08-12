@@ -2527,6 +2527,31 @@ void executorAtenNeg(const nncir::Node& op_node, StreamExecutor& stream_executor
     }
 }
 
+void executorAtenNorm(const nncir::Node& op_node, StreamExecutor& stream_executor)
+{
+    DLOG(INFO) << "execute Aten Norm node";
+    auto node = cast<nncir::AtenNormNode>(op_node);
+
+    auto& input_edge = cast<nncir::DataEdge>(node.getInEdge(0));
+    int input_tensor_blob_id = input_edge.getBlobId();
+    auto input_ivalue = stream_executor.findBlob(input_tensor_blob_id).second;
+    assert(input_ivalue.isTensor());
+    auto input_tensor = input_ivalue.toTensor();
+
+    auto p = node.getP();
+    if (nncir::isDefaultValue(p)) {
+        auto& data_edge = cast<nncir::DataEdge>(node.getInEdge(1));
+        int data_blob_id = data_edge.getBlobId();
+        auto data_iv = stream_executor.findBlob(data_blob_id).second;
+        assert(data_iv.isInt());
+        p = data_iv.toInt();
+    }
+
+    auto output = nnrt::atenNorm(input_tensor, p);
+    auto& out_edge = cast<nncir::DataEdge>(node.getFirstOutEdge());
+    stream_executor.updateBlob(out_edge.getBlobId(), DataType::TENSOR, tensorToIValue(output));
+}
+
 void executorAtenNot(const nncir::Node& op_node, StreamExecutor& stream_executor)
 {
     DLOG(INFO) << "execute Aten Not node";

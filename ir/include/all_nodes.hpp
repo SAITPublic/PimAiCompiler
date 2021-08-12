@@ -82,6 +82,7 @@
 #include "ir/include/nn_nodes/aten_mul_node.hpp"
 #include "ir/include/nn_nodes/aten_ne_node.hpp"
 #include "ir/include/nn_nodes/aten_neg_node.hpp"
+#include "ir/include/nn_nodes/aten_norm_node.hpp"
 #include "ir/include/nn_nodes/aten_not_node.hpp"
 #include "ir/include/nn_nodes/aten_ones_node.hpp"
 #include "ir/include/nn_nodes/aten_pack_padded_sequence_node.hpp"

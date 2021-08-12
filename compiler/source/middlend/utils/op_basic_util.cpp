@@ -68,6 +68,7 @@ bool OpBasicUtil::isAtenOp(const nn_ir::Node& node) const {
                 nn_ir::AtenMulNode,
                 nn_ir::AtenNeNode,
                 nn_ir::AtenNegNode,
+                nn_ir::AtenNormNode,
                 nn_ir::AtenNotNode,
                 nn_ir::AtenOnesNode,
                 nn_ir::AtenPackPaddedSequenceNode,

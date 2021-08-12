@@ -1195,6 +1195,17 @@ IRNNNodeParser::parseNNNode<IR::NNNode::AnyType_AtenNegNode>(const IR::NnNode*  
 }
 
 template <>
+std::unique_ptr<nn_ir::NNNode> IRNNNodeParser::parseNNNode<IR::NNNode::AnyType_AtenNormNode>(
+    const IR::NnNode* ir_node, const nn_ir::NodeInfo& node_info)
+{
+    auto aten_norm_node = ir_node->nn_node_as_AtenNormNode();
+    Log::IR::E_IF(aten_norm_node == nullptr) << "IRNNNodeParser::parseNNNode<NN::AtenNormNode>() => wrong node type!";
+
+    auto p = aten_norm_node->p();
+    return std::make_unique<nn_ir::AtenNormNode>(node_info, p);
+}
+
+template <>
 std::unique_ptr<nn_ir::NNNode> IRNNNodeParser::parseNNNode<IR::NNNode::AnyType_AtenNotNode>(
     const IR::NnNode* ir_node, const nn_ir::NodeInfo& node_info)
 {

@@ -349,6 +349,8 @@ bool atenNe(const at::Scalar &self, const at::Scalar &other)
 
 at::Tensor atenNeg(const at::Tensor &self) { return at::neg(self); }
 
+at::Tensor atenNorm(const at::Tensor &self, at::Scalar p) { return at::norm(self, p); }
+
 at::Tensor atenNot(const at::Tensor &self) { return at::logical_not(self); }
 
 bool atenNot(const bool &input) { return !input; };
