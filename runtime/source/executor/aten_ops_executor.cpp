@@ -3205,25 +3205,33 @@ void executorAtenTo(const nncir::Node& op_node, StreamExecutor& stream_executor)
 
     auto to_node = cast<nncir::AtenToNode>(op_node);
     int edge_id = 0;
+    bool other_tensor_type = false; // true for other tensor, false for dtype.
 
-    auto& input_self = cast<nncir::DataEdge>(to_node.getInEdge(0));
+    auto& input_self = cast<nncir::DataEdge>(to_node.getInEdge(edge_id++));
     int input_self_blob_id = input_self.getBlobId();
-
-    auto data_type = stream_executor.findBlob(input_self_blob_id).first;
     torch::jit::IValue iv_self = stream_executor.findBlob(input_self_blob_id).second;
     assert(iv_self.isTensor());
     at::Tensor self_tensor = iv_self.toTensor();
-    edge_id++;
 
-    auto ori_dtype = to_node.getDType();
-    if (nncir::isDefaultValue(ori_dtype)) {
-        auto& ori_dtype_edge = cast<nncir::DataEdge>(to_node.getInEdge(edge_id++));
-        int ori_dtype_blob_id = ori_dtype_edge.getBlobId();
-        auto ori_dtype_iv = stream_executor.findBlob(ori_dtype_blob_id).second;
-        assert(ori_dtype_iv.isInt());
-        ori_dtype = ori_dtype_iv.toInt();
+    auto& input_other = cast<nncir::DataEdge>(to_node.getInEdge(edge_id++));
+    int input_other_blob_id = input_other.getBlobId();
+    torch::jit::IValue iv_other = stream_executor.findBlob(input_other_blob_id).second;
+
+    at::ScalarType dtype;
+
+    if (iv_other.isTensor()) {
+        other_tensor_type = true;
+    } else {
+        auto ori_dtype = to_node.getDType();
+        if (nncir::isDefaultValue(ori_dtype)) {
+            auto& ori_dtype_edge = cast<nncir::DataEdge>(to_node.getInEdge(edge_id++));
+            int ori_dtype_blob_id = ori_dtype_edge.getBlobId();
+            auto ori_dtype_iv = stream_executor.findBlob(ori_dtype_blob_id).second;
+            assert(ori_dtype_iv.isInt());
+            ori_dtype = ori_dtype_iv.toInt();
+        }
+        dtype = at::ScalarType(ori_dtype);
     }
-    auto dtype = at::ScalarType(ori_dtype);
 
     int non_blocking_val = to_node.getNonBlocking();
     if (nncir::isDefaultValue(non_blocking_val)) {
@@ -3253,15 +3261,24 @@ void executorAtenTo(const nncir::Node& op_node, StreamExecutor& stream_executor)
         assert(optional_memory_format_iv.isInt());
         optional_memory_format = optional_memory_format_iv.toInt();
     }
-
+    
+    at::Tensor output;
     if (optional_memory_format == -1) {  // optional_memory_format = NONE
-        auto output = nnrt::atenTo(self_tensor, dtype, non_blocking, copy);
+        if (other_tensor_type) {
+            output = nnrt::atenTo(self_tensor, iv_other.toTensor(), non_blocking, copy);
+        } else {
+            output = nnrt::atenTo(self_tensor, dtype, non_blocking, copy);
+        }
         // update output
         auto& out_edge = cast<nncir::DataEdge>(to_node.getFirstOutEdge());
         stream_executor.updateBlob(out_edge.getBlobId(), DataType::TENSOR, tensorToIValue(output));
     } else {
         auto memory_format = getMemoryFormat(optional_memory_format);
-        auto output = nnrt::atenTo(self_tensor, dtype, non_blocking, copy, memory_format);
+        if (other_tensor_type) {
+            output = nnrt::atenTo(self_tensor, iv_other.toTensor(), non_blocking, copy, memory_format);
+        } else {
+            output = nnrt::atenTo(self_tensor, dtype, non_blocking, copy, memory_format);
+        }
         // update output
         auto& out_edge = cast<nncir::DataEdge>(to_node.getFirstOutEdge());
         stream_executor.updateBlob(out_edge.getBlobId(), DataType::TENSOR, tensorToIValue(output));
