@@ -21,22 +21,32 @@ namespace nn_ir {
 
 class AtenEmbeddingNode : public NodeMixin<AtenEmbeddingNode, NNNode> {
  public:
-    explicit AtenEmbeddingNode(const NodeInfo& node_info, int64_t padding_idx,
+    explicit AtenEmbeddingNode(const NodeInfo& node_info, std::vector<float16> weights,
+                                Shape2D weights_shape, int64_t padding_idx,
                                 int scale_grad_by_freq, int sparse)
-                                : NodeMixin(node_info, NodeType::ATENEMBEDDING), padding_idx_(padding_idx), 
+                                : NodeMixin(node_info, NodeType::ATENEMBEDDING), 
+                                weights_(weights),
+                                weights_shape_(weights_shape),
+                                padding_idx_(padding_idx), 
                                 scale_grad_by_freq_(scale_grad_by_freq), sparse_(sparse) {}
 
     std::string getNodeTypeAsString(void) const override { return "AtenEmbedding"; }
 
+    void setWeights(std::vector<float16> weights) { weights_ = weights; }
+    void setWeightsShape(Shape2D weights_shape) { weights_shape_ = weights_shape; }
     void setPaddingIdx(int64_t padding_idx) { padding_idx_ = padding_idx;}
     void setScaleGradByFreq(int scale_grad_by_freq) { scale_grad_by_freq_ = scale_grad_by_freq; }
     void setSparse(int sparse) { sparse_ = sparse; }
 
+    std::vector<float16> getWeights() { return weights_; }
+    Shape2D getWeightsShape() { return weights_shape_; }
     int64_t  getPaddingIdx() { return padding_idx_; }
     int getScaleGradByFreq() { return scale_grad_by_freq_; }
     int getSparse() { return sparse_; }
 
  private:
+    std::vector<float16> weights_;
+    Shape2D weights_shape_;
     int64_t padding_idx_;
     int scale_grad_by_freq_;
     int sparse_;

@@ -115,6 +115,16 @@ std::vector<T> makeDataArrFromVector(const flatbuffers::Vector<int64_t>* data_ar
     return data_vector;
 }
 
+template <typename T>
+std::vector<T> makeDataArrFromVector(const flatbuffers::Vector<float>* data_arr) {
+    std::vector<T> data_vector;
+    if (!data_arr) {
+        return data_vector;
+    }
+    auto raw_data = reinterpret_cast<const T*>(data_arr->data());
+    data_vector.assign(raw_data, raw_data + (data_arr->size()*sizeof(float) / sizeof(T)));
+    return data_vector;
+}
 
 template <typename T>
 std::vector<T> getShift(const flatbuffers::Vector<T>* ir_shift_value) {
