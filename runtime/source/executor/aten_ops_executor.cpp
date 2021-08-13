@@ -1151,12 +1151,14 @@ void executorAtenFill(const nncir::Node& op_node, StreamExecutor& stream_executo
         // update output
         auto& out_edge = cast<nncir::DataEdge>(node.getFirstOutEdge());
         stream_executor.updateBlob(out_edge.getBlobId(), DataType::TENSOR, tensorToIValue(output));
+        stream_executor.updateBlob(input_self_blob_id, DataType::TENSOR, tensorToIValue(output)); //in-place op
     } else if (iv_other.isScalar()) {
         at::Scalar other_scalar = iv_other.toScalar();
         auto output = nnrt::atenFill(self_tensor, other_scalar);
         // update output
         auto& out_edge = cast<nncir::DataEdge>(node.getFirstOutEdge());
         stream_executor.updateBlob(out_edge.getBlobId(), DataType::TENSOR, tensorToIValue(output));
+        stream_executor.updateBlob(input_self_blob_id, DataType::TENSOR, tensorToIValue(output)); //in-place op
     } else {
         DLOG(ERROR) << "Unsupported input type for aten::fill_";
     }
@@ -1443,7 +1445,6 @@ void executorAtenIndex(const nncir::Node& op_node, StreamExecutor& stream_execut
 void executorAtenIndexPut(const nncir::Node& op_node, StreamExecutor& stream_executor)
 {
     DLOG(INFO) << "execute Aten IndexPut node";
-
     auto node = cast<nncir::AtenIndexPutNode>(op_node);
 
     auto& input_self = cast<nncir::DataEdge>(node.getInEdge(0));
@@ -1482,6 +1483,7 @@ void executorAtenIndexPut(const nncir::Node& op_node, StreamExecutor& stream_exe
     // update output
     auto& out_edge = cast<nncir::DataEdge>(node.getFirstOutEdge());
     stream_executor.updateBlob(out_edge.getBlobId(), DataType::TENSOR, tensorToIValue(output));
+    stream_executor.updateBlob(input_self_blob_id, DataType::TENSOR, tensorToIValue(output)); //in-place op
 }
 
 void executorAtenIndexSelect(const nncir::Node& op_node, StreamExecutor& stream_executor)
@@ -2122,12 +2124,14 @@ void executorAtenMaskedFill(const nncir::Node& op_node, StreamExecutor& stream_e
         // update output
         auto& out_edge = cast<nncir::DataEdge>(node.getFirstOutEdge());
         stream_executor.updateBlob(out_edge.getBlobId(), DataType::TENSOR, tensorToIValue(output));
+        stream_executor.updateBlob(input_self_blob_id, DataType::TENSOR, tensorToIValue(output)); //in-place op
     } else if (iv_value.isScalar()) {
         at::Scalar value_scalar = iv_value.toScalar();
         auto output = nnrt::atenMaskedFill(self_tensor, other_tensor, value_scalar);
         // update output
         auto& out_edge = cast<nncir::DataEdge>(node.getFirstOutEdge());
         stream_executor.updateBlob(out_edge.getBlobId(), DataType::TENSOR, tensorToIValue(output));
+        stream_executor.updateBlob(input_self_blob_id, DataType::TENSOR, tensorToIValue(output));//in-place op
     } else {
         DLOG(ERROR) << "Unsupported input type for aten::masked_fill";
     }
@@ -3213,7 +3217,7 @@ void executorAtenTo(const nncir::Node& op_node, StreamExecutor& stream_executor)
     assert(iv_self.isTensor());
     at::Tensor self_tensor = iv_self.toTensor();
 
-    auto& input_other = cast<nncir::DataEdge>(to_node.getInEdge(edge_id++));
+    auto& input_other = cast<nncir::DataEdge>(to_node.getInEdge(edge_id));
     int input_other_blob_id = input_other.getBlobId();
     torch::jit::IValue iv_other = stream_executor.findBlob(input_other_blob_id).second;
 
@@ -3221,6 +3225,7 @@ void executorAtenTo(const nncir::Node& op_node, StreamExecutor& stream_executor)
 
     if (iv_other.isTensor()) {
         other_tensor_type = true;
+        edge_id++;
     } else {
         auto ori_dtype = to_node.getDType();
         if (nncir::isDefaultValue(ori_dtype)) {
@@ -3238,8 +3243,11 @@ void executorAtenTo(const nncir::Node& op_node, StreamExecutor& stream_executor)
         auto& non_blocking_edge = cast<nncir::DataEdge>(to_node.getInEdge(edge_id++));
         int non_blocking_blob_id = non_blocking_edge.getBlobId();
         auto non_blocking_iv = stream_executor.findBlob(non_blocking_blob_id).second;
-        // assert(non_blocking_iv.isBool());
-        non_blocking_val = non_blocking_iv.toInt();
+        if (non_blocking_iv.isNone()) {
+            non_blocking_val = 0;
+        } else {
+            non_blocking_val = non_blocking_iv.toInt();
+        }
     }
     bool non_blocking = static_cast<bool>(non_blocking_val);
 
@@ -3248,8 +3256,11 @@ void executorAtenTo(const nncir::Node& op_node, StreamExecutor& stream_executor)
         auto& copy_edge = cast<nncir::DataEdge>(to_node.getInEdge(edge_id++));
         int copy_blob_id = copy_edge.getBlobId();
         auto copy_iv = stream_executor.findBlob(copy_blob_id).second;
-        assert(copy_iv.isBool());
-        copy_val = copy_iv.toBool();
+        if (copy_iv.isNone()) {
+            copy_val = 0;
+        } else {
+            copy_val = copy_iv.toInt();
+        }
     }
     bool copy = static_cast<bool>(copy_val);
 
