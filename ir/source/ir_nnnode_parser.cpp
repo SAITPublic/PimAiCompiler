@@ -791,18 +791,29 @@ IRNNNodeParser::parseNNNode<IR::NNNode::AnyType_AtenEmbeddingNode>(const IR::NnN
     Log::IR::E_IF(aten_embedding_node == nullptr)
         << "IRNNNodeParser::parseNNNode<NN::AtenEmbeddingNode>() => wrong node type!";
 
-    auto weights_fp32 = makeDataArrFromVector<float>(aten_embedding_node->weights());
-    std::vector<float16> weights;
-    for (auto item : weights_fp32) {
-        weights.push_back(static_cast<float16>(item));
+    auto weights_data_fp32 = makeDataArrFromVector<float>(aten_embedding_node->weights());
+    std::vector<float16> weights_data;
+    for (auto item : weights_data_fp32) {
+        weights_data.push_back(static_cast<float16>(item));
     }
-    nn_ir::Shape2D weights_shape = std::get<nn_ir::Shape2D>(nn_ir::parseParam(aten_embedding_node->weights_shape()));
+    nn_ir::Shape2D weights_shape = std::get<nn_ir::Shape2D>(
+                                        nn_ir::parseParam(aten_embedding_node->weights_shape()));
+    std::vector<std::vector<float16>> weights;
+    auto cnt = 0;
+    for (auto h = 0; h < weights_shape.h; h++) {
+        std::vector<float16> data;
+        for (auto w = 0; w < weights_shape.w; w++) {
+            data.push_back(weights_data[cnt++]);
+        }
+        weights.push_back(data);
+    }
+
     int64_t padding_idx = aten_embedding_node->padding_idx();
     int scale_grad_by_freq = aten_embedding_node->scale_grad_by_freq();
     int sparse = aten_embedding_node->sparse();
 
-    return std::make_unique<nn_ir::AtenEmbeddingNode>(node_info, weights, weights_shape, padding_idx,
-                                                      scale_grad_by_freq, sparse);
+    return std::make_unique<nn_ir::AtenEmbeddingNode>(node_info, weights, weights_shape,
+                                                      padding_idx, scale_grad_by_freq, sparse);
 }
 
 template <>

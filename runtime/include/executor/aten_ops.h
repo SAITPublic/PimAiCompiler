@@ -90,9 +90,6 @@ at::Tensor atenDropout(const at::Tensor &input, double p, bool train);
 
 at::Tensor &atenDropout_(at::Tensor &self, double p, bool train);
 
-at::Tensor atenEmbedding(const at::Tensor &weight, const at::Tensor &indices, int64_t padding_idx = -1,
-                         bool scale_grad_by_freq = false, bool sparse = false);
-
 at::Tensor atenEq(const at::Tensor &self, const at::Scalar &other);
 
 at::Tensor atenEq(const at::Tensor &self, const at::Tensor &other);

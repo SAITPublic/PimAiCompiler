@@ -967,53 +967,27 @@ void executorAtenEmbedding(const nncir::Node& op_node, StreamExecutor& stream_ex
     auto node = cast<nncir::AtenEmbeddingNode>(op_node);
     int edge_id = 0;
 
-    auto& input_weights = cast<nncir::DataEdge>(node.getInEdge(0));
-    auto& input_indices = cast<nncir::DataEdge>(node.getInEdge(1));
+    auto weights = node.getWeights();
+    auto weights_shape = node.getWeightsShape();
+    assert(weights.size() > 0);
 
-    // Get input blob
-    int input_weights_blob_id = input_weights.getBlobId();
+    auto& input_indices = cast<nncir::DataEdge>(node.getInEdge(edge_id++));
     int input_indices_blob_id = input_indices.getBlobId();
-    // Find the input blob
-    torch::jit::IValue iv_weights = stream_executor.findBlob(input_weights_blob_id).second;
     torch::jit::IValue iv_indices = stream_executor.findBlob(input_indices_blob_id).second;
-    assert(iv_weights.isTensor());
     assert(iv_indices.isTensor());
-    edge_id += 2;
+    auto indices_tensor = iv_indices.toTensor();
+    assert(indices_tensor.item().type() == torch::kInt64);
 
-    int64_t padding_idx = node.getPaddingIdx();
-    if (nncir::isDefaultValue(padding_idx)) {
-        auto& padding_idx_edge = cast<nncir::DataEdge>(node.getInEdge(edge_id++));
-        int padding_idx_blob_id = padding_idx_edge.getBlobId();
-        auto padding_idx_iv = stream_executor.findBlob(padding_idx_blob_id).second;
-        assert(padding_idx_iv.isInt());
-        padding_idx = padding_idx_iv.toInt();
-    }
+    // get output
+    auto output = weights[indices_tensor.item().toInt()];
 
-    int scale_grad_by_freq_val = node.getScaleGradByFreq();
-    if (nncir::isDefaultValue(scale_grad_by_freq_val)) {
-        auto& scale_grad_by_freq_edge = cast<nncir::DataEdge>(node.getInEdge(edge_id++));
-        int scale_grad_by_freq_blob_id = scale_grad_by_freq_edge.getBlobId();
-        auto scale_grad_by_freq_iv = stream_executor.findBlob(scale_grad_by_freq_blob_id).second;
-        assert(scale_grad_by_freq_iv.isInt());
-        scale_grad_by_freq_val = scale_grad_by_freq_iv.toInt();
-    }
-    bool scale_grad_by_freq = static_cast<bool>(scale_grad_by_freq_val);
-
-    int sparse_val = node.getSparse();
-    if (nncir::isDefaultValue(sparse_val)) {
-        auto& sparse_edge = cast<nncir::DataEdge>(node.getInEdge(edge_id++));
-        int sparse_blob_id = sparse_edge.getBlobId();
-        auto sparse_iv = stream_executor.findBlob(sparse_blob_id).second;
-        assert(sparse_iv.isInt());
-        sparse_val = sparse_iv.toInt();
-    }
-    bool sparse = static_cast<bool>(sparse_val);
-
-    auto output =
-        nnrt::atenEmbedding(iv_weights.toTensor(), iv_indices.toTensor(), padding_idx, scale_grad_by_freq, sparse);
+    // get output tensor
+    auto output_tensor_cpu =torch::from_blob(output.data(), {1, 1, weights_shape.w},
+                                             at::TensorOptions().dtype(torch::kFloat16));
+    auto output_tensor = std::move(output_tensor_cpu.cuda());
 
     auto& out_edge = cast<nncir::DataEdge>(node.getFirstOutEdge());
-    stream_executor.updateBlob(out_edge.getBlobId(), DataType::TENSOR, tensorToIValue(output));
+    stream_executor.updateBlob(out_edge.getBlobId(), DataType::TENSOR, tensorToIValue(output_tensor));
 }
 
 void executorAtenEq(const nncir::Node& op_node, StreamExecutor& stream_executor)
