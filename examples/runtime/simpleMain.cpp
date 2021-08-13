@@ -73,9 +73,9 @@ void run_hwr_from_file(std::string ir_file)
     tv_comp.loadTV("./examples/runtime/resource/hwr/inputs/output_hwr_y_hat_128_1_98.bin", {128, 1, 98},
                    DataType::FLOAT16, "hwr_final_output");
     if (tv_comp.compare(output_tensors.at(0).cpu(), "hwr_final_output")) {
-        DLOG(INFO) << "HWR run successfully, output is correct !";
+        LOG(INFO) << "HWR run successfully, output is correct !";
     } else {
-        DLOG(INFO) << "HWR run failed, output is incorrect !";
+        LOG(INFO) << "HWR run failed, output is incorrect !";
     }
 }
 

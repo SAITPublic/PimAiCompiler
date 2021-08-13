@@ -21,9 +21,13 @@ endif()
 add_definitions(-DC10_USE_GLOG)
 add_definitions(-D_GLIBCXX_USE_CXX11_ABI=1)
 
-# for debug, please set `-O0 -g`
-# for release, please set -O3
-add_definitions(-O0 -g -w)   # close warning
+# for debug, set `-O0 -g`
+# for release, set -O3 for optimize
+if(CMAKE_BUILD_TYPE MATCHES "Release")
+    add_definitions(-O3 -w)
+elseif(CMAKE_BUILD_TYPE MATCHES "Debug")
+    add_definitions(-O0 -g -w)
+endif()
 
 #include(Torch.cmake)
 include_directories("${PROJECT_SOURCE_DIR}"
