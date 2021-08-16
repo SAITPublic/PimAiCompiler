@@ -787,33 +787,27 @@ template <>
 std::unique_ptr<nn_ir::NNNode>
 IRNNNodeParser::parseNNNode<IR::NNNode::AnyType_AtenEmbeddingNode>(const IR::NnNode*      ir_node,
                                                                    const nn_ir::NodeInfo& node_info) {
-    auto aten_embedding_node = ir_node->nn_node_as_AtenEmbeddingNode();
-    Log::IR::E_IF(aten_embedding_node == nullptr)
+    auto aten_embedding_ir_node = ir_node->nn_node_as_AtenEmbeddingNode();
+    Log::IR::E_IF(aten_embedding_ir_node == nullptr)
         << "IRNNNodeParser::parseNNNode<NN::AtenEmbeddingNode>() => wrong node type!";
 
-    auto weights_data_fp32 = makeDataArrFromVector<float>(aten_embedding_node->weights());
+    auto weights_data_fp32 = makeDataArrFromVector<float>(aten_embedding_ir_node->weights());
     std::vector<float16> weights_data;
     for (auto item : weights_data_fp32) {
         weights_data.push_back(static_cast<float16>(item));
     }
     nn_ir::Shape2D weights_shape = std::get<nn_ir::Shape2D>(
-                                        nn_ir::parseParam(aten_embedding_node->weights_shape()));
-    std::vector<std::vector<float16>> weights;
-    auto cnt = 0;
-    for (auto h = 0; h < weights_shape.h; h++) {
-        std::vector<float16> data;
-        for (auto w = 0; w < weights_shape.w; w++) {
-            data.push_back(weights_data[cnt++]);
-        }
-        weights.push_back(data);
-    }
+                                        nn_ir::parseParam(aten_embedding_ir_node->weights_shape()));
+    int64_t padding_idx = aten_embedding_ir_node->padding_idx();
+    int scale_grad_by_freq = aten_embedding_ir_node->scale_grad_by_freq();
+    int sparse = aten_embedding_ir_node->sparse();
 
-    int64_t padding_idx = aten_embedding_node->padding_idx();
-    int scale_grad_by_freq = aten_embedding_node->scale_grad_by_freq();
-    int sparse = aten_embedding_node->sparse();
+    auto aten_embedding_node =
+                std::make_unique<nn_ir::AtenEmbeddingNode>(node_info, padding_idx, scale_grad_by_freq, sparse);
 
-    return std::make_unique<nn_ir::AtenEmbeddingNode>(node_info, weights, weights_shape,
-                                                      padding_idx, scale_grad_by_freq, sparse);
+    aten_embedding_node->setWeights(weights_data, weights_shape);
+
+    return aten_embedding_node;
 }
 
 template <>

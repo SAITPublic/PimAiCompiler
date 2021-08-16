@@ -968,7 +968,6 @@ void executorAtenEmbedding(const nncir::Node& op_node, StreamExecutor& stream_ex
     int edge_id = 0;
 
     auto weights = node.getWeights();
-    auto weights_shape = node.getWeightsShape();
     assert(weights.size() > 0);
 
     auto& input_indices = cast<nncir::DataEdge>(node.getInEdge(edge_id++));
@@ -978,16 +977,9 @@ void executorAtenEmbedding(const nncir::Node& op_node, StreamExecutor& stream_ex
     auto indices_tensor = iv_indices.toTensor();
     assert(indices_tensor.item().type() == torch::kInt64);
 
-    // get output
     auto output = weights[indices_tensor.item().toInt()];
-
-    // get output tensor
-    auto output_tensor_cpu =torch::from_blob(output.data(), {1, 1, weights_shape.w},
-                                             at::TensorOptions().dtype(torch::kFloat16));
-    auto output_tensor = std::move(output_tensor_cpu.cuda());
-
     auto& out_edge = cast<nncir::DataEdge>(node.getFirstOutEdge());
-    stream_executor.updateBlob(out_edge.getBlobId(), DataType::TENSOR, tensorToIValue(output_tensor));
+    stream_executor.updateBlob(out_edge.getBlobId(), DataType::TENSOR, tensorToIValue(output));
 }
 
 void executorAtenEq(const nncir::Node& op_node, StreamExecutor& stream_executor)
