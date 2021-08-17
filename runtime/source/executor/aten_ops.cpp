@@ -286,6 +286,8 @@ at::Tensor atenMaskedFill(const at::Tensor &self, const at::Tensor &mask, const 
     return at::masked_fill(self, mask, value);
 }
 
+at::Tensor atenMaskedSelect(const at::Tensor &self, const at::Tensor &mask) { return at::masked_select(self, mask); }
+
 at::Tensor atenMatmul(const at::Tensor &self, const at::Tensor &other) { return at::matmul(self, other); }
 
 at::Tensor atenMax(const at::Tensor &self) { return at::max(self); }
@@ -406,7 +408,8 @@ at::Tensor atenSub(const at::Tensor &self, const at::Tensor &other, at::Scalar a
     return at::sub(self, other, alpha);
 }
 
-at::Tensor atenSum(const at::Tensor &self, at::IntArrayRef dim, bool keepdim, at::ScalarType dtype) {
+at::Tensor atenSum(const at::Tensor &self, at::IntArrayRef dim, bool keepdim, c10::optional<at::ScalarType> dtype)
+{
     return at::sum(self, dim, keepdim, dtype);
 }
 

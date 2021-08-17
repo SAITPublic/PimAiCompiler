@@ -335,6 +335,7 @@ void StreamExecutor::registerOp()
     this->global_op_register_.insert({nncir::NodeType::ATENLSTM2, executorAtenLSTM2});
     this->global_op_register_.insert({nncir::NodeType::ATENLT, executorAtenLt});
     this->global_op_register_.insert({nncir::NodeType::ATENMASKEDFILL, executorAtenMaskedFill});
+    this->global_op_register_.insert({nncir::NodeType::ATENMASKEDSELECT, executorAtenMaskedSelect});
     this->global_op_register_.insert({nncir::NodeType::ATENMATMUL, executorAtenMatmul});
     this->global_op_register_.insert({nncir::NodeType::ATENMAX, executorAtenMax});
     this->global_op_register_.insert({nncir::NodeType::ATENMAXPOOL2D, executorAtenMaxPool2d});

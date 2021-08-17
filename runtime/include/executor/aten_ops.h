@@ -204,6 +204,8 @@ at::Tensor atenMaskedFill(const at::Tensor &self, const at::Tensor &mask, at::Sc
 
 at::Tensor atenMaskedFill(const at::Tensor &self, const at::Tensor &mask, const at::Tensor &value);
 
+at::Tensor atenMaskedSelect(const at::Tensor & self, const at::Tensor & mask);
+
 at::Tensor atenMatmul(const at::Tensor &self, const at::Tensor &other);
 
 at::Tensor atenMax(const at::Tensor &self);
@@ -304,7 +306,7 @@ at::Tensor atenSub(const at::Tensor &self, at::Scalar other, at::Scalar alpha = 
 
 at::Tensor atenSub(const at::Tensor &self, const at::Tensor &other, at::Scalar alpha = 1);
 
-at::Tensor atenSum(const at::Tensor &self, at::IntArrayRef dim, bool keepdim, at::ScalarType dtype);
+at::Tensor atenSum(const at::Tensor &self, at::IntArrayRef dim, bool keepdim, c10::optional<at::ScalarType> dtype);
 
 at::Tensor atenTanh(const at::Tensor &self);
 

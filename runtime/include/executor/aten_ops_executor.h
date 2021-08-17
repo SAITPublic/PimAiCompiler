@@ -66,6 +66,7 @@ void executorAtenLSTM1(const nncir::Node& op_node, StreamExecutor& stream_execut
 void executorAtenLSTM2(const nncir::Node& op_node, StreamExecutor& stream_executor);
 void executorAtenLt(const nncir::Node& op_node, StreamExecutor& stream_executor);
 void executorAtenMaskedFill(const nncir::Node& op_node, StreamExecutor& stream_executor);
+void executorAtenMaskedSelect(const nncir::Node& op_node, StreamExecutor& stream_executor);
 void executorAtenMatmul(const nncir::Node& op_node, StreamExecutor& stream_executor);
 void executorAtenMax(const nncir::Node& op_node, StreamExecutor& stream_executor);
 void executorAtenMaxPool2d(const nncir::Node& op_node, StreamExecutor& stream_executor);

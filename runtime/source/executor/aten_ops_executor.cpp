@@ -2137,6 +2137,34 @@ void executorAtenMaskedFill(const nncir::Node& op_node, StreamExecutor& stream_e
     }
 }
 
+void executorAtenMaskedSelect(const nncir::Node& op_node, StreamExecutor& stream_executor)
+{
+    DLOG(INFO) << "execute Aten MaskedSelect node";
+
+    auto node = cast<nncir::AtenMaskedSelectNode>(op_node);
+
+    auto& input_self = cast<nncir::DataEdge>(node.getInEdge(0));
+    auto& input_mask = cast<nncir::DataEdge>(node.getInEdge(1));
+
+    // Get input blob
+    int input_self_blob_id = input_self.getBlobId();
+    int input_mask_blob_id = input_mask.getBlobId();
+
+
+    // Find the input blob
+    auto iv_self = stream_executor.findBlob(input_self_blob_id).second;
+    auto iv_mask = stream_executor.findBlob(input_mask_blob_id).second;
+    assert(iv_self.isTensor() && iv_mask.isTensor());
+    auto self_tensor = iv_self.toTensor();
+    auto mask_tensor = iv_mask.toTensor();
+
+    auto output = nnrt::atenMaskedSelect(self_tensor, mask_tensor);
+    // update output
+    auto& out_edge = cast<nncir::DataEdge>(node.getFirstOutEdge());
+    stream_executor.updateBlob(out_edge.getBlobId(), DataType::TENSOR, tensorToIValue(output));
+    
+}
+
 void executorAtenMatmul(const nncir::Node& op_node, StreamExecutor& stream_executor)
 {
     DLOG(INFO) << "execute Aten Matmul node";
@@ -2640,7 +2668,7 @@ void executorAtenOnes(const nncir::Node& op_node, StreamExecutor& stream_executo
         options = options.pinned_memory(static_cast<bool>(pin_memory));
     }
 
-    auto output = nnrt::atenOnes(at::ArrayRef<int64_t>(array_ref), options);
+    auto output = nnrt::atenOnes(at::ArrayRef<int64_t>(array_ref), options).cuda();
     auto& out_edge = cast<nncir::DataEdge>(node.getFirstOutEdge());
     stream_executor.updateBlob(out_edge.getBlobId(), DataType::TENSOR, tensorToIValue(output));
 }
@@ -3104,12 +3132,18 @@ void executorAtenSum(const nncir::Node& op_node, StreamExecutor& stream_executor
         auto& data_edge = cast<nncir::DataEdge>(node.getInEdge(edge_id++));
         int data_blob_id = data_edge.getBlobId();
         auto data_iv = stream_executor.findBlob(data_blob_id).second;
-        assert(data_iv.isInt());
-        dtype = data_iv.toInt();
+        if (!data_iv.isNone()) {
+            dtype = data_iv.toInt();
+        }
     }
 
-    auto output =
-        nnrt::atenSum(self_tensor, at::ArrayRef<int64_t>(dims), static_cast<bool>(keepdim), at::ScalarType(dtype));
+    at::Tensor output;
+    if (nncir::isDefaultValue(dtype)) {
+        output = nnrt::atenSum(self_tensor, at::ArrayRef<int64_t>(dims), static_cast<bool>(keepdim), c10::nullopt);
+    } else {
+        output =
+            nnrt::atenSum(self_tensor, at::ArrayRef<int64_t>(dims), static_cast<bool>(keepdim), at::ScalarType(dtype));
+    }
     auto& out_edge = cast<nncir::DataEdge>(node.getFirstOutEdge());
     stream_executor.updateBlob(out_edge.getBlobId(), DataType::TENSOR, tensorToIValue(output));
 }
