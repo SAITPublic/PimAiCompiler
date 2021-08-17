@@ -218,67 +218,77 @@ void StreamExecutor::setInputTensors(const std::vector<torch::Tensor>& input_ten
     }
 }
 
+std::vector<torch::Tensor> StreamExecutor::iValueParser(torch::jit::IValue &iv) 
+{
+    std::vector<torch::Tensor> out_tensor;
+    std::vector<int64_t> out_list;
+    if (iv.isTuple()) {
+        auto tuple_ = iv.toTuple();
+        auto ivs = primTupleUnpack(tuple_);
+        for (auto iv_ : ivs) {
+            if (iv_.isTensor()) {
+                out_tensor.push_back(iv_.toTensor());
+            } else if (iv_.isList()) {
+                auto temp_out = iValueParser(iv_);
+                for (auto &out : temp_out) {
+                    out_tensor.push_back(out);
+                }
+            } else if (iv_.isInt()) {
+                auto temp_out = iValueParser(iv_);
+                for (auto &out : temp_out) {
+                    out_tensor.push_back(out);
+                }
+            } else {
+                DLOG(FATAL) << "Output data type do no support!";
+            }
+        }
+    } else if (iv.isList()) {
+        auto list_ = iv.toListRef();
+        out_list.clear();
+        for (auto iv_ : list_) {
+            if (iv_.isTensor()) {
+                out_tensor.push_back(iv_.toTensor());
+            } else if(iv_.isInt()) {
+                out_list.push_back(iv_.toInt());
+            } else if (iv_.isList()) {
+                auto temp_out = iValueParser(iv_);
+                for (auto &out : temp_out) {
+                    out_tensor.push_back(out);
+                }
+            } else {
+                DLOG(FATAL) << "Output data type do no support!";
+            }
+        }
+        if (out_list.size() != 0) {
+            torch::Tensor out_ =
+                torch::from_blob(out_list.data(), {1, static_cast<int64_t>(out_list.size())}, torch::kLong).clone();
+            out_tensor.push_back(std::move(out_));
+        }
+    } else if (iv.isInt()) {
+        out_list.push_back(iv.toInt());
+        torch::Tensor out_ =
+            torch::from_blob(out_list.data(), {static_cast<int64_t>(out_list.size())}, torch::kLong).clone();
+        out_tensor.push_back(std::move(out_));
+    } else {
+        DLOG(FATAL) << "Output data type do no support!";
+    }
+    return out_tensor;
+}
+
 void StreamExecutor::getOutputTensors(std::vector<torch::Tensor>& output_tensors)
 {
     output_tensors.clear();
     std::vector<std::vector<int64_t>> out_list;
 
-    // checkout the dtype of outpus
-    bool is_all_tensor = true;
     for (auto& id_ : this->output_blob_ids_) {
         auto iv = this->findBlob(id_).second;
-        if (!iv.isTensor()) {
-            is_all_tensor = false;
-            break;
+        auto temp_out = iValueParser(iv);
+        for (auto& out : temp_out) {
+            output_tensors.push_back(out);
         }
     }
-
-    if (is_all_tensor) {
-        for (auto& id_ : this->output_blob_ids_) {
-            auto blob = this->findBlob(id_);
-            output_tensors.push_back(blob.second.toTensor());
-        }
-    } else {
-        // For RNNT, there's only one output with Tuple dtype
-        //  %774 : (Tensor, Tensor, int[][]) = prim::TupleConstruct(%x_padded3.1, %x_lens.1, %output.1)
-        //  return (%774)
-        if (this->output_blob_ids_.size() == 1) {
-            auto blob = this->findBlob(output_blob_ids_.at(0));
-            if (blob.second.isTuple()) {
-                auto tuple_ = blob.second.toTuple();
-                auto ivs = primTupleUnpack(tuple_);
-                for (auto& iv_ : ivs) {
-                    if (iv_.isTensor()) {
-                        auto tensor = iv_.toTensor();
-                        output_tensors.push_back(tensor);
-                    } else if (iv_.isList()) {
-                        // list[list]
-                        auto lst = iv_.toList().vec();
-                        for (auto item : iv_.toList().vec()) {
-                            std::vector<int64_t> vals;
-                            for (auto val : item.toList().vec()) {
-                                vals.push_back(val.toInt());
-                            }
-                            out_list.push_back(vals);
-                        }
-                    }
-                }
-            }
-            // print RNNT result
-            // logits, logits_lens, output
-            // _, _, transcript = self.greedy_decoder.forward(feature, feature_length)
-            std::stringstream ss;
-            for (auto& item : out_list.at(0)) {
-                ss << item << " ";
-            }
-            DLOG(INFO) << "RNNT_output: " << ss.str();
-            // convert list[list[int]] to tensor
-            torch::Tensor out_ =
-                torch::from_blob(out_list.at(0).data(), {1, static_cast<int64_t>(out_list.at(0).size())}, torch::kLong)
-                    .clone();
-            output_tensors.push_back(std::move(out_));
-            DLOG(INFO) << "Inference output: " << output_tensors.at(2);
-        }
+    for (auto idx = 0; idx < output_tensors.size(); idx++) {
+        DLOG(INFO) << "Output tensor" << idx << ": " << output_tensors[idx];
     }
 }
 

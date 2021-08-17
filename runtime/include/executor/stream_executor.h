@@ -42,6 +42,8 @@ class StreamExecutor
     void setInputTensors(const std::vector<torch::Tensor>& input_tensors);
 
     void getOutputTensors(std::vector<torch::Tensor>& output_tensors);
+    
+    std::vector<torch::Tensor> iValueParser(torch::jit::IValue &iv);
 
     const std::shared_ptr<nncir::NNIR> getGraph();
 
