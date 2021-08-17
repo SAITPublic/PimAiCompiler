@@ -13,9 +13,6 @@
 using namespace nnrt;
 namespace fs = std::experimental::filesystem;
 
-#define RUN_RNNT 0
-#define RUN_HWR 1
-
 void run_rnnt_from_file(std::string ir_file)
 {
     std::string feature_len_file = "examples/runtime/resource/rnnt/inputs/feature_len.bin";
@@ -79,6 +76,39 @@ void run_hwr_from_file(std::string ir_file)
     }
 }
 
+void run_gnmt_from_file(std::string ir_file)
+{
+    std::string src_file = "examples/runtime/resource/gnmt/inputs/src_128_67.bin";
+    std::string src_length_file = "examples/runtime/resource/gnmt/inputs/src_length_128.bin";
+    std::string bos_file = "examples/runtime/resource/gnmt/inputs/bos_1280_1.bin";
+    std::string current_path = fs::current_path();
+    if (current_path.find("/build") != std::string::npos) {
+        src_file = "../" + src_file;
+        src_length_file = "../" + src_length_file;
+        bos_file = "../" + bos_file;
+    }
+    if (access(src_file.c_str(), F_OK) == -1 || access(src_length_file.c_str(), F_OK) == -1 || access(bos_file.c_str(), F_OK) == -1) {
+        DLOG(ERROR) << "Please run at base or build directory.";
+    }
+
+    NNRuntime runtime(ir_file);
+    std::vector<torch::Tensor> input_tensors;
+    // load inputs from files
+    auto tensor_src = loadTensor(src_file, {128, 67}, DataType::INT64).cuda();
+    auto tensor_src_length = loadTensor(src_length_file, {128}, DataType::INT64).cuda();
+    auto tensor_bos = loadTensor(bos_file, {1280, 1}, DataType::INT64).cuda();
+
+    input_tensors.push_back(tensor_src);
+    input_tensors.push_back(tensor_src_length);
+    input_tensors.push_back(tensor_bos);
+
+    for (auto item : input_tensors) {
+        DLOG(INFO) << "Input: "
+                   << "size: " << item.sizes() << " dtype:" << item.dtype() << " device:" << item.device();
+    }
+    // Inference
+    auto output_tensors = runtime.inferenceModel(input_tensors);
+}
 int main(int argc, const char* argv[])
 {
     LOG(INFO) << "start runtime! ";
@@ -108,7 +138,7 @@ int main(int argc, const char* argv[])
     } else if (std::string(model_kind) == "HWR") {
         run_hwr_from_file(ir_file);
     } else if (std::string(model_kind) == "GNMT") {
-        // TODO
+        run_gnmt_from_file(ir_file);
     } else {
         DLOG(FATAL) << "Choice must be one of [RNNT, HWR, GNMT]";
     }
