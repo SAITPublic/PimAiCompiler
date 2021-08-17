@@ -13,13 +13,16 @@ namespace nn_ir
 class AtenMaskedFillNode : public NodeMixin<AtenMaskedFillNode, NNNode>
 {
    public:
-    explicit AtenMaskedFillNode(const NodeInfo& node_info)
-        : NodeMixin(node_info, NodeType::ATENMASKEDFILL)
+    explicit AtenMaskedFillNode(const NodeInfo& node_info, bool is_inplace)
+        : NodeMixin(node_info, NodeType::ATENMASKEDFILL), is_inplace_(is_inplace)
     {
     }
+    std::string getNodeTypeAsString(void) const override { return "AtenMaskedFill"; }
+    bool getIsInplace() const { return is_inplace_; }
 
-    std::string getNodeTypeAsString(void) const override {
-        return "AtenMaskedFill"; }
+   private:
+    bool is_inplace_ = false;
+
 };  // class AtenMaskedFillNode
 
 }  // namespace nn_ir

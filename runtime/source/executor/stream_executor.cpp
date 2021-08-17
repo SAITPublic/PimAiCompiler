@@ -76,7 +76,8 @@ StreamExecutor::StreamExecutor(const std::shared_ptr<nncir::NNIR> ir_graph)
         } else if (op_node.getNodeType() == nncir::NodeType::ATENLSTM1 ||
                    op_node.getNodeType() == nncir::NodeType::ATENLSTM2 ||
                    op_node.getNodeType() == nncir::NodeType::ATENCONV2D ||
-                   op_node.getNodeType() == nncir::NodeType::ATENBATCHNORM2D) {
+                   op_node.getNodeType() == nncir::NodeType::ATENBATCHNORM2D || 
+                   op_node.getNodeType() == nncir::NodeType::ATENLINEAR) {
             // For Ops' with weight/bias, firstly save to global_blobs_ once
             std::vector<nncir::Blob*> weight_blobs;
             std::vector<nncir::Blob*> bias_blobs;
@@ -97,25 +98,16 @@ StreamExecutor::StreamExecutor(const std::shared_ptr<nncir::NNIR> ir_graph)
                 auto bn2d_node = cast<nncir::AtenBatchNorm2dNode>(op_node);
                 weight_blobs = bn2d_node.getWeightBlob();
                 bias_blobs = bn2d_node.getBiasBlob();
+            } else if (op_node.getNodeType() == nncir::NodeType::ATENLINEAR) {
+                auto linear_node = cast<nncir::AtenLinearNode>(op_node);
+                weight_blobs = linear_node.getWeightBlob();
+                bias_blobs = linear_node.getBiasBlob();
             }
             for (auto blob : weight_blobs) {
                 this->loadWeightAndBias(blob);
             }
             for (auto blob : bias_blobs) {
                 this->loadWeightAndBias(blob);
-            }
-        } else if (op_node.getNodeType() == nncir::NodeType::ATENLINEAR) {
-            // For Ops' with weight/bias, firstly save to global_blobs_ once
-            auto linear_node = cast<nncir::AtenLinearNode>(op_node);
-            auto weight_blobs = linear_node.getWeightBlob();
-            auto bias_blobs = linear_node.getBiasBlob();
-
-            for (auto blob : weight_blobs) {
-                this->loadWeightAndBias(blob, "weight", "gpu");
-            }
-
-            for (auto blob : bias_blobs) {
-                this->loadWeightAndBias(blob, "bias", "gpu");
             }
         } else if (op_node.getNodeType() == nncir::NodeType::PRIMCONSTANT) {
             // to speed up, runtime only load Constant data once, all constants are reused

@@ -121,6 +121,7 @@ void executePrimData(const nncir::Node& op_node, StreamExecutor& stream_executor
     torch::Tensor tensor_value = primData(tensor);
     // update output
     auto& out_edge = cast<nncir::DataEdge>(data_node.getFirstOutEdge());
+    stream_executor.releation_blob_ids_map_.insert({out_edge.getBlobId(), {input_blob_id, -1}});
     stream_executor.updateBlob(out_edge.getBlobId(), DataType::TENSOR, tensorToIValue(tensor_value));
 }
 

@@ -38,6 +38,8 @@ torch::Tensor createPtTensor(void* data_ptr, const std::vector<int64_t>& shape, 
         scalar_type = c10::ScalarType::Int;
     } else if (dtype == DataType::INT64) {
         scalar_type = c10::ScalarType::Long;
+    } else if (dtype == DataType::BOOL) {
+        scalar_type = c10::ScalarType::Bool;
     } else {
         DLOG(ERROR) << "Unsupport dtype when create Tensor";
     }
@@ -79,6 +81,8 @@ torch::Tensor loadTensor(const std::string& bin_file, const std::vector<int64_t>
         total_size = num_elements * sizeof(float);
     } else if (dtype == DataType::FLOAT16) {
         total_size = num_elements * sizeof(float) / 2;
+    } else if (dtype == DataType::BOOL) {
+        total_size = num_elements * sizeof(bool);
     } else {
         DLOG(ERROR) << "unsupported data type!";
     }

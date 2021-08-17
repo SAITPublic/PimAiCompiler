@@ -1091,9 +1091,10 @@ std::unique_ptr<nn_ir::NNNode> IRNNNodeParser::parseNNNode<IR::NNNode::AnyType_A
     const IR::NnNode* ir_node, const nn_ir::NodeInfo& node_info)
 {
     auto aten_masked_fill_node = ir_node->nn_node_as_AtenMaskedFillNode();
+    auto is_inplace = aten_masked_fill_node->is_inplace();
     Log::IR::E_IF(aten_masked_fill_node == nullptr)
         << "IRNNNodeParser::parseNNNode<NN::AtenMaskedFillNode>() => wrong node type!";
-    return std::make_unique<nn_ir::AtenMaskedFillNode>(node_info);
+    return std::make_unique<nn_ir::AtenMaskedFillNode>(node_info, is_inplace);
 }
 
 template <>

@@ -78,7 +78,7 @@ void executorAtenAdd(const nncir::Node& op_node, StreamExecutor& stream_executor
         auto& out_edge = cast<nncir::DataEdge>(add_node.getFirstOutEdge());
         stream_executor.updateBlob(out_edge.getBlobId(), DataType::TENSOR, tensorToIValue(output));
     } else {
-        DLOG(ERROR) << "Unsupported input type for aten::add";
+        DLOG(FATAL) << "Unsupported input type for aten::add";
     }
 }  // executorAtenAdd
 
@@ -142,7 +142,7 @@ void executorAtenAnd(const nncir::Node& op_node, StreamExecutor& stream_executor
         value_a = iv_a.toInt();
         value_b = iv_b.toInt();
     }else{
-        DLOG(ERROR) << "Wrong input type for AtenAdd.";
+        DLOG(FATAL) << "Wrong input type for AtenAdd.";
     }
 
     auto output = nnrt::atenAnd(value_a, value_b);
@@ -534,7 +534,7 @@ void executorAtenBool(const nncir::Node& op_node, StreamExecutor& stream_executo
         auto double_value = ivalue.toDouble();
         output = nnrt::atenBool(double_value);
     } else {
-        DLOG(ERROR) << "Unsupported type for aten::Bool.";
+        DLOG(FATAL) << "Unsupported type for aten::Bool.";
     }
     auto& out_edge = cast<nncir::DataEdge>(node.getFirstOutEdge());
     stream_executor.updateBlob(out_edge.getBlobId(), DataType::BOOL, boolToIValue(output));
@@ -915,7 +915,7 @@ void executorAtenDiv(const nncir::Node& op_node, StreamExecutor& stream_executor
         auto& out_edge = cast<nncir::DataEdge>(div_node.getFirstOutEdge());
         stream_executor.updateBlob(out_edge.getBlobId(), DataType::TENSOR, tensorToIValue(output));
     } else {
-        DLOG(ERROR) << "Unsupported input type for aten::div";
+        DLOG(FATAL) << "Unsupported input type for aten::div";
     }
 }
 
@@ -1058,7 +1058,7 @@ void executorAtenEq(const nncir::Node& op_node, StreamExecutor& stream_executor)
         auto& out_edge = cast<nncir::DataEdge>(eq_node.getFirstOutEdge());
         stream_executor.updateBlob(out_edge.getBlobId(), DataType::BOOL, scalarToIValue(output));
     } else {
-        DLOG(ERROR) << "Unsupported input type for aten::eq";
+        DLOG(FATAL) << "Unsupported input type for aten::eq";
     }
 }
 
@@ -1160,7 +1160,7 @@ void executorAtenFill(const nncir::Node& op_node, StreamExecutor& stream_executo
         stream_executor.updateBlob(out_edge.getBlobId(), DataType::TENSOR, tensorToIValue(output));
         stream_executor.updateBlob(input_self_blob_id, DataType::TENSOR, tensorToIValue(output)); //in-place op
     } else {
-        DLOG(ERROR) << "Unsupported input type for aten::fill_";
+        DLOG(FATAL) << "Unsupported input type for aten::fill_";
     }
 }
 
@@ -1196,7 +1196,7 @@ void executorAtenFloorDivide(const nncir::Node& op_node, StreamExecutor& stream_
         auto& out_edge = cast<nncir::DataEdge>(node.getFirstOutEdge());
         stream_executor.updateBlob(out_edge.getBlobId(), DataType::TENSOR, tensorToIValue(output));
     } else {
-        DLOG(ERROR) << "Unsupported input type for aten::floor_divide";
+        DLOG(FATAL) << "Unsupported input type for aten::floor_divide";
     }
 }
 
@@ -1265,7 +1265,7 @@ void executorAtenFormat(const nncir::Node& op_node, StreamExecutor& stream_execu
         auto& out_edge = cast<nncir::DataEdge>(format_node.getFirstOutEdge());
         stream_executor.updateBlob(out_edge.getBlobId(), DataType::STRING, strToIValue(output));
     } else {
-        DLOG(ERROR) << "Unsupported input type for aten::format";
+        DLOG(FATAL) << "Unsupported input type for aten::format";
     }
 }
 
@@ -1346,7 +1346,7 @@ void executorAtenGe(const nncir::Node& op_node, StreamExecutor& stream_executor)
         auto& out_edge = cast<nncir::DataEdge>(node.getFirstOutEdge());
         stream_executor.updateBlob(out_edge.getBlobId(), DataType::TENSOR, tensorToIValue(output));
     } else {
-        DLOG(ERROR) << "Unsupported input type for aten::ge";
+        DLOG(FATAL) << "Unsupported input type for aten::ge";
     }
 }
 
@@ -1537,7 +1537,7 @@ void executorAtenInt(const nncir::Node& op_node, StreamExecutor& stream_executor
         auto self_tensor = iv_self.toTensor();
         output = nnrt::atenInt(self_tensor);
     } else {
-        DLOG(ERROR) << "AtenInt data type do not support!";
+        DLOG(FATAL) << "AtenInt data type do not support!";
     }
 
     // update output
@@ -2125,22 +2125,26 @@ void executorAtenMaskedFill(const nncir::Node& op_node, StreamExecutor& stream_e
     auto self_tensor = iv_self.toTensor();
     auto other_tensor = iv_other.toTensor();
 
+    at::Tensor output;
     if (iv_value.isTensor()) {
         auto value_tensor = iv_value.toTensor();
-        auto output = nnrt::atenMaskedFill(self_tensor, other_tensor, value_tensor);
-        // update output
-        auto& out_edge = cast<nncir::DataEdge>(node.getFirstOutEdge());
-        stream_executor.updateBlob(out_edge.getBlobId(), DataType::TENSOR, tensorToIValue(output));
-        stream_executor.updateBlob(input_self_blob_id, DataType::TENSOR, tensorToIValue(output)); //in-place op
+        output = nnrt::atenMaskedFill(self_tensor, other_tensor, value_tensor);
     } else if (iv_value.isScalar()) {
         at::Scalar value_scalar = iv_value.toScalar();
-        auto output = nnrt::atenMaskedFill(self_tensor, other_tensor, value_scalar);
-        // update output
-        auto& out_edge = cast<nncir::DataEdge>(node.getFirstOutEdge());
-        stream_executor.updateBlob(out_edge.getBlobId(), DataType::TENSOR, tensorToIValue(output));
-        stream_executor.updateBlob(input_self_blob_id, DataType::TENSOR, tensorToIValue(output));//in-place op
+        output = nnrt::atenMaskedFill(self_tensor, other_tensor, value_scalar);
     } else {
-        DLOG(ERROR) << "Unsupported input type for aten::masked_fill";
+        DLOG(FATAL) << "Unsupported input type for aten::masked_fill";
+    }
+
+    // update output
+    auto& out_edge = cast<nncir::DataEdge>(node.getFirstOutEdge());
+    stream_executor.updateBlob(out_edge.getBlobId(), DataType::TENSOR, tensorToIValue(output));
+    bool is_inplace = node.getIsInplace();
+    if (is_inplace) {
+        auto releation_blob_id = stream_executor.releation_blob_ids_map_.find(input_self_blob_id);
+        assert(releation_blob_id != stream_executor.releation_blob_ids_map_.end());
+        auto ori_id = releation_blob_id->second.first;
+        stream_executor.updateBlob(ori_id, DataType::TENSOR, tensorToIValue(output));
     }
 }
 
@@ -2169,7 +2173,6 @@ void executorAtenMaskedSelect(const nncir::Node& op_node, StreamExecutor& stream
     // update output
     auto& out_edge = cast<nncir::DataEdge>(node.getFirstOutEdge());
     stream_executor.updateBlob(out_edge.getBlobId(), DataType::TENSOR, tensorToIValue(output));
-    
 }
 
 void executorAtenMatmul(const nncir::Node& op_node, StreamExecutor& stream_executor)
@@ -2279,7 +2282,7 @@ void executorAtenMax(const nncir::Node& op_node, StreamExecutor& stream_executor
         stream_executor.updateBlob(out_blob_ids[1], DataType::TENSOR, tensorToIValue(std::get<1>(output)));
 
     } else {
-        DLOG(ERROR) << "Unsupported input type for aten::max";
+        DLOG(FATAL) << "Unsupported input type for aten::max";
     }
 }
 
@@ -2474,10 +2477,10 @@ void executorAtenMul(const nncir::Node& op_node, StreamExecutor& stream_executor
             auto& out_edge = cast<nncir::DataEdge>(node.getFirstOutEdge());
             stream_executor.updateBlob(out_edge.getBlobId(), DataType::TENSOR, tensorToIValue(output));
         } else {
-            DLOG(ERROR) << "Unsupported input type for aten::mul";
+            DLOG(FATAL) << "Unsupported input type for aten::mul";
         }
     } else {
-        DLOG(ERROR) << "Unsupported input type for aten::mul";
+        DLOG(FATAL) << "Unsupported input type for aten::mul";
     }
 }
 
@@ -2531,7 +2534,7 @@ void executorAtenNe(const nncir::Node& op_node, StreamExecutor& stream_executor)
         auto& out_edge = cast<nncir::DataEdge>(ne_node.getFirstOutEdge());
         stream_executor.updateBlob(out_edge.getBlobId(), DataType::BOOL, boolToIValue(output));
     } else {
-        DLOG(ERROR) << "Unsupported input type for aten::ne";
+        DLOG(FATAL) << "Unsupported input type for aten::ne";
     }
 }
 
@@ -2562,7 +2565,7 @@ void executorAtenNeg(const nncir::Node& op_node, StreamExecutor& stream_executor
         stream_executor.updateBlob(out_edge.getBlobId(), DataType::TENSOR, tensorToIValue(output));
 
     } else {
-        DLOG(ERROR) << "AtenNeg: unsupported dtype!";
+        DLOG(FATAL) << "AtenNeg: unsupported dtype!";
     }
 }
 
@@ -2675,7 +2678,7 @@ void executorAtenOnes(const nncir::Node& op_node, StreamExecutor& stream_executo
         options = options.pinned_memory(static_cast<bool>(pin_memory));
     }
 
-    auto output = nnrt::atenOnes(at::ArrayRef<int64_t>(array_ref), options).cuda();
+    auto output = nnrt::atenOnes(at::ArrayRef<int64_t>(array_ref), options);
     auto& out_edge = cast<nncir::DataEdge>(node.getFirstOutEdge());
     stream_executor.updateBlob(out_edge.getBlobId(), DataType::TENSOR, tensorToIValue(output));
 }
@@ -2813,7 +2816,7 @@ void executorAtenPow(const nncir::Node& op_node, StreamExecutor& stream_executor
         auto& out_edge = cast<nncir::DataEdge>(node.getFirstOutEdge());
         stream_executor.updateBlob(out_edge.getBlobId(), DataType::TENSOR, tensorToIValue(output));
     } else {
-        DLOG(ERROR) << "Unsupported input type for aten::pow";
+        DLOG(FATAL) << "Unsupported input type for aten::pow";
     }
 }
 
@@ -3098,7 +3101,7 @@ void executorAtenSub(const nncir::Node& op_node, StreamExecutor& stream_executor
         auto& out_edge = cast<nncir::DataEdge>(sub_node.getFirstOutEdge());
         stream_executor.updateBlob(out_edge.getBlobId(), DataType::TENSOR, tensorToIValue(output));
     } else {
-        DLOG(ERROR) << "Unsupported input type for aten::sub";
+        DLOG(FATAL) << "Unsupported input type for aten::sub";
     }
 }
 
@@ -3208,7 +3211,7 @@ void executorAtenTensor(const nncir::Node& op_node, StreamExecutor& stream_execu
         } else if (iv_pin_memory.isBool()) {
             options = options.pinned_memory(iv_pin_memory.toBool());
         } else {
-            DLOG(ERROR) << "Unsupported data type to parse iv_pin_memory.";
+            DLOG(FATAL) << "Unsupported data type to parse iv_pin_memory.";
         }
     }
     // FIXME(SRCX): To get list item type, is there a better way?
@@ -3223,7 +3226,7 @@ void executorAtenTensor(const nncir::Node& op_node, StreamExecutor& stream_execu
     } else if (iv_self.isScalar()) {
         value_item = iv_self;
     } else {
-        DLOG(ERROR) << "Unsupported data type to IValue.";
+        DLOG(FATAL) << "Unsupported data type to IValue.";
     }
 
     at::Tensor output;
@@ -3238,7 +3241,7 @@ void executorAtenTensor(const nncir::Node& op_node, StreamExecutor& stream_execu
         parseIValueList<double>(stream_executor.findBlob(input_self_blob_id).second, value_vec, dim, 1);
         output = nnrt::atenTensor(at::ArrayRef<double>(value_vec), options).reshape(at::ArrayRef<int64_t>(dim));
     } else {
-        DLOG(ERROR) << "Unsupported data type to parse IValue list.";
+        DLOG(FATAL) << "Unsupported data type to parse IValue list.";
     }
     auto& out_edge = cast<nncir::DataEdge>(tensor_node.getFirstOutEdge());
     stream_executor.updateBlob(out_edge.getBlobId(), DataType::TENSOR, tensorToIValue(output));
