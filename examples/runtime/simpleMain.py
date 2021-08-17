@@ -97,6 +97,24 @@ def test_hwr_inference(model_ir_file : str, input_tensor_file : str):
     print('HWR avg_time:{}ms'.format((time_end - time_start) / test_cnt * 1000))
 
 
+def test_gnmt_inference(model_ir_file : str, src_file : str, src_length_file : str,  bos_file : str):
+    # Prepare inputs
+    src = torch.load(src_file).cuda()   # dtype=torch.long
+    src_length = torch.load(src_length_file).cuda()   # dtype=torch.long
+    bos = torch.load(bos_file).cuda()   # dtype=torch.long
+    # Init nnruntime
+    rt = Nnrt.NNRuntime(model_ir_file)
+        # warn-up
+    _, _, _ = rt.inferenceModel([src, src_length, bos])
+    # Run and test
+    time_start = time.time()
+    test_cnt = 100
+    for _ in tqdm.tqdm(range(test_cnt)):
+        _, _, transcript = rt.inferenceModel([src, src_length, bos])
+    time_end = time.time()
+    print('GNMT avg_time:{}ms'.format((time_end - time_start) / test_cnt * 1000))
+
+
 if __name__ == '__main__':
     arg_parser = argparse.ArgumentParser()
     arg_parser.add_argument("--model_kind", type=str, choices=['RNNT', 'HWR', 'GNMT'], help='choose model to inference', required=True)
@@ -116,6 +134,10 @@ if __name__ == '__main__':
         assert os.path.exists(input_tensor_file)
         test_hwr_inference(args.graph_ir_file, input_tensor_file)
     elif args.model_kind == 'GNMT':
-        # TODO
-        pass
+        gnmt_ir_file = args.graph_ir_file
+        src_file = os.path.join(current_dir, './resource/gnmt/inputs/src_128_67.pt')
+        src_length_file = os.path.join(current_dir, './resource/gnmt/inputs/src_length_128.pt')
+        bos_file = os.path.join(current_dir, './resource/gnmt/inputs/bos_1280_1.pt')
+        assert os.path.exists(src_file) and os.path.exists(src_length_file) and os.path.exists(bos_file)
+        test_gnmt_inference(gnmt_ir_file, src_file, src_length_file, bos_file)
     
