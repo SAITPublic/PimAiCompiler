@@ -20,9 +20,27 @@ class AtenLinearNode : public NodeMixin<AtenLinearNode, NNNode>
     }
 
     std::string getNodeTypeAsString(void) const override { return "AtenLinear"; }
-
     std::vector<int64_t> getWeightBlobIds() const { return weight_blob_ids_; }
     std::vector<int64_t> getBiasBlobIds() const { return bias_blob_ids_; }
+    std::vector<Blob*> getWeightBlob() const
+    {
+        std::vector<Blob*> weight_blobs;
+        for (auto weight_blob_id : weight_blob_ids_) {
+            auto weight_blob = getGraph().getBlob(weight_blob_id);
+            weight_blobs.push_back(weight_blob);
+        }
+        return weight_blobs;
+    }
+
+    std::vector<Blob*> getBiasBlob() const
+    {
+        std::vector<Blob*> bias_blobs;
+        for (auto bias_blob_id : bias_blob_ids_) {
+            auto bias_blob = (bias_blob_id == INVALID_ID) ? nullptr : getGraph().getBlob(bias_blob_id);
+            bias_blobs.push_back(bias_blob);
+        }
+        return bias_blobs;
+    }
 
    private:
     std::vector<int64_t> weight_blob_ids_;

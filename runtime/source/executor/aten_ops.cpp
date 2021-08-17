@@ -236,7 +236,8 @@ int64_t atenLen(const c10::List<at::IValue> &list) { return list.size(); }
 
 int64_t atenLen(const at::Tensor &input) { return input.dim(); }
 
-at::Tensor atenLinear(const at::Tensor &input, const at::Tensor &weight, const at::Tensor &bias) {
+at::Tensor atenLinear(const at::Tensor &input, const at::Tensor &weight, const c10::optional<at::Tensor> &bias)
+{
     return at::linear(input, weight, bias);
 }
 

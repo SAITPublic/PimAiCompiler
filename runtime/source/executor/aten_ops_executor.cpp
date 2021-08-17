@@ -1660,15 +1660,22 @@ void executorAtenLinear(const nncir::Node& op_node, StreamExecutor& stream_execu
     auto tensor = iv_tensor.toTensor();
 
     auto weight_blob_id = (node.getWeightBlobIds())[0];
-    auto bias_blob_id = (node.getBiasBlobIds())[0];
     std::vector<at::Tensor> weights;
     auto weight_iv = stream_executor.findBlob(weight_blob_id).second;
-    auto bias_iv = stream_executor.findBlob(weight_blob_id).second;
-    assert(weight_iv.isTensor() && bias_iv.isTensor());
+    assert(weight_iv.isTensor());
     auto weight_tensor = weight_iv.toTensor();
-    auto bias_tensor = bias_iv.toTensor();
 
-    auto output = nnrt::atenLinear(tensor, weight_tensor, bias_tensor);
+    at::Tensor output;
+    if (!node.getBiasBlobIds().empty()) {
+        auto bias_blob_id = (node.getBiasBlobIds())[0];
+        std::vector<at::Tensor> bias;
+        auto bias_iv = stream_executor.findBlob(bias_blob_id).second;
+        assert(bias_iv.isTensor());
+        auto bias_tensor = bias_iv.toTensor();
+        output = nnrt::atenLinear(tensor, weight_tensor, bias_tensor);
+    } else {
+        output = nnrt::atenLinear(tensor, weight_tensor);
+    }
     // update output
     auto& out_edge = cast<nncir::DataEdge>(node.getFirstOutEdge());
     stream_executor.updateBlob(out_edge.getBlobId(), DataType::TENSOR, tensorToIValue(output));

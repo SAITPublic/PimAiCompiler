@@ -104,6 +104,19 @@ StreamExecutor::StreamExecutor(const std::shared_ptr<nncir::NNIR> ir_graph)
             for (auto blob : bias_blobs) {
                 this->loadWeightAndBias(blob);
             }
+        } else if (op_node.getNodeType() == nncir::NodeType::ATENLINEAR) {
+            // For Ops' with weight/bias, firstly save to global_blobs_ once
+            auto linear_node = cast<nncir::AtenLinearNode>(op_node);
+            auto weight_blobs = linear_node.getWeightBlob();
+            auto bias_blobs = linear_node.getBiasBlob();
+
+            for (auto blob : weight_blobs) {
+                this->loadWeightAndBias(blob, "weight", "gpu");
+            }
+
+            for (auto blob : bias_blobs) {
+                this->loadWeightAndBias(blob, "bias", "gpu");
+            }
         } else if (op_node.getNodeType() == nncir::NodeType::PRIMCONSTANT) {
             // to speed up, runtime only load Constant data once, all constants are reused
             // in every inference forward
