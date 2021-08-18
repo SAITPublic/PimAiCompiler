@@ -15,7 +15,7 @@ class NNRuntime
    public:
     NNRuntime() {}
 
-    NNRuntime(const std::string torch_model_path);
+    NNRuntime(const std::string torch_model_path, int compile_level = 1);
 
     std::vector<torch::Tensor> inferenceModel(const std::vector<torch::Tensor>& input_tensors);
 

@@ -21,7 +21,13 @@ input_file_path_option(std::vector<std::string>{"-i", "--input"}, "<file>", "Inp
 static cl_opt::Option<std::string>
 model_type_option(std::vector<std::string>{"-m", "--model"}, "<model type>", "Possible model type: RNNT/HWR/GNMT", cl_opt::Required::YES);
 
-void run_rnnt_from_file(std::string ir_file)
+static cl_opt::Option<int> compile_level_option("-l",
+                                                "<compile level>",
+                                                "compile level. Possible values: 0 (frontend->middlend->backend),\n\
+                                                 1 (middlend->backend), 2 (backend)",
+                                                cl_opt::Required::YES);
+
+void run_rnnt_from_file(std::string ir_file, int compile_level)
 {
     std::string feature_len_file = "examples/runtime/resource/rnnt/inputs/feature_len.bin";
     std::string feature_file = "examples/runtime/resource/rnnt/inputs/feature.bin";
@@ -34,7 +40,7 @@ void run_rnnt_from_file(std::string ir_file)
         DLOG(ERROR) << "Please run at base or build directory.";
     }
 
-    NNRuntime runtime(ir_file);
+    NNRuntime runtime(ir_file, compile_level);
     std::vector<torch::Tensor> input_tensors;
     // load inputs from files
     auto tensor_feature = loadTensor(feature_file, {341, 1, 240}, DataType::FLOAT16).cuda();
@@ -50,7 +56,7 @@ void run_rnnt_from_file(std::string ir_file)
     auto output_tensors = runtime.inferenceModel(input_tensors);
 }
 
-void run_hwr_from_file(std::string ir_file)
+void run_hwr_from_file(std::string ir_file, int compile_level)
 {
     std::string input_file = "./examples/runtime/resource/hwr/inputs/input_hwr_1_1_1024_128.bin";
     std::string current_path = fs::current_path();
@@ -61,7 +67,7 @@ void run_hwr_from_file(std::string ir_file)
         DLOG(ERROR) << "Please run at base or build directory.";
     }
 
-    NNRuntime runtime(ir_file);
+    NNRuntime runtime(ir_file, compile_level);
     std::vector<torch::Tensor> input_tensors;
     // load inputs from files
     auto tensor_ = loadTensor(input_file, {1, 1, 1024, 128}, DataType::FLOAT16).cuda();
@@ -84,7 +90,7 @@ void run_hwr_from_file(std::string ir_file)
     }
 }
 
-void run_gnmt_from_file(std::string ir_file)
+void run_gnmt_from_file(std::string ir_file, int compile_level)
 {
     std::string src_file = "examples/runtime/resource/gnmt/inputs/src_1_12_torch.cuda.LongTensor.bin";
     std::string src_length_file = "examples/runtime/resource/gnmt/inputs/src_length_1_torch.cuda.LongTensor.bin";
@@ -99,7 +105,7 @@ void run_gnmt_from_file(std::string ir_file)
         DLOG(ERROR) << "Please run at base or build directory.";
     }
 
-    NNRuntime runtime(ir_file);
+    NNRuntime runtime(ir_file, compile_level);
     std::vector<torch::Tensor> input_tensors;
     // load inputs from files
     auto tensor_src = loadTensor(src_file, {1, 12}, DataType::INT64).cuda();
@@ -124,13 +130,14 @@ int main(int argc, char* argv[])
 
     auto input_file_path = static_cast<std::string>(input_file_path_option);
     auto model_type = static_cast<std::string>(model_type_option);
+    auto compile_level = static_cast<int>(compile_level_option);
 
-    if (std::string(model_type) == "RNNT") {
-        run_rnnt_from_file(input_file_path);
-    } else if (std::string(model_type) == "HWR") {
-        run_hwr_from_file(input_file_path);
-    } else if (std::string(model_type) == "GNMT") {
-        run_gnmt_from_file(input_file_path);
+    if (model_type == "RNNT") {
+        run_rnnt_from_file(input_file_path, compile_level);
+    } else if (model_type == "HWR") {
+        run_hwr_from_file(input_file_path, compile_level);
+    } else if (model_type == "GNMT") {
+        run_gnmt_from_file(input_file_path, compile_level);
     } else {
         DLOG(FATAL) << "Choice must be one of [RNNT, HWR, GNMT]";
     }

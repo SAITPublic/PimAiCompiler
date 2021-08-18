@@ -16,7 +16,7 @@ class ModelBuilder
     }
 
     // compiler intput model_path; output NNIR(LLO)
-    RetVal compileModel();
+    RetVal compileModel(int compile_level);
 
     RetVal preloadModel();
 
