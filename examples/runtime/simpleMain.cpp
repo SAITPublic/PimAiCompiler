@@ -6,12 +6,20 @@
 #include <iostream>
 #include <memory>
 #include <set>
+
+#include "common/include/command_line_parser.hpp"
 #include "nn_runtime.h"
 #include "runtime/include/executor/prim_utils.h"
 #include "runtime/include/tv_tools.h"
 
 using namespace nnrt;
 namespace fs = std::experimental::filesystem;
+
+static cl_opt::Option<std::string>
+input_file_path_option(std::vector<std::string>{"-i", "--input"}, "<file>", "Input file path", cl_opt::Required::YES);
+
+static cl_opt::Option<std::string>
+model_type_option(std::vector<std::string>{"-m", "--model"}, "<model type>", "Possible model type: RNNT/HWR/GNMT", cl_opt::Required::YES);
 
 void run_rnnt_from_file(std::string ir_file)
 {
@@ -109,36 +117,20 @@ void run_gnmt_from_file(std::string ir_file)
     // Inference
     auto output_tensors = runtime.inferenceModel(input_tensors);
 }
-int main(int argc, const char* argv[])
+
+int main(int argc, char* argv[])
 {
-    LOG(INFO) << "start runtime! ";
-    auto print_error = []() {
-        LOG(ERROR) << "Usage: ./simpleMian model_path! or set ENV (export GRAPH_IR_FILE=path/to/your/graph_ir; export "
-                      "MODEL_KIND=RNNT/HWR/GNMT)";
-        return -1;
-    };
+    cl_opt::CommandLineParser::getInstance().parseCommandLine(argc, argv);
 
-    char* ir_file = nullptr;
-    char* model_kind = nullptr;
-    if (argc == 1) {
-        ir_file = getenv("GRAPH_IR_FILE");
-        model_kind = getenv("MODEL_KIND");
-        if (ir_file == nullptr || model_kind == nullptr) {
-            return print_error();
-        }
-    } else if (argc == 3) {
-        ir_file = const_cast<char*>(argv[1]);
-        model_kind = const_cast<char*>(argv[2]);
-    } else {
-        return print_error();
-    }
+    auto input_file_path = static_cast<std::string>(input_file_path_option);
+    auto model_type = static_cast<std::string>(model_type_option);
 
-    if (std::string(model_kind) == "RNNT") {
-        run_rnnt_from_file(ir_file);
-    } else if (std::string(model_kind) == "HWR") {
-        run_hwr_from_file(ir_file);
-    } else if (std::string(model_kind) == "GNMT") {
-        run_gnmt_from_file(ir_file);
+    if (std::string(model_type) == "RNNT") {
+        run_rnnt_from_file(input_file_path);
+    } else if (std::string(model_type) == "HWR") {
+        run_hwr_from_file(input_file_path);
+    } else if (std::string(model_type) == "GNMT") {
+        run_gnmt_from_file(input_file_path);
     } else {
         DLOG(FATAL) << "Choice must be one of [RNNT, HWR, GNMT]";
     }
