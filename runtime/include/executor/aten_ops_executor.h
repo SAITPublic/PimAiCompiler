@@ -92,7 +92,8 @@ void executorAtenSub(const nncir::Node& op_node, StreamExecutor& stream_executor
 void executorAtenSum(const nncir::Node& op_node, StreamExecutor& stream_executor);
 void executorAtenTanh(const nncir::Node& op_node, StreamExecutor& stream_executor);
 void executorAtenTensor(const nncir::Node& op_node, StreamExecutor& stream_executor);
-void executorAtenTo(const nncir::Node& op_node, StreamExecutor& stream_executor);
+void executorAtenTo1(const nncir::Node& op_node, StreamExecutor& stream_executor);
+void executorAtenTo2(const nncir::Node& op_node, StreamExecutor& stream_executor);
 void executorAtenTopk(const nncir::Node& op_node, StreamExecutor& stream_executor);
 void executorAtenTranspose(const nncir::Node& op_node, StreamExecutor& stream_executor);
 void executorAtenUnsqueeze(const nncir::Node& op_node, StreamExecutor& stream_executor);
