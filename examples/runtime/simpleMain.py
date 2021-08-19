@@ -70,8 +70,8 @@ def test_rnnt_inference(model_ir_file : str, feature_file : str, feature_len_fil
     feature = torch.load(feature_file).cuda()   # dtype=torch.fp16
     feature_len = torch.load(feature_len_file)  # dtype=torch.long
     # Init nnruntime
-    rt = Nnrt.NNRuntime(model_ir_file, compile_level)
-        # warn-up
+    rt = Nnrt.NNRuntime(input_file=model_ir_file, compile_level=compile_level)
+    # warn-up
     _, _, _ = rt.inferenceModel([feature, feature_len])
     # Run and test
     time_start = time.time()
@@ -120,9 +120,9 @@ if __name__ == '__main__':
     arg_parser = argparse.ArgumentParser()
     arg_parser.add_argument("--model_kind", type=str, choices=['RNNT', 'HWR', 'GNMT'], help='choose model to inference', required=True)
     arg_parser.add_argument('--input_file', type=str, help='Input file', required=True)
-    arg_parser.add_argument('--compile_level', type=int, 
+    arg_parser.add_argument('--compile_level', type=int, default=1,
                             help='Possible values: 0 (frontend->middlend->backend), 1 (middlend->backend), 2 (backend)',
-                            required=True)
+                            required=False)
     args = arg_parser.parse_args()
     
     assert os.path.exists(args.input_file)
