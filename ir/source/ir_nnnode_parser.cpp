@@ -1408,17 +1408,31 @@ IRNNNodeParser::parseNNNode<IR::NNNode::AnyType_AtenTensorNode>(const IR::NnNode
 
 template <>
 std::unique_ptr<nn_ir::NNNode>
-IRNNNodeParser::parseNNNode<IR::NNNode::AnyType_AtenToNode>(const IR::NnNode*      ir_node,
-                                                            const nn_ir::NodeInfo& node_info) {
-    auto aten_to_node = ir_node->nn_node_as_AtenToNode();
-    Log::IR::E_IF(aten_to_node == nullptr) << "IRNNNodeParser::parseNNNode<NN::AtenToNode>() => wrong node type!";
+IRNNNodeParser::parseNNNode<IR::NNNode::AnyType_AtenTo1Node>(const IR::NnNode*      ir_node,
+                                                             const nn_ir::NodeInfo& node_info) {
+    auto aten_to_node = ir_node->nn_node_as_AtenTo1Node();
+    Log::IR::E_IF(aten_to_node == nullptr) << "IRNNNodeParser::parseNNNode<NN::AtenTo1Node>() => wrong node type!";
 
     int64_t dtype = aten_to_node->dtype();
     int non_blocking = aten_to_node->non_blocking();
     int copy = aten_to_node->copy();
     int optional_memory_format = aten_to_node->optional_memory_format();
 
-    return std::make_unique<nn_ir::AtenToNode>(node_info, dtype, non_blocking, copy, optional_memory_format);
+    return std::make_unique<nn_ir::AtenTo1Node>(node_info, dtype, non_blocking, copy, optional_memory_format);
+}
+
+template <>
+std::unique_ptr<nn_ir::NNNode>
+IRNNNodeParser::parseNNNode<IR::NNNode::AnyType_AtenTo2Node>(const IR::NnNode*      ir_node,
+                                                             const nn_ir::NodeInfo& node_info) {
+    auto aten_to_node = ir_node->nn_node_as_AtenTo2Node();
+    Log::IR::E_IF(aten_to_node == nullptr) << "IRNNNodeParser::parseNNNode<NN::AtenTo2Node>() => wrong node type!";
+
+    int non_blocking = aten_to_node->non_blocking();
+    int copy = aten_to_node->copy();
+    int optional_memory_format = aten_to_node->optional_memory_format();
+
+    return std::make_unique<nn_ir::AtenTo2Node>(node_info, non_blocking, copy, optional_memory_format);
 }
 
 template <>

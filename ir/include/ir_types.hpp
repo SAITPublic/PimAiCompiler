@@ -273,7 +273,8 @@ class AtenSubNode;
 class AtenSumNode;
 class AtenTanhNode;
 class AtenTensorNode;
-class AtenToNode;
+class AtenTo1Node;
+class AtenTo2Node;
 class AtenTopkNode;
 class AtenTransposeNode;
 class AtenUnsqueezeNode;
@@ -472,7 +473,8 @@ enum class NodeType {
     ATENSUM,
     ATENTANH,
     ATENTENSOR,
-    ATENTO,
+    ATENTO1,
+    ATENTO2,
     ATENTOPK,
     ATENTRANSPOSE,
     ATENUNSQUEEZE,
@@ -625,7 +627,8 @@ inline std::ostream& operator<<(std::ostream& s, nn_ir::NodeType type) {
         ENUM_STR(ATENSUM)
         ENUM_STR(ATENTANH)
         ENUM_STR(ATENTENSOR)
-        ENUM_STR(ATENTO)
+        ENUM_STR(ATENTO1)
+        ENUM_STR(ATENTO2)
         ENUM_STR(ATENTOPK)
         ENUM_STR(ATENTRANSPOSE)
         ENUM_STR(ATENUNSQUEEZE)

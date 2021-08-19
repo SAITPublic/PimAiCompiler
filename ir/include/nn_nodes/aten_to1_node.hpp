@@ -19,14 +19,14 @@
 namespace nn_compiler {
 namespace nn_ir {
 
-class AtenToNode : public NodeMixin<AtenToNode, NNNode> {
+class AtenTo1Node : public NodeMixin<AtenTo1Node, NNNode> {
  public:
-    explicit AtenToNode(const NodeInfo&     node_info,
-                        int64_t             dtype,
-                        int                 non_blocking,
-                        int                 copy,
-                        int                 optional_memory_format)
-        : NodeMixin(node_info, NodeType::ATENTO), dtype_(dtype), non_blocking_(non_blocking),
+    explicit AtenTo1Node(const NodeInfo&     node_info,
+                         int64_t             dtype,
+                         int                 non_blocking,
+                         int                 copy,
+                         int                 optional_memory_format)
+        : NodeMixin(node_info, NodeType::ATENTO1), dtype_(dtype), non_blocking_(non_blocking),
           copy_(copy), optional_memory_format_(optional_memory_format) {}
 
     std::string getNodeTypeAsString(void) const override { return "AtenTo"; }
@@ -52,7 +52,7 @@ class AtenToNode : public NodeMixin<AtenToNode, NNNode> {
     int non_blocking_;
     int copy_;
     int optional_memory_format_ = -1;
-}; // class AtenToNode
+}; // class AtenTo1Node
 
 } // namespace nn_ir
 } // namespace nn_compiler
