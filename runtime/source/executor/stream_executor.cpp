@@ -1,5 +1,6 @@
 #include "executor/stream_executor.h"
 #include <torch/script.h>
+#include "c10/hip/HIPFunctions.h"
 #include "common/include/cast.hpp"
 #include "executor/aten_ops_executor.h"
 #include "executor/prim_ops_executor.h"
@@ -11,6 +12,9 @@
 #include "ir/include/nn_ir.hpp"
 #include "nnrt_types.h"
 #include "tv_tools.h"
+
+#include <sys/time.h>
+#define ENABLE_PROFILING
 
 namespace nncir = nn_compiler::nn_ir;
 
@@ -128,6 +132,18 @@ RetVal StreamExecutor::inferenceModel(const std::shared_ptr<nncir::NNIR> graph,
                                       const std::vector<torch::Tensor>& input_tensors,
                                       std::vector<torch::Tensor>& output_tensors)
 {
+// #ifdef ENABLE_PROFILING
+    bool enable_prof = false;
+    timeval start, end;
+    timeval h_start, h_end;
+    float perf_getNode = 0.f;
+    float perf_getNodeType = 0.f;
+    float perf_findOpExecutor = 0.f;
+    float perf_opExecutor = 0.f;
+    std::unordered_map<std::string, float> perf_map;
+    gettimeofday(&start, nullptr);
+#endif
+
     // Set Input Tensors
     for (auto& in : input_tensors) {
         DLOG(INFO) << "Input Tensor:" << in.sizes() << " data:" << in;
@@ -146,13 +162,44 @@ RetVal StreamExecutor::inferenceModel(const std::shared_ptr<nncir::NNIR> graph,
                 type == nncir::NodeType::PRIMBLOCK);
     };
 
-    // Execute Graph
-    for (cursor_ = cursor_begin; cursor_ < cursor_end;) {
-        nncir::Node* node = graph->getNode(cursor_);
-        DLOG(INFO) << "Node id:" << node->getId() << " name:" << node->getName() << " type:" << node->getNodeType();
-        auto node_type = node->getNodeType();
-        auto op_executor = this->findOpExecutor(node_type);
+#ifdef ENABLE_PROFILING
+    gettimeofday(&end, nullptr);
+    float perf = (end.tv_sec - start.tv_sec) * 1000.f + (end.tv_usec - start.tv_usec) / 1000.f;
+    LOG(INFO) << "setInput perf is " << perf << " ms";
+#endif
 
+    // Execute Graph
+#ifdef ENABLE_PROFILING
+    gettimeofday(&start, nullptr);
+#endif 
+
+    for (cursor_ = cursor_begin; cursor_ < cursor_end;) {
+#ifdef ENABLE_PROFILING
+        gettimeofday(&h_start, nullptr);
+#endif
+        nncir::Node* node = graph->getNode(cursor_);
+#ifdef ENABLE_PROFILING
+        gettimeofday(&h_end, nullptr);
+        perf_getNode += (h_end.tv_sec - h_start.tv_sec) * 1000.f + (h_end.tv_usec - h_start.tv_usec) / 1000.f;
+#endif
+
+        DLOG(INFO) << "Node id:" << node->getId() << " name:" << node->getName() << " type:" << node->getNodeType();
+
+#ifdef ENABLE_PROFILING
+        gettimeofday(&h_start, nullptr);
+#endif
+        auto node_type = node->getNodeType();
+#ifdef ENABLE_PROFILING
+        gettimeofday(&h_end, nullptr);
+        perf_getNodeType += (h_end.tv_sec - h_start.tv_sec) * 1000.f + (h_end.tv_usec - h_start.tv_usec) / 1000.f;
+        gettimeofday(&h_start, nullptr);
+#endif
+        auto op_executor = this->findOpExecutor(node_type);
+#ifdef ENABLE_PROFILING
+        gettimeofday(&h_end, nullptr);
+        perf_findOpExecutor += (h_end.tv_sec - h_start.tv_sec) * 1000.f + (h_end.tv_usec - h_start.tv_usec) / 1000.f;
+        gettimeofday(&h_start, nullptr);
+#endif
         if (node_type == nncir::NodeType::PRIMCONSTANT) {
             // skip PrimConstant, constant are pre-loaded
             cursor_++;
@@ -164,13 +211,42 @@ RetVal StreamExecutor::inferenceModel(const std::shared_ptr<nncir::NNIR> graph,
         if (!is_control_op(node_type)) {
             cursor_++;
         }
+#ifdef ENABLE_PROFILING
+        at::hip::device_synchronize();
+        gettimeofday(&h_end, nullptr);
+        float tmp = (h_end.tv_sec - h_start.tv_sec) * 1000.f + (h_end.tv_usec - h_start.tv_usec) / 1000.f;
+        perf_opExecutor += tmp;
+        auto tnode = perf_map.find(node->getName());
+        if (tnode != perf_map.end()) {
+            tnode->second += tmp;
+        } else {
+            perf_map.insert(std::make_pair(node->getName(), tmp));
+        }
+#endif
     }
-
+#ifdef ENABLE_PROFILING
+    gettimeofday(&end, nullptr);
+    perf += (end.tv_sec - start.tv_sec) * 1000.f + (end.tv_usec - start.tv_usec) / 1000.f;
+    LOG(INFO) << "execute graph perf is " << perf << " ms";
+    LOG(INFO) << " ____perf_getNode is:        " << perf_getNode << " ms";
+    LOG(INFO) << " ____perf_getNodeType is:    " << perf_getNodeType << " ms";
+    LOG(INFO) << " ____perf_findOpExecutor is: " << perf_findOpExecutor << " ms";
+    for (const auto& n : perf_map) {
+        LOG(INFO) << " _____________________ " << n.first << "perf is : " << n.second << " ms";
+    }
+    LOG(INFO) << " perf_opExecutor is        " << perf_opExecutor << " ms";
+    gettimeofday(&start, nullptr);
+#endif
     // Read Output Tensors
     this->getOutputTensors(output_tensors);
     for (auto& out : output_tensors) {
         DLOG(INFO) << "Output Tensor:" << out.sizes();
     }
+#ifdef ENABLE_PROFILING
+    gettimeofday(&end, nullptr);
+    perf = (end.tv_sec - start.tv_sec) * 1000.f + (end.tv_usec - start.tv_usec) / 1000.f;
+    LOG(INFO) << "setoutput perf is " << perf << " ms";
+#endif
     return RetVal::SUCCESS;
 }
 
