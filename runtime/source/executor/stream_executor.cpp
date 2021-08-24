@@ -14,7 +14,7 @@
 #include "tv_tools.h"
 
 #include <sys/time.h>
-#define ENABLE_PROFILING
+// #define ENABLE_PROFILING
 
 namespace nncir = nn_compiler::nn_ir;
 
@@ -132,7 +132,7 @@ RetVal StreamExecutor::inferenceModel(const std::shared_ptr<nncir::NNIR> graph,
                                       const std::vector<torch::Tensor>& input_tensors,
                                       std::vector<torch::Tensor>& output_tensors)
 {
-// #ifdef ENABLE_PROFILING
+#ifdef ENABLE_PROFILING
     bool enable_prof = false;
     timeval start, end;
     timeval h_start, h_end;
