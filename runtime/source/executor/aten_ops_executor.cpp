@@ -967,7 +967,7 @@ void executorAtenEmbedding(const nncir::Node& op_node, StreamExecutor& stream_ex
     auto node = cast<nncir::AtenEmbeddingNode>(op_node);
     int edge_id = 0;
 
-    auto weights = node.getWeights();
+    auto& weights = node.getWeights();
     assert(weights.size() > 0);
 
     auto& input_indices = cast<nncir::DataEdge>(node.getInEdge(edge_id++));

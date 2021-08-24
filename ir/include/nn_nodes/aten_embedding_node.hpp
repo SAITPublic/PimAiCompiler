@@ -35,7 +35,7 @@ class AtenEmbeddingNode : public NodeMixin<AtenEmbeddingNode, NNNode> {
     void setScaleGradByFreq(int scale_grad_by_freq) { scale_grad_by_freq_ = scale_grad_by_freq; }
     void setSparse(int sparse) { sparse_ = sparse; }
 
-    std::vector<at::Tensor> getWeights() { return weights_; }
+    const std::vector<at::Tensor>& getWeights() { return weights_; }
     int64_t  getPaddingIdx() { return padding_idx_; }
     int getScaleGradByFreq() { return scale_grad_by_freq_; }
     int getSparse() { return sparse_; }
