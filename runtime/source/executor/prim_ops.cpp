@@ -83,11 +83,6 @@ void primRaiseException(std::string msg)
     throw exception;
 }
 
-torch::Tensor primTensorConstant(void* data_ptr, std::vector<int64_t>& shape, DataType dtype)
-{
-    return createPtTensor(data_ptr, shape, dtype).cuda();
-}
-
 // the unpacked tensors will append to stack
 // torch::jit::Value can convert to tensor/int/bool/float and so-on
 // tuple: c10::ivalue::Tuple

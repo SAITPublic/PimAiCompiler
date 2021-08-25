@@ -28,15 +28,19 @@ IRCONTROLNodeParser::parseControlNode<IR::CONTROLNode::AnyType_PrimConstantNode>
     auto data_type = prim_constant_node->data_type();
     auto ntype = prim_constant_node->ntype()->c_str();
     auto ir_shape = prim_constant_node->tensor_shape();
+    auto ir_stride = prim_constant_node->stride();
     nn_ir::Shape4D shape;
+    nn_ir::Shape4D stride;
     // type is NONE
     if (!ir_shape) {
         shape = {0, 0, 0, 0};
+        stride = {0, 0, 0, 0};
     } else {
         shape = std::get<nn_ir::Shape4D>(nn_ir::parseParam(ir_shape));
+        stride = std::get<nn_ir::Shape4D>(nn_ir::parseParam(ir_stride));
     }
 
-    return std::make_unique<nn_ir::PrimConstantNode>(node_info, ntype, data, bit_width, data_type, shape);
+    return std::make_unique<nn_ir::PrimConstantNode>(node_info, ntype, data, bit_width, data_type, shape, stride);
 }
 
 template <>
@@ -304,7 +308,13 @@ IRCONTROLNodeParser::parseControlNode<IR::CONTROLNode::AnyType_PrimVariableNode>
         shape.push_back(std::get<nn_ir::Shape4D>(nn_ir::parseParam(shape_item)));
     }
 
-    return std::make_unique<nn_ir::PrimVariableNode>(node_info, data, shape, data_type, tensor_data_type);
+    auto strides_arr = prim_variable_node->strides();
+    std::vector<nn_ir::Shape4D> strides;
+    for (auto strides_item : *strides_arr) {
+        strides.push_back(std::get<nn_ir::Shape4D>(nn_ir::parseParam(strides_item)));
+    }
+
+    return std::make_unique<nn_ir::PrimVariableNode>(node_info, data, shape, strides, data_type, tensor_data_type);
 }
 
 } // namespace nn_compiler

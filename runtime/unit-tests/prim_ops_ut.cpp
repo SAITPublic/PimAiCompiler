@@ -144,9 +144,9 @@ TEST(NnrUnitTest, primConstant)
             std::vector<int64_t> shape;
             for (auto& item : tensor.sizes()) shape.push_back(item);
             if (tp == torch::kHalf) {
-                ASSERT_EQUAL(nnrt::primTensorConstant(tensor.data_ptr(), shape, nnrt::DataType::FLOAT16), tensor);
+                ASSERT_EQUAL(nnrt::createPtTensor(tensor.data_ptr(), shape, nnrt::DataType::FLOAT16), tensor);
             } else if (tp == torch::kFloat32) {
-                ASSERT_EQUAL(nnrt::primTensorConstant(tensor.data_ptr(), shape, nnrt::DataType::FLOAT32), tensor);
+                ASSERT_EQUAL(nnrt::createPtTensor(tensor.data_ptr(), shape, nnrt::DataType::FLOAT32), tensor);
             }
         }
     }

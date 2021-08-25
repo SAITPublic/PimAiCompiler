@@ -53,8 +53,6 @@ T primScalarConstant(T* data_ptr)
 // STRING, DEVICE
 std::string primStrConstsnt(void* data_ptr);
 
-torch::Tensor primTensorConstant(void* data_ptr, std::vector<int64_t>& shape, DataType dtype);
-
 void primTupleConstruct(std::vector<torch::IValue>& stack, size_t num_inputs);
 
 torch::IValue primTupleIndex(const std::vector<torch::IValue>& inputs, int64_t index);

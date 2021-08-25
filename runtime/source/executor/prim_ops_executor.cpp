@@ -63,6 +63,7 @@ void executePrimConstant(const nncir::Node& op_node, StreamExecutor& stream_exec
     } else if (ntype == "Tensor") {
         auto shape_ = constant_node.getShape();
         auto bit_width = constant_node.getBitWidth();
+        auto stride_ = constant_node.getStride();
         auto scalar_type = DataType::NONE;
 
         if (bit_width == 16) {
@@ -75,7 +76,8 @@ void executePrimConstant(const nncir::Node& op_node, StreamExecutor& stream_exec
         auto temp_data = constant_node.getData();
         uint8_t* ptr = const_cast<uint8_t*>(temp_data.data());
         std::vector<int64_t> input_shape = getDataShapeFromShape4D(shape_);
-        auto tensor = primTensorConstant((void*)ptr, input_shape, scalar_type);
+        std::vector<int64_t> stride = getDataShapeFromShape4D(stride_);
+        auto tensor = createPtTensor((void*)ptr, input_shape, scalar_type, stride).cuda();
         iv = tensorToIValue(tensor);
         dtype = DataType::TENSOR;
     } else if (ntype == "(int, int, int)") {
@@ -594,6 +596,7 @@ void executePrimVariable(const nncir::Node& op_node, StreamExecutor& stream_exec
     auto variable_node = cast<nncir::PrimVariableNode>(op_node);
     auto data_arr = variable_node.getData();
     auto tensor_shape = variable_node.getShape();
+    auto strides = variable_node.getStrides();
     auto node_data_type = variable_node.getDataType();
     auto tensor_data_type = variable_node.getTensorDataType();
     uint8_t* ptr = const_cast<uint8_t*>(data_arr.data());
@@ -611,6 +614,8 @@ void executePrimVariable(const nncir::Node& op_node, StreamExecutor& stream_exec
 
         for (uint32_t idx = 0; idx < tensor_shape.size(); idx++) {
             std::vector<int64_t> input_shape = getDataShapeFromShape4D(tensor_shape.at(idx));
+            std::vector<int64_t> stride = getDataShapeFromShape4D(strides.at(idx));
+            
             torch::jit::IValue iv;
             scalar_type = DataType::NONE;
             auto bytenum = 0;
@@ -622,7 +627,7 @@ void executePrimVariable(const nncir::Node& op_node, StreamExecutor& stream_exec
             // is tensor type: list[tensor, ...]
             if (size != 1 && (tensor_data_type.at(idx).find("int") != std::string::npos ||
                               tensor_data_type.at(idx).find("float") != std::string::npos)) {
-                auto tensor = primTensorConstant((void*)(ptr + total_size * bytenum), input_shape, scalar_type);
+                auto tensor = createPtTensor((void*)(ptr + total_size * bytenum), input_shape, scalar_type, stride).cuda();
                 iv = tensorToIValue(tensor);
                 list_type = at::ListType::ofTensors();
             }
@@ -652,10 +657,11 @@ void executePrimVariable(const nncir::Node& op_node, StreamExecutor& stream_exec
         stream_executor.updateBlob(out_edge.getBlobId(), DataType::BOOL, iv);
     } else if (node_data_type.find("Tensor") != std::string::npos) {
         std::vector<int64_t> input_shape = getDataShapeFromShape4D(tensor_shape.at(0));
+        std::vector<int64_t> stride = getDataShapeFromShape4D(strides.at(0));
         auto var_info = getVariableInfo(ptr, tensor_data_type.at(0), 0);
         auto scalar_type = var_info.second.second;
         torch::jit::IValue iv = var_info.first;
-        auto tensor = primTensorConstant((void*)ptr, input_shape, scalar_type);
+        auto tensor = createPtTensor((void*)ptr, input_shape, scalar_type, stride).cuda();
 
         auto& out_edge = cast<nncir::DataEdge>(variable_node.getFirstOutEdge());
         stream_executor.updateBlob(out_edge.getBlobId(), DataType::TENSOR, iv);

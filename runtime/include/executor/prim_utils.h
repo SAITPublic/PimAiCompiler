@@ -38,7 +38,8 @@ void push(std::vector<torch::jit::IValue>& stack, Types&&... args)
     (void)std::initializer_list<int>{(push_one(stack, std::forward<Types>(args)), 0)...};
 }
 
-torch::Tensor createPtTensor(void* data_ptr, const std::vector<int64_t>& shape, DataType dtype);
+torch::Tensor createPtTensor(void* data_ptr, const std::vector<int64_t>& shape, DataType dtype,
+                             const std::vector<int64_t>& stride = {});
 
 std::vector<int64_t> getDataShapeFromShape4D(nn_compiler::nn_ir::Shape4D shape);
 

@@ -26,7 +26,8 @@ void drop(std::vector<torch::jit::IValue>& stack, size_t n) { stack.erase(stack.
  * @param dtype
  * @return torch::Tensor
  */
-torch::Tensor createPtTensor(void* data_ptr, const std::vector<int64_t>& shape, DataType dtype)
+torch::Tensor createPtTensor(void* data_ptr, const std::vector<int64_t>& shape, DataType dtype,
+                             const std::vector<int64_t>& stride)
 {
     c10::ScalarType scalar_type;
 
@@ -44,7 +45,11 @@ torch::Tensor createPtTensor(void* data_ptr, const std::vector<int64_t>& shape, 
         DLOG(ERROR) << "Unsupport dtype when create Tensor";
     }
     auto sizes = c10::IntArrayRef(shape);
-    return torch::from_blob(data_ptr, sizes, c10::TensorOptions().dtype(scalar_type));
+    if (stride.size() == 0) {
+        return torch::from_blob(data_ptr, sizes, c10::TensorOptions().dtype(scalar_type));
+    } else {
+        return torch::from_blob(data_ptr, sizes, stride, c10::TensorOptions().dtype(scalar_type));
+    }
 }
 
 std::vector<int64_t> getDataShapeFromShape4D(nn_compiler::nn_ir::Shape4D shape)
