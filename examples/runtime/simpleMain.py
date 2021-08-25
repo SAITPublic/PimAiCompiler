@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import argparse
+from typing import Mapping
 import torch
 import sys
 import os
@@ -135,9 +136,9 @@ if __name__ == '__main__':
         test_hwr_inference(args.graph_ir_file, input_tensor_file)
     elif args.model_kind == 'GNMT':
         gnmt_ir_file = args.graph_ir_file
-        src_file = os.path.join(current_dir, './resource/gnmt/inputs/src_128_67.pt')
-        src_length_file = os.path.join(current_dir, './resource/gnmt/inputs/src_length_128.pt')
-        bos_file = os.path.join(current_dir, './resource/gnmt/inputs/bos_1280_1.pt')
+        src_file = os.path.join(current_dir, './resource/gnmt/inputs/src_1_12_torch.cuda.LongTensor.pt')
+        src_length_file = os.path.join(current_dir, './resource/gnmt/inputs/src_length_1_torch.cuda.LongTensor.pt')
+        bos_file = os.path.join(current_dir, './resource/gnmt/inputs/bos_1_1_torch.cuda.LongTensor.pt')
         assert os.path.exists(src_file) and os.path.exists(src_length_file) and os.path.exists(bos_file)
         test_gnmt_inference(gnmt_ir_file, src_file, src_length_file, bos_file)
     
