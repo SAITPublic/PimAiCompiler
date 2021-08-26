@@ -118,6 +118,12 @@ at::Tensor atenDropout(const at::Tensor &input, double p, bool train) { return a
 
 at::Tensor &atenDropout_(at::Tensor &self, double p, bool train) { return at::dropout_(self, p, train); }
 
+at::Tensor atenEmbedding(const at::Tensor &weight, const at::Tensor &indices, int64_t padding_idx,	
+                         bool scale_grad_by_freq, bool sparse)	
+{	
+    return at::embedding(weight, indices, padding_idx, scale_grad_by_freq, sparse);	
+}
+
 at::Tensor atenEq(const at::Tensor &self, const at::Scalar &other) { return at::eq(self, other); }
 
 bool atenEq(const at::Scalar &self, const at::Scalar &other)
