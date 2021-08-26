@@ -14,6 +14,7 @@
 #include "ir/include/ir_types.hpp"
 #include "ir/include/nn_ir.hpp"
 #include "executor/aten_ops_executor.h"
+#include "executor/custom_ops.hpp"
 
 
 namespace nnrt
@@ -2210,10 +2211,61 @@ void executorAtenMatmul(const nncir::Node& op_node, StreamExecutor& stream_execu
     assert(iv_self.isTensor());
     assert(iv_other.isTensor());
 
-    auto output = nnrt::atenMatmul(iv_self.toTensor(), iv_other.toTensor());
-    // update output
-    auto& out_edge = cast<nncir::DataEdge>(node.getFirstOutEdge());
-    stream_executor.updateBlob(out_edge.getBlobId(), DataType::TENSOR, tensorToIValue(output));
+    int dim_i0 = iv_self.toTensor().dim();
+    int dim_i1 = iv_other.toTensor().dim();
+    int i0_is_vector = 0;
+    int i1_is_vector = 0;
+
+    for (int i = 0; i < dim_i0; ++i) {
+        if (iv_self.toTensor().size(i) != 1) {
+            i0_is_vector += 1;
+        }
+    }
+
+    for (int i = 0; i < dim_i1; ++i) {
+        if (iv_other.toTensor().size(i) != 1) {
+            i1_is_vector += 1;
+        }
+    }
+
+    if ((i0_is_vector != 1 && i1_is_vector != 1)) {
+        auto output = nnrt::atenMatmul(iv_self.toTensor(), iv_other.toTensor());
+        // update output
+        auto& out_edge = cast<nncir::DataEdge>(node.getFirstOutEdge());
+        stream_executor.updateBlob(out_edge.getBlobId(), DataType::TENSOR, tensorToIValue(output));
+    } else {
+        float alpha = 1.0f;
+        float beta = 0.0f;
+        if (i0_is_vector == 1 && i1_is_vector != 1) {
+            int m = 1;
+            int n = iv_other.toTensor().size(dim_i1 - 1);
+            int k = iv_other.toTensor().size(dim_i1 - 2);
+
+            _Float16* x = (_Float16*)iv_self.toTensor().data_ptr();
+            _Float16* A = (_Float16*)iv_other.toTensor().data_ptr();
+            auto options = at::TensorOptions().dtype(at::kHalf).device(at::kCUDA);
+            auto output = at::zeros({1, 1, 1, n}, options);
+            _Float16* y = (_Float16*)output.data_ptr();
+            rocblas_gemv_template_xAy(nullptr, x, A, y, m, n, k, alpha, beta);
+
+            auto& out_edge = cast<nncir::DataEdge>(node.getFirstOutEdge());
+            stream_executor.updateBlob(out_edge.getBlobId(), DataType::TENSOR, tensorToIValue(output));
+        } else {
+            int m = iv_self.toTensor().size(dim_i0 - 2);
+            int n = 1;
+            int k = iv_self.toTensor().size(dim_i0 - 1);
+
+            _Float16* A = (_Float16*)iv_self.toTensor().data_ptr();
+            _Float16* x = (_Float16*)iv_other.toTensor().data_ptr();
+            auto options = at::TensorOptions().dtype(at::kHalf).device(at::kCUDA);
+            auto output = at::zeros({1, 1, m, 1}, options);
+            _Float16* y = (_Float16*)output.data_ptr();
+            rocblas_gemv_template_Axy(nullptr, A, x, y, m, n, k, alpha, beta);
+
+            auto& out_edge = cast<nncir::DataEdge>(node.getFirstOutEdge());
+            stream_executor.updateBlob(out_edge.getBlobId(), DataType::TENSOR, tensorToIValue(output));
+        }
+    }
 }
 
 void executorAtenMax(const nncir::Node& op_node, StreamExecutor& stream_executor)
