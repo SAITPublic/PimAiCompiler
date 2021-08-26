@@ -11,3 +11,5 @@ add_dependencies(ir flatc_cpp_generator)
 target_include_directories("ir" SYSTEM PUBLIC ${PROJECT_SOURCE_DIR}/third_party/half/include)
 
 target_link_libraries(ir PUBLIC common torch c10)
+
+install (TARGETS ir LIBRARY DESTINATION ${ROCM_PATH}/lib/)

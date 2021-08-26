@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.13)
+cmake_minimum_required(VERSION 3.5.1)
 project(NNCompiler)
 
 set(NN_COMPILER_VERSION_MAJOR 1)

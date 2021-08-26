@@ -116,6 +116,7 @@ uninstall_fn()
 {
     sudo rm -f ${ROCM_PATH}/lib/libnn_runtime.so
     sudo rm -f ${ROCM_PATH}/lib/Nnrt.cpython-36m-x86_64-linux-gnu.so
+    sudo rm -f ${ROCM_PATH}/lib/libir.so
     sudo rm -f ${ROCM_PATH}/include/nn_runtime.h
 }
 
