@@ -16,7 +16,7 @@ class ModelBuilder
     }
 
     // compiler intput model_path; output NNIR(LLO)
-    RetVal compileModel(int compile_level);
+    RetVal compileModel(int compile_level, const std::string model_type);
 
     RetVal preloadModel();
 

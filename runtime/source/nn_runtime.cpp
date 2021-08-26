@@ -6,13 +6,13 @@
 
 namespace nnrt
 {
-NNRuntime::NNRuntime(const std::string torch_model_path, int compile_level)
+NNRuntime::NNRuntime(const std::string torch_model_path, int compile_level, std::string model_type)
 {
     DLOG(INFO) << "get torch model path:" << torch_model_path;
 
     // compile and preload model
     ModelBuilder builder(torch_model_path);
-    builder.compileModel(compile_level);
+    builder.compileModel(compile_level, model_type);
     builder.preloadModel();
 
     this->mbuilder_ = std::make_shared<ModelBuilder>(builder);

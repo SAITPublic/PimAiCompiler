@@ -65,12 +65,12 @@ def test_simple_cases():
     test_simple_loop_net(loop_ir_files)
 
 
-def test_rnnt_inference(model_ir_file : str, feature_file : str, feature_len_file : str, compile_level : int):
+def test_rnnt_inference(input_file : str, feature_file : str, feature_len_file : str, compile_level : int, model_type : str):
     # Prepare inputs
     feature = torch.load(feature_file).cuda()   # dtype=torch.fp16
     feature_len = torch.load(feature_len_file)  # dtype=torch.long
     # Init nnruntime
-    rt = Nnrt.NNRuntime(input_file=model_ir_file, compile_level=compile_level)
+    rt = Nnrt.NNRuntime(input_file, compile_level, model_type)
     # warn-up
     _, _, _ = rt.inferenceModel([feature, feature_len])
     # Run and test
@@ -82,11 +82,11 @@ def test_rnnt_inference(model_ir_file : str, feature_file : str, feature_len_fil
     print('RNNT avg_time:{}ms'.format((time_end - time_start) / test_cnt * 1000))
 
 
-def test_hwr_inference(model_ir_file : str, input_tensor_file : str, compile_level : int):
+def test_hwr_inference(input_file : str, input_tensor_file : str, compile_level : int, model_type : str):
     # Prepare inputs
     input_tensor = torch.load(input_tensor_file).cuda()   # dtype=torch.fp16
     # Init nnruntime
-    rt = Nnrt.NNRuntime(model_ir_file, compile_level)
+    rt = Nnrt.NNRuntime(input_file, compile_level, model_type)
     # warn-up
     _ = rt.inferenceModel([input_tensor])
     # Run and test
@@ -98,13 +98,13 @@ def test_hwr_inference(model_ir_file : str, input_tensor_file : str, compile_lev
     print('HWR avg_time:{}ms'.format((time_end - time_start) / test_cnt * 1000))
 
 
-def test_gnmt_inference(model_ir_file : str, src_file : str, src_length_file : str,  bos_file : str):
+def test_gnmt_inference(input_file : str, src_file : str, src_length_file : str,  bos_file : str, compile_level : int, model_type : str):
     # Prepare inputs
     src = torch.load(src_file).cuda()   # dtype=torch.long
     src_length = torch.load(src_length_file).cuda()   # dtype=torch.long
     bos = torch.load(bos_file).cuda()   # dtype=torch.long
     # Init nnruntime
-    rt = Nnrt.NNRuntime(model_ir_file)
+    rt = Nnrt.NNRuntime(input_file, compile_level, model_type)
         # warn-up
     _, _, _ = rt.inferenceModel([src, src_length, bos])
     # Run and test
@@ -128,20 +128,20 @@ if __name__ == '__main__':
     assert os.path.exists(args.input_file)
     if args.model_kind == 'RNNT':
         # Inference RNNT
-        rnnt_ir_file = args.input_file
+        rnnt_input_file = args.input_file
         feature_file = os.path.join(current_dir, './resource/rnnt/inputs/feature.pth')
         feature_len_file = os.path.join(current_dir,'./resource/rnnt/inputs/feature_len.pth')
         assert os.path.exists(feature_file) and os.path.exists(feature_len_file)
-        test_rnnt_inference(rnnt_ir_file, feature_file, feature_len_file, args.compile_level)
+        test_rnnt_inference(rnnt_input_file, feature_file, feature_len_file, args.compile_level, args.model_kind)
     elif args.model_kind == 'HWR':
         input_tensor_file = os.path.join(current_dir, './resource/hwr/inputs/input_hwr_1_1_1024_128.pt')
         assert os.path.exists(input_tensor_file)
-        test_hwr_inference(args.input_file, input_tensor_file, args.compile_level)
+        test_hwr_inference(args.input_file, input_tensor_file, args.compile_level, args.model_kind)
     elif args.model_kind == 'GNMT':
-        gnmt_ir_file = args.graph_ir_file
+        gnmt_input_file = args.input_file
         src_file = os.path.join(current_dir, './resource/gnmt/inputs/src_1_12_torch.cuda.LongTensor.pt')
         src_length_file = os.path.join(current_dir, './resource/gnmt/inputs/src_length_1_torch.cuda.LongTensor.pt')
         bos_file = os.path.join(current_dir, './resource/gnmt/inputs/bos_1_1_torch.cuda.LongTensor.pt')
         assert os.path.exists(src_file) and os.path.exists(src_length_file) and os.path.exists(bos_file)
-        test_gnmt_inference(gnmt_ir_file, src_file, src_length_file, bos_file)
+        test_gnmt_inference(gnmt_input_file, src_file, src_length_file, bos_file, args.compile_level, args.model_kind)
     
