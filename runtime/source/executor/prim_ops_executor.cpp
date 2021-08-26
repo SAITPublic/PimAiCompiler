@@ -30,11 +30,8 @@ void executePrimConstant(const nncir::Node& op_node, StreamExecutor& stream_exec
     DataType dtype = DataType::NONE;
 
     // Get the data_ptr
-    uint8_t* ptr = const_cast<uint8_t*>(constant_node.getData().data());
-
-    // dont del these 2 line, otherwise the data will be error
-    std::vector<uint8_t> tmp_data = constant_node.getData();
-    int len = tmp_data.size();
+    auto constant_data = constant_node.getData();
+    uint8_t* ptr = const_cast<uint8_t*>(constant_data.data());
 
     if (ntype == "str") {
         std::string str = primStrConstsnt((void*)ptr);
@@ -73,8 +70,6 @@ void executePrimConstant(const nncir::Node& op_node, StreamExecutor& stream_exec
         } else {
             DLOG(ERROR) << "PrimConstant Error, unsupport data type when create Tensor!";
         }
-        auto temp_data = constant_node.getData();
-        uint8_t* ptr = const_cast<uint8_t*>(temp_data.data());
         std::vector<int64_t> input_shape = getDataShapeFromShape4D(shape_);
         std::vector<int64_t> stride = getDataShapeFromShape4D(stride_);
         auto tensor = createPtTensor((void*)ptr, input_shape, scalar_type, stride).cuda();
