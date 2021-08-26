@@ -2,11 +2,13 @@
 
 namespace nn_compiler {
 
-RetVal NNCompiler::initialize(const int& compile_level, const std::string& file_path) {
+RetVal NNCompiler::initialize(const int& compile_level, const std::string& file_path,
+                              const std::string& model_name) {
     Log::NC::I() << "NNCompiler::initialize(compile_level, file_path) is called";
 
     compile_level_ = compile_level;
     input_file_path_ = file_path;
+    model_name_ = model_name;
 
     // frontend initialize
     frontend_driver_ = std::make_unique<frontend::FrontendDriver>();
@@ -23,7 +25,7 @@ RetVal NNCompiler::compile() {
 
     switch(compile_level_) {
         case 0:
-            frontend(input_file_path_);
+            frontend(input_file_path_, model_name_);
             middlend();
             backend();
             break;
@@ -46,7 +48,7 @@ RetVal NNCompiler::compile(std::vector<std::shared_ptr<nn_compiler::nn_ir::NNIR>
 
     switch(compile_level_) {
         case 0:
-            frontend(input_file_path_);
+            frontend(input_file_path_, model_name_);
             middlend();
             backend();
             break;
@@ -73,10 +75,10 @@ RetVal NNCompiler::finalize() {
     return RetVal::SUCCESS;
 }
 
-RetVal NNCompiler::frontend(const std::string& file_path) {
+RetVal NNCompiler::frontend(const std::string& file_path, const std::string& model_name) {
     Log::NC::I() << "NNCompiler::frontend(file_path) is called";
 
-    frontend_driver_->initialize(file_path);
+    frontend_driver_->initialize(file_path, model_name);
     frontend_driver_->run();
     frontend_driver_->wrapup(NNIR_graphs_);
     frontend_driver_->finalize();

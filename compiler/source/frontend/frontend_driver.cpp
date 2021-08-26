@@ -9,11 +9,11 @@
 namespace nn_compiler {
 namespace frontend {
 
-RetVal FrontendDriver::initialize(const std::string& in_file_path) {
+RetVal FrontendDriver::initialize(const std::string& in_file_path, const std::string& model_name) {
     Log::FE::I() << "NNCompiler FrontendDriver::initialize() is called";
     in_file_path_ = in_file_path;
 
-    graphgen_core_ = std::make_shared<graphgen::GraphGenCore>();
+    graphgen_core_ = std::make_shared<graphgen::GraphGenCore>(model_name);
 
     return RetVal::SUCCESS;
 }

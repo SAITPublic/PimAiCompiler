@@ -14,6 +14,9 @@
 static cl_opt::Option<std::string>
 input_file_path(std::vector<std::string>{"-i", "--input"}, "<file>", "Input file path", cl_opt::Required::YES);
 
+static cl_opt::Option<std::string>
+model_name(std::vector<std::string>{"-m", "--model"}, "<name>", "Model name[RNNT, GNMT, HWR]", cl_opt::Required::YES);
+
 static cl_opt::Option<int> compile_level("-l",
                                          "<compile level>",
                                          "compile level. Possible values: 0 (frontend->middlend->backend),\n\
@@ -29,7 +32,8 @@ int main(int argc, char* argv[]) {
     nn_compiler::NNCompiler compiler;
 
     // initialize
-    compiler.initialize(static_cast<int>(compile_level), static_cast<std::string>(input_file_path));
+    compiler.initialize(static_cast<int>(compile_level), static_cast<std::string>(input_file_path),
+                        static_cast<std::string>(model_name));
 
     // compile
     compiler.compile();

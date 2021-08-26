@@ -30,10 +30,11 @@ class NNCompiler {
      * @brief   initialize a compiler.
      * @details This function initializes a compiler,
      *          and build a compilation pipeline with frontend, middlend and backend.
-     * @inputs  int compile_level, std::string file_path
+     * @inputs  int compile_level, std::string file_path, std::string model_name
      * @returns return code: success or failure.
      */
-    RetVal initialize(const int& compile_level, const std::string& file_path);
+    RetVal initialize(const int& compile_level, const std::string& file_path,
+                      const std::string& model_name);
 
     /**
      * @brief   run compiler.
@@ -62,10 +63,10 @@ class NNCompiler {
     /**
      * @brief   Frontend compilation pipeline.
      * @details This function runs frontend compilation pipeline with torchscript IR input.
-     * @inputs  torchscript IR file path
+     * @inputs  torchscript IR file path and model name[RNNT, GNMT, HWR]
      * @returns return code: success or failure.
      */
-    RetVal frontend(const std::string& file_path);
+    RetVal frontend(const std::string& file_path, const std::string& model_name);
 
     /**
      * @brief   Milddlend compilation pipeline.
@@ -116,6 +117,8 @@ class NNCompiler {
     // TODO: Add members of backend drivers
 
     std::vector<std::shared_ptr<nn_compiler::nn_ir::NNIR>> NNIR_graphs_;
+
+    std::string model_name_ = "";
 
 }; // class NNCompiler
 

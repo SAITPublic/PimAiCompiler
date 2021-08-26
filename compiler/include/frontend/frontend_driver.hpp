@@ -21,10 +21,10 @@ class FrontendDriver {
     /**
      * @brief     initialize a frontend pipeline
      * @details   This function initialize a frontend pipeline
-     * @inputs    std::string& in_file_path
+     * @inputs    const std::string& in_file_path, const std::string& model_name
      * @returns   return code
      */
-    RetVal initialize(const std::string& in_file_path);
+    RetVal initialize(const std::string& in_file_path, const std::string& model_name);
 
     /**
      * @brief   Call and run frontend
