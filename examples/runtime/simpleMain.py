@@ -90,10 +90,12 @@ def test_hwr_inference(input_file : str, input_tensor_file : str, compile_level 
     # warn-up
     _ = rt.inferenceModel([input_tensor])
     # Run and test
+    torch.cuda.synchronize()
     time_start = time.time()
     test_cnt = 100
     for _ in tqdm.tqdm(range(test_cnt)):
         outpus = rt.inferenceModel([input_tensor])
+        torch.cuda.synchronize()
     time_end = time.time()
     print('HWR avg_time:{}ms'.format((time_end - time_start) / test_cnt * 1000))
 
@@ -144,4 +146,3 @@ if __name__ == '__main__':
         bos_file = os.path.join(current_dir, './resource/gnmt/inputs/bos_1_1_torch.cuda.LongTensor.pt')
         assert os.path.exists(src_file) and os.path.exists(src_length_file) and os.path.exists(bos_file)
         test_gnmt_inference(gnmt_input_file, src_file, src_length_file, bos_file, args.compile_level, args.model_kind)
-    

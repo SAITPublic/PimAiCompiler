@@ -32,7 +32,7 @@ void StreamExecutor::loadWeightAndBias(nncir::Blob* blob)
 
     auto data_blob = cast_if<nncir::DataBlob>(blob);
     if (data_blob == nullptr) {
-        DLOG(ERROR) << "The blob is not weight or bias blob!";
+        LOG(FATAL) << "The blob is not weight or bias blob!";
     }
 
     auto bit_width = blob->getBitWidth();
@@ -59,7 +59,7 @@ void StreamExecutor::loadWeightAndBias(nncir::Blob* blob)
         torch::jit::IValue iv = tensorToIValue(tensor_data);
         this->global_blobs_.insert({blob_id, {DataType::TENSOR, iv}});
     } else {
-        DLOG(FATAL) << "bit witgh Error!";
+        LOG(FATAL) << "Bit witdh Error!";
     }
 }
 
@@ -124,7 +124,7 @@ StreamExecutor::StreamExecutor(const std::shared_ptr<nncir::NNIR> ir_graph)
     DLOG(INFO) << "Num outputs of Graph:" << this->output_blob_ids_.size();
 
     if (this->input_blob_ids_.size() == 0 || this->output_blob_ids_.size() == 0) {
-        DLOG(FATAL) << "The Graph must have >= 1 inputs and outputs!";
+        LOG(FATAL) << "The Graph must have >= 1 inputs and outputs!";
     }
 }
 
@@ -294,7 +294,7 @@ void StreamExecutor::setInputTensors(const std::vector<torch::Tensor>& input_ten
     }
 }
 
-std::vector<torch::Tensor> StreamExecutor::iValueParser(torch::jit::IValue &iv) 
+std::vector<torch::Tensor> StreamExecutor::iValueParser(torch::jit::IValue& iv)
 {
     std::vector<torch::Tensor> out_tensor;
     std::vector<int64_t> out_list;
@@ -306,16 +306,16 @@ std::vector<torch::Tensor> StreamExecutor::iValueParser(torch::jit::IValue &iv)
                 out_tensor.push_back(iv_.toTensor());
             } else if (iv_.isList()) {
                 auto temp_out = iValueParser(iv_);
-                for (auto &out : temp_out) {
+                for (auto& out : temp_out) {
                     out_tensor.push_back(out);
                 }
             } else if (iv_.isInt()) {
                 auto temp_out = iValueParser(iv_);
-                for (auto &out : temp_out) {
+                for (auto& out : temp_out) {
                     out_tensor.push_back(out);
                 }
             } else {
-                DLOG(FATAL) << "Output data type do no support!";
+                LOG(FATAL) << "Dtype of output is unsupported !";
             }
         }
     } else if (iv.isList()) {
@@ -324,15 +324,15 @@ std::vector<torch::Tensor> StreamExecutor::iValueParser(torch::jit::IValue &iv)
         for (auto iv_ : list_) {
             if (iv_.isTensor()) {
                 out_tensor.push_back(iv_.toTensor());
-            } else if(iv_.isInt()) {
+            } else if (iv_.isInt()) {
                 out_list.push_back(iv_.toInt());
             } else if (iv_.isList()) {
                 auto temp_out = iValueParser(iv_);
-                for (auto &out : temp_out) {
+                for (auto& out : temp_out) {
                     out_tensor.push_back(out);
                 }
             } else {
-                DLOG(FATAL) << "Output data type do no support!";
+                LOG(FATAL) << "Dtype of output is unsupported !";
             }
         }
         if (out_list.size() != 0) {
@@ -345,8 +345,10 @@ std::vector<torch::Tensor> StreamExecutor::iValueParser(torch::jit::IValue &iv)
         torch::Tensor out_ =
             torch::from_blob(out_list.data(), {static_cast<int64_t>(out_list.size())}, torch::kLong).clone();
         out_tensor.push_back(std::move(out_));
+    } else if (iv.isTensor()) {
+        out_tensor.push_back(iv.toTensor());
     } else {
-        DLOG(FATAL) << "Output data type do no support!";
+        LOG(FATAL) << "Dtype of output is unsupported !";
     }
     return out_tensor;
 }
