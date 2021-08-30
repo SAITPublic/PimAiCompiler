@@ -1,6 +1,6 @@
 
 option(BUILD_PY_RUNTIME "option for build py_nnruntime extension" ON)
-option(BUILD_RUNTIME_UTEST "option for build utest" OFF)
+option(BUILD_RUNTIME_UTEST "option for build utest" ON)
 
 add_subdirectory(source)
 

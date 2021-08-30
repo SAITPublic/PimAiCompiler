@@ -9,6 +9,7 @@
     ASSERT_TRUE(t1.is_same_size(t2)); \
     ASSERT_TRUE(t1.allclose(t2));
 
+// https://pytorch.org/docs/stable/generated/torch.allclose.html#torch.allclose
 #define ASSERT_ALLCLOSE_TOLERANCES(t1, t2, atol, rtol) \
     ASSERT_TRUE(t1.is_same_size(t2));                  \
     ASSERT_TRUE(t1.allclose(t2, atol, rtol));
