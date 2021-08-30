@@ -2241,8 +2241,14 @@ void executorAtenMatmul(const nncir::Node& op_node, StreamExecutor& stream_execu
             int n = iv_other.toTensor().size(dim_i1 - 1);
             int k = iv_other.toTensor().size(dim_i1 - 2);
 
-            _Float16* x = (_Float16*)iv_self.toTensor().data_ptr();
-            _Float16* A = (_Float16*)iv_other.toTensor().data_ptr();
+            auto self = iv_self.toTensor();
+            auto other = iv_other.toTensor();
+
+            if(!self.is_contiguous()) self = self.contiguous();
+            if(!other.is_contiguous()) other = other.contiguous();
+
+            _Float16* x = (_Float16*)self.data_ptr();
+            _Float16* A = (_Float16*)other.data_ptr();
             auto options = at::TensorOptions().dtype(at::kHalf).device(at::kCUDA);
             auto output = at::zeros({1, 1, 1, n}, options);
             _Float16* y = (_Float16*)output.data_ptr();
@@ -2255,8 +2261,14 @@ void executorAtenMatmul(const nncir::Node& op_node, StreamExecutor& stream_execu
             int n = 1;
             int k = iv_self.toTensor().size(dim_i0 - 1);
 
-            _Float16* A = (_Float16*)iv_self.toTensor().data_ptr();
-            _Float16* x = (_Float16*)iv_other.toTensor().data_ptr();
+            auto self = iv_self.toTensor();
+            auto other = iv_other.toTensor();
+
+            if(!self.is_contiguous()) self = self.contiguous();
+            if(!other.is_contiguous()) other = other.contiguous();
+
+            _Float16* A = (_Float16*)self.data_ptr();
+            _Float16* x = (_Float16*)other.data_ptr();
             auto options = at::TensorOptions().dtype(at::kHalf).device(at::kCUDA);
             auto output = at::zeros({1, 1, m, 1}, options);
             _Float16* y = (_Float16*)output.data_ptr();
