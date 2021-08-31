@@ -22,7 +22,7 @@ NNRuntime::NNRuntime(const std::string torch_model_path, int compile_level, std:
     rocblas_init();
 }
 
-std::vector<torch::Tensor> NNRuntime::inferenceModel(const std::vector<torch::Tensor>& input_tensors)
+std::vector<torch::Tensor> NNRuntime::inferenceModel(const std::vector<torch::Tensor>& input_tensors, bool profiling)
 {
     DLOG(INFO) << "numInputs:" << input_tensors.size();
     for (auto& item : input_tensors) {
@@ -30,7 +30,14 @@ std::vector<torch::Tensor> NNRuntime::inferenceModel(const std::vector<torch::Te
     }
 
     std::vector<torch::Tensor> output_tensors;
-    auto status = executor_->inferenceModel(this->mbuilder_->get_runnable_ir(), input_tensors, output_tensors);
+    auto status = RetVal::FAILURE;
+    if (profiling) {
+        status =
+            executor_->inferenceModelwithProfiling(this->mbuilder_->get_runnable_ir(), input_tensors, output_tensors);
+    } else {
+        status = executor_->inferenceModel(this->mbuilder_->get_runnable_ir(), input_tensors, output_tensors);
+    }
+
     if (status != RetVal::SUCCESS) {
         LOG(ERROR) << " inference model fail!";
     }

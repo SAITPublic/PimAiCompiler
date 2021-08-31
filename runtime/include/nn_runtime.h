@@ -17,7 +17,8 @@ class NNRuntime
 
     NNRuntime(const std::string torch_model_path, int compile_level = 1, std::string model_type = "");
 
-    std::vector<torch::Tensor> inferenceModel(const std::vector<torch::Tensor>& input_tensors);
+    std::vector<torch::Tensor> inferenceModel(const std::vector<torch::Tensor>& input_tensors,
+                                              bool profiling = false);
 
     int rocblas_init(void);
     

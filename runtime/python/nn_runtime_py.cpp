@@ -10,5 +10,5 @@ PYBIND11_MODULE(Nnrt, m)
         // ref: https://pybind11.readthedocs.io/en/latest/advanced/functions.html#default-arguments-revisited
         .def(py::init<const std::string, const int, const std::string>(), py::arg("input_file"), py::arg("compile_level") = 1, py::arg("model_type") = "")
         .def("test", &NNRuntime::test)
-        .def("inferenceModel", &NNRuntime::inferenceModel, py::arg("input_tensors"));
+        .def("inferenceModel", &NNRuntime::inferenceModel, py::arg("input_tensors"), py::arg("profiling") = false);
 }
