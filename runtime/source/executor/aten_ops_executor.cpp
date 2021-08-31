@@ -2227,56 +2227,49 @@ void executorAtenMatmul(const nncir::Node& op_node, StreamExecutor& stream_execu
             i1_is_vector += 1;
         }
     }
+    if (i0_is_vector == 1 && i1_is_vector != 1 && dim_i0 > 1) {
+        float alpha = 1.0f;
+        float beta = 0.0f;
+        int m = 1;
+        int n = iv_other.toTensor().size(dim_i1 - 1);
+        int k = iv_other.toTensor().size(dim_i1 - 2);
 
-    if ((i0_is_vector != 1 && i1_is_vector != 1)) {
+        _Float16* x = (_Float16*)iv_self.toTensor().data_ptr();
+        _Float16* A = (_Float16*)iv_other.toTensor().data_ptr();
+        auto options = at::TensorOptions().dtype(at::kHalf).device(at::kCUDA);
+        auto output_shape = iv_self.toTensor().sizes().vec();
+        output_shape[dim_i0 - 1] = n;
+        output_shape[dim_i0 - 2] = 1;
+        auto output = at::zeros(output_shape, options);
+        _Float16* y = (_Float16*)output.data_ptr();
+        rocblas_gemv_template_xAy(nullptr, x, A, y, m, n, k, alpha, beta);
+
+        auto& out_edge = cast<nncir::DataEdge>(node.getFirstOutEdge());
+        stream_executor.updateBlob(out_edge.getBlobId(), DataType::TENSOR, tensorToIValue(output));
+    } else if (i0_is_vector != 1 && i1_is_vector == 1 && dim_i1 > 1) {
+        float alpha = 1.0f;
+        float beta = 0.0f;
+        int m = iv_self.toTensor().size(dim_i0 - 2);
+        int n = 1;
+        int k = iv_self.toTensor().size(dim_i0 - 1);
+
+        _Float16* A = (_Float16*)iv_self.toTensor().data_ptr();
+        _Float16* x = (_Float16*)iv_other.toTensor().data_ptr();
+        auto options = at::TensorOptions().dtype(at::kHalf).device(at::kCUDA);
+        auto output_shape = iv_other.toTensor().sizes().vec();
+        output_shape[dim_i1 - 1] = 1;
+        output_shape[dim_i1 - 2] = m;
+        auto output = at::zeros(output_shape, options);
+        _Float16* y = (_Float16*)output.data_ptr();
+        rocblas_gemv_template_Axy(nullptr, A, x, y, m, n, k, alpha, beta);
+
+        auto& out_edge = cast<nncir::DataEdge>(node.getFirstOutEdge());
+        stream_executor.updateBlob(out_edge.getBlobId(), DataType::TENSOR, tensorToIValue(output));
+    } else {
         auto output = nnrt::atenMatmul(iv_self.toTensor(), iv_other.toTensor());
         // update output
         auto& out_edge = cast<nncir::DataEdge>(node.getFirstOutEdge());
         stream_executor.updateBlob(out_edge.getBlobId(), DataType::TENSOR, tensorToIValue(output));
-    } else {
-        float alpha = 1.0f;
-        float beta = 0.0f;
-        if (i0_is_vector == 1 && i1_is_vector != 1) {
-            int m = 1;
-            int n = iv_other.toTensor().size(dim_i1 - 1);
-            int k = iv_other.toTensor().size(dim_i1 - 2);
-
-            auto self = iv_self.toTensor();
-            auto other = iv_other.toTensor();
-
-            if(!self.is_contiguous()) self = self.contiguous();
-            if(!other.is_contiguous()) other = other.contiguous();
-
-            _Float16* x = (_Float16*)self.data_ptr();
-            _Float16* A = (_Float16*)other.data_ptr();
-            auto options = at::TensorOptions().dtype(at::kHalf).device(at::kCUDA);
-            auto output = at::zeros({1, 1, 1, n}, options);
-            _Float16* y = (_Float16*)output.data_ptr();
-            rocblas_gemv_template_xAy(nullptr, x, A, y, m, n, k, alpha, beta);
-
-            auto& out_edge = cast<nncir::DataEdge>(node.getFirstOutEdge());
-            stream_executor.updateBlob(out_edge.getBlobId(), DataType::TENSOR, tensorToIValue(output));
-        } else {
-            int m = iv_self.toTensor().size(dim_i0 - 2);
-            int n = 1;
-            int k = iv_self.toTensor().size(dim_i0 - 1);
-
-            auto self = iv_self.toTensor();
-            auto other = iv_other.toTensor();
-
-            if(!self.is_contiguous()) self = self.contiguous();
-            if(!other.is_contiguous()) other = other.contiguous();
-
-            _Float16* A = (_Float16*)self.data_ptr();
-            _Float16* x = (_Float16*)other.data_ptr();
-            auto options = at::TensorOptions().dtype(at::kHalf).device(at::kCUDA);
-            auto output = at::zeros({1, 1, m, 1}, options);
-            _Float16* y = (_Float16*)output.data_ptr();
-            rocblas_gemv_template_Axy(nullptr, A, x, y, m, n, k, alpha, beta);
-
-            auto& out_edge = cast<nncir::DataEdge>(node.getFirstOutEdge());
-            stream_executor.updateBlob(out_edge.getBlobId(), DataType::TENSOR, tensorToIValue(output));
-        }
     }
 }
 
