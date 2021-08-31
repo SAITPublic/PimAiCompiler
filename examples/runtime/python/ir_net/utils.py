@@ -4,7 +4,7 @@ import shutil
 import sys
 
 current_dir = os.path.dirname(os.path.abspath(__file__))
-nnrt_path = os.path.abspath(os.path.join(current_dir, '../../../build/runtime/python'))
+nnrt_path = os.path.abspath(os.path.join(current_dir, '../../../../build/runtime/python'))
 # Load Nnr module
 sys.path.append(nnrt_path)
 import Nnrt

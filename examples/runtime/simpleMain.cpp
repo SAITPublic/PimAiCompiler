@@ -21,8 +21,8 @@ int main(int argc, char* argv[]) {
     cl_opt::CommandLineParser::getInstance().parseCommandLine(argc, argv);
     // parse command arguments
     auto input_file_path = static_cast<std::string>(input_file_path_option);
-    auto model_type      = static_cast<std::string>(model_type_option);
-    auto compile_level   = static_cast<int>(compile_level_option);
+    auto model_type = static_cast<std::string>(model_type_option);
+    auto compile_level = static_cast<int>(compile_level_option);
 
     examples::PipelineManager pipeline_manager;
 

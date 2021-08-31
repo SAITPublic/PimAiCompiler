@@ -53,12 +53,12 @@ def test_simple_loop_net(graph_ir_files : str):
 def test_simple_cases():
     # Some simple cases
     # Set IR files
-    add_ir_file = os.path.join(current_dir, 'ir_files/simple_add_net/sample_add_frontend.ir')
+    add_ir_file = os.path.join(current_dir, '../resource/ir_files/simple_add_net/sample_add_frontend.ir')
     loop_ir_files = [
-        os.path.join(current_dir, 'ir_files/simple_loop_net/loop_frontend_1.ir'),
-        os.path.join(current_dir, 'ir_files/simple_loop_net/loop_frontend_2.ir')
+        os.path.join(current_dir, '../resource/ir_files/simple_loop_net/loop_frontend_1.ir'),
+        os.path.join(current_dir, '../resource/ir_files/simple_loop_net/loop_frontend_2.ir')
     ]
-    if_ir_file = os.path.join(current_dir, 'ir_files/simple_if_net/if_frontend_3.ir')
+    if_ir_file = os.path.join(current_dir, '../resource/ir_files/simple_if_net/if_frontend_3.ir')
 
     # inference & compare result
     test_simple_add_net(add_ir_file)
@@ -131,18 +131,18 @@ if __name__ == '__main__':
     if args.model_kind == 'RNNT':
         # Inference RNNT
         rnnt_input_file = args.input_file
-        feature_file = os.path.join(current_dir, './resource/rnnt/inputs/feature.pth')
-        feature_len_file = os.path.join(current_dir,'./resource/rnnt/inputs/feature_len.pth')
+        feature_file = os.path.join(current_dir, '../resource/rnnt/inputs/feature.pth')
+        feature_len_file = os.path.join(current_dir,'../resource/rnnt/inputs/feature_len.pth')
         assert os.path.exists(feature_file) and os.path.exists(feature_len_file)
         test_rnnt_inference(rnnt_input_file, feature_file, feature_len_file, args.compile_level, args.model_kind)
     elif args.model_kind == 'HWR':
-        input_tensor_file = os.path.join(current_dir, './resource/hwr/inputs/input_hwr_1_1_1024_128.pt')
+        input_tensor_file = os.path.join(current_dir, '../resource/hwr/inputs/input_hwr_1_1_1024_128.pt')
         assert os.path.exists(input_tensor_file)
         test_hwr_inference(args.input_file, input_tensor_file, args.compile_level, args.model_kind)
     elif args.model_kind == 'GNMT':
         gnmt_input_file = args.input_file
-        src_file = os.path.join(current_dir, './resource/gnmt/inputs/src_1_12_torch.cuda.LongTensor.pt')
-        src_length_file = os.path.join(current_dir, './resource/gnmt/inputs/src_length_1_torch.cuda.LongTensor.pt')
-        bos_file = os.path.join(current_dir, './resource/gnmt/inputs/bos_1_1_torch.cuda.LongTensor.pt')
+        src_file = os.path.join(current_dir, '../resource/gnmt/inputs/src_1_12_torch.cuda.LongTensor.pt')
+        src_length_file = os.path.join(current_dir, '../resource/gnmt/inputs/src_length_1_torch.cuda.LongTensor.pt')
+        bos_file = os.path.join(current_dir, '../resource/gnmt/inputs/bos_1_1_torch.cuda.LongTensor.pt')
         assert os.path.exists(src_file) and os.path.exists(src_length_file) and os.path.exists(bos_file)
         test_gnmt_inference(gnmt_input_file, src_file, src_length_file, bos_file, args.compile_level, args.model_kind)

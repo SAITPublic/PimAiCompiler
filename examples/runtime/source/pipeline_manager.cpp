@@ -20,35 +20,35 @@ namespace fs = std::experimental::filesystem;
 namespace examples {
 
 RetVal PipelineManager::initialize(const std::string& input_file, const int& compile_level,
-                                  const std::string& model_type) {
+                                   const std::string& model_type) {
     if (model_type == "RNNT") {
         model_type_ = ModelType::RNNT;
     } else if (model_type == "GNMT") {
         model_type_ = ModelType::GNMT;
-    }  else if (model_type == "HWR") {
+    } else if (model_type == "HWR") {
         model_type_ = ModelType::HWR;
     } else {
         DLOG(FATAL) << "Unsupported model type.";
     }
     input_file_path_ = input_file;
-    compile_level_   = compile_level;
+    compile_level_ = compile_level;
 
     return RetVal::SUCCESS;
 }
 
 RetVal PipelineManager::run() {
     switch (model_type_) {
-    case ModelType::RNNT:
-        load_and_run_rnnt();
-        break;
-    case ModelType::GNMT:
-        load_and_run_gnmt();
-        break;
-    case ModelType::HWR:
-        load_and_run_hwr();
-        break;
-    default:
-        break;
+        case ModelType::RNNT:
+            load_and_run_rnnt();
+            break;
+        case ModelType::GNMT:
+            load_and_run_gnmt();
+            break;
+        case ModelType::HWR:
+            load_and_run_hwr();
+            break;
+        default:
+            break;
     }
 
     return RetVal::SUCCESS;
