@@ -1,10 +1,11 @@
+#include "executor/aten_ops_executor.h"
 #include <algorithm>
 #include <vector>
 #include "c10/hip/HIPFunctions.h"
 #include "common/include/cast.hpp"
 #include "executor/aten_ops.h"
+#include "executor/custom_ops.hpp"
 #include "executor/stream_executor.h"
-#include "tv_tools.h"
 #include "executor/utils.h"
 #include "glog/logging.h"
 #include "ir/include/all_nodes.hpp"
@@ -13,9 +14,7 @@
 #include "ir/include/edge.hpp"
 #include "ir/include/ir_types.hpp"
 #include "ir/include/nn_ir.hpp"
-#include "executor/aten_ops_executor.h"
-#include "executor/custom_ops.hpp"
-
+#include "tv_tools.h"
 
 namespace nnrt
 {
@@ -32,7 +31,7 @@ void executorAtenAdd(const nncir::Node& op_node, StreamExecutor& stream_executor
         if (add_node.getInEdgeIds().size() == 3) {
             auto& alpha_edge = cast<nncir::DataEdge>(add_node.getInEdge(2));
             auto edge_name = alpha_edge.getName();
-            //if "prim::if" layer linked to current, this edge has no practical meaning 
+            // if "prim::if" layer linked to current, this edge has no practical meaning
             if (edge_name.find("prim::If") == std::string::npos) {
                 int alpha_blob_id = alpha_edge.getBlobId();
                 auto alpha_iv = stream_executor.findBlob(alpha_blob_id).second;
@@ -110,11 +109,89 @@ void executorAtenAddmm(const nncir::Node& op_node, StreamExecutor& stream_execut
     torch::jit::IValue iv_beta = stream_executor.findBlob(input_beta_blob_id).second;
     torch::jit::IValue iv_alpha = stream_executor.findBlob(input_alpha_blob_id).second;
 
-    auto output = nnrt::atenAddmm(iv_self.toTensor(), iv_mat1.toTensor(), iv_mat2.toTensor(), iv_beta.toScalar(),
-                                  iv_alpha.toScalar());
-    // update output
-    auto& out_edge = cast<nncir::DataEdge>(addmm_node.getFirstOutEdge());
-    stream_executor.updateBlob(out_edge.getBlobId(), DataType::TENSOR, tensorToIValue(output));
+    int dim_i0 = iv_mat1.toTensor().dim();
+    int dim_i1 = iv_mat2.toTensor().dim();
+    int i0_is_vector = 0;
+    int i1_is_vector = 0;
+
+    for (int i = 0; i < dim_i0; ++i) {
+        if (iv_mat1.toTensor().size(i) != 1) {
+            i0_is_vector += 1;
+        }
+    }
+
+    for (int i = 0; i < dim_i1; ++i) {
+        if (iv_mat2.toTensor().size(i) != 1) {
+            i1_is_vector += 1;
+        }
+    }
+
+    if (i0_is_vector == 1 && i1_is_vector != 1 && dim_i0 > 1) {
+        float alpha = 1.0f;
+        float beta = 0.0f;
+        bool relu = false;
+        int m = 1;
+
+        auto self = iv_self.toTensor();
+        auto mat1 = iv_mat1.toTensor();
+        auto mat2 = iv_mat2.toTensor();
+        if (!self.is_contiguous()) self = self.contiguous();
+        if (!mat1.is_contiguous()) mat1 = mat1.contiguous();
+        if (!mat2.is_contiguous()) mat2 = mat2.contiguous();
+
+        int n = mat2.size(dim_i1 - 1);
+        int k = mat2.size(dim_i1 - 2);
+
+        _Float16* b = (_Float16*)self.data_ptr();
+        _Float16* x = (_Float16*)mat1.data_ptr();
+        _Float16* A = (_Float16*)mat2.data_ptr();
+        auto options = at::TensorOptions().dtype(at::kHalf).device(at::kCUDA);
+        auto output_shape = mat1.sizes().vec();
+        output_shape[dim_i0 - 1] = n;
+        output_shape[dim_i0 - 2] = 1;
+        auto output = at::zeros(output_shape, options);
+        _Float16* y = (_Float16*)output.data_ptr();
+        rocblas_addmv_template_xAy(nullptr, b, x, A, y, m, n, k, alpha, beta, relu);
+
+        // update output
+        auto& out_edge = cast<nncir::DataEdge>(addmm_node.getFirstOutEdge());
+        stream_executor.updateBlob(out_edge.getBlobId(), DataType::TENSOR, tensorToIValue(output));
+    } else if (i0_is_vector != 1 && i1_is_vector == 1 && dim_i1 > 1) {
+        float alpha = 1.0f;
+        float beta = 0.0f;
+        bool relu = false;
+
+        auto self = iv_self.toTensor();
+        auto mat1 = iv_mat1.toTensor();
+        auto mat2 = iv_mat2.toTensor();
+        if (!self.is_contiguous()) self = self.contiguous();
+        if (!mat1.is_contiguous()) mat1 = mat1.contiguous();
+        if (!mat2.is_contiguous()) mat2 = mat2.contiguous();
+
+        int m = mat1.size(dim_i0 - 2);
+        int n = 1;
+        int k = mat1.size(dim_i0 - 1);
+
+        _Float16* b = (_Float16*)self.data_ptr();
+        _Float16* A = (_Float16*)mat1.data_ptr();
+        _Float16* x = (_Float16*)mat2.data_ptr();
+        auto options = at::TensorOptions().dtype(at::kHalf).device(at::kCUDA);
+        auto output_shape = mat2.sizes().vec();
+        output_shape[dim_i1 - 1] = 1;
+        output_shape[dim_i1 - 2] = m;
+        auto output = at::zeros(output_shape, options);
+        _Float16* y = (_Float16*)output.data_ptr();
+        rocblas_addmv_template_Axy(nullptr, b, A, x, y, m, n, k, alpha, beta, relu);
+
+        auto& out_edge = cast<nncir::DataEdge>(addmm_node.getFirstOutEdge());
+        stream_executor.updateBlob(out_edge.getBlobId(), DataType::TENSOR, tensorToIValue(output));
+    } else {
+        auto output = nnrt::atenAddmm(iv_self.toTensor(), iv_mat1.toTensor(), iv_mat2.toTensor(), iv_beta.toScalar(),
+                                      iv_alpha.toScalar());
+        // update output
+        auto& out_edge = cast<nncir::DataEdge>(addmm_node.getFirstOutEdge());
+        stream_executor.updateBlob(out_edge.getBlobId(), DataType::TENSOR, tensorToIValue(output));
+    }
 }
 
 void executorAtenAnd(const nncir::Node& op_node, StreamExecutor& stream_executor)
@@ -136,13 +213,13 @@ void executorAtenAnd(const nncir::Node& op_node, StreamExecutor& stream_executor
 
     bool value_a;
     bool value_b;
-    if(iv_a.isBool() && iv_b.isBool()){
+    if (iv_a.isBool() && iv_b.isBool()) {
         value_a = iv_a.toBool();
         value_b = iv_b.toBool();
-    }else if (iv_a.isInt() && iv_b.isInt()){
+    } else if (iv_a.isInt() && iv_b.isInt()) {
         value_a = iv_a.toInt();
         value_b = iv_b.toInt();
-    }else{
+    } else {
         DLOG(FATAL) << "Wrong input type for AtenAdd.";
     }
 
@@ -394,7 +471,7 @@ void executorAtenArange3(const nncir::Node& op_node, StreamExecutor& stream_exec
         auto layout_id = edge_layout.getBlobId();
         auto iv_layout = stream_executor.findBlob(layout_id).second;
         if (!iv_layout.isNone()) {
-           options = options.layout(iv_layout.toLayout());
+            options = options.layout(iv_layout.toLayout());
         }
     } else {
         options = options.layout(at::Layout(layout));
@@ -744,7 +821,6 @@ void executorAtenConv2d(const nncir::Node& op_node, StreamExecutor& stream_execu
 
     // DLOG(INFO) << "weight: " << weight_tensor;
     // DLOG(INFO) << "bias: " << bias_tensor;
-
 
     auto output = nnrt::atenConv2d(self_tensor, weight_tensor, bias_tensor, at::ArrayRef<int64_t>(stride_vec),
                                    at::ArrayRef<int64_t>(padding_vec), at::ArrayRef<int64_t>(dilation_vec), groups);
@@ -1168,14 +1244,14 @@ void executorAtenFill(const nncir::Node& op_node, StreamExecutor& stream_executo
         // update output
         auto& out_edge = cast<nncir::DataEdge>(node.getFirstOutEdge());
         stream_executor.updateBlob(out_edge.getBlobId(), DataType::TENSOR, tensorToIValue(output));
-        stream_executor.updateBlob(input_self_blob_id, DataType::TENSOR, tensorToIValue(output)); //in-place op
+        stream_executor.updateBlob(input_self_blob_id, DataType::TENSOR, tensorToIValue(output));  // in-place op
     } else if (iv_other.isScalar()) {
         at::Scalar other_scalar = iv_other.toScalar();
         auto output = nnrt::atenFill(self_tensor, other_scalar);
         // update output
         auto& out_edge = cast<nncir::DataEdge>(node.getFirstOutEdge());
         stream_executor.updateBlob(out_edge.getBlobId(), DataType::TENSOR, tensorToIValue(output));
-        stream_executor.updateBlob(input_self_blob_id, DataType::TENSOR, tensorToIValue(output)); //in-place op
+        stream_executor.updateBlob(input_self_blob_id, DataType::TENSOR, tensorToIValue(output));  // in-place op
     } else {
         DLOG(FATAL) << "Unsupported input type for aten::fill_";
     }
@@ -1392,7 +1468,7 @@ void executorAtenGetItem(const nncir::Node& op_node, StreamExecutor& stream_exec
     auto output = nnrt::atenGetItem(self_list, idx);
     // update output
     auto& out_edge = cast<nncir::DataEdge>(get_item_node.getFirstOutEdge());
-    stream_executor.releation_blob_ids_map_.insert({out_edge.getBlobId(),{input_self_blob_id, idx}});
+    stream_executor.releation_blob_ids_map_.insert({out_edge.getBlobId(), {input_self_blob_id, idx}});
     stream_executor.updateBlob(out_edge.getBlobId(), DataType::IVALUE, output);
 }
 
@@ -1500,7 +1576,7 @@ void executorAtenIndexPut(const nncir::Node& op_node, StreamExecutor& stream_exe
     // update output
     auto& out_edge = cast<nncir::DataEdge>(node.getFirstOutEdge());
     stream_executor.updateBlob(out_edge.getBlobId(), DataType::TENSOR, tensorToIValue(output));
-    stream_executor.updateBlob(input_self_blob_id, DataType::TENSOR, tensorToIValue(output)); //in-place op
+    stream_executor.updateBlob(input_self_blob_id, DataType::TENSOR, tensorToIValue(output));  // in-place op
 }
 
 void executorAtenIndexSelect(const nncir::Node& op_node, StreamExecutor& stream_executor)
@@ -1658,7 +1734,7 @@ void executorAtenLen(const nncir::Node& op_node, StreamExecutor& stream_executor
     } else {
         DLOG(FATAL) << "Aten len op's data type do not support!";
     }
- 
+
     // update output
     auto& out_edge = cast<nncir::DataEdge>(node.getFirstOutEdge());
     stream_executor.updateBlob(out_edge.getBlobId(), DataType::INT64, intToIValue(output));
@@ -1780,7 +1856,6 @@ void executorAtenLogSoftmax(const nncir::Node& op_node, StreamExecutor& stream_e
     // update output
     auto& out_edge = cast<nncir::DataEdge>(node.getFirstOutEdge());
     stream_executor.updateBlob(out_edge.getBlobId(), DataType::TENSOR, tensorToIValue(output));
-
 }
 
 void executorAtenLSTM1(const nncir::Node& op_node, StreamExecutor& stream_executor)
@@ -1923,7 +1998,7 @@ void executorAtenLSTM1(const nncir::Node& op_node, StreamExecutor& stream_execut
     at::TensorList params(param_vector);
     auto output =
         nnrt::atenLstm1(input, hx, params, static_cast<bool>(has_biases), num_layers, dropout, static_cast<bool>(train),
-                       static_cast<bool>(bidirectional), static_cast<bool>(batch_first));
+                        static_cast<bool>(bidirectional), static_cast<bool>(batch_first));
 
     auto out_blob_ids = getOutBlobIds(op_node);
     auto pos = std::unique(out_blob_ids.begin(), out_blob_ids.end());
@@ -1933,7 +2008,6 @@ void executorAtenLSTM1(const nncir::Node& op_node, StreamExecutor& stream_execut
     stream_executor.updateBlob(out_blob_ids[0], DataType::TENSOR, tensorToIValue(std::get<0>(output)));
     stream_executor.updateBlob(out_blob_ids[1], DataType::TENSOR, tensorToIValue(std::get<1>(output)));
     stream_executor.updateBlob(out_blob_ids[2], DataType::TENSOR, tensorToIValue(std::get<2>(output)));
-
 }
 
 void executorAtenLSTM2(const nncir::Node& op_node, StreamExecutor& stream_executor)
@@ -2075,7 +2149,7 @@ void executorAtenLSTM2(const nncir::Node& op_node, StreamExecutor& stream_execut
     at::TensorList params(param_vector);
 
     auto output = nnrt::atenLstm2(input, batch_sizes, hx, params, static_cast<bool>(has_biases), num_layers, dropout,
-                                static_cast<bool>(train), static_cast<bool>(bidirectional));
+                                  static_cast<bool>(train), static_cast<bool>(bidirectional));
 
     auto out_blob_ids = getOutBlobIds(op_node);
     auto pos = std::unique(out_blob_ids.begin(), out_blob_ids.end());
@@ -2178,7 +2252,6 @@ void executorAtenMaskedSelect(const nncir::Node& op_node, StreamExecutor& stream
     int input_self_blob_id = input_self.getBlobId();
     int input_mask_blob_id = input_mask.getBlobId();
 
-
     // Find the input blob
     auto iv_self = stream_executor.findBlob(input_self_blob_id).second;
     auto iv_mask = stream_executor.findBlob(input_mask_blob_id).second;
@@ -2231,13 +2304,20 @@ void executorAtenMatmul(const nncir::Node& op_node, StreamExecutor& stream_execu
         float alpha = 1.0f;
         float beta = 0.0f;
         int m = 1;
-        int n = iv_other.toTensor().size(dim_i1 - 1);
-        int k = iv_other.toTensor().size(dim_i1 - 2);
 
-        _Float16* x = (_Float16*)iv_self.toTensor().data_ptr();
-        _Float16* A = (_Float16*)iv_other.toTensor().data_ptr();
+        auto self = iv_self.toTensor();
+        auto other = iv_other.toTensor();
+
+        if (!self.is_contiguous()) self = self.contiguous();
+        if (!other.is_contiguous()) other = other.contiguous();
+
+        int n = other.size(dim_i1 - 1);
+        int k = other.size(dim_i1 - 2);
+
+        _Float16* x = (_Float16*)self.data_ptr();
+        _Float16* A = (_Float16*)other.data_ptr();
         auto options = at::TensorOptions().dtype(at::kHalf).device(at::kCUDA);
-        auto output_shape = iv_self.toTensor().sizes().vec();
+        auto output_shape = self.sizes().vec();
         output_shape[dim_i0 - 1] = n;
         output_shape[dim_i0 - 2] = 1;
         auto output = at::zeros(output_shape, options);
@@ -2249,14 +2329,21 @@ void executorAtenMatmul(const nncir::Node& op_node, StreamExecutor& stream_execu
     } else if (i0_is_vector != 1 && i1_is_vector == 1 && dim_i1 > 1) {
         float alpha = 1.0f;
         float beta = 0.0f;
-        int m = iv_self.toTensor().size(dim_i0 - 2);
-        int n = 1;
-        int k = iv_self.toTensor().size(dim_i0 - 1);
 
-        _Float16* A = (_Float16*)iv_self.toTensor().data_ptr();
-        _Float16* x = (_Float16*)iv_other.toTensor().data_ptr();
+        auto self = iv_self.toTensor();
+        auto other = iv_other.toTensor();
+
+        if (!self.is_contiguous()) self = self.contiguous();
+        if (!other.is_contiguous()) other = other.contiguous();
+
+        int m = self.size(dim_i0 - 2);
+        int n = 1;
+        int k = self.size(dim_i0 - 1);
+
+        _Float16* A = (_Float16*)self.data_ptr();
+        _Float16* x = (_Float16*)other.data_ptr();
         auto options = at::TensorOptions().dtype(at::kHalf).device(at::kCUDA);
-        auto output_shape = iv_other.toTensor().sizes().vec();
+        auto output_shape = other.sizes().vec();
         output_shape[dim_i1 - 1] = 1;
         output_shape[dim_i1 - 2] = m;
         auto output = at::zeros(output_shape, options);
@@ -3800,7 +3887,6 @@ void executorAtenBatchNorm2d(const nncir::Node& op_node, StreamExecutor& stream_
     // save outputs
     auto out_blob_id = getUniqueOutBlobIds(op_node)[0];
     stream_executor.updateBlob(out_blob_id, DataType::TENSOR, tensorToIValue(output));
-
 }
 
 void executorAtenReshape(const nncir::Node& op_node, StreamExecutor& stream_executor)
