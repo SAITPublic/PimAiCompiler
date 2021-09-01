@@ -41,10 +41,6 @@ struct ProfileEvent {
     long long ts;
 };
 
-#define MAX_EVENTS 10000
-ProfileResult profile_events[MAX_EVENTS];
-int g_index = 0;
-
 class ProfileWriter
 {
     friend class ProfileTimer;
@@ -231,7 +227,6 @@ class ProfileTimer
     {
         static_assert(std::is_constructible_v<std::string, T>);
         m_startTimepoint = std::chrono::high_resolution_clock::now();
-        g_index++;
     }
 
     ~ProfileTimer()

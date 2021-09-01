@@ -4,3 +4,6 @@
 [submodule "third_party/json"]
 	path = third_party/json
 	url = https://github.sec.samsung.net/PIM/amalgamated_json.git
+[submodule "third_party/catapult"]
+	path = third_party/catapult
+	url = https://github.sec.samsung.net/PIM/catapult.git

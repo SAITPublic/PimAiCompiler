@@ -6,10 +6,12 @@
 #include <string>
 #include <vector>
 #include "builder/model_builder.h"
+#include "c10/hip/HIPFunctions.h"
 #include "ir/include/data_edge.hpp"
 #include "ir/include/edge.hpp"
 #include "ir/include/nn_ir.hpp"
 #include "nnrt_types.h"
+#include "runtime/include/profiler.h"
 #include "utils.h"
 
 // #include "prim_ops_executor.h"
