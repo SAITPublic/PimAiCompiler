@@ -53,27 +53,28 @@ Caffe2Targets.cmake 161: foreach(_target "protobuf::libprotobuf" "gloo_hip" )
 ```
 $ ./scripts/build.sh all -o .
 ```
-# How to run
 
-## Compiler
-### Set ME_PASS_CONFIG_PATH
+[Set env path: ME_PASS_CONFIG_PATH]
 ```
 default file is: compiler/include/middlend/passes/pass_config.json
 ```
 
-### Run compiler
+# How to run
+
+## Compiler
+
 ```
 ./build/compiler/compiler -h [--help]
 
 General Options:
   -h [ --help ]            Help info
   -i, <input file>         Input file path
+  -m, <model type>         Model type. Possible values: RNNT/GNMT/HWR
   -l, <compile level>      Compile level. Possible values (default: 0):
                                                     0 (frontend->middlend->backend);
                                                     1 (middlend->backend);
                                                     2 (backend)
   -g, <graphgen_path>      GraphGen real path
-  -c, <configuration file> [middlend] passes configuration file path. default: compiler/include/middlend/passes/pass_config.json
 ```
 ### Note:
 When running with compile level 0 (frontend->middlend->backend) in __docker__, please update docker with:
@@ -83,6 +84,22 @@ sudo apt-get install libprotobuf-dev protobuf-compiler --fix-missing
 ```
 
 And then __rebuild GraphGen in docker__.
+
+## Compiler + Runtime
+
+```
+./build/examples/runtime/simpleMain -h [--help]
+
+General Options:
+  -h [ --help ]            Help info
+  -i, <input file>         Input file path
+  -m, <model type>         Model type. Possible values: RNNT/GNMT/HWR
+  -l, <compile level>      Compile level. Possible values (default: 0):
+                                                    0 (frontend->middlend->backend);
+                                                    1 (middlend->backend);
+                                                    2 (backend)
+  -p, <profiling>          Run with profiling
+```
 
 # How to test
 

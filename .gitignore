@@ -42,3 +42,8 @@ cmake-build-debug
 # graphviz files
 *.gv
 *.svg
+
+#profiling files
+*.html
+trace.json
+results.json
