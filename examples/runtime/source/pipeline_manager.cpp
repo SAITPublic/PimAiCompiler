@@ -17,10 +17,11 @@
 using namespace nnrt;
 namespace fs = std::experimental::filesystem;
 
-namespace examples {
-
+namespace examples
+{
 RetVal PipelineManager::initialize(const std::string& input_file, const int& compile_level,
-                                   const std::string& model_type) {
+                                   const std::string& model_type, const bool& profiling)
+{
     if (model_type == "RNNT") {
         model_type_ = ModelType::RNNT;
     } else if (model_type == "GNMT") {
@@ -32,11 +33,13 @@ RetVal PipelineManager::initialize(const std::string& input_file, const int& com
     }
     input_file_path_ = input_file;
     compile_level_ = compile_level;
+    is_profiling_ = profiling;
 
     return RetVal::SUCCESS;
 }
 
-RetVal PipelineManager::run() {
+RetVal PipelineManager::run()
+{
     switch (model_type_) {
         case ModelType::RNNT:
             load_and_run_rnnt();
@@ -54,11 +57,10 @@ RetVal PipelineManager::run() {
     return RetVal::SUCCESS;
 }
 
-RetVal PipelineManager::finalize() {
-    return RetVal::SUCCESS;
-}
+RetVal PipelineManager::finalize() { return RetVal::SUCCESS; }
 
-void PipelineManager::load_and_run_rnnt() {
+void PipelineManager::load_and_run_rnnt()
+{
     std::string feature_len_file = "examples/runtime/resource/rnnt/inputs/feature_len.bin";
     std::string feature_file = "examples/runtime/resource/rnnt/inputs/feature.bin";
     std::string current_path = fs::current_path();
@@ -83,10 +85,11 @@ void PipelineManager::load_and_run_rnnt() {
                    << "size: " << item.sizes() << " dtype:" << item.dtype() << " device:" << item.device();
     }
     // Inference
-    runtime.inferenceModel(input_tensors);
+    runtime.inferenceModel(input_tensors, is_profiling_);
 }
 
-void PipelineManager::load_and_run_gnmt() {
+void PipelineManager::load_and_run_gnmt()
+{
     std::string src_file = "examples/runtime/resource/gnmt/inputs/src_1_12_torch.cuda.LongTensor.bin";
     std::string src_length_file = "examples/runtime/resource/gnmt/inputs/src_length_1_torch.cuda.LongTensor.bin";
     std::string bos_file = "examples/runtime/resource/gnmt/inputs/bos_1_1_torch.cuda.LongTensor.bin";
@@ -97,7 +100,7 @@ void PipelineManager::load_and_run_gnmt() {
         bos_file = "../" + bos_file;
     }
     if (access(src_file.c_str(), F_OK) == -1 || access(src_length_file.c_str(), F_OK) == -1 ||
-            access(bos_file.c_str(), F_OK) == -1) {
+        access(bos_file.c_str(), F_OK) == -1) {
         DLOG(ERROR) << "Please run at base or build directory.";
     }
 
@@ -117,10 +120,11 @@ void PipelineManager::load_and_run_gnmt() {
                    << "size: " << item.sizes() << " dtype:" << item.dtype() << " device:" << item.device();
     }
     // Inference
-    runtime.inferenceModel(input_tensors);
+    runtime.inferenceModel(input_tensors, is_profiling_);
 }
 
-void PipelineManager::load_and_run_hwr() {
+void PipelineManager::load_and_run_hwr()
+{
     std::string input_file = "./examples/runtime/resource/hwr/inputs/input_hwr_1_1_1024_128.bin";
     std::string current_path = fs::current_path();
     if (current_path.find("/build") != std::string::npos) {
@@ -141,7 +145,7 @@ void PipelineManager::load_and_run_hwr() {
                    << "size: " << item.sizes() << " dtype:" << item.dtype() << " device:" << item.device();
     }
     // Inference
-    auto output_tensors = runtime.inferenceModel(input_tensors);
+    auto output_tensors = runtime.inferenceModel(input_tensors, is_profiling_);
     // check outputs
     TVComparator& tv_comp = TVComparator::getInstance();
     tv_comp.loadTV("./examples/runtime/resource/hwr/inputs/output_hwr_y_hat_128_1_98.bin", {128, 1, 98},
@@ -153,4 +157,4 @@ void PipelineManager::load_and_run_hwr() {
     }
 }
 
-}
+} // namespace examples

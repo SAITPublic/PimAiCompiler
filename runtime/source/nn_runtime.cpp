@@ -32,8 +32,11 @@ std::vector<torch::Tensor> NNRuntime::inferenceModel(const std::vector<torch::Te
     std::vector<torch::Tensor> output_tensors;
     auto status = RetVal::FAILURE;
     if (profiling) {
-        status =
-            executor_->inferenceModelwithProfiling(this->mbuilder_->get_runnable_ir(), input_tensors, output_tensors);
+        // profiling result of the first running time is not accurate.
+        for (int i = 0; i < 10; i ++) {
+            status = executor_->inferenceModelwithProfiling(this->mbuilder_->get_runnable_ir(),
+                                                            input_tensors, output_tensors);
+        }
     } else {
         status = executor_->inferenceModel(this->mbuilder_->get_runnable_ir(), input_tensors, output_tensors);
     }

@@ -2,16 +2,12 @@
 
 #include "common/include/log.hpp"
 
-namespace examples {
-
-class PipelineManager {
+namespace examples
+{
+class PipelineManager
+{
  public:
-    enum class ModelType {
-        NO_MODEL = 0,
-        RNNT,
-        GNMT,
-        HWR
-    };
+    enum class ModelType { NO_MODEL = 0, RNNT, GNMT, HWR };
 
     PipelineManager() = default;
 
@@ -24,10 +20,12 @@ class PipelineManager {
     /**
      * @brief     initialize a pipeline manager
      * @details   This function initialize a pipeline manager
-     * @inputs    const std::string& input_file, const int& compile_level, const std::string& model_type
+     * @inputs    const std::string& input_file, const int& compile_level, const std::string& model_type,
+     *            const bool& profiling
      * @returns   return code
      */
-    RetVal initialize(const std::string& input_file, const int& compile_level, const std::string& model_type);
+    RetVal initialize(const std::string& input_file, const int& compile_level, const std::string& model_type,
+                      const bool& profiling);
 
     /**
      * @brief   Call and run pipeline
@@ -50,12 +48,14 @@ class PipelineManager {
 
     int compile_level_ = 1;
 
+    bool is_profiling_ = false;
+
     void load_and_run_rnnt();
 
     void load_and_run_gnmt();
 
     void load_and_run_hwr();
 
-}; // class PipelineManager
+};  // class PipelineManager
 
-} // namespace examples
+}  // namespace examples
