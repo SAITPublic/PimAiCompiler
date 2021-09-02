@@ -109,7 +109,7 @@ template <typename U, typename V, typename W>
 void rocblas_gemv_template_xAy(hipStream_t p_stream, const V *x, const V *A, W *y, int m, int n, int k, U alpha, U beta)
 {
     if (m != 1) {
-        DLOG(INFO) << "its' gemm, unsupported";
+        // found gemm, unsupported
         return;
     }
     static constexpr int NB = 256;
@@ -184,7 +184,7 @@ template <typename U, typename V, typename W>
 void rocblas_gemv_template_Axy(hipStream_t p_stream, const V *A, const V *x, W *y, int m, int n, int k, U alpha, U beta)
 {
     if (n != 1) {
-        DLOG(INFO) << "its' gemm, unsupported";
+        // found gemm, unsupported
         return;
     }
     static constexpr int NB = 256;
@@ -268,7 +268,7 @@ void rocblas_addmv_template_xAy(hipStream_t p_stream, const V *b, const V *x, co
                                 U alpha, U beta, bool relu)
 {
     if (m != 1) {
-        DLOG(INFO) << "its' gemm, unsupported";
+        // found gemm, unsupported
         return;
     }
     static constexpr int NB = 256;
@@ -351,7 +351,7 @@ void rocblas_addmv_template_Axy(hipStream_t p_stream, const V *b, const V *A, co
                                 U alpha, U beta, bool relu)
 {
     if (n != 1) {
-        DLOG(INFO) << "its' gemm, unsupported";
+        // found gemm, unsupported
         return;
     }
     static constexpr int NB = 256;
