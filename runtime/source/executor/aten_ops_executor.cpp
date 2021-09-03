@@ -111,6 +111,7 @@ void executorAtenAddmm(const nncir::Node& op_node, StreamExecutor& stream_execut
 
     int dim_i0 = iv_mat1.toTensor().dim();
     int dim_i1 = iv_mat2.toTensor().dim();
+    int dim_self = iv_self.toTensor().dim();
     int i0_is_vector = 0;
     int i1_is_vector = 0;
 
@@ -185,10 +186,29 @@ void executorAtenAddmm(const nncir::Node& op_node, StreamExecutor& stream_execut
 
         auto& out_edge = cast<nncir::DataEdge>(addmm_node.getFirstOutEdge());
         stream_executor.updateBlob(out_edge.getBlobId(), DataType::TENSOR, tensorToIValue(output));
+    } else if (dim_self == 1) {
+        auto self = iv_self.toTensor();
+        auto mat1 = iv_mat1.toTensor();
+        auto mat2 = iv_mat2.toTensor();
+
+        self = self.unsqueeze(1);
+        self = self.repeat({1, mat2.size(dim_i1 - 1)});
+
+        if (dim_i1 != 2) {
+            mat2 = mat2.squeeze(0);
+        }
+
+        auto output = nnrt::atenAddmm(self, mat1, mat2, iv_beta.toScalar(), iv_alpha.toScalar());
+        // update output
+        for (int i = 0; i < dim_i1 - 2; ++i) {
+            output = output.unsqueeze(0);
+        }
+        auto& out_edge = cast<nncir::DataEdge>(addmm_node.getFirstOutEdge());
+        stream_executor.updateBlob(out_edge.getBlobId(), DataType::TENSOR, tensorToIValue(output));
     } else {
         auto output = nnrt::atenAddmm(iv_self.toTensor(), iv_mat1.toTensor(), iv_mat2.toTensor(), iv_beta.toScalar(),
                                       iv_alpha.toScalar());
-        // update output
+
         auto& out_edge = cast<nncir::DataEdge>(addmm_node.getFirstOutEdge());
         stream_executor.updateBlob(out_edge.getBlobId(), DataType::TENSOR, tensorToIValue(output));
     }
