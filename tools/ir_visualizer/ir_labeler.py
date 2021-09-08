@@ -78,7 +78,8 @@ import IR.NNNode.AtenLinearNode
 import IR.NNNode.AtenListNode
 import IR.NNNode.AtenLogNode
 import IR.NNNode.AtenLogSoftmaxNode
-import IR.NNNode.AtenLSTMNode
+import IR.NNNode.AtenLSTM1Node
+import IR.NNNode.AtenLSTM2Node
 import IR.NNNode.AtenLtNode
 import IR.NNNode.AtenMaskedFillNode
 import IR.NNNode.AtenMaskedSelectNode
@@ -87,8 +88,9 @@ import IR.NNNode.AtenMaxNode
 import IR.NNNode.AtenMaxPool2dNode
 import IR.NNNode.AtenMinNode
 import IR.NNNode.AtenMulNode
-import IR.NNNode.AtenNegNode
 import IR.NNNode.AtenNeNode
+import IR.NNNode.AtenNegNode
+import IR.NNNode.AtenNormNode
 import IR.NNNode.AtenNotNode
 import IR.NNNode.AtenOnesNode
 import IR.NNNode.AtenPackPaddedSequenceNode
@@ -105,7 +107,8 @@ import IR.NNNode.AtenSubNode
 import IR.NNNode.AtenSumNode
 import IR.NNNode.AtenTanhNode
 import IR.NNNode.AtenTensorNode
-import IR.NNNode.AtenToNode
+import IR.NNNode.AtenTo1Node
+import IR.NNNode.AtenTo2Node
 import IR.NNNode.AtenTopkNode
 import IR.NNNode.AtenTransposeNode
 import IR.NNNode.AtenUnsqueezeNode
@@ -263,11 +266,16 @@ def nn_node_label(nn_node: IR.NnNode.NnNode) -> (object, str):
         aten_expand_node.Init(nn_node.NnNode().Bytes, nn_node.NnNode().Pos)
         return aten_expand_node, aten_expand_node_label(aten_expand_node)
     
-    elif node_type == IR.NNNode.AnyType.AnyType().AtenLSTMNode:
-        aten_lstm_node = IR.NNNode.AtenLSTMNode.AtenLSTMNode()
+    elif node_type == IR.NNNode.AnyType.AnyType().AtenLSTM1Node:
+        aten_lstm_node = IR.NNNode.AtenLSTM1Node.AtenLSTM1Node()
         aten_lstm_node.Init(nn_node.NnNode().Bytes, nn_node.NnNode().Pos)
-        return aten_lstm_node, aten_lstm_node_label(aten_lstm_node)
+        return aten_lstm_node, aten_lstm1_node_label(aten_lstm_node)
     
+    elif node_type == IR.NNNode.AnyType.AnyType().AtenLSTM2Node:
+        aten_lstm_node = IR.NNNode.AtenLSTM2Node.AtenLSTM2Node()
+        aten_lstm_node.Init(nn_node.NnNode().Bytes, nn_node.NnNode().Pos)
+        return aten_lstm_node, aten_lstm2_node_label(aten_lstm_node)
+
     elif node_type == IR.NNNode.AnyType.AnyType().AtenSelectNode:
         aten_select_node = IR.NNNode.AtenSelectNode.AtenSelectNode()
         aten_select_node.Init(nn_node.NnNode().Bytes, nn_node.NnNode().Pos)
@@ -283,10 +291,15 @@ def nn_node_label(nn_node: IR.NnNode.NnNode) -> (object, str):
         aten_slice_node.Init(nn_node.NnNode().Bytes, nn_node.NnNode().Pos)
         return aten_slice_node, aten_slice_node_label(aten_slice_node)
     
-    elif node_type == IR.NNNode.AnyType.AnyType().AtenToNode:
-        aten_to_node = IR.NNNode.AtenToNode.AtenToNode()
+    elif node_type == IR.NNNode.AnyType.AnyType().AtenTo1Node:
+        aten_to_node = IR.NNNode.AtenTo1Node.AtenTo1Node()
         aten_to_node.Init(nn_node.NnNode().Bytes, nn_node.NnNode().Pos)
-        return aten_to_node, aten_to_node_label(aten_to_node)
+        return aten_to_node, aten_to1_node_label(aten_to_node)
+
+    elif node_type == IR.NNNode.AnyType.AnyType().AtenTo2Node:
+        aten_to_node = IR.NNNode.AtenTo2Node.AtenTo2Node()
+        aten_to_node.Init(nn_node.NnNode().Bytes, nn_node.NnNode().Pos)
+        return aten_to_node, aten_to2_node_label(aten_to_node)
     
     elif node_type == IR.NNNode.AnyType.AnyType().AtenTransposeNode:
         aten_transpose_node = IR.NNNode.AtenTransposeNode.AtenTransposeNode()
@@ -398,10 +411,10 @@ def nn_node_label(nn_node: IR.NnNode.NnNode) -> (object, str):
         aten_min_node.Init(nn_node.NnNode().Bytes, nn_node.NnNode().Pos)
         return aten_min_node, aten_min_node_label(aten_min_node)
 
-    elif node_type == IR.NNNode.AnyType.AnyType().AtenMulNode:
-        aten_mul_node = IR.NNNode.AtenMulNode.AtenMulNode()
-        aten_mul_node.Init(nn_node.NnNode().Bytes, nn_node.NnNode().Pos)
-        return aten_mul_node, aten_mul_node_label(aten_mul_node)
+    elif node_type == IR.NNNode.AnyType.AnyType().AtenNormNode:
+        aten_norm_node = IR.NNNode.AtenNormNode.AtenNormNode()
+        aten_norm_node.Init(nn_node.NnNode().Bytes, nn_node.NnNode().Pos)
+        return aten_norm_node, aten_norm_node_label(aten_norm_node)
     
     elif node_type == IR.NNNode.AnyType.AnyType().AtenOnesNode:
         aten_ones_node = IR.NNNode.AtenOnesNode.AtenOnesNode()
@@ -752,15 +765,30 @@ def aten_unsqueeze_node_label(aten_unsqueeze_node: IR.NNNode.AtenUnsqueezeNode.A
     return list_table([retval])
 
 
-def aten_to_node_label(aten_to_node: IR.NNNode.AtenToNode.AtenToNode) -> str:
-    retval = 'AtenTo Node<br/>'
+def aten_to1_node_label(aten_to_node: IR.NNNode.AtenTo1Node.AtenTo1Node) -> str:
+    retval = 'AtenTo1 Node<br/>'
     dtype = aten_to_node.Dtype()
     non_blocking = aten_to_node.NonBlocking()
     copy = aten_to_node.Copy()
-
     optional_memory_format = aten_to_node.OptionalMemoryFormat()
+
     if dtype is not None:
         retval += 'Dtype: {}<br/>'.format(dtype)
+    if non_blocking is not None:
+        retval += 'NonBlocking: {}<br/>'.format(non_blocking)
+    if copy is not None:
+        retval += 'Copy: {}<br/>'.format(copy)
+    if optional_memory_format is not None:
+        retval += 'OptionalMemoryFormat: {}<br/>'.format(optional_memory_format)
+    return list_table([retval])
+
+
+def aten_to2_node_label(aten_to_node: IR.NNNode.AtenTo2Node.AtenTo2Node) -> str:
+    retval = 'AtenTo2 Node<br/>'
+    non_blocking = aten_to_node.NonBlocking()
+    copy = aten_to_node.Copy()
+    optional_memory_format = aten_to_node.OptionalMemoryFormat()
+
     if non_blocking is not None:
         retval += 'NonBlocking: {}<br/>'.format(non_blocking)
     if copy is not None:
@@ -876,7 +904,7 @@ def aten_cat_node_label(aten_cat_node: IR.NNNode.AtenCatNode.AtenCatNode) -> str
     return list_table([retval])
 
 
-def aten_lstm_node_label(aten_lstm_node: IR.NNNode.AtenLSTMNode.AtenLSTMNode) -> str:
+def aten_lstm1_node_label(aten_lstm_node: IR.NNNode.AtenLSTM1Node.AtenLSTM1Node) -> str:
     retval = 'AtenLSTM Node<br/>'
     has_biases = aten_lstm_node.HasBiases()
     num_layers = aten_lstm_node.NumLayers()
@@ -897,6 +925,27 @@ def aten_lstm_node_label(aten_lstm_node: IR.NNNode.AtenLSTMNode.AtenLSTMNode) ->
         retval += 'Bidirectional: {}<br/>'.format(bidirectional)
     if batch_first is not None:
         retval += 'BatchFirst: {}<br/>'.format(batch_first)
+    return list_table([retval])
+
+
+def aten_lstm2_node_label(aten_lstm_node: IR.NNNode.AtenLSTM2Node.AtenLSTM2Node) -> str:
+    retval = 'AtenLSTM Node<br/>'
+    has_biases = aten_lstm_node.HasBiases()
+    num_layers = aten_lstm_node.NumLayers()
+    dropout = aten_lstm_node.Dropout()
+    train = aten_lstm_node.Train()
+    bidirectional = aten_lstm_node.Bidirectional()
+
+    if has_biases is not None:
+        retval += 'HasBiases: {}<br/>'.format(has_biases)
+    if num_layers is not None:
+        retval += 'NumLayers: {}<br/>'.format(num_layers)
+    if dropout is not None:
+        retval += 'Dropout: {}<br/>'.format(dropout)
+    if train is not None:
+        retval += 'Train: {}<br/>'.format(train)
+    if bidirectional is not None:
+        retval += 'Bidirectional: {}<br/>'.format(bidirectional)
     return list_table([retval])
 
 
@@ -940,8 +989,6 @@ def aten_arange1_node_label(aten_arange_node: IR.NNNode.AtenArange1Node.AtenAran
 
     if end is not None:
         retval += 'End: {}<br/>'.format(end)
-    if step is not None:
-        retval += 'Step: {}<br/>'.format(step)
     if dtype is not None:
         retval += 'Dtype: {}<br/>'.format(dtype)
     if layout is not None:
@@ -967,8 +1014,6 @@ def aten_arange2_node_label(aten_arange_node: IR.NNNode.AtenArange2Node.AtenAran
         retval += 'Start: {}<br/>'.format(start)
     if end is not None:
         retval += 'End: {}<br/>'.format(end)
-    if step is not None:
-        retval += 'Step: {}<br/>'.format(step)
     if dtype is not None:
         retval += 'Dtype: {}<br/>'.format(dtype)
     if layout is not None:
@@ -1107,29 +1152,29 @@ def aten_min_node_label(aten_min_node: IR.NNNode.AtenMinNode.AtenMinNode) -> str
     return list_table([retval])
 
 
-def aten_mul_node_label(aten_mul_node: IR.NNNode.AtenMulNode.AtenMulNode) -> str:
-    retval = 'AtenMul Node<br/>'
-    other = aten_mul_node.Other()
-    if other is not None:
-        retval += 'Other: {}<br/>'.format(other)
+def aten_norm_node_label(aten_norm_node: IR.NNNode.AtenNormNode.AtenNormNode) -> str:
+    retval = 'AtenNorm Node<br/>'
+    p = aten_norm_node.P()
+    if p is not None:
+        retval += 'p: {}<br/>'.format(p)
     return list_table([retval])
 
 
 def aten_ones_node_label(aten_ones_node: IR.NNNode.AtenOnesNode.AtenOnesNode) -> str:
     retval = 'AtenOnes Node<br/>'
-    size = aten_ones_node.Size()
     dtype = aten_ones_node.Dtype()
     layout = aten_ones_node.Layout()
     device = aten_ones_node.Device()
+    pin_memory = aten_ones_node.PinMemory()
 
-    if size is not None:
-        retval += 'Size: {}<br/>'.format(size)
     if dtype is not None:
         retval += 'Dtype: {}<br/>'.format(dtype)
     if layout is not None:
         retval += 'Layout: {}<br/>'.format(layout)
     if device is not None:
         retval += 'Device: {}<br/>'.format(device)
+    if pin_memory is not None:
+        retval += 'PinMemory: {}<br/>'.format(pin_memory)
     return list_table([retval])
 
 
@@ -1275,7 +1320,8 @@ def prim_constant_node_label(prim_constant_node: IR.CONTROLNode.PrimConstantNode
         dtype = named_datatype[data_type]
         type_map = {'INT8':np.int8,'UINT8':np.uint8,'INT16':np.int16,'UINT16':np.uint16,'INT32':np.int32,'INT64':np.int64,'FLOAT16':np.float16,'FLOAT32':np.float32,'FLOAT64':np.float64,'BOOL':np.bool}
         numpy_data = numpy_data.astype(type_map[dtype])
-        retval += 'Value: {}<br/>'.format(numpy_data[0])
+        if numpy_data.size > 0:
+            retval += 'Value: {}<br/>'.format(numpy_data[0])
     return list_table([retval])
 
 

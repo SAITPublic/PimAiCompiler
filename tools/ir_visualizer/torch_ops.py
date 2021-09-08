@@ -51,7 +51,8 @@ import IR.NNNode.AtenLinearNode
 import IR.NNNode.AtenListNode
 import IR.NNNode.AtenLogNode
 import IR.NNNode.AtenLogSoftmaxNode
-import IR.NNNode.AtenLSTMNode
+import IR.NNNode.AtenLSTM1Node
+import IR.NNNode.AtenLSTM2Node
 import IR.NNNode.AtenLtNode
 import IR.NNNode.AtenMaskedFillNode
 import IR.NNNode.AtenMaskedSelectNode
@@ -79,7 +80,8 @@ import IR.NNNode.AtenSubNode
 import IR.NNNode.AtenSumNode
 import IR.NNNode.AtenTanhNode
 import IR.NNNode.AtenTensorNode
-import IR.NNNode.AtenToNode
+import IR.NNNode.AtenTo1Node
+import IR.NNNode.AtenTo2Node
 import IR.NNNode.AtenTopkNode
 import IR.NNNode.AtenTransposeNode
 import IR.NNNode.AtenUnsqueezeNode
@@ -172,7 +174,8 @@ def create_aten_ops_map():
         IR.NNNode.AnyType.AnyType().AtenIntNode : 'AtenIntNode',
         IR.NNNode.AnyType.AnyType().AtenIsNode : 'AtenIsNode',
         IR.NNNode.AnyType.AnyType().AtenItemNode : 'AtenItemNode',
-        IR.NNNode.AnyType.AnyType().AtenLSTMNode : 'AtenLSTMNode',
+        IR.NNNode.AnyType.AnyType().AtenLSTM1Node : 'AtenLSTM1Node',
+        IR.NNNode.AnyType.AnyType().AtenLSTM2Node : 'AtenLSTM2Node',
         IR.NNNode.AnyType.AnyType().AtenLeakyReluNode : 'AtenLeakyReluNode',
         IR.NNNode.AnyType.AnyType().AtenLenNode : 'AtenLenNode',
         IR.NNNode.AnyType.AnyType().AtenLinearNode : 'AtenLinearNode',
@@ -206,7 +209,8 @@ def create_aten_ops_map():
         IR.NNNode.AnyType.AnyType().AtenSumNode : 'AtenSumNode',
         IR.NNNode.AnyType.AnyType().AtenTanhNode : 'AtenTanhNode',
         IR.NNNode.AnyType.AnyType().AtenTensorNode : 'AtenTensorNode',
-        IR.NNNode.AnyType.AnyType().AtenToNode : 'AtenToNode',
+        IR.NNNode.AnyType.AnyType().AtenTo1Node : 'AtenTo1Node',
+        IR.NNNode.AnyType.AnyType().AtenTo2Node : 'AtenTo2Node',
         IR.NNNode.AnyType.AnyType().AtenTopkNode : 'AtenTopkNode',
         IR.NNNode.AnyType.AnyType().AtenTransposeNode : 'AtenTransposeNode',
         IR.NNNode.AnyType.AnyType().AtenUnsqueezeNode : 'AtenUnsqueezeNode',
@@ -260,6 +264,7 @@ aten_ops_no_attr_dict = {
     'AtenMaskedSelectNode' : IR.NNNode.AtenMaskedSelectNode.AtenMaskedSelectNode(),
     'AtenMatmulNode' : IR.NNNode.AtenMatmulNode.AtenMatmulNode(),
     'AtenMaxNode' : IR.NNNode.AtenMaxNode.AtenMaxNode(),
+    'AtenMulNode' : IR.NNNode.AtenMulNode.AtenMulNode(),
     'AtenNeNode' : IR.NNNode.AtenNeNode.AtenNeNode(),
     'AtenNegNode' : IR.NNNode.AtenNegNode.AtenNegNode(),
     'AtenNotNode' : IR.NNNode.AtenNotNode.AtenNotNode(),
