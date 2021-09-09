@@ -16,14 +16,23 @@
 #include "ir/include/ir_types.hpp"
 #include "ir/include/nn_node.hpp"
 
+#include "ir/include/ir_includes.hpp"
+
 namespace nn_compiler {
 namespace nn_ir {
 
 class AtenAddmmNode : public NodeMixin<AtenAddmmNode, NNNode> {
  public:
-    explicit AtenAddmmNode(const NodeInfo& node_info): NodeMixin(node_info, NodeType::ATENADDMM) {}
+    explicit AtenAddmmNode(const NodeInfo& node_info, const std::string& act_type):
+            NodeMixin(node_info, NodeType::ATENADDMM), act_type_(act_type) {}
 
     std::string getNodeTypeAsString(void) const override { return "AtenAddmm"; }
+    std::string get_act_type () { return act_type_; }
+    void set_act_type(const std::string& act_type) {
+        act_type_ = act_type;
+    }
+private:
+    std::string act_type_ = "none";
 }; // class AtenAddmmNode
 
 } // namespace nn_ir

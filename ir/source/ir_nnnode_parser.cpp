@@ -458,7 +458,7 @@ IRNNNodeParser::parseNNNode<IR::NNNode::AnyType_AtenAddmmNode>(const IR::NnNode*
     auto aten_addmm_node = ir_node->nn_node_as_AtenAddmmNode();
     Log::IR::E_IF(aten_addmm_node == nullptr)
         << "IRNNNodeParser::parseNNNode<NN::AtenAddmmNode>() => wrong node type!";
-    return std::make_unique<nn_ir::AtenAddmmNode>(node_info);
+    return std::make_unique<nn_ir::AtenAddmmNode>(node_info, aten_addmm_node->act_type()->str());
 }
 
 template <>

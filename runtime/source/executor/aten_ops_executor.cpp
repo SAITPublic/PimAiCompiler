@@ -87,6 +87,8 @@ void executorAtenAddmm(const nncir::Node& op_node, StreamExecutor& stream_execut
     DLOG(INFO) << "execute Aten Addmm node";
 
     auto addmm_node = cast<nncir::AtenAddmmNode>(op_node);
+    auto act_type = addmm_node.get_act_type();
+    // TODO choose the corresponding kernel when activation type is aten::none, aten::relu, aten::max
 
     auto& input_self = cast<nncir::DataEdge>(addmm_node.getInEdge(0));
     auto& input_mat1 = cast<nncir::DataEdge>(addmm_node.getInEdge(1));
@@ -132,6 +134,9 @@ void executorAtenAddmm(const nncir::Node& op_node, StreamExecutor& stream_execut
         float beta = 0.0f;
         bool relu = false;
         int m = 1;
+        if (act_type == "aten::relu") {
+            relu = true;
+        }
 
         auto self = iv_self.toTensor();
         auto mat1 = iv_mat1.toTensor();
@@ -161,6 +166,9 @@ void executorAtenAddmm(const nncir::Node& op_node, StreamExecutor& stream_execut
         float alpha = 1.0f;
         float beta = 0.0f;
         bool relu = false;
+        if (act_type == "aten::relu") {
+            relu = true;
+        }
 
         auto self = iv_self.toTensor();
         auto mat1 = iv_mat1.toTensor();
