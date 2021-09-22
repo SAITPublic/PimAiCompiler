@@ -264,6 +264,7 @@ std::tuple<at::Tensor, at::Tensor, at::Tensor> atenLstm1(const at::Tensor &input
                                                         double dropout, bool train, bool bidirectional,
                                                         bool batch_first)
 {
+    dropout = 0.0f;
     return at::lstm(input, hx, params, has_biases, num_layers, dropout, train, bidirectional, batch_first);
 }
 
@@ -272,6 +273,7 @@ std::tuple<at::Tensor, at::Tensor, at::Tensor> atenLstm2(const at::Tensor &data,
                                                         int64_t num_layers, double dropout, bool train,
                                                         bool bidirectional)
 {
+    dropout = 0.0f;
     return at::lstm(data, batch_sizes, hx, params, has_biases, num_layers, dropout, train, bidirectional);
 }
 
