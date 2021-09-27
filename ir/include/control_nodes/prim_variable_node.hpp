@@ -14,13 +14,14 @@ class PrimVariableNode : public NodeMixin<PrimVariableNode, CONTROLNode>
    public:
     explicit PrimVariableNode(const NodeInfo &node_info, std::vector<uint8_t> data, std::vector<Shape4D> shape,
                               std::vector<Shape4D> strides, std::string data_type,
-                              std::vector<std::string> tensor_data_type)
+                              std::vector<std::string> tensor_data_type, bool is_constant)
         : NodeMixin(node_info, NodeType::PRIMVARIABLE),
           data_(data),
           shape_(shape),
           strides_(strides),
           data_type_(data_type),
-          tensor_data_type_(tensor_data_type)
+          tensor_data_type_(tensor_data_type),
+          is_constant_(is_constant)
     {
     }
 
@@ -30,12 +31,14 @@ class PrimVariableNode : public NodeMixin<PrimVariableNode, CONTROLNode>
     void setStrides(std::vector<Shape4D> strides) { strides_ = strides; }
     void setDataType(std::string data_type) { data_type_ = data_type; }
     void setTensorDataType(std::vector<std::string> tensor_data_type) { tensor_data_type_ = tensor_data_type; }
+    void setIsConstant(bool is_constant) { is_constant_ = is_constant; }
 
     const std::vector<uint8_t> getData() const { return data_; }
     const std::vector<Shape4D> getShape() const { return shape_; }
     const std::vector<Shape4D> getStrides() const { return strides_; }
     const std::string getDataType() const { return data_type_; }
     const std::vector<std::string> getTensorDataType() const { return tensor_data_type_; }
+    const bool getIsConstant() const { return is_constant_; }
 
    private:
     std::vector<uint8_t> data_;
@@ -43,6 +46,8 @@ class PrimVariableNode : public NodeMixin<PrimVariableNode, CONTROLNode>
     std::vector<Shape4D> strides_;
     std::string data_type_;
     std::vector<std::string> tensor_data_type_;
+    bool is_constant_ = false;
+
 };  // class PrimVariableNode
 
 }  // namespace nn_ir

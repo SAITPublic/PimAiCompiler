@@ -116,6 +116,10 @@ StreamExecutor::StreamExecutor(const std::shared_ptr<nncir::NNIR> ir_graph)
             // to speed up, runtime only load Constant data once, all constants are reused
             // in every inference forward
             executePrimConstant(op_node, *this);
+        } else if (op_node.getNodeType() == nncir::NodeType::PRIMVARIABLE && cast<nncir::PrimVariableNode>(op_node).getIsConstant()) {
+            // to speed up, runtime only load variable data once, all constants inside are reused
+            // in every inference forward
+            executePrimVariable(op_node, *this);
         }
     }
 
@@ -208,8 +212,8 @@ RetVal StreamExecutor::inferenceModelwithProfiling(const std::shared_ptr<nncir::
 
         auto op_executor = this->findOpExecutor(node_type);
 
-        if (node_type == nncir::NodeType::PRIMCONSTANT) {
-            // skip PrimConstant, constant are pre-loaded
+        if (node_type == nncir::NodeType::PRIMCONSTANT || (node_type == nncir::NodeType::PRIMVARIABLE && cast<nncir::PrimVariableNode>(node).getIsConstant())) {
+            // skip PrimConstant and PrimVariable, constant are pre-loaded
             cursor_++;
             continue;
         } else {

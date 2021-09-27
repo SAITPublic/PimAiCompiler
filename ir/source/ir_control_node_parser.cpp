@@ -313,8 +313,8 @@ IRCONTROLNodeParser::parseControlNode<IR::CONTROLNode::AnyType_PrimVariableNode>
     for (auto strides_item : *strides_arr) {
         strides.push_back(std::get<nn_ir::Shape4D>(nn_ir::parseParam(strides_item)));
     }
-
-    return std::make_unique<nn_ir::PrimVariableNode>(node_info, data, shape, strides, data_type, tensor_data_type);
+    bool is_constant = static_cast<bool>(prim_variable_node->is_constant());
+    return std::make_unique<nn_ir::PrimVariableNode>(node_info, data, shape, strides, data_type, tensor_data_type, is_constant);
 }
 
 } // namespace nn_compiler
