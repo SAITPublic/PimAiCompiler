@@ -221,7 +221,7 @@ TEST(NnrUnitTest, lstmTest)
     c10::ArrayRef<at::Tensor> param_tuple(param_tmp.data(), 2);
 
     auto r =
-        nnrt::atenLstm(input, h_tuple, param_tuple, has_bias, num_layer, dropout, train, bidirectional, batch_first);
+        nnrt::atenLstm1(input, h_tuple, param_tuple, has_bias, num_layer, dropout, train, bidirectional, batch_first);
 
     // kCUDA
     auto input_gpu = input.to(kCUDA);
@@ -240,7 +240,7 @@ TEST(NnrUnitTest, lstmTest)
     param_tmp_gpu.push_back(param_h_gpu);
     c10::ArrayRef<at::Tensor> param_tuple_gpu(param_tmp_gpu.data(), 2);
 
-    auto r_gpu = nnrt::atenLstm(input_gpu, h_tuple_gpu, param_tuple_gpu, has_bias, num_layer, dropout, train,
+    auto r_gpu = nnrt::atenLstm1(input_gpu, h_tuple_gpu, param_tuple_gpu, has_bias, num_layer, dropout, train,
                                 bidirectional, batch_first);
     DLOG(INFO) << ((std::get<0>(r_gpu))[0]).to(kCPU);
     DLOG(INFO) << std::get<0>(r)[0];
@@ -636,7 +636,7 @@ TEST(NnrUnitTest, deriveTest)
     int64_t index = 9;
     int64_t step = 8;
     int64_t t = start + index * step;
-    int64_t r = nnrt::atenDeriveIndex(start, index, step);
+    int64_t r = nnrt::atenDeriveIndex(index, start, step);
     EXPECT_TRUE(t == r);
 }
 

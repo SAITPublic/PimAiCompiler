@@ -5,6 +5,7 @@
 #include "executor/prim_ops.h"
 #include "glog/logging.h"
 #include "ut_utils.h"
+#include "executor/prim_utils.h"
 
 using std::vector;
 
@@ -41,8 +42,15 @@ TEST(NnrUnitTest, primTupleIndexTest)
     std::vector<torch::Tensor> tuple_tensors = {torch::ones({sz, sz}), 2 * torch::ones({sz / 2, sz / 2}),
                                                 torch::zeros({sz / 4, sz / 4})};
 
+    std::vector<torch::IValue> vec;
     for (int i = 0; i < tuple_tensors.size(); i++) {
-        ASSERT_EQUAL(nnrt::primTupleIndex(tuple_tensors, i), tuple_tensors.at(i));
+        auto a = tuple_tensors[i];
+        auto iv = torch::jit::IValue(a);
+        vec.push_back(iv);
+    }
+
+    for (int i = 0; i < tuple_tensors.size(); i++) {
+        ASSERT_EQUAL(nnrt::primTupleIndex(vec, i).toTensor(), vec.at(i).toTensor());
     }
 }
 

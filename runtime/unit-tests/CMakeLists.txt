@@ -15,7 +15,7 @@ target_link_libraries(NnrtCustomOpUnitTest ${UT_LIBS})
 endif()
 
 if(PRIM_OP_UTEST)
-add_executable(NnrtPrimOpUnitTest "prim_op_ut.cpp")
+add_executable(NnrtPrimOpUnitTest "prim_ops_ut.cpp")
 target_link_libraries(NnrtPrimOpUnitTest ${UT_LIBS})
 endif()
 
