@@ -6,7 +6,7 @@ option(ATEN_OP_UTEST "Build AtenOp UT" OFF)
 option(PRIM_OP_UTEST "Build PrimOp UT" OFF)
 option(CUSTOM_OP_UTEST "Build CustomOp UT" ON)
 
-set(UT_LIBS gtest_main gtest nn_runtime torch torch_cpu c10 torch_hip c10_hip)
+set(UT_LIBS gtest_main gtest nn_runtime torch torch_cpu c10 torch_hip c10_hip PimRuntime)
 
 include_directories("${PROJECT_SOURCE_DIR}/runtime/include")
 if(CUSTOM_OP_UTEST)
