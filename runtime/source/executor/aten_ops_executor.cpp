@@ -14,6 +14,7 @@
 #include "ir/include/edge.hpp"
 #include "ir/include/ir_types.hpp"
 #include "ir/include/nn_ir.hpp"
+#include "pim_runtime_api.h"
 #include "tv_tools.h"
 
 namespace nnrt
@@ -157,14 +158,25 @@ void executorAtenAddmm(const nncir::Node& op_node, StreamExecutor& stream_execut
         output_shape[dim_i0 - 2] = 1;
         auto output = at::zeros(output_shape, options);
         _Float16* y = (_Float16*)output.data_ptr();
-        rocblas_addmv_template_xAy(nullptr, b, x, A, y, m, n, k, alpha, beta, relu);
+
+        PimDesc* pim_desc = PimCreateDesc(1, 1, n, k, PIM_FP16, OP_GEMV);
+        PimBo* dev_op0 = PimCreateBo(pim_desc, MEM_TYPE_DEVICE, GEMV_INPUT, x);
+        PimBo* dev_op1 = PimCreateBo(pim_desc, MEM_TYPE_DEVICE, GEMV_WEIGHT, A);
+        PimBo* dev_op2 = PimCreateBo(pim_desc, MEM_TYPE_DEVICE, GEMV_INPUT, b);
+        PimBo* dev_out = PimCreateBo(pim_desc, MEM_TYPE_DEVICE, GEMV_OUTPUT, y);
+
+        PimExecuteGemvAdd(dev_out, dev_op0, dev_op1, dev_op2, relu, nullptr);
+
+        PimDestroyBo(dev_op0);
+        PimDestroyBo(dev_op1);
+        PimDestroyBo(dev_op2);
+        PimDestroyBo(dev_out);
+        PimDestroyDesc(pim_desc);
 
         // update output
         auto& out_edge = cast<nncir::DataEdge>(addmm_node.getFirstOutEdge());
         stream_executor.updateBlob(out_edge.getBlobId(), DataType::TENSOR, tensorToIValue(output));
     } else if (i0_is_vector != 1 && i1_is_vector == 1 && dim_i1 > 1) {
-        float alpha = 1.0f;
-        float beta = 0.0f;
         bool relu = false;
         if (act_type == "aten::relu") {
             relu = true;
@@ -190,7 +202,20 @@ void executorAtenAddmm(const nncir::Node& op_node, StreamExecutor& stream_execut
         output_shape[dim_i1 - 2] = m;
         auto output = at::zeros(output_shape, options);
         _Float16* y = (_Float16*)output.data_ptr();
-        rocblas_addmv_template_Axy(nullptr, b, A, x, y, m, n, k, alpha, beta, relu);
+
+        PimDesc* pim_desc = PimCreateDesc(1, 1, m, k, PIM_FP16, OP_GEMV);
+        PimBo* dev_op0 = PimCreateBo(pim_desc, MEM_TYPE_DEVICE, GEMV_INPUT, x);
+        PimBo* dev_op1 = PimCreateBo(pim_desc, MEM_TYPE_DEVICE, GEMV_WEIGHT_T, A);
+        PimBo* dev_op2 = PimCreateBo(pim_desc, MEM_TYPE_DEVICE, GEMV_OUTPUT, b);
+        PimBo* dev_out = PimCreateBo(pim_desc, MEM_TYPE_DEVICE, GEMV_OUTPUT, y);
+
+        PimExecuteGemvAdd(dev_out, dev_op0, dev_op1, dev_op2, relu, nullptr);
+
+        PimDestroyBo(dev_op0);
+        PimDestroyBo(dev_op1);
+        PimDestroyBo(dev_op2);
+        PimDestroyBo(dev_out);
+        PimDestroyDesc(pim_desc);
 
         auto& out_edge = cast<nncir::DataEdge>(addmm_node.getFirstOutEdge());
         stream_executor.updateBlob(out_edge.getBlobId(), DataType::TENSOR, tensorToIValue(output));
@@ -2329,10 +2354,6 @@ void executorAtenMatmul(const nncir::Node& op_node, StreamExecutor& stream_execu
         }
     }
     if (i0_is_vector == 1 && i1_is_vector != 1) {
-        float alpha = 1.0f;
-        float beta = 0.0f;
-        int m = 1;
-
         auto self = iv_self.toTensor();
         auto other = iv_other.toTensor();
 
@@ -2356,14 +2377,22 @@ void executorAtenMatmul(const nncir::Node& op_node, StreamExecutor& stream_execu
         }
         auto output = at::zeros(output_shape, options);
         _Float16* y = (_Float16*)output.data_ptr();
-        rocblas_gemv_template_xAy(nullptr, x, A, y, m, n, k, alpha, beta);
+
+        PimDesc* pim_desc = PimCreateDesc(1, 1, n, k, PIM_FP16, OP_GEMV);
+        PimBo* dev_op0 = PimCreateBo(pim_desc, MEM_TYPE_DEVICE, GEMV_INPUT, x);
+        PimBo* dev_op1 = PimCreateBo(pim_desc, MEM_TYPE_DEVICE, GEMV_WEIGHT, A);
+        PimBo* dev_out = PimCreateBo(pim_desc, MEM_TYPE_DEVICE, GEMV_OUTPUT, y);
+
+        PimExecuteGemv(dev_out, dev_op0, dev_op1, nullptr);
+
+        PimDestroyBo(dev_op0);
+        PimDestroyBo(dev_op1);
+        PimDestroyBo(dev_out);
+        PimDestroyDesc(pim_desc);
 
         auto& out_edge = cast<nncir::DataEdge>(node.getFirstOutEdge());
         stream_executor.updateBlob(out_edge.getBlobId(), DataType::TENSOR, tensorToIValue(output));
     } else if (i0_is_vector != 1 && i1_is_vector == 1) {
-        float alpha = 1.0f;
-        float beta = 0.0f;
-
         auto self = iv_self.toTensor();
         auto other = iv_other.toTensor();
 
@@ -2389,13 +2418,22 @@ void executorAtenMatmul(const nncir::Node& op_node, StreamExecutor& stream_execu
         }
         auto output = at::zeros(output_shape, options);
         _Float16* y = (_Float16*)output.data_ptr();
-        rocblas_gemv_template_Axy(nullptr, A, x, y, m, n, k, alpha, beta);
+
+        PimDesc* pim_desc = PimCreateDesc(1, 1, m, k, PIM_FP16, OP_GEMV);
+        PimBo* dev_op0 = PimCreateBo(pim_desc, MEM_TYPE_DEVICE, GEMV_INPUT, x);
+        PimBo* dev_op1 = PimCreateBo(pim_desc, MEM_TYPE_DEVICE, GEMV_WEIGHT_T, A);
+        PimBo* dev_out = PimCreateBo(pim_desc, MEM_TYPE_DEVICE, GEMV_OUTPUT, y);
+
+        PimExecuteGemv(dev_out, dev_op0, dev_op1, nullptr);
+
+        PimDestroyBo(dev_op0);
+        PimDestroyBo(dev_op1);
+        PimDestroyBo(dev_out);
+        PimDestroyDesc(pim_desc);
+
         auto& out_edge = cast<nncir::DataEdge>(node.getFirstOutEdge());
         stream_executor.updateBlob(out_edge.getBlobId(), DataType::TENSOR, tensorToIValue(output));
     } else if (i0_is_vector == 1 && i1_is_vector == 1) {
-        float alpha = 1.0f;
-        float beta = 0.0f;
-
         auto self = iv_self.toTensor();
         auto other = iv_other.toTensor();
 
@@ -2422,7 +2460,18 @@ void executorAtenMatmul(const nncir::Node& op_node, StreamExecutor& stream_execu
 
         auto output = at::zeros(output_shape, options);
         _Float16* y = (_Float16*)output.data_ptr();
-        rocblas_gemv_template_Axy(nullptr, A, x, y, m, n, k, alpha, beta);
+
+        PimDesc* pim_desc = PimCreateDesc(1, 1, k, m, PIM_FP16, OP_GEMV);
+        PimBo* dev_op0 = PimCreateBo(pim_desc, MEM_TYPE_DEVICE, GEMV_INPUT, x);
+        PimBo* dev_op1 = PimCreateBo(pim_desc, MEM_TYPE_DEVICE, GEMV_WEIGHT_T, A);
+        PimBo* dev_out = PimCreateBo(pim_desc, MEM_TYPE_DEVICE, GEMV_OUTPUT, y);
+
+        PimExecuteGemv(dev_out, dev_op0, dev_op1, nullptr);
+
+        PimDestroyBo(dev_op0);
+        PimDestroyBo(dev_op1);
+        PimDestroyBo(dev_out);
+        PimDestroyDesc(pim_desc);
 
         auto& out_edge = cast<nncir::DataEdge>(node.getFirstOutEdge());
         stream_executor.updateBlob(out_edge.getBlobId(), DataType::TENSOR, tensorToIValue(output));

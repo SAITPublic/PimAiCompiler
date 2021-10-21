@@ -3,6 +3,7 @@
 #include <cstdio>
 #include <memory>
 #include <tuple>
+#include "pim_runtime_api.h"
 
 namespace nnrt
 {
@@ -29,6 +30,8 @@ std::vector<torch::Tensor> NNRuntime::inferenceModel(const std::vector<torch::Te
         DLOG(INFO) << "shape:" << item.sizes() << " dtype:" << item.dtype() << " device:" << item.device();
     }
 
+    PimInitialize(RT_TYPE_HIP, PIM_FP16);
+
     std::vector<torch::Tensor> output_tensors;
     auto status = RetVal::FAILURE;
     if (profiling) {
@@ -41,6 +44,8 @@ std::vector<torch::Tensor> NNRuntime::inferenceModel(const std::vector<torch::Te
     } else {
         status = executor_->inferenceModel(this->mbuilder_->get_runnable_ir(), input_tensors, output_tensors);
     }
+
+    PimDeinitialize();
 
     if (status != RetVal::SUCCESS) {
         LOG(ERROR) << " inference model fail!";
