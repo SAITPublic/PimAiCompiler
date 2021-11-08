@@ -30,8 +30,6 @@ std::vector<torch::Tensor> NNRuntime::inferenceModel(const std::vector<torch::Te
         DLOG(INFO) << "shape:" << item.sizes() << " dtype:" << item.dtype() << " device:" << item.device();
     }
 
-    PimInitialize(RT_TYPE_HIP, PIM_FP16);
-
     std::vector<torch::Tensor> output_tensors;
     auto status = RetVal::FAILURE;
     if (profiling) {
@@ -45,15 +43,12 @@ std::vector<torch::Tensor> NNRuntime::inferenceModel(const std::vector<torch::Te
         status = executor_->inferenceModel(this->mbuilder_->get_runnable_ir(), input_tensors, output_tensors);
     }
 
-    PimDeinitialize();
-
     if (status != RetVal::SUCCESS) {
         LOG(ERROR) << " inference model fail!";
     }
 
     // for simple test, fill zeros to outputs
     // output_tensors.push_back(torch::zeros({10, 10}, torch::kF16));
-
     DLOG(INFO) << "numOutps:" << output_tensors.size() << std::endl;
 
     return output_tensors;
