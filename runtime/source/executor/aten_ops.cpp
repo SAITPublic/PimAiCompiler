@@ -1,3 +1,4 @@
+#include "c10/hip/HIPFunctions.h"
 #include "executor/aten_ops.h"
 #include <iostream>
 namespace nnrt

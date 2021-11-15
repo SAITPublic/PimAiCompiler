@@ -6,7 +6,6 @@
 #include <string>
 #include <vector>
 #include "builder/model_builder.h"
-#include "c10/hip/HIPFunctions.h"
 #include "ir/include/data_edge.hpp"
 #include "ir/include/edge.hpp"
 #include "ir/include/nn_ir.hpp"

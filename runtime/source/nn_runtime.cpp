@@ -1,9 +1,9 @@
+#include "c10/hip/HIPFunctions.h"
 #include "nn_runtime.h"
 #include <glog/logging.h>
 #include <cstdio>
 #include <memory>
 #include <tuple>
-#include "pim_runtime_api.h"
 
 namespace nnrt
 {
