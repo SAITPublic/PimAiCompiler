@@ -4,6 +4,7 @@
 #include <cstdio>
 #include <memory>
 #include <tuple>
+#include "pim_runtime_api.h"
 
 namespace nnrt
 {
@@ -21,6 +22,7 @@ NNRuntime::NNRuntime(const std::string torch_model_path, int compile_level, std:
     this->executor_ = std::make_shared<StreamExecutor>(this->mbuilder_->get_runnable_ir());
 
     rocblas_init();
+    PimInitialize(RT_TYPE_HIP, PIM_FP16);
 }
 
 std::vector<torch::Tensor> NNRuntime::inferenceModel(const std::vector<torch::Tensor>& input_tensors, bool profiling)
@@ -72,6 +74,11 @@ int NNRuntime::test(void)
     DLOG(INFO) << "hello NNRuntime::test!";
 
     return 0;
+}
+
+NNRuntime::~NNRuntime() {
+    DLOG(INFO) << "NNRuntime Destructor is called";
+    PimDeinitialize();
 }
 
 }  // namespace nnrt

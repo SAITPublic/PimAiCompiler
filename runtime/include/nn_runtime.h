@@ -24,6 +24,8 @@ class NNRuntime
     
     int test(void);
 
+    ~NNRuntime();
+
    private:
     // Runnable NNIR in ModelBuilder
     std::shared_ptr<ModelBuilder> mbuilder_;
