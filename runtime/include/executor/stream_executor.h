@@ -5,6 +5,7 @@
 #include <stack>
 #include <string>
 #include <vector>
+#include <miopen/miopen.h>
 #include "builder/model_builder.h"
 #include "ir/include/data_edge.hpp"
 #include "ir/include/edge.hpp"
@@ -26,6 +27,7 @@ class StreamExecutor
 {
    public:
     StreamExecutor(const std::shared_ptr<nncir::NNIR> ir_graph);
+    ~StreamExecutor();
 
     void loadWeightAndBias(nncir::Blob* blob);
 
@@ -90,6 +92,13 @@ class StreamExecutor
     int64_t cursor_ = 0;  // like the program counter
     std::stack<int64_t> loop_condition_stack_;
     std::unordered_map<int, std::pair<int, int>> releation_blob_ids_map_;
+
+    // miopen
+    miopenTensorDescriptor_t input_tensor, hidden_tensor, weight_tensor, output_tensor;
+    std::vector<miopenTensorDescriptor_t> input_tensors;
+    std::vector<miopenTensorDescriptor_t> output_tensors;
+    miopenHandle_t handle;
+    miopenRNNDescriptor_t rnnDesc;
 };
 
 }  // namespace nnrt

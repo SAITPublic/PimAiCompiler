@@ -64,6 +64,13 @@ void StreamExecutor::loadWeightAndBias(nncir::Blob* blob)
 
 StreamExecutor::StreamExecutor(const std::shared_ptr<nncir::NNIR> ir_graph)
 {
+    miopenCreate(&handle);
+    miopenCreateTensorDescriptor(&input_tensor);
+    miopenCreateTensorDescriptor(&hidden_tensor);
+    miopenCreateTensorDescriptor(&weight_tensor);
+    miopenCreateTensorDescriptor(&output_tensor);
+    miopenCreateRNNDescriptor(&rnnDesc);
+
     this->ir_graph_ = ir_graph;
     this->registerOp();
     // Get the output & input node from ir_graph at once
@@ -129,6 +136,16 @@ StreamExecutor::StreamExecutor(const std::shared_ptr<nncir::NNIR> ir_graph)
     if (this->input_blob_ids_.size() == 0 || this->output_blob_ids_.size() == 0) {
         LOG(FATAL) << "The Graph must have >= 1 inputs and outputs!";
     }
+}
+
+StreamExecutor::~StreamExecutor() {
+    miopenDestroyTensorDescriptor(output_tensor);
+    miopenDestroyTensorDescriptor(weight_tensor);
+    miopenDestroyTensorDescriptor(hidden_tensor);
+    miopenDestroyTensorDescriptor(input_tensor);
+
+    miopenDestroyRNNDescriptor(rnnDesc);
+    miopenDestroy(handle);
 }
 
 RetVal StreamExecutor::inferenceModel(const std::shared_ptr<nncir::NNIR> graph,
