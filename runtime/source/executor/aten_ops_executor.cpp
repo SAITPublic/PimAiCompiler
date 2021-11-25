@@ -67,10 +67,36 @@ void executorAtenAdd(const nncir::Node& op_node, StreamExecutor& stream_executor
     if (dtype == DataType::TENSOR) {
         assert(iv_other.isTensor());
         at::Tensor other_tensor = iv_other.toTensor();
-        auto output = nnrt::atenAdd(self_tensor, other_tensor, alpha);
-        // update output
-        auto& out_edge = cast<nncir::DataEdge>(add_node.getFirstOutEdge());
-        stream_executor.updateBlob(out_edge.getBlobId(), DataType::TENSOR, tensorToIValue(output));
+        {
+            auto& out_edge = cast<nncir::DataEdge>(add_node.getFirstOutEdge());
+            if (!self_tensor.is_contiguous()) self_tensor = self_tensor.contiguous();
+            if (!other_tensor.is_contiguous()) other_tensor = other_tensor.contiguous();
+            int dim0 = self_tensor.dim();
+            int dim1 = other_tensor.dim();
+
+            auto options = at::TensorOptions().dtype(at::kHalf).device(at::kCUDA);
+            auto output_tmp = at::zeros(self_tensor.sizes().vec(), options);
+
+            _Float16* A = (_Float16*)self_tensor.data_ptr();
+            _Float16* B = (_Float16*)other_tensor.data_ptr();
+            _Float16* C = A;
+
+            int m = 1;
+            int n = 1;
+            int a_m_s = 1;
+            int a_n_s = 1;
+            int b_m_s = 1;
+            int b_n_s = 1;
+
+            m = self_tensor.size(dim0 - 2);
+            n = self_tensor.size(dim0 - 1);
+
+            bool sym = (dim0 == dim1);
+            custom_add(nullptr, A, B, C, m, n, alpha, sym, a_m_s, a_n_s, b_m_s, b_n_s);
+
+            // update output
+            stream_executor.updateBlob(out_edge.getBlobId(), DataType::TENSOR, tensorToIValue(self_tensor));
+        }
     } else if (isScalarType(dtype)) {
         assert(iv_other.isScalar());
         at::Scalar other_scalar = iv_other.toScalar();
