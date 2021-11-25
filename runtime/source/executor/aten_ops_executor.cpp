@@ -81,6 +81,16 @@ void executorAtenAdd(const nncir::Node& op_node, StreamExecutor& stream_executor
             _Float16* B = (_Float16*)other_tensor.data_ptr();
             _Float16* C = A;
 
+            at::Tensor tmp;
+            char* env = std::getenv("ENABLE_GNMT_OPT");
+            if (*env == '1' && out_edge.getBlobId() == 442) {
+                int cat_s0 = 4430;
+                auto it = stream_executor.global_blobs_.find(cat_s0);
+                auto options = at::TensorOptions().dtype(at::kHalf).device(at::kCUDA);
+                tmp = torch::from_blob((_Float16*)(it->second.second.toTensor().data_ptr()), {1, 1, 1024}, options);
+                C = (_Float16*)tmp.data_ptr();
+            }
+
             int m = 1;
             int n = 1;
             int a_m_s = 1;
@@ -95,7 +105,11 @@ void executorAtenAdd(const nncir::Node& op_node, StreamExecutor& stream_executor
             custom_add(nullptr, A, B, C, m, n, alpha, sym, a_m_s, a_n_s, b_m_s, b_n_s);
 
             // update output
-            stream_executor.updateBlob(out_edge.getBlobId(), DataType::TENSOR, tensorToIValue(self_tensor));
+            if (*env == '1' && out_edge.getBlobId() == 442) {
+                stream_executor.updateBlob(out_edge.getBlobId(), DataType::TENSOR, tensorToIValue(tmp));
+            } else {
+                stream_executor.updateBlob(out_edge.getBlobId(), DataType::TENSOR, tensorToIValue(self_tensor));
+            }
         }
     } else if (isScalarType(dtype)) {
         assert(iv_other.isScalar());
@@ -664,11 +678,66 @@ void executorAtenBmm(const nncir::Node& op_node, StreamExecutor& stream_executor
     torch::jit::IValue iv_self = stream_executor.findBlob(input_self_blob_id).second;
     torch::jit::IValue iv_other = stream_executor.findBlob(input_other_blob_id).second;
     assert(iv_self.isTensor() && iv_other.isTensor());
+    {
+        auto& out_edge = cast<nncir::DataEdge>(bmm_node.getFirstOutEdge());
+        at::Tensor tmp0, tmp1, tmp2;
+        char* env = std::getenv("ENABLE_GNMT_OPT");
+        if (*env == '1' && out_edge.getBlobId() == 342) {
+            int cat_s = 3460;
+            auto it = stream_executor.global_blobs_.find(cat_s);
+            auto options = at::TensorOptions().dtype(at::kHalf).device(at::kCUDA);
+            tmp0 = torch::from_blob((_Float16*)(it->second.second.toTensor().data_ptr()) + 1024, {1, 1, 1024}, options);
 
-    auto output = nnrt::atenBmm(iv_self.toTensor(), iv_other.toTensor());
-    // update output
-    auto& out_edge = cast<nncir::DataEdge>(bmm_node.getFirstOutEdge());
-    stream_executor.updateBlob(out_edge.getBlobId(), DataType::TENSOR, tensorToIValue(output));
+            cat_s = 3940;
+            it = stream_executor.global_blobs_.find(cat_s);
+            tmp1 = torch::from_blob((_Float16*)(it->second.second.toTensor().data_ptr()) + 1024, {1, 1, 1024}, options);
+
+            cat_s = 4430;
+            it = stream_executor.global_blobs_.find(cat_s);
+            tmp2 = torch::from_blob((_Float16*)(it->second.second.toTensor().data_ptr()) + 1024, {1, 1, 1024}, options);
+        }
+
+        auto self_tensor = iv_self.toTensor();
+        auto other_tensor = iv_other.toTensor();
+
+        if (!self_tensor.is_contiguous()) self_tensor = self_tensor.contiguous();
+        if (!other_tensor.is_contiguous()) other_tensor = other_tensor.contiguous();
+
+        int dim0 = self_tensor.dim();
+        int dim1 = other_tensor.dim();
+        int m = self_tensor.size(dim0 - 2);
+        int k = self_tensor.size(dim0 - 1);
+        int n = other_tensor.size(dim1 - 1);
+        int k_ = other_tensor.size(dim1 - 2);
+        assert(k_ == k);
+
+        auto options = at::TensorOptions().dtype(at::kHalf).device(at::kCUDA);
+        auto output_shape = self_tensor.sizes().vec();
+        output_shape[dim0 - 1] = n;
+        output_shape[dim0 - 2] = m;
+
+        _Float16* x = (_Float16*)self_tensor.data_ptr();
+        _Float16* A = (_Float16*)other_tensor.data_ptr();
+        auto output = at::zeros(output_shape, options);
+        _Float16* y = (_Float16*)output.data_ptr();
+
+        if (*env == '1' && out_edge.getBlobId() == 342) {
+            y = (_Float16*)tmp0.data_ptr();
+        }
+
+        rocblas_bmm_template_xAy(nullptr, x, A, y, m, n, k);
+        if (*env == '1' && out_edge.getBlobId() == 342) {
+            nnrt::atenCopy_(tmp1, tmp0, c10::attr::non_blocking);
+            nnrt::atenCopy_(tmp2, tmp0, c10::attr::non_blocking);
+        }
+
+        // update output
+        if (*env == '1' && out_edge.getBlobId() == 342) {
+            stream_executor.updateBlob(out_edge.getBlobId(), DataType::TENSOR, tensorToIValue(tmp0));
+        } else {
+            stream_executor.updateBlob(out_edge.getBlobId(), DataType::TENSOR, tensorToIValue(output));
+        }
+    }
 }
 
 void executorAtenBool(const nncir::Node& op_node, StreamExecutor& stream_executor)
@@ -706,6 +775,25 @@ void executorAtenCat(const nncir::Node& op_node, StreamExecutor& stream_executor
 
     auto& input_list_edge = cast<nncir::DataEdge>(cat_node.getInEdge(0));
     auto input_blob_id = input_list_edge.getBlobId();
+
+    char* env = std::getenv("ENABLE_GNMT_OPT");
+    if (*env == '1' && stream_executor.cursor_ == 600) {
+        int cat_id = 22222;
+        auto it = stream_executor.global_blobs_.find(cat_id);
+        auto& out_edge = cast<nncir::DataEdge>(cat_node.getFirstOutEdge());
+        auto output = it->second.second.toTensor().clone();
+        stream_executor.updateBlob(out_edge.getBlobId(), DataType::TENSOR, tensorToIValue(output));
+        return;
+    }
+
+    int cat_id = input_blob_id * 10;
+    auto it = stream_executor.global_blobs_.find(cat_id);
+    if (*env == '1' && it != stream_executor.global_blobs_.end()) {
+        auto& out_edge = cast<nncir::DataEdge>(cat_node.getFirstOutEdge());
+        auto output = it->second.second;
+        stream_executor.updateBlob(out_edge.getBlobId(), DataType::TENSOR, output);
+        return;
+    }
 
     auto ivalue = stream_executor.findBlob(input_blob_id).second;
     assert(ivalue.isTensorList());
@@ -1808,6 +1896,12 @@ void executorAtenLen(const nncir::Node& op_node, StreamExecutor& stream_executor
     int64_t output = -1;
     if (iv.isList()) {
         output = nnrt::atenLen(iv.toList());
+
+        char* env = std::getenv("ENABLE_GNMT_OPT");
+        if (*env == '1' && stream_executor.cursor_ == 587 && iv.toList().size() == 4) {
+            int next_node_id = 599;
+            stream_executor.setCursor(next_node_id);
+        }
     } else if (iv.isTensor()) {
         output = nnrt::atenLen(iv.toTensor());
     } else {
@@ -2267,7 +2361,18 @@ void executorAtenLSTM1(const nncir::Node& op_node, StreamExecutor& stream_execut
         workspace_dev = workspace.data_ptr();
 
         auto it0 = stream_executor.global_blobs_.find(out_blob_ids[0]);
-        {
+
+        char* env = std::getenv("ENABLE_GNMT_OPT");
+        if (*env == '1' && it0 != stream_executor.global_blobs_.end() && seq_len == 1) {
+            out_dev = it0->second.second.toTensor().data_ptr();
+            hy_dev = stream_executor.global_blobs_.find(out_blob_ids[1])->second.second.toTensor().data_ptr();
+            cy_dev = stream_executor.global_blobs_.find(out_blob_ids[2])->second.second.toTensor().data_ptr();
+            miopenRNNForwardInference(stream_executor.handle, stream_executor.rnnDesc, seq_len, stream_executor.input_tensors.data(), in_dev,
+                                  stream_executor.hidden_tensor, hx_dev, stream_executor.hidden_tensor, cx_dev, stream_executor.weight_tensor, wei_dev,
+                                  stream_executor.output_tensors.data(), out_dev, stream_executor.hidden_tensor, hy_dev, stream_executor.hidden_tensor, cy_dev,
+                                  workspace_dev, workspace_size);
+
+        } else {
             auto output = at::empty({in_len[0], seq_len, out_len[0]}, input.options());
             out_dev = output.data_ptr();
             at::Tensor hy, cy;
@@ -2279,10 +2384,57 @@ void executorAtenLSTM1(const nncir::Node& op_node, StreamExecutor& stream_execut
 
                 hy_dev = hy.data_ptr();
                 cy_dev = cy.data_ptr();
+
+                if (*env == '1' && (out_blob_ids[1] == 298 || out_blob_ids[1] == 386 || out_blob_ids[1] == 434 || out_blob_ids[1] == 483)) {
+                    int cat_f = 22222;
+                    auto cat = stream_executor.global_blobs_.find(cat_f);
+                    auto cat_mem = cat->second.second.toTensor();
+
+                    if (out_blob_ids[1] == 298 && out_blob_ids[2] == 299) {
+                        hy = torch::from_blob((_Float16*)(cat_mem.data_ptr()), {1, 1, 1024}, options);
+                        cy = torch::from_blob((_Float16*)(cat_mem.data_ptr()) + 1024, {1, 1, 1024}, options);
+                        hy_dev = hy.data_ptr();
+                        cy_dev = cy.data_ptr();
+                    }
+                    if (out_blob_ids[1] == 386 && out_blob_ids[2] == 387) {
+                        hy = torch::from_blob((_Float16*)(cat_mem.data_ptr()) + 2048, {1, 1, 1024}, options);
+                        cy = torch::from_blob((_Float16*)(cat_mem.data_ptr()) + 3072, {1, 1, 1024}, options);
+                        hy_dev = hy.data_ptr();
+                        cy_dev = cy.data_ptr();
+                    }
+                    if (out_blob_ids[1] == 434 && out_blob_ids[2] == 435) {
+                        hy = torch::from_blob((_Float16*)(cat_mem.data_ptr()) + 4096, {1, 1, 1024}, options);
+                        cy = torch::from_blob((_Float16*)(cat_mem.data_ptr()) + 5120, {1, 1, 1024}, options);
+                        hy_dev = hy.data_ptr();
+                        cy_dev = cy.data_ptr();
+                    }
+                    if (out_blob_ids[1] == 483 && out_blob_ids[2] == 484) {
+                        hy = torch::from_blob((_Float16*)(cat_mem.data_ptr()) + 6144, {1, 1, 1024}, options);
+                        cy = torch::from_blob((_Float16*)(cat_mem.data_ptr()) + 7168, {1, 1, 1024}, options);
+                        hy_dev = hy.data_ptr();
+                        cy_dev = cy.data_ptr();
+                    }
+                }
+
+                if (*env == '1' && out_blob_ids[0] == 297) {
+                    int cat_s1 = 3460;
+                    auto it = stream_executor.global_blobs_.find(cat_s1);
+                    auto options = at::TensorOptions().dtype(at::kHalf).device(at::kCUDA);
+                    auto cat_mem = it->second.second.toTensor();
+                    output  = torch::from_blob((_Float16*)(cat_mem.data_ptr()), {1, 1, 1024}, options);
+                }
+
+                if (*env == '1' && out_blob_ids[0] == 385) {
+                    int cat_s2 = 3940;
+                    auto it = stream_executor.global_blobs_.find(cat_s2);
+                    auto options = at::TensorOptions().dtype(at::kHalf).device(at::kCUDA);
+                    auto cat_mem = it->second.second.toTensor();
+                    output  = torch::from_blob((_Float16*)(cat_mem.data_ptr()), {1, 1, 1024}, options);
+                }
             }
-            miopenRNNForwardInference(stream_executor.handle, stream_executor.rnnDesc, seq_len, stream_executor.input_tensors.data(), in_dev, 
-                                    stream_executor.hidden_tensor, hx_dev, stream_executor.hidden_tensor, cx_dev, stream_executor.weight_tensor, wei_dev, 
-                                    stream_executor.output_tensors.data(), out_dev, stream_executor.hidden_tensor, hy_dev, stream_executor.hidden_tensor, cy_dev, 
+            miopenRNNForwardInference(stream_executor.handle, stream_executor.rnnDesc, seq_len, stream_executor.input_tensors.data(), in_dev,
+                                    stream_executor.hidden_tensor, hx_dev, stream_executor.hidden_tensor, cx_dev, stream_executor.weight_tensor, wei_dev,
+                                    stream_executor.output_tensors.data(), out_dev, stream_executor.hidden_tensor, hy_dev, stream_executor.hidden_tensor, cy_dev,
                                     workspace_dev, workspace_size);
 
             if (!static_cast<bool>(batch_first)) output = output.transpose(0, 1);
@@ -2620,7 +2772,17 @@ void executorAtenLSTM2(const nncir::Node& op_node, StreamExecutor& stream_execut
         workspace_dev = workspace.data_ptr();
         auto it0 = stream_executor.global_blobs_.find(out_blob_ids[0]);
 
-        {
+        char* env = std::getenv("ENABLE_GNMT_OPT");
+        if (*env == '1' && it0 != stream_executor.global_blobs_.end() && seq_len == 1) {
+            out_dev = it0->second.second.toTensor().data_ptr();
+            hy_dev = stream_executor.global_blobs_.find(out_blob_ids[1])->second.second.toTensor().data_ptr();
+            cy_dev = stream_executor.global_blobs_.find(out_blob_ids[2])->second.second.toTensor().data_ptr();
+            miopenRNNForwardInference(stream_executor.handle, stream_executor.rnnDesc, seq_len, stream_executor.input_tensors.data(), in_dev,
+                                  stream_executor.hidden_tensor, hx_dev, stream_executor.hidden_tensor, cx_dev, stream_executor.weight_tensor, wei_dev,
+                                  stream_executor.output_tensors.data(), out_dev, stream_executor.hidden_tensor, hy_dev, stream_executor.hidden_tensor, cy_dev,
+                                  workspace_dev, workspace_size);
+
+        } else {
             auto output = at::empty({seq_len, out_len[0]}, input.options());
             out_dev = output.data_ptr();
             at::Tensor hy, cy;

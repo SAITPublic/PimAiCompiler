@@ -408,4 +408,36 @@ void custom_add(hipStream_t p_stream, U *A, U *B, U *C, int m, int n, W alpha, b
     }
 }
 
+template <int NB_X, typename V, typename W>
+__global__ void bmm_kernel_xAy(int m, int n, int k, const V *xa, const V *Aa, W *ya)
+{
+    int index = hipBlockIdx_x * NB_X + hipThreadIdx_x;
+    const V *x = xa;
+    const V *A = Aa + index;
+    W *y = ya + index;
+
+    W sum = 0.0;
+    for (int i = 0; i < k; ++i) {
+        sum += x[i] * A[i * n];
+    }
+    y[0] = sum;
+}
+
+template <typename V, typename W>
+void rocblas_bmm_template_xAy(hipStream_t p_stream, const V *x, const V *A, W *y, int m, int n, int k)
+{
+    if (m != 1) {
+        // found gemm, unsupported
+        return;
+    }
+    static constexpr int NB = 256;
+    dim3 gemvt_grid(n / NB);
+    dim3 gemvt_threads(NB);
+
+    hipLaunchKernelGGL((bmm_kernel_xAy<NB>), gemvt_grid, gemvt_threads, 0, p_stream, m, n, k,
+                       x,  // k
+                       A,  // kxn
+                       y);
+}
+
 #endif  // __CUSTOM_OPS__

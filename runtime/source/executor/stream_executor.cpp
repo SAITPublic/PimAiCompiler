@@ -71,6 +71,26 @@ StreamExecutor::StreamExecutor(const std::shared_ptr<nncir::NNIR> ir_graph)
     miopenCreateTensorDescriptor(&output_tensor);
     miopenCreateRNNDescriptor(&rnnDesc);
 
+    char* env = std::getenv("ENABLE_GNMT_OPT");
+    if (*env == '1') {
+        auto options = at::TensorOptions().dtype(at::kHalf).device(at::kCUDA);
+        // memory cat_s
+        int cat_s0 = 3460;
+        int cat_s1 = 3940;
+        int cat_s2 = 4430;
+        auto cat_mem_s0 = at::zeros({1, 1, 2048}, options);
+        auto cat_mem_s1 = at::zeros({1, 1, 2048}, options);
+        auto cat_mem_s2 = at::zeros({1, 1, 2048}, options);
+        this->global_blobs_.insert({cat_s0, {DataType::TENSOR, tensorToIValue(cat_mem_s0)}});
+        this->global_blobs_.insert({cat_s1, {DataType::TENSOR, tensorToIValue(cat_mem_s1)}});
+        this->global_blobs_.insert({cat_s2, {DataType::TENSOR, tensorToIValue(cat_mem_s2)}});
+
+        // memory cat_f
+        int cat_f = 22222;
+        auto cat_mem = at::empty({8, 1, 1024}, options);
+        this->global_blobs_.insert({cat_f, {DataType::TENSOR, tensorToIValue(cat_mem)}});
+    }
+
     this->ir_graph_ = ir_graph;
     this->registerOp();
     // Get the output & input node from ir_graph at once
