@@ -62,8 +62,10 @@ void StreamExecutor::loadWeightAndBias(nncir::Blob* blob)
     }
 }
 
-StreamExecutor::StreamExecutor(const std::shared_ptr<nncir::NNIR> ir_graph)
+StreamExecutor::StreamExecutor(const std::shared_ptr<nncir::NNIR> ir_graph, std::string model_type)
 {
+    modelType = model_type;
+
     miopenCreate(&handle);
     miopenCreateTensorDescriptor(&input_tensor);
     miopenCreateTensorDescriptor(&hidden_tensor);
@@ -71,8 +73,7 @@ StreamExecutor::StreamExecutor(const std::shared_ptr<nncir::NNIR> ir_graph)
     miopenCreateTensorDescriptor(&output_tensor);
     miopenCreateRNNDescriptor(&rnnDesc);
 
-    char* env = std::getenv("ENABLE_GNMT_OPT");
-    if (*env == '1') {
+    if (modelType == "GNMT") {
         auto options = at::TensorOptions().dtype(at::kHalf).device(at::kCUDA);
         // memory cat_s
         int cat_s0 = 3460;

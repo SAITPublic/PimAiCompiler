@@ -73,8 +73,7 @@ void executePrimConstant(const nncir::Node& op_node, StreamExecutor& stream_exec
         std::vector<int64_t> input_shape = getDataShapeFromShape4D(shape_);
         std::vector<int64_t> stride = getDataShapeFromShape4D(stride_);
 
-        char* env = std::getenv("ENABLE_GNMT_OPT");
-        if (*env == '1' && cast<nncir::DataEdge>(constant_node.getOutEdge(0)).getBlobId() == 3) {
+        if (stream_executor.modelType == "GNMT" && cast<nncir::DataEdge>(constant_node.getOutEdge(0)).getBlobId() == 3) {
             std::vector<int64_t> reorder_shape(input_shape);
 
             int align_m = 32;

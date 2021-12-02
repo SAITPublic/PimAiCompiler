@@ -82,8 +82,7 @@ void executorAtenAdd(const nncir::Node& op_node, StreamExecutor& stream_executor
             _Float16* C = A;
 
             at::Tensor tmp;
-            char* env = std::getenv("ENABLE_GNMT_OPT");
-            if (*env == '1' && out_edge.getBlobId() == 442) {
+            if (stream_executor.modelType == "GNMT" && out_edge.getBlobId() == 442) {
                 int cat_s0 = 4430;
                 auto it = stream_executor.global_blobs_.find(cat_s0);
                 auto options = at::TensorOptions().dtype(at::kHalf).device(at::kCUDA);
@@ -105,7 +104,7 @@ void executorAtenAdd(const nncir::Node& op_node, StreamExecutor& stream_executor
             custom_add(nullptr, A, B, C, m, n, alpha, sym, a_m_s, a_n_s, b_m_s, b_n_s);
 
             // update output
-            if (*env == '1' && out_edge.getBlobId() == 442) {
+            if (stream_executor.modelType == "GNMT" && out_edge.getBlobId() == 442) {
                 stream_executor.updateBlob(out_edge.getBlobId(), DataType::TENSOR, tensorToIValue(tmp));
             } else {
                 stream_executor.updateBlob(out_edge.getBlobId(), DataType::TENSOR, tensorToIValue(self_tensor));
@@ -681,8 +680,7 @@ void executorAtenBmm(const nncir::Node& op_node, StreamExecutor& stream_executor
     {
         auto& out_edge = cast<nncir::DataEdge>(bmm_node.getFirstOutEdge());
         at::Tensor tmp0, tmp1, tmp2;
-        char* env = std::getenv("ENABLE_GNMT_OPT");
-        if (*env == '1' && out_edge.getBlobId() == 342) {
+        if (stream_executor.modelType == "GNMT" && out_edge.getBlobId() == 342) {
             int cat_s = 3460;
             auto it = stream_executor.global_blobs_.find(cat_s);
             auto options = at::TensorOptions().dtype(at::kHalf).device(at::kCUDA);
@@ -721,18 +719,18 @@ void executorAtenBmm(const nncir::Node& op_node, StreamExecutor& stream_executor
         auto output = at::zeros(output_shape, options);
         _Float16* y = (_Float16*)output.data_ptr();
 
-        if (*env == '1' && out_edge.getBlobId() == 342) {
+        if (stream_executor.modelType == "GNMT" && out_edge.getBlobId() == 342) {
             y = (_Float16*)tmp0.data_ptr();
         }
 
         rocblas_bmm_template_xAy(nullptr, x, A, y, m, n, k);
-        if (*env == '1' && out_edge.getBlobId() == 342) {
+        if (stream_executor.modelType == "GNMT" && out_edge.getBlobId() == 342) {
             nnrt::atenCopy_(tmp1, tmp0, c10::attr::non_blocking);
             nnrt::atenCopy_(tmp2, tmp0, c10::attr::non_blocking);
         }
 
         // update output
-        if (*env == '1' && out_edge.getBlobId() == 342) {
+        if (stream_executor.modelType == "GNMT" && out_edge.getBlobId() == 342) {
             stream_executor.updateBlob(out_edge.getBlobId(), DataType::TENSOR, tensorToIValue(tmp0));
         } else {
             stream_executor.updateBlob(out_edge.getBlobId(), DataType::TENSOR, tensorToIValue(output));
@@ -776,8 +774,7 @@ void executorAtenCat(const nncir::Node& op_node, StreamExecutor& stream_executor
     auto& input_list_edge = cast<nncir::DataEdge>(cat_node.getInEdge(0));
     auto input_blob_id = input_list_edge.getBlobId();
 
-    char* env = std::getenv("ENABLE_GNMT_OPT");
-    if (*env == '1' && stream_executor.cursor_ == 600) {
+    if (stream_executor.modelType == "GNMT" && stream_executor.cursor_ == 600) {
         int cat_id = 22222;
         auto it = stream_executor.global_blobs_.find(cat_id);
         auto& out_edge = cast<nncir::DataEdge>(cat_node.getFirstOutEdge());
@@ -788,7 +785,7 @@ void executorAtenCat(const nncir::Node& op_node, StreamExecutor& stream_executor
 
     int cat_id = input_blob_id * 10;
     auto it = stream_executor.global_blobs_.find(cat_id);
-    if (*env == '1' && it != stream_executor.global_blobs_.end()) {
+    if (stream_executor.modelType == "GNMT" && it != stream_executor.global_blobs_.end()) {
         auto& out_edge = cast<nncir::DataEdge>(cat_node.getFirstOutEdge());
         auto output = it->second.second;
         stream_executor.updateBlob(out_edge.getBlobId(), DataType::TENSOR, output);
@@ -1897,8 +1894,7 @@ void executorAtenLen(const nncir::Node& op_node, StreamExecutor& stream_executor
     if (iv.isList()) {
         output = nnrt::atenLen(iv.toList());
 
-        char* env = std::getenv("ENABLE_GNMT_OPT");
-        if (*env == '1' && stream_executor.cursor_ == 587 && iv.toList().size() == 4) {
+        if (stream_executor.modelType == "GNMT" && stream_executor.cursor_ == 587 && iv.toList().size() == 4) {
             int next_node_id = 599;
             stream_executor.setCursor(next_node_id);
         }
@@ -2362,8 +2358,7 @@ void executorAtenLSTM1(const nncir::Node& op_node, StreamExecutor& stream_execut
 
         auto it0 = stream_executor.global_blobs_.find(out_blob_ids[0]);
 
-        char* env = std::getenv("ENABLE_GNMT_OPT");
-        if (*env == '1' && it0 != stream_executor.global_blobs_.end() && seq_len == 1) {
+        if (stream_executor.modelType == "GNMT" && it0 != stream_executor.global_blobs_.end() && seq_len == 1) {
             out_dev = it0->second.second.toTensor().data_ptr();
             hy_dev = stream_executor.global_blobs_.find(out_blob_ids[1])->second.second.toTensor().data_ptr();
             cy_dev = stream_executor.global_blobs_.find(out_blob_ids[2])->second.second.toTensor().data_ptr();
@@ -2385,7 +2380,7 @@ void executorAtenLSTM1(const nncir::Node& op_node, StreamExecutor& stream_execut
                 hy_dev = hy.data_ptr();
                 cy_dev = cy.data_ptr();
 
-                if (*env == '1' && (out_blob_ids[1] == 298 || out_blob_ids[1] == 386 || out_blob_ids[1] == 434 || out_blob_ids[1] == 483)) {
+                if (stream_executor.modelType == "GNMT" && (out_blob_ids[1] == 298 || out_blob_ids[1] == 386 || out_blob_ids[1] == 434 || out_blob_ids[1] == 483)) {
                     int cat_f = 22222;
                     auto cat = stream_executor.global_blobs_.find(cat_f);
                     auto cat_mem = cat->second.second.toTensor();
@@ -2416,7 +2411,7 @@ void executorAtenLSTM1(const nncir::Node& op_node, StreamExecutor& stream_execut
                     }
                 }
 
-                if (*env == '1' && out_blob_ids[0] == 297) {
+                if (stream_executor.modelType == "GNMT" && out_blob_ids[0] == 297) {
                     int cat_s1 = 3460;
                     auto it = stream_executor.global_blobs_.find(cat_s1);
                     auto options = at::TensorOptions().dtype(at::kHalf).device(at::kCUDA);
@@ -2424,7 +2419,7 @@ void executorAtenLSTM1(const nncir::Node& op_node, StreamExecutor& stream_execut
                     output  = torch::from_blob((_Float16*)(cat_mem.data_ptr()), {1, 1, 1024}, options);
                 }
 
-                if (*env == '1' && out_blob_ids[0] == 385) {
+                if (stream_executor.modelType == "GNMT" && out_blob_ids[0] == 385) {
                     int cat_s2 = 3940;
                     auto it = stream_executor.global_blobs_.find(cat_s2);
                     auto options = at::TensorOptions().dtype(at::kHalf).device(at::kCUDA);
@@ -2772,8 +2767,7 @@ void executorAtenLSTM2(const nncir::Node& op_node, StreamExecutor& stream_execut
         workspace_dev = workspace.data_ptr();
         auto it0 = stream_executor.global_blobs_.find(out_blob_ids[0]);
 
-        char* env = std::getenv("ENABLE_GNMT_OPT");
-        if (*env == '1' && it0 != stream_executor.global_blobs_.end() && seq_len == 1) {
+        if (stream_executor.modelType == "GNMT" && it0 != stream_executor.global_blobs_.end() && seq_len == 1) {
             out_dev = it0->second.second.toTensor().data_ptr();
             hy_dev = stream_executor.global_blobs_.find(out_blob_ids[1])->second.second.toTensor().data_ptr();
             cy_dev = stream_executor.global_blobs_.find(out_blob_ids[2])->second.second.toTensor().data_ptr();

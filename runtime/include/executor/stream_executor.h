@@ -26,7 +26,7 @@ using OpExecutorFn = std::function<void(const nncir::Node&, StreamExecutor& stre
 class StreamExecutor
 {
    public:
-    StreamExecutor(const std::shared_ptr<nncir::NNIR> ir_graph);
+    StreamExecutor(const std::shared_ptr<nncir::NNIR> ir_graph, std::string model_type = "");
     ~StreamExecutor();
 
     void loadWeightAndBias(nncir::Blob* blob);
@@ -99,6 +99,8 @@ class StreamExecutor
     std::vector<miopenTensorDescriptor_t> output_tensors;
     miopenHandle_t handle;
     miopenRNNDescriptor_t rnnDesc;
+
+    std::string modelType;
 };
 
 }  // namespace nnrt

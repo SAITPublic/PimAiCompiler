@@ -19,7 +19,7 @@ NNRuntime::NNRuntime(const std::string torch_model_path, int compile_level, std:
 
     this->mbuilder_ = std::make_shared<ModelBuilder>(builder);
 
-    this->executor_ = std::make_shared<StreamExecutor>(this->mbuilder_->get_runnable_ir());
+    this->executor_ = std::make_shared<StreamExecutor>(this->mbuilder_->get_runnable_ir(), model_type);
 
     rocblas_init();
     PimInitialize(RT_TYPE_HIP, PIM_FP16);
