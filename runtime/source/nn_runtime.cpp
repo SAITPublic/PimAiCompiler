@@ -37,12 +37,11 @@ std::vector<torch::Tensor> NNRuntime::inferenceModel(const std::vector<torch::Te
     if (profiling) {
         // profiling result of the first running time is not accurate.
         for (int i = 0; i < 10; i ++) {
-            status = executor_->inferenceModel(this->mbuilder_->get_runnable_ir(), input_tensors, output_tensors);
+            status = executor_->inferenceModel(input_tensors, output_tensors);
         }
-        status = executor_->inferenceModelwithProfiling(this->mbuilder_->get_runnable_ir(),
-                                                        input_tensors, output_tensors);
+        status = executor_->inferenceModelwithProfiling(input_tensors, output_tensors);
     } else {
-        status = executor_->inferenceModel(this->mbuilder_->get_runnable_ir(), input_tensors, output_tensors);
+        status = executor_->inferenceModel(input_tensors, output_tensors);
     }
 
     if (status != RetVal::SUCCESS) {

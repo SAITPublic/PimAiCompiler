@@ -168,8 +168,7 @@ StreamExecutor::~StreamExecutor() {
     miopenDestroy(handle);
 }
 
-RetVal StreamExecutor::inferenceModel(const std::shared_ptr<nncir::NNIR> graph,
-                                      const std::vector<torch::Tensor>& input_tensors,
+RetVal StreamExecutor::inferenceModel(const std::vector<torch::Tensor>& input_tensors,
                                       std::vector<torch::Tensor>& output_tensors)
 {
     // Set Input Tensors
@@ -181,7 +180,7 @@ RetVal StreamExecutor::inferenceModel(const std::shared_ptr<nncir::NNIR> graph,
     // cursor skiped the InputNode and OutputNode
     // [cursor_begin, cursor_end)
     int cursor_begin = input_tensors.size();
-    int cursor_end = graph->getNodeCount() - this->output_blob_ids_.size();
+    int cursor_end = ir_graph_->getNodeCount() - this->output_blob_ids_.size();
 
     // control_op will move cursor by itself
     auto is_control_op = [](nncir::NodeType type) {
@@ -192,7 +191,7 @@ RetVal StreamExecutor::inferenceModel(const std::shared_ptr<nncir::NNIR> graph,
 
     // Execute Graph
     for (cursor_ = cursor_begin; cursor_ < cursor_end;) {
-        nncir::Node* node = graph->getNode(cursor_);
+        nncir::Node* node = ir_graph_->getNode(cursor_);
         DLOG(INFO) << "Node id:" << node->getId() << " name:" << node->getName() << " type:" << node->getNodeType();
         auto node_type = node->getNodeType();
 
@@ -219,8 +218,7 @@ RetVal StreamExecutor::inferenceModel(const std::shared_ptr<nncir::NNIR> graph,
     return RetVal::SUCCESS;
 }
 
-RetVal StreamExecutor::inferenceModelwithProfiling(const std::shared_ptr<nncir::NNIR> graph,
-                                                   const std::vector<torch::Tensor>& input_tensors,
+RetVal StreamExecutor::inferenceModelwithProfiling(const std::vector<torch::Tensor>& input_tensors,
                                                    std::vector<torch::Tensor>& output_tensors) {
     ProfileWriter::beginSession("start");
 
@@ -231,7 +229,7 @@ RetVal StreamExecutor::inferenceModelwithProfiling(const std::shared_ptr<nncir::
     this->setInputTensors(input_tensors);
 
     int cursor_begin = input_tensors.size();
-    int cursor_end = graph->getNodeCount() - this->output_blob_ids_.size();
+    int cursor_end = ir_graph_->getNodeCount() - this->output_blob_ids_.size();
 
     auto is_control_op = [](nncir::NodeType type) {
         return (type == nncir::NodeType::PRIMIF || type == nncir::NodeType::PRIMENDIF ||
@@ -241,7 +239,7 @@ RetVal StreamExecutor::inferenceModelwithProfiling(const std::shared_ptr<nncir::
 
     // Execute Graph
     for (cursor_ = cursor_begin; cursor_ < cursor_end;) {
-        nncir::Node* node = graph->getNode(cursor_);
+        nncir::Node* node = ir_graph_->getNode(cursor_);
 
         auto node_type = node->getNodeType();
         auto node_name = node->getName();

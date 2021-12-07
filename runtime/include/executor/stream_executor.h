@@ -31,12 +31,10 @@ class StreamExecutor
 
     void loadWeightAndBias(nncir::Blob* blob);
 
-    RetVal inferenceModel(const std::shared_ptr<nncir::NNIR> runnable_ir,
-                          const std::vector<torch::Tensor>& input_tensors,
+    RetVal inferenceModel(const std::vector<torch::Tensor>& input_tensors,
                           std::vector<torch::Tensor>& output_tensors);
 
-    RetVal inferenceModelwithProfiling(const std::shared_ptr<nncir::NNIR> runnable_ir,
-                                       const std::vector<torch::Tensor>& input_tensors,
+    RetVal inferenceModelwithProfiling(const std::vector<torch::Tensor>& input_tensors,
                                        std::vector<torch::Tensor>& output_tensors);
 
     void updateBlob(int64_t blob_id, DataType dtype, const torch::jit::IValue& iv);
