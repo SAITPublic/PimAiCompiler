@@ -1,6 +1,9 @@
 #pragma once
 
+#include <torch/script.h>
+
 #include "ir/include/nn_ir.hpp"
+#include "nnrt_types.h"
 
 namespace nncir = nn_compiler::nn_ir;
 
@@ -9,6 +12,8 @@ namespace nnrt
 class ModelBuilder
 {
    public:
+    typedef std::unordered_map<int64_t, std::pair<nnrt::DataType, torch::jit::IValue>> blob_store_type;
+
     ModelBuilder(std::string model_path)
     {
         this->model_path_ = model_path;
@@ -20,11 +25,12 @@ class ModelBuilder
 
     RetVal preloadModel();
 
-    std::shared_ptr<nncir::NNIR> get_runnable_ir() { return this->runnable_ir_; }
+    std::pair<std::shared_ptr<nncir::NNIR>, blob_store_type> getModel();
 
    private:
-    // Runnable NNIR
     std::shared_ptr<nncir::NNIR> runnable_ir_;
+
+    blob_store_type preloaded_blobs_container_;
 
     std::string model_path_;
 };

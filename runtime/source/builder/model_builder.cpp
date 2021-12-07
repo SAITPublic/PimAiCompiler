@@ -20,4 +20,8 @@ RetVal ModelBuilder::compileModel(const int compile_level, const std::string mod
 
 RetVal ModelBuilder::preloadModel() { return RetVal::SUCCESS; }
 
+std::pair<std::shared_ptr<nncir::NNIR>, ModelBuilder::blob_store_type> ModelBuilder::getModel() {
+    return std::make_pair(this->runnable_ir_, this->preloaded_blobs_container_);
+}
+
 }  // namespace nnrt
