@@ -26,10 +26,11 @@ using OpExecutorFn = std::function<void(const nncir::Node&, StreamExecutor& stre
 class StreamExecutor
 {
    public:
-    StreamExecutor(const std::shared_ptr<nncir::NNIR> ir_graph, std::string model_type = "");
-    ~StreamExecutor();
+    typedef std::unordered_map<int64_t, std::pair<nnrt::DataType, torch::jit::IValue>> blob_store_type;
 
-    void loadWeightAndBias(nncir::Blob* blob);
+    StreamExecutor(std::pair<std::shared_ptr<nncir::NNIR>, blob_store_type> model, std::string model_type);
+
+    ~StreamExecutor();
 
     RetVal inferenceModel(const std::vector<torch::Tensor>& input_tensors,
                           std::vector<torch::Tensor>& output_tensors);
@@ -80,14 +81,17 @@ class StreamExecutor
     }
 
    public:
+    std::shared_ptr<nncir::NNIR> ir_graph_;
+
     // Global input & output vars
-    std::unordered_map<int64_t, std::pair<DataType, torch::jit::IValue>> global_blobs_;
+    blob_store_type global_blobs_;
     // Op Register
     std::unordered_map<nncir::NodeType, OpExecutorFn> global_op_register_;
     std::vector<int64_t> input_blob_ids_;
     std::vector<int64_t> output_blob_ids_;
-    std::shared_ptr<nncir::NNIR> ir_graph_;
+
     int64_t cursor_ = 0;  // like the program counter
+
     std::stack<int64_t> loop_condition_stack_;
     std::unordered_map<int, std::pair<int, int>> releation_blob_ids_map_;
 

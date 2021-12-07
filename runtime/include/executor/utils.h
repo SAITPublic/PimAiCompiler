@@ -2,8 +2,6 @@
 
 #include <torch/script.h>
 #include "ir/include/nn_ir.hpp"
-
-#include "ir/include/nn_ir.hpp"
 #include "nnrt_types.h"
 
 namespace nncir = nn_compiler::nn_ir;

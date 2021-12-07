@@ -2,6 +2,10 @@
 
 #include <torch/script.h>
 
+#include "common/include/cast.hpp"
+#include "ir/include/all_nodes.hpp"
+#include "ir/include/data_blob.hpp"
+#include "ir/include/ir_types.hpp"
 #include "ir/include/nn_ir.hpp"
 #include "nnrt_types.h"
 
@@ -24,6 +28,8 @@ class ModelBuilder
     RetVal compileModel(int compile_level, const std::string model_type);
 
     RetVal preloadModel();
+
+    void loadWeightAndBias(nncir::Blob* blob);
 
     std::pair<std::shared_ptr<nncir::NNIR>, blob_store_type> getModel();
 
