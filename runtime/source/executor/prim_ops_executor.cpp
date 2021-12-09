@@ -77,7 +77,7 @@ void executePrimConstant(const nncir::Node& op_node, StreamExecutor& stream_exec
             std::vector<int64_t> reorder_shape(input_shape);
 
             int align_m = 32;
-            int align_k = 64;
+            int align_k = 16;
 
             int m_align = (input_shape[0] + align_m - 1) / align_m * align_m;
             int k_align = (input_shape[1] + align_k - 1) / align_k * align_k;
