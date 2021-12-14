@@ -774,7 +774,7 @@ void executorAtenCat(const nncir::Node& op_node, StreamExecutor& stream_executor
     auto& input_list_edge = cast<nncir::DataEdge>(cat_node.getInEdge(0));
     auto input_blob_id = input_list_edge.getBlobId();
 
-    if (stream_executor.modelType == "GNMT" && stream_executor.cursor_ == 600) {
+    if (stream_executor.modelType == "GNMT" && stream_executor.cursor_ == 595) {
         int cat_id = 22222;
         auto it = stream_executor.global_blobs_.find(cat_id);
         auto& out_edge = cast<nncir::DataEdge>(cat_node.getFirstOutEdge());
@@ -1894,8 +1894,8 @@ void executorAtenLen(const nncir::Node& op_node, StreamExecutor& stream_executor
     if (iv.isList()) {
         output = nnrt::atenLen(iv.toList());
 
-        if (stream_executor.modelType == "GNMT" && stream_executor.cursor_ == 587 && iv.toList().size() == 4) {
-            int next_node_id = 599;
+        if (stream_executor.modelType == "GNMT" && stream_executor.cursor_ == 582 && iv.toList().size() == 4) {
+            int next_node_id = 594;
             stream_executor.setCursor(next_node_id);
         }
     } else if (iv.isTensor()) {
@@ -2380,30 +2380,27 @@ void executorAtenLSTM1(const nncir::Node& op_node, StreamExecutor& stream_execut
                 hy_dev = hy.data_ptr();
                 cy_dev = cy.data_ptr();
 
-                if (stream_executor.modelType == "GNMT" && (out_blob_ids[1] == 298 || out_blob_ids[1] == 386 || out_blob_ids[1] == 434 || out_blob_ids[1] == 483)) {
+                if (stream_executor.modelType == "GNMT" && lstm1_node.getMatchCustomOpt()) {
                     int cat_f = 22222;
                     auto cat = stream_executor.global_blobs_.find(cat_f);
                     auto cat_mem = cat->second.second.toTensor();
 
-                    if (out_blob_ids[1] == 298 && out_blob_ids[2] == 299) {
+                    if (lstm1_node.getCustomOptNumber() == 0) {
                         hy = torch::from_blob((_Float16*)(cat_mem.data_ptr()), {1, 1, 1024}, options);
                         cy = torch::from_blob((_Float16*)(cat_mem.data_ptr()) + 1024, {1, 1, 1024}, options);
                         hy_dev = hy.data_ptr();
                         cy_dev = cy.data_ptr();
-                    }
-                    if (out_blob_ids[1] == 386 && out_blob_ids[2] == 387) {
+                    }else if (lstm1_node.getCustomOptNumber() == 1) {
                         hy = torch::from_blob((_Float16*)(cat_mem.data_ptr()) + 2048, {1, 1, 1024}, options);
                         cy = torch::from_blob((_Float16*)(cat_mem.data_ptr()) + 3072, {1, 1, 1024}, options);
                         hy_dev = hy.data_ptr();
                         cy_dev = cy.data_ptr();
-                    }
-                    if (out_blob_ids[1] == 434 && out_blob_ids[2] == 435) {
+                    }else if (lstm1_node.getCustomOptNumber() == 2) {
                         hy = torch::from_blob((_Float16*)(cat_mem.data_ptr()) + 4096, {1, 1, 1024}, options);
                         cy = torch::from_blob((_Float16*)(cat_mem.data_ptr()) + 5120, {1, 1, 1024}, options);
                         hy_dev = hy.data_ptr();
                         cy_dev = cy.data_ptr();
-                    }
-                    if (out_blob_ids[1] == 483 && out_blob_ids[2] == 484) {
+                    }else if (lstm1_node.getCustomOptNumber() == 3) {
                         hy = torch::from_blob((_Float16*)(cat_mem.data_ptr()) + 6144, {1, 1, 1024}, options);
                         cy = torch::from_blob((_Float16*)(cat_mem.data_ptr()) + 7168, {1, 1, 1024}, options);
                         hy_dev = hy.data_ptr();
