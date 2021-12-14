@@ -17,6 +17,14 @@
             "utils"        : []
         },
         {
+            "name"         : "CatLabelingPass",
+            "type"         : "graph",
+            "is_mandatory" : true,
+            "enable"       : true,
+            "ctx_data"     : [],
+            "utils"        : ["OpBasicUtil"]
+        },
+        {
             "name"         : "MemoryLabelingPass",
             "type"         : "memory",
             "is_mandatory" : true,

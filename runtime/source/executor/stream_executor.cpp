@@ -73,24 +73,7 @@ StreamExecutor::StreamExecutor(const std::shared_ptr<nncir::NNIR> ir_graph, std:
     miopenCreateTensorDescriptor(&output_tensor);
     miopenCreateRNNDescriptor(&rnnDesc);
 
-    if (modelType == "GNMT") {
-        auto options = at::TensorOptions().dtype(at::kHalf).device(at::kCUDA);
-        // memory cat_s
-        int cat_s0 = 3460;
-        int cat_s1 = 3940;
-        int cat_s2 = 4430;
-        auto cat_mem_s0 = at::zeros({1, 1, 2048}, options);
-        auto cat_mem_s1 = at::zeros({1, 1, 2048}, options);
-        auto cat_mem_s2 = at::zeros({1, 1, 2048}, options);
-        this->global_blobs_.insert({cat_s0, {DataType::TENSOR, tensorToIValue(cat_mem_s0)}});
-        this->global_blobs_.insert({cat_s1, {DataType::TENSOR, tensorToIValue(cat_mem_s1)}});
-        this->global_blobs_.insert({cat_s2, {DataType::TENSOR, tensorToIValue(cat_mem_s2)}});
 
-        // memory cat_f
-        int cat_f = 22222;
-        auto cat_mem = at::empty({8, 1, 1024}, options);
-        this->global_blobs_.insert({cat_f, {DataType::TENSOR, tensorToIValue(cat_mem)}});
-    }
 
     this->ir_graph_ = ir_graph;
     this->registerOp();
@@ -98,6 +81,22 @@ StreamExecutor::StreamExecutor(const std::shared_ptr<nncir::NNIR> ir_graph, std:
     this->input_blob_ids_.clear();
     this->output_blob_ids_.clear();
     for (auto& op_node : ir_graph_->getNodes()) {
+        if (modelType == "GNMT" && op_node.getNodeType() == nncir::NodeType::ATENCAT) {
+            auto cat_node = cast_if<nncir::AtenCatNode>(op_node);
+            auto options = at::TensorOptions().dtype(at::kHalf).device(at::kCUDA);
+            auto mem_blob_id = cat_node->getMemBlobId();
+            if (mem_blob_id != -1) {
+                // memory cat_s
+                auto cat_mem_s0 = at::zeros({1, 1, 2048}, options);
+                this->global_blobs_.insert({mem_blob_id, {DataType::TENSOR, tensorToIValue(cat_mem_s0)}});
+            } else {
+                // memory cat_f
+                int cat_f = 22222;
+                cat_node->setMemBlobId(cat_f);
+                auto cat_mem = at::empty({8, 1, 1024}, options);
+                this->global_blobs_.insert({cat_f, {DataType::TENSOR, tensorToIValue(cat_mem)}});
+            }
+        }
         if (op_node.getNodeType() == nncir::NodeType::PRIMINPUT) {
             auto& data_edge = cast<nncir::DataEdge>(op_node.getOutEdge(0));
             this->input_blob_ids_.push_back(data_edge.getBlobId());
