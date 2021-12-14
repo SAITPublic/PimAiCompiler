@@ -9,6 +9,14 @@
             "utils"        : ["OpBasicUtil"]
         },
         {
+            "name"         : "LstmLabelingPass",
+            "type"         : "graph",
+            "is_mandatory" : true,
+            "enable"       : true,
+            "ctx_data"     : [],
+            "utils"        : []
+        },
+        {
             "name"         : "MemoryLabelingPass",
             "type"         : "memory",
             "is_mandatory" : true,

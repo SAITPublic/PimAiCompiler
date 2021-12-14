@@ -2,6 +2,7 @@
 #define OPTIMIZATION_PASS(PASS_TYPE)
 #endif
 OPTIMIZATION_PASS(DeviceLabelingPass)
+OPTIMIZATION_PASS(LstmLabelingPass)
 OPTIMIZATION_PASS(MemoryLabelingPass)
 OPTIMIZATION_PASS(ControlNodeExecutionPass)
 
