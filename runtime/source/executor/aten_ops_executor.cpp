@@ -774,7 +774,7 @@ void executorAtenCat(const nncir::Node& op_node, StreamExecutor& stream_executor
     auto& input_list_edge = cast<nncir::DataEdge>(cat_node.getInEdge(0));
     auto input_blob_id = input_list_edge.getBlobId();
 
-    if (stream_executor.modelType == "GNMT" && stream_executor.cursor_ == 595) {
+    if (stream_executor.modelType == "GNMT" && op_node.getFirstInEdge().getInNode()->getNumInputs() == 0) {
         int cat_id = 22222;
         auto it = stream_executor.global_blobs_.find(cat_id);
         auto& out_edge = cast<nncir::DataEdge>(cat_node.getFirstOutEdge());
@@ -1893,9 +1893,10 @@ void executorAtenLen(const nncir::Node& op_node, StreamExecutor& stream_executor
     int64_t output = -1;
     if (iv.isList()) {
         output = nnrt::atenLen(iv.toList());
-
-        if (stream_executor.modelType == "GNMT" && stream_executor.cursor_ == 582 && iv.toList().size() == 4) {
-            int next_node_id = 594;
+        if (stream_executor.modelType == "GNMT" &&
+            op_node.getFirstInEdge().getInNode()->getNodeType() == nncir::NodeType::PRIMVARIABLE &&
+            iv.toList().size() == 4) {
+            int next_node_id = cast<nncir::PrimLoopNode>(op_node.getFirstOutEdge().getOutNode()).getGotoNode() - 1;
             stream_executor.setCursor(next_node_id);
         }
     } else if (iv.isTensor()) {
