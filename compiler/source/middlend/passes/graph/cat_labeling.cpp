@@ -1,15 +1,14 @@
 #include "common/include/common.hpp"
-#include "ir/include/ir_includes.hpp"
 #include "compiler/include/common/log.hpp"
+#include "ir/include/ir_includes.hpp"
 
 #include "compiler/include/middlend/passes/graph/cat_labeling.hpp"
 
+#include <algorithm>
 #include <set>
 #include <vector>
-#include <algorithm>
 
 namespace nn_compiler {
-
 /**
  * @brief.      initialize a CatLabelingPass
  * @param[in].  UtilManager& util_manager, TraitManager& trait_manager.
@@ -35,12 +34,13 @@ RetVal CatLabelingPass::run(nn_ir::NNIR& graph, CompilationContext& context) {
     for (auto&& node : graph.getNodes()) {
         if (node.getNodeType() == nn_ir::NodeType::ATENBMM) {
             op_basic_util_->getOffspring(target_cat_ids_bmm, graph, node, nn_ir::NodeType::ATENCAT, 3);
-        }else if (node.getNodeType() == nn_ir::NodeType::ATENLSTM1 && cast<nn_ir::AtenLSTM1Node>(node).getMatchCustomOpt()) {
+        } else if (node.getNodeType() == nn_ir::NodeType::ATENLSTM1 &&
+                   cast<nn_ir::AtenLSTM1Node>(node).getMatchCustomOpt()) {
             op_basic_util_->getOffspring(target_cat_ids_lstm, graph, node, nn_ir::NodeType::ATENCAT, 3);
         }
     }
     for (auto cat_bmm : target_cat_ids_bmm) {
-        if(std::find(target_cat_ids_lstm.begin(), target_cat_ids_lstm.end(), cat_bmm) != target_cat_ids_lstm.end()) {
+        if (std::find(target_cat_ids_lstm.begin(), target_cat_ids_lstm.end(), cat_bmm) != target_cat_ids_lstm.end()) {
             target_cat_ids.emplace_back(cat_bmm);
         }
     }
@@ -52,4 +52,4 @@ RetVal CatLabelingPass::run(nn_ir::NNIR& graph, CompilationContext& context) {
     return RetVal::SUCCESS;
 }
 
-} // namespace nn_compiler
+}  // namespace nn_compiler

@@ -16,7 +16,8 @@ class OpBasicUtil {
 
     std::string getPrimOpName(const nn_ir::Node& node) const;
 
-    void getOffspring(std::vector<int64_t>& res, nn_ir::NNIR& graph, nn_ir::Node& node, nn_ir::NodeType targetNodeType, int level) const;
+    void getOffspring(std::vector<int64_t>& res, nn_ir::NNIR& graph, nn_ir::Node& node, nn_ir::NodeType targetNodeType,
+                      int level) const;
 };
 
 } // namespace nn_compiler

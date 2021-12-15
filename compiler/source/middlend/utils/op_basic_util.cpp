@@ -152,14 +152,17 @@ std::string OpBasicUtil::getPrimOpName(const nn_ir::Node& node) const {
     return "";
 }
 
-void OpBasicUtil::getOffspring(std::vector<int64_t>& res, nn_ir::NNIR& graph, nn_ir::Node& node, nn_ir::NodeType targetNodeType, int level) const {
-    if(level == 0 || node.getNumOutputs() == 0) {
+void OpBasicUtil::getOffspring(std::vector<int64_t>& res, nn_ir::NNIR& graph, nn_ir::Node& node,
+                               nn_ir::NodeType targetNodeType, int level) const
+{
+    if (level == 0 || node.getNumOutputs() == 0) {
         return;
     }
     int next_level = level - 1;
     for (auto out_id : node.getOutEdgeIds()) {
         auto out_node = graph.getEdge(out_id)->getOutNode();
-        if (out_node && out_node->getNodeType() == targetNodeType && std::find(res.begin(), res.end(), out_node->getId()) == res.end()) {
+        if (out_node && out_node->getNodeType() == targetNodeType &&
+            std::find(res.begin(), res.end(), out_node->getId()) == res.end()) {
             res.emplace_back(out_node->getId());
         }
         getOffspring(res, graph, *out_node, targetNodeType, next_level);
