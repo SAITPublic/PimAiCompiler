@@ -9,16 +9,19 @@
 
 /***
  * @ detail:
- * LSTM pattern recognition for connection:
- *               |
- *          aten::lstm1
- *               |
- *     prim::tuple_construct
- *               |
- *         aten::append
- *               |
- * 
- * Find and set the matched aten::lstm1 for runtime optimization.
+ * Cat pattern recognition for connection:
+ *               |         |
+ *          aten::bmm  aten::lstm1
+ *               |         |
+ *          some node  some node
+ *               |         |
+*           aten::list_construct
+ *               \         /
+ *                \       /
+ *                aten::Cat
+ *                    |
+ * From aten::bmm and aten::lstm1, search common aten::cat within 3 levels deep.
+ * Find and set the matched aten::cat for runtime optimization.
  **/
 
 namespace nn_compiler {
