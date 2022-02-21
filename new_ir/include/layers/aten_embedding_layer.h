@@ -5,15 +5,15 @@
 namespace nn_compiler {
 namespace ir {
 
-class AtenEmbeddinNNLayer : public NNLayer {
+class AtenEmbeddingLayer : public NNLayer {
  public:
-    AtenEmbeddinNNLayer() {}
+    AtenEmbeddingLayer() {}
 
-    AtenEmbeddinNNLayer(std::string name, std::string type)
+    AtenEmbeddingLayer(std::string name, std::string type)
             : NNLayer(name, type) {
     }
 
-    explicit AtenEmbeddinNNLayer(const AtenEmbeddinNNLayer &aten_embedding_layer) :
+    explicit AtenEmbeddingLayer(const AtenEmbeddingLayer &aten_embedding_layer) :
         NNLayer(aten_embedding_layer) {
         this->_weights = aten_embedding_layer._weights;
         this->_weights_shape = aten_embedding_layer._weights_shape;
@@ -22,10 +22,10 @@ class AtenEmbeddinNNLayer : public NNLayer {
         this->_scale_grad_by_freq = aten_embedding_layer._scale_grad_by_freq;
     }
 
-    virtual ~AtenEmbeddinNNLayer() {}
+    virtual ~AtenEmbeddingLayer() {}
 
     virtual std::shared_ptr<NNLayer> clone() {
-        return std::shared_ptr<AtenEmbeddinNNLayer>(new AtenEmbeddinNNLayer(*this));
+        return std::shared_ptr<AtenEmbeddingLayer>(new AtenEmbeddingLayer(*this));
     }
 
     void setWeights(std::vector<float> weights) { _weights = weights; }
