@@ -3,6 +3,7 @@
 #include "common/include/command_line_parser.hpp"
 
 #include "compiler/include/frontend/frontend_driver.hpp"
+#include "compiler/include/frontend/optimizer/pass_manager.h"
 
 #include "ir/include/ir_importer.hpp"
 
@@ -17,7 +18,7 @@ RetVal FrontendDriver::initialize(const std::string& in_file_path, const std::st
     return RetVal::SUCCESS;
 }
 
-RetVal FrontendDriver::run(std::unique_ptr<nn_compiler::ir::NNModel> model) {
+RetVal FrontendDriver::run(std::unique_ptr<nn_compiler::ir::NNModel>& model) {
     Log::FE::I() << "NNCompiler FrontendDriver::run() is called";
 
     importer(model);
@@ -33,14 +34,15 @@ RetVal FrontendDriver::finalize() {
     return RetVal::SUCCESS;
 }
 
-RetVal FrontendDriver::importer(std::unique_ptr<nn_compiler::ir::NNModel> model) {
+RetVal FrontendDriver::importer(std::unique_ptr<nn_compiler::ir::NNModel>& model) {
     // TODO(SRCX): model importer
 
     return RetVal::SUCCESS;
 }
 
-RetVal FrontendDriver::optimizer(std::unique_ptr<nn_compiler::ir::NNModel> model) {
-    // TODO(SRCX): graph optimizer
+RetVal FrontendDriver::optimizer(std::unique_ptr<nn_compiler::ir::NNModel>& model) {
+    auto pass_manager = std::make_shared<PassManager>(model_name_);
+    pass_manager->runPasses(model);
 
     return RetVal::SUCCESS;
 }

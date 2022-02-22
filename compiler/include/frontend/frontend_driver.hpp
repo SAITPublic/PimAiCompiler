@@ -34,7 +34,7 @@ class FrontendDriver {
      * @details This function calls the pipeline of frontend
      * @returns return code
      */
-    RetVal run(std::unique_ptr<nn_compiler::ir::NNModel> model);
+    RetVal run(std::unique_ptr<nn_compiler::ir::NNModel>& model);
 
     /**
      * @brief   Destroy all data and terminate the program
@@ -56,14 +56,14 @@ class FrontendDriver {
      * @details This function reads in mode file and build model in NNModel
      * @returns return code
      */
-    RetVal importer(std::unique_ptr<nn_compiler::ir::NNModel> model);
+    RetVal importer(std::unique_ptr<nn_compiler::ir::NNModel>& model);
 
     /**
      * @brief   Apply Graph optimizations
      * @details This function runs graph optimization passes onto model graph
      * @returns return code
      */
-    RetVal optimizer(std::unique_ptr<nn_compiler::ir::NNModel> model);
+    RetVal optimizer(std::unique_ptr<nn_compiler::ir::NNModel>& model);
 }; // class FrontendDriver
 
 } // namespace frontend
