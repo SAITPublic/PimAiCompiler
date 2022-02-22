@@ -116,7 +116,10 @@ class NNCompiler {
     std::unique_ptr<middlend::MiddlendDriver> middlend_driver_ = nullptr;
     // TODO: Add members of backend drivers
 
+    // TODO(SRCX): remove NNIR graphs when refactor successfully
     std::vector<std::shared_ptr<nn_compiler::nn_ir::NNIR>> NNIR_graphs_;
+
+    std::unique_ptr<ir::NNModel> model_ = nullptr;
 
     std::string model_name_ = "";
 

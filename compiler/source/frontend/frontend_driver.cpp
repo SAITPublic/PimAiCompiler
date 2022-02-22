@@ -12,38 +12,18 @@ namespace frontend {
 RetVal FrontendDriver::initialize(const std::string& in_file_path, const std::string& model_name) {
     Log::FE::I() << "NNCompiler FrontendDriver::initialize() is called";
     in_file_path_ = in_file_path;
-
-    graphgen_core_ = std::make_shared<graphgen::GraphGenCore>(model_name);
+    model_name_   = model_name;
 
     return RetVal::SUCCESS;
 }
 
-RetVal FrontendDriver::run() {
+RetVal FrontendDriver::run(std::unique_ptr<nn_compiler::ir::NNModel> model) {
     Log::FE::I() << "NNCompiler FrontendDriver::run() is called";
 
-    try {
-      graphgen_core_->model_import(in_file_path_);
-    }
-    catch(const std::exception& e) {
-      Log::FE::E() << e.what();
-    }
+    importer(model);
 
-    graphgen_core_->intermediate_process();
+    optimizer(model);
 
-    graphgen_core_->model_export("");
-
-    return RetVal::SUCCESS;
-}
-
-RetVal FrontendDriver::wrapup(std::vector<std::shared_ptr<nn_compiler::nn_ir::NNIR>>& NNIR_graphs) {
-    Log::FE::I() << "NNCompiler FrontendDriver::wrapup() is called";
-
-    importFrontendIR();
-
-    NNIR_graphs.clear();
-    for (auto graph : graphs_) {
-        NNIR_graphs.push_back(graph);
-    }
     return RetVal::SUCCESS;
 }
 
@@ -53,10 +33,16 @@ RetVal FrontendDriver::finalize() {
     return RetVal::SUCCESS;
 }
 
-void FrontendDriver::importFrontendIR() {
-    IRImporter ir_importer;
-    std::string ir_file_path = "output/pim/frontend/frontend.ir"; // based on GraphGen setting
-    ir_importer.getNNIRFromFile(ir_file_path, graphs_);
+RetVal FrontendDriver::importer(std::unique_ptr<nn_compiler::ir::NNModel> model) {
+    // TODO(SRCX): model importer
+
+    return RetVal::SUCCESS;
+}
+
+RetVal FrontendDriver::optimizer(std::unique_ptr<nn_compiler::ir::NNModel> model) {
+    // TODO(SRCX): graph optimizer
+
+    return RetVal::SUCCESS;
 }
 
 } // namespace frontend

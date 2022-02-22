@@ -1,9 +1,12 @@
 #pragma once
 
+#include <memory>
+#include <string>
+#include <vector>
+
 #include "compiler/include/common/log.hpp"
 #include "ir/include/nn_ir.hpp"
-
-#include "graphgen_core.h"
+#include "new_ir/include/nn_model.h"
 
 namespace nn_compiler {
 namespace frontend {
@@ -31,15 +34,7 @@ class FrontendDriver {
      * @details This function calls the pipeline of frontend
      * @returns return code
      */
-    RetVal run();
-
-    /**
-     * @brief    Do post-compile actions
-     * @details  This function reads in the result IR geneated by frontend
-     * @inputs   A vector of NNIR graphs
-     * @returns  return code
-     */
-    RetVal wrapup(std::vector<std::shared_ptr<nn_compiler::nn_ir::NNIR>>& NNIR_graphs);
+    RetVal run(std::unique_ptr<nn_compiler::ir::NNModel> model);
 
     /**
      * @brief   Destroy all data and terminate the program
@@ -51,14 +46,24 @@ class FrontendDriver {
  private:
     std::string in_file_path_ = "";
 
-    std::string graphgen_path_ = "";
+    std::string model_name_ = "";
 
+    // TODO(SRCX): remove NNIR graphs when refactor successfully
     std::vector<std::shared_ptr<nn_compiler::nn_ir::NNIR>> graphs_;
 
-    std::shared_ptr<graphgen::GraphGenCore> graphgen_core_ = nullptr;
+    /**
+     * @brief   Import model
+     * @details This function reads in mode file and build model in NNModel
+     * @returns return code
+     */
+    RetVal importer(std::unique_ptr<nn_compiler::ir::NNModel> model);
 
-    void importFrontendIR();
-
+    /**
+     * @brief   Apply Graph optimizations
+     * @details This function runs graph optimization passes onto model graph
+     * @returns return code
+     */
+    RetVal optimizer(std::unique_ptr<nn_compiler::ir::NNModel> model);
 }; // class FrontendDriver
 
 } // namespace frontend
