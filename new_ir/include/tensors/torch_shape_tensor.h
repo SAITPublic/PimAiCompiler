@@ -74,6 +74,12 @@ class TSSTensor {
         return dim_size_;
     }
 
+    void setFeaturemapType(DataType data_type) {
+        featuremap_type_ = data_type;
+    }
+    DataType getFeaturemapType() const {
+        return featuremap_type_;
+    }
     void setReprType(std::string type_str) {
         repr_type_ = type_str;
     }
@@ -95,6 +101,8 @@ class TSSTensor {
     std::vector<int32_t> dims_;
     int32_t dim_size_ = 0;
     uint32_t parent_layer_id_ = 0;
+
+    DataType featuremap_type_ = DataType::UNDEFINED;
 };
 
 } // namespace ir

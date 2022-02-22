@@ -1,5 +1,6 @@
 #include "compiler/include/common/log.hpp"
 #include "compiler/include/frontend/optimizer/pass_manager.h"
+#include "compiler/source/frontend/optimizer/take_in_body_net.h"
 
 namespace nn_compiler {
 namespace frontend {
@@ -13,8 +14,10 @@ void PassManager::runPasses(std::unique_ptr<nn_compiler::ir::NNModel>& model) {
     auto base_pass = std::make_shared<Pass>();
 
     // 1. TODO(SRCX): declare optimization passes, like: auto fuse_act = std::make_shared<FuseActivation>();
+    auto take_in_body_net                = std::make_shared<TakeInBodyNet>();
 
     // 2. TODO(SRCX): add optimization passes, like: base_pass->add(fuse_act);
+    base_pass->add(take_in_body_net);
 
     while (base_pass->getSuccessor() != nullptr) {
         base_pass = base_pass->getSuccessor();
