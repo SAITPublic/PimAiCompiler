@@ -74,6 +74,13 @@ class TSSTensor {
         return dim_size_;
     }
 
+    void setReprType(std::string type_str) {
+        repr_type_ = type_str;
+    }
+    std::string getReprType() {
+        return repr_type_;
+    }
+
  private:
     static uint32_t getNextId() {
         static std::atomic<uint32_t> id{0};
@@ -84,6 +91,7 @@ class TSSTensor {
     void setID(uint32_t id) {
         id_ = id;
     }
+    std::string repr_type_;
     std::vector<int32_t> dims_;
     int32_t dim_size_ = 0;
     uint32_t parent_layer_id_ = 0;

@@ -13,4 +13,4 @@
 #include "common/include/common.hpp"
 #include "common/include/log.hpp"
 
-DEFINE_LOGGER(IR, "[IR]")
+DEFINE_LOGGER(NIR, "[IR]")

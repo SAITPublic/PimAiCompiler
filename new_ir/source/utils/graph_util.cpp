@@ -35,7 +35,7 @@ int32_t inferBitwidth(DataType graphgen_type) {
             bitwidth = 16;
             break;
         default:
-            Log::IR::E() << "Does not support data type";
+            Log::NIR::E() << "Does not support data type";
             break;
     }
     return bitwidth;

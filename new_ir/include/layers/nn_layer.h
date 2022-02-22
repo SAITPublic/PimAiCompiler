@@ -20,7 +20,7 @@
 #include <vector>
 
 #include "glog/logging.h"
-#include "new_ir/include/common/log.hpp"
+#include "ir/include/common/log.hpp"
 #include "new_ir/include/types.h"
 
 #include "new_ir/include/tensors/shape_tensor.h"
