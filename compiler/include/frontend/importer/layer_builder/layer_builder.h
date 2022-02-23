@@ -976,6 +976,123 @@ class PrimListConstructBuilder : public LayerBuilder
     std::shared_ptr<ir::PrimListConstructLayer> prim_list_construct_layer_;
 };
 
+class PrimListUnpackBuilder : public LayerBuilder
+{
+   public:
+    std::shared_ptr<ir::NNLayer> buildLayer(const torch::jit::Node* node_ref);
+
+   private:
+    std::shared_ptr<ir::PrimListUnpackLayer> prim_list_unpack_layer_;
+};
+
+class PrimLoopBuilder : public LayerBuilder
+{
+   public:
+    std::shared_ptr<ir::NNLayer> buildLayer(const torch::jit::Node* node_ref);
+
+   private:
+    std::shared_ptr<ir::PrimLoopLayer> prim_loop_layer_;
+};
+
+class PrimLoopIndexBuilder : public LayerBuilder
+{
+   public:
+    std::shared_ptr<ir::NNLayer> buildLayer(const torch::jit::Node* node_ref);
+
+   private:
+    std::shared_ptr<ir::PrimLoopIndexLayer> prim_loop_index_layer_;
+};
+
+class PrimOutputBuilder : public LayerBuilder
+{
+   public:
+    std::shared_ptr<ir::NNLayer> buildLayer(const torch::jit::Node* node_ref);
+
+   private:
+    std::shared_ptr<ir::PrimOutputLayer> prim_output_layer_;
+};
+
+class PrimRaiseExceptionBuilder : public LayerBuilder
+{
+   public:
+    std::shared_ptr<ir::NNLayer> buildLayer(const torch::jit::Node* node_ref);
+
+   private:
+    std::shared_ptr<ir::PrimRaiseExceptionLayer> prim_raise_exception_layer_;
+};
+
+class PrimSetAttrBuilder : public LayerBuilder
+{
+   public:
+    std::shared_ptr<ir::NNLayer> buildLayer(const torch::jit::Node* node_ref);
+
+   private:
+    std::shared_ptr<ir::PrimSetAttrLayer> prim_set_attr_layer_;
+};
+
+class PrimTupleConstructBuilder : public LayerBuilder
+{
+   public:
+    std::shared_ptr<ir::NNLayer> buildLayer(const torch::jit::Node* node_ref);
+
+   private:
+    std::shared_ptr<ir::PrimTupleConstructLayer> prim_tuple_construct_layer_;
+};
+
+class PrimTupleIndexBuilder : public LayerBuilder
+{
+   public:
+    std::shared_ptr<ir::NNLayer> buildLayer(const torch::jit::Node* node_ref);
+
+   private:
+    std::shared_ptr<ir::PrimTupleIndexLayer> prim_tuple_index_layer_;
+};
+
+class PrimTupleUnpackBuilder : public LayerBuilder
+{
+   public:
+    std::shared_ptr<ir::NNLayer> buildLayer(const torch::jit::Node* node_ref);
+
+   private:
+    std::shared_ptr<ir::PrimTupleUnpackLayer> prim_tuple_unpack_layer_;
+};
+
+class PrimTypeBuilder : public LayerBuilder
+{
+   public:
+    std::shared_ptr<ir::NNLayer> buildLayer(const torch::jit::Node* node_ref);
+
+   private:
+    std::shared_ptr<ir::PrimTypeLayer> prim_type_layer_;
+};
+
+class PrimUncheckedCastBuilder : public LayerBuilder
+{
+   public:
+    std::shared_ptr<ir::NNLayer> buildLayer(const torch::jit::Node* node_ref);
+
+   private:
+    std::shared_ptr<ir::PrimUncheckedCastLayer> prim_unchecked_cast_layer_;
+};
+
+class PrimUninitializedBuilder : public LayerBuilder
+{
+   public:
+    std::shared_ptr<ir::NNLayer> buildLayer(const torch::jit::Node* node_ref);
+
+   private:
+    std::shared_ptr<ir::PrimUninitializedLayer> prim_uninitialized_layer_;
+};
+
+class PrimVariableBuilder : public LayerBuilder
+{
+   public:
+    std::shared_ptr<ir::NNLayer> buildLayer(const torch::jit::Node* node_ref);
+
+   private:
+    std::shared_ptr<ir::PrimVariableLayer> prim_variable_layer_;
+};
+
 class LayerBuilders
 {
    public:
@@ -1091,6 +1208,19 @@ class LayerBuilders
         layer_builders_["prim::If"] = std::make_shared<PrimIfBuilder>();
         layer_builders_["prim::Input"] = std::make_shared<PrimInputBuilder>();
         layer_builders_["prim::ListConstruct"] = std::make_shared<PrimListConstructBuilder>();
+        layer_builders_["prim::ListUnpack"] = std::make_shared<PrimListUnpackBuilder>();
+        layer_builders_["prim::Loop"] = std::make_shared<PrimLoopBuilder>();
+        layer_builders_["prim::LoopIndex"] = std::make_shared<PrimLoopIndexBuilder>();
+        layer_builders_["prim::Output"] = std::make_shared<PrimOutputBuilder>();
+        layer_builders_["prim::RaiseException"] = std::make_shared<PrimRaiseExceptionBuilder>();
+        layer_builders_["prim::SetAttr"] = std::make_shared<PrimSetAttrBuilder>();
+        layer_builders_["prim::TupleConstruct"] = std::make_shared<PrimTupleConstructBuilder>();
+        layer_builders_["prim::TupleIndex"] = std::make_shared<PrimTupleIndexBuilder>();
+        layer_builders_["prim::TupleUnpack"] = std::make_shared<PrimTupleUnpackBuilder>();
+        layer_builders_["prim::type"] = std::make_shared<PrimTypeBuilder>();
+        layer_builders_["prim::unchecked_cast"] = std::make_shared<PrimUncheckedCastBuilder>();
+        layer_builders_["prim::Uninitialized"] = std::make_shared<PrimUninitializedBuilder>();
+        layer_builders_["prim::Variable"] = std::make_shared<PrimVariableBuilder>();
     }
 
     std::shared_ptr<LayerBuilder> get(std::string layer_type)
