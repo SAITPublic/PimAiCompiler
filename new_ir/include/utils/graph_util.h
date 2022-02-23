@@ -3,6 +3,8 @@
 #include "common/include/log.hpp"
 #include "new_ir/include/types.h"
 
+#include "new_ir/include/utils/graph_search.h"
+
 namespace nn_compiler {
 namespace ir {
 
