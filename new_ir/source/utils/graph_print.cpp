@@ -20,7 +20,7 @@ void printGraphModel(std::unique_ptr<ir::NNModel>& nn_model) {
                 nn_model->getTSSTensors()[iid]->getReprType() + ", ");
         }
         network_line.append(") :");
-        Log::IR::I() << network_line;
+        Log::NIR::I() << network_line;
 
         std::string layer_line;
         for (auto layer : graph->getLayers()) {
@@ -58,7 +58,7 @@ void printGraphModel(std::unique_ptr<ir::NNModel>& nn_model) {
                 layer_line.append(std::to_string(iid) + ", ");
             }
             layer_line.append(")");
-            Log::IR::I() << layer_line;
+            Log::NIR::I() << layer_line;
         }
 
         auto gout_ids = graph->getGraphOutTensorID();
@@ -69,7 +69,7 @@ void printGraphModel(std::unique_ptr<ir::NNModel>& nn_model) {
             return_line.append(std::to_string(oid) +  ", ");
         }
         return_line.append(") \n\n");
-        Log::IR::I() << return_line;
+        Log::NIR::I() << return_line;
     }
 }
 
