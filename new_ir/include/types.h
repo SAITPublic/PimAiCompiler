@@ -10,6 +10,7 @@
 
 #pragma once
 
+#include <float.h>
 #include "new_ir/include/common/log.hpp"
 
 namespace nn_compiler {

@@ -12,9 +12,9 @@ bool isSingleValueType(DataType data_type) {
             data_type == DataType::BOOL);
 }
 
-int32_t inferBitwidth(DataType graphgen_type) {
+int32_t inferBitwidth(DataType type) {
     int32_t bitwidth = 8;
-    switch (graphgen_type) {
+    switch (type) {
         case DataType::INT8:
         case DataType::UINT8:
         case DataType ::LIST:

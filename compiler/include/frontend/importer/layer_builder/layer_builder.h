@@ -3,8 +3,8 @@
 #include <torch/script.h>
 #include <vector>
 
-#include "all_layers.h"
-#include "import/utils/attr_parser.h"
+#include "importer/layer_builder/all_layers.h"
+#include "importer/utils/attr_parser.h"
 #include "new_ir/include/layers/nn_layer.h"
 #include "new_ir/include/nn_network.h"
 #include "new_ir/include/tensors/data_tensor.h"
@@ -299,8 +299,8 @@ class AtenEmbeddingBuilder : public LayerBuilder
    public:
     std::shared_ptr<ir::NNLayer> buildLayer(const torch::jit::Node* node_ref);
 
-   private:
-    std::shared_ptr<ir::AtenEmbeddinNNLayer> aten_embedding_layer_;
+ private:
+    std::shared_ptr<ir::AtenEmbeddingLayer> aten_embedding_layer_;
 };
 
 class AtenEqBuilder : public LayerBuilder
@@ -491,8 +491,8 @@ class AtenLogBuilder : public LayerBuilder
    public:
     std::shared_ptr<ir::NNLayer> buildLayer(const torch::jit::Node* node_ref);
 
-   private:
-    std::shared_ptr<ir::AtenLoNNLayer> aten_log_layer_;
+ private:
+    std::shared_ptr<ir::AtenLogLayer> aten_log_layer_;
 };
 
 class AtenLogSoftmaxBuilder : public LayerBuilder
@@ -620,8 +620,8 @@ class AtenNegBuilder : public LayerBuilder
    public:
     std::shared_ptr<ir::NNLayer> buildLayer(const torch::jit::Node* node_ref);
 
-   private:
-    std::shared_ptr<ir::AtenNeNNLayer> aten_neg_layer_;
+ private:
+    std::shared_ptr<ir::AtenNegLayer> aten_neg_layer_;
 };
 
 class AtenNormBuilder : public LayerBuilder

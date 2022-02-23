@@ -8,7 +8,7 @@ namespace ir {
 
 bool isSingleValueType(DataType data_type);
 
-int32_t inferBitwidth(DataType graphgen_type);
+int32_t inferBitwidth(DataType type);
 
 std::string ConvertDataType(const DataType previous_type);
 
