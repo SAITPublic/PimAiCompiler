@@ -15,6 +15,7 @@
 #include "compiler/include/frontend/optimizer/swap_matmul_inputs.h"
 
 #include "compiler/include/frontend/optimizer/take_in_body_net.h"
+#include "compiler/include/frontend/optimizer/set_attribute.h"
 
 namespace nn_compiler {
 namespace frontend {
@@ -37,11 +38,13 @@ void PassManager::runPasses(std::unique_ptr<nn_compiler::ir::NNModel>& model) {
     auto swap_addmm_inputs = std::make_shared<SwapAddmmInputs>();
     auto swap_matmul_inputs = std::make_shared<SwapMatmulInputs>();
     auto set_weights_for_embedding = std::make_shared<SetWeightsForEmbedding>();
+    auto set_attribute                   = std::make_shared<SetAttribute>();
 
     // 2. TODO(SRCX): add optimization passes, like: base_pass->add(fuse_act);
     base_pass->add(take_in_body_net);
     take_in_body_net->add(construct_list);
     construct_list->add(remake_dtensor_of_prim_variable);
+    remake_dtensor_of_prim_variable->add(set_attribute);
 
     remove_get_attr_layers->add(remove_if_with_addmm);
     remove_if_with_addmm->add(remove_cat_for_addmm);
