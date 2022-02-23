@@ -5,15 +5,13 @@
 
 namespace nnrt
 {
-at::Tensor atenAdd(const at::Tensor &self, at::Scalar other, at::Scalar alpha = 1);
+at::Tensor atenAdd(const at::Tensor &self, const at::Scalar &other, const at::Scalar &alpha = 1);
 
-at::Tensor atenAdd(const at::Tensor &self, const at::Tensor &other, at::Scalar alpha = 1);
+at::Tensor atenAdd(const at::Tensor &self, const at::Tensor &other, const at::Scalar &alpha = 1);
 
 int64_t atenAdd(int64_t &self, int64_t other, int64_t alpha = 1);
 
-at::Tensor &atenAdd_(at::Tensor &self, const at::Tensor &other, at::Scalar alpha = 1);
-
-at::Tensor &atenAdd_(at::Tensor &self, at::Scalar other, at::Scalar alpha = 1);
+at::Tensor &atenAdd_(at::Tensor &self, const at::Scalar &other, const at::Scalar &alpha = 1);
 
 at::Tensor atenAddmm(const at::Tensor &self, const at::Tensor &mat1, const at::Tensor &mat2, const at::Scalar &beta = 1,
                      const at::Scalar &alpha = 1);
@@ -151,9 +149,9 @@ at::Tensor atenGt(const at::Tensor &self, const at::Scalar &other);
 
 at::Tensor atenGt(const at::Tensor &self, const at::Tensor &other);
 
-at::Tensor atenIndex(const at::Tensor &self, at::TensorList indices);
+at::Tensor atenIndex(const at::Tensor &self, const c10::List<c10::optional<at::Tensor>>& indices);
 
-at::Tensor &atenIndexPut(at::Tensor &self, at::TensorList indices, const at::Tensor &values, bool accumulate);
+at::Tensor &atenIndexPut(at::Tensor &self, const c10::List<c10::optional<at::Tensor>>& indices, const at::Tensor &values, bool accumulate);
 
 at::Tensor atenIndexSelect(const at::Tensor &self, int64_t dim, const at::Tensor &index);
 
@@ -317,8 +315,9 @@ at::Tensor atenTensor(at::ArrayRef<int64_t> array, const at::TensorOptions &opti
 
 at::Tensor atenTensor(at::ArrayRef<double> array, const at::TensorOptions &options);
 
-at::Tensor atenTo(const at::Tensor &self, const at::TensorOptions &options = {}, bool non_blocking = false,
-                  bool copy = false, c10::optional<at::MemoryFormat> memory_format = c10::nullopt);
+at::Tensor atenTo(const at::Tensor & self, c10::optional<at::ScalarType> dtype={}, c10::optional<at::Layout> layout={},
+                  c10::optional<at::Device> device={}, c10::optional<bool> pin_memory={}, bool non_blocking=false,
+                  bool copy=false, c10::optional<at::MemoryFormat> memory_format=c10::nullopt);
 
 at::Tensor atenTo(const at::Tensor &self, at::Device device, at::ScalarType dtype, bool non_blocking = false,
                   bool copy = false, c10::optional<at::MemoryFormat> memory_format = c10::nullopt);

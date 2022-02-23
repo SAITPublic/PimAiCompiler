@@ -1704,14 +1704,13 @@ void executorAtenIndex(const nncir::Node& op_node, StreamExecutor& stream_execut
     int indices_blob_id = indices_edge.getBlobId();
     auto indices_iv = stream_executor.findBlob(indices_blob_id).second;
     assert(indices_iv.isTensorList());
-    auto indices_list_tensor = indices_iv.toTensorList();
-    std::vector<at::Tensor> indices_list_tensor_vector;
-    for (auto tensor : indices_list_tensor) {
-        indices_list_tensor_vector.push_back(tensor);
+    auto indices_list_ivalue = indices_iv.toList();
+    c10::List<c10::optional<at::Tensor>> indices_optional_list;
+    for (torch::jit::IValue iv : indices_list_ivalue) {
+        indices_optional_list.push_back(iv.toOptional<at::Tensor>());
     }
-    at::TensorList indices(indices_list_tensor_vector);
 
-    auto output = nnrt::atenIndex(self_tensor, indices);
+    auto output = nnrt::atenIndex(self_tensor, indices_optional_list);
     // update output
     auto& out_edge = cast<nncir::DataEdge>(node.getFirstOutEdge());
     stream_executor.updateBlob(out_edge.getBlobId(), DataType::TENSOR, tensorToIValue(output));
@@ -1732,12 +1731,11 @@ void executorAtenIndexPut(const nncir::Node& op_node, StreamExecutor& stream_exe
     int indices_blob_id = indices_edge.getBlobId();
     auto indices_iv = stream_executor.findBlob(indices_blob_id).second;
     assert(indices_iv.isTensorList());
-    auto indices_list_tensor = indices_iv.toTensorList();
-    std::vector<at::Tensor> indices_list_tensor_vector;
-    for (auto tensor : indices_list_tensor) {
-        indices_list_tensor_vector.push_back(tensor);
+    auto indices_list_ivalue = indices_iv.toList();
+    c10::List<c10::optional<at::Tensor>> indices_optional_list;
+    for (torch::jit::IValue iv : indices_list_ivalue) {
+        indices_optional_list.push_back(iv.toOptional<at::Tensor>());
     }
-    at::TensorList indices(indices_list_tensor_vector);
 
     auto& input_other = cast<nncir::DataEdge>(node.getInEdge(2));
     int input_other_blob_id = input_other.getBlobId();
@@ -1754,7 +1752,7 @@ void executorAtenIndexPut(const nncir::Node& op_node, StreamExecutor& stream_exe
         accumulate = accumulate_iv.toInt();
     }
 
-    auto output = nnrt::atenIndexPut(self_tensor, indices, value_tensor, static_cast<bool>(accumulate));
+    auto output = nnrt::atenIndexPut(self_tensor, indices_optional_list, value_tensor, static_cast<bool>(accumulate));
     // update output
     auto& out_edge = cast<nncir::DataEdge>(node.getFirstOutEdge());
     stream_executor.updateBlob(out_edge.getBlobId(), DataType::TENSOR, tensorToIValue(output));

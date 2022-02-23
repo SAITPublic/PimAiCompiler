@@ -3,21 +3,16 @@
 #include <iostream>
 namespace nnrt
 {
-at::Tensor atenAdd(const at::Tensor &self, at::Scalar other, at::Scalar alpha) { return at::add(self, other, alpha); }
+at::Tensor atenAdd(const at::Tensor &self, const at::Scalar &other, const at::Scalar &alpha) { return at::add(self, other, alpha); }
 
-at::Tensor atenAdd(const at::Tensor &self, const at::Tensor &other, at::Scalar alpha)
+at::Tensor atenAdd(const at::Tensor &self, const at::Tensor &other, const at::Scalar &alpha)
 {
     return at::add(self, other, alpha);
 }
 
 int64_t atenAdd(int64_t &self, int64_t other, int64_t alpha) { return self + other * alpha; }
 
-at::Tensor &atenAdd_(at::Tensor &self, const at::Tensor &other, at::Scalar alpha)
-{
-    return at::native::add_(self, other, alpha);
-}
-
-at::Tensor &atenAdd_(at::Tensor &self, at::Scalar other, at::Scalar alpha)
+at::Tensor &atenAdd_(at::Tensor &self, const at::Scalar &other, const at::Scalar &alpha)
 {
     return at::native::add_(self, other, alpha);
 }
@@ -197,11 +192,11 @@ at::Tensor atenGt(const at::Tensor &self, const at::Scalar &other) { return at::
 
 at::Tensor atenGt(const at::Tensor &self, const at::Tensor &other) { return at::gt(self, other); }
 
-at::Tensor atenIndex(const at::Tensor &self, at::TensorList indices) {
+at::Tensor atenIndex(const at::Tensor &self, const c10::List<c10::optional<at::Tensor>>& indices) {
     return at::index(self, indices);
 }
 
-at::Tensor &atenIndexPut(at::Tensor &self, at::TensorList indices,
+at::Tensor &atenIndexPut(at::Tensor &self, const c10::List<c10::optional<at::Tensor>>& indices,
                          const at::Tensor &values, bool accumulate) {
     return at::index_put_(self, indices, values, accumulate);
 }
@@ -433,10 +428,10 @@ at::Tensor atenTensor(at::ArrayRef<double> array, const at::TensorOptions &optio
     return at::tensor(array, options);
 }
 
-at::Tensor atenTo(const at::Tensor &self, const at::TensorOptions &options, bool non_blocking, bool copy,
-                  c10::optional<at::MemoryFormat> memory_format)
-{
-    return at::native::to(self, options, non_blocking, copy, memory_format);
+at::Tensor atenTo(const at::Tensor & self, c10::optional<at::ScalarType> dtype, c10::optional<at::Layout> layout,
+                  c10::optional<at::Device> device, c10::optional<bool> pin_memory, bool non_blocking,
+                  bool copy, c10::optional<at::MemoryFormat> memory_format) {
+    return at::native::to(self, dtype, layout, device, pin_memory, non_blocking, copy, memory_format);
 }
 
 at::Tensor atenTo(const at::Tensor &self, at::Device device, at::ScalarType dtype, bool non_blocking, bool copy,
