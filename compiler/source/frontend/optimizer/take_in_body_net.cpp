@@ -1,6 +1,6 @@
 #include <string>
 
-#include "compiler/source/frontend/optimizer/take_in_body_net.h"
+#include "compiler/include/frontend/optimizer/take_in_body_net.h"
 
 #include "new_ir/include/layers/pim_general_layers.h"
 #include "new_ir/include/layers/prim_if_layer.h"

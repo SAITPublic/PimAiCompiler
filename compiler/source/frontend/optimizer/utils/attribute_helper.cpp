@@ -48,7 +48,7 @@
 #include "new_ir/include/layers/prim_loop_layer.h"
 #include "new_ir/include/layers/prim_tuple_index_layer.h"
 
-#include "compiler/source/frontend/optimizer/utils/attribute_helper.h"
+#include "compiler/include/frontend/optimizer/utils/attribute_helper.h"
 
 #include "half.hpp"
 

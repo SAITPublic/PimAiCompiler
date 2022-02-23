@@ -3,7 +3,7 @@
 #include "compiler/include/frontend/optimizer/pass.h"
 #include "new_ir/include/layers/prim_variable_layer.h"
 
-#include "compiler/source/frontend/optimizer/utils/attribute_helper.h"
+#include "compiler/include/frontend/optimizer/utils/attribute_helper.h"
 
 namespace nn_compiler {
 

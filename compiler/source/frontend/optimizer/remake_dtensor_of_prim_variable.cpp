@@ -1,5 +1,5 @@
 #include "new_ir/include/utils/graph_util.h"
-#include "compiler/source/frontend/optimizer/remake_dtensor_of_prim_variable.h"
+#include "compiler/include/frontend/optimizer/remake_dtensor_of_prim_variable.h"
 #include "new_ir/include/utils/graph_search.h"
 
 namespace nn_compiler {

@@ -1,6 +1,6 @@
 #include <string>
 
-#include "compiler/source/frontend/optimizer/construct_list.h"
+#include "compiler/include/frontend/optimizer/construct_list.h"
 
 #include "new_ir/include/utils/graph_util.h"
 #include "new_ir/include/tensors/data_tensor.h"

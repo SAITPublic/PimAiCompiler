@@ -1,8 +1,8 @@
 #include "compiler/include/common/log.hpp"
 #include "compiler/include/frontend/optimizer/pass_manager.h"
-#include "compiler/source/frontend/optimizer/take_in_body_net.h"
-#include "compiler/source/frontend/optimizer/construct_list.h"
-#include "compiler/source/frontend/optimizer/remake_dtensor_of_prim_variable.h"
+#include "compiler/include/frontend/optimizer/take_in_body_net.h"
+#include "compiler/include/frontend/optimizer/construct_list.h"
+#include "compiler/include/frontend/optimizer/remake_dtensor_of_prim_variable.h"
 
 namespace nn_compiler {
 namespace frontend {
