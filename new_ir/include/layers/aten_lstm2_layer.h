@@ -2,7 +2,6 @@
 
 #include "new_ir/include/layers/nn_layer.h"
 #include "new_ir/include/tensors/data_tensor.h"
-#include <float.h>
 
 /**
  * API_2:

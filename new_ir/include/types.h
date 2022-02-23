@@ -12,6 +12,7 @@
 
 #include <float.h>
 #include "new_ir/include/common/log.hpp"
+#include <float.h>
 
 namespace nn_compiler {
 namespace ir {
