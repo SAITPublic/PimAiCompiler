@@ -17,6 +17,7 @@
 #include "compiler/include/frontend/optimizer/take_in_body_net.h"
 #include "compiler/include/frontend/optimizer/set_attribute.h"
 #include "compiler/include/frontend/optimizer/remove_constant_layers.h"
+#include "compiler/include/frontend/optimizer/remove_dropout_layers.h"
 
 namespace nn_compiler {
 namespace frontend {
@@ -41,6 +42,7 @@ void PassManager::runPasses(std::unique_ptr<nn_compiler::ir::NNModel>& model) {
     auto set_weights_for_embedding = std::make_shared<SetWeightsForEmbedding>();
     auto set_attribute                   = std::make_shared<SetAttribute>();
     auto remove_constant_layers          = std::make_shared<RemoveConstantLayers>();
+    auto remove_dropout_layers           = std::make_shared<RemoveDropoutLayers>();
 
     // 2. TODO(SRCX): add optimization passes, like: base_pass->add(fuse_act);
     base_pass->add(take_in_body_net);
@@ -48,6 +50,7 @@ void PassManager::runPasses(std::unique_ptr<nn_compiler::ir::NNModel>& model) {
     construct_list->add(remake_dtensor_of_prim_variable);
     remake_dtensor_of_prim_variable->add(set_attribute);
     set_attribute->add(remove_constant_layers);
+    remove_constant_layers->add(remove_dropout_layers);
 
     remove_get_attr_layers->add(remove_if_with_addmm);
     remove_if_with_addmm->add(remove_cat_for_addmm);
