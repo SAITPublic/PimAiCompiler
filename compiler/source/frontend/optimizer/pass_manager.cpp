@@ -1,10 +1,13 @@
-#include "compiler/include/frontend/optimizer/pass_manager.h"
 #include "compiler/include/common/log.hpp"
+#include "compiler/include/frontend/optimizer/pass_manager.h"
+
+
 #include "compiler/include/frontend/optimizer/construct_list.h"
 #include "compiler/include/frontend/optimizer/remake_dtensor_of_prim_variable.h"
 #include "compiler/include/frontend/optimizer/remove_cat_for_addmm.h"
 #include "compiler/include/frontend/optimizer/remove_get_attr_layers.h"
 #include "compiler/include/frontend/optimizer/remove_if_with_addmm.h"
+#include "compiler/include/frontend/optimizer/swap_addmm_inputs.h"
 
 #include "compiler/include/frontend/optimizer/take_in_body_net.h"
 
@@ -25,6 +28,7 @@ void PassManager::runPasses(std::unique_ptr<nn_compiler::ir::NNModel>& model) {
     auto remove_get_attr_layers          = std::make_shared<RemoveGetAttrLayers>();
     auto remove_if_with_addmm            = std::make_shared<RemoveIfWithAddmm>();
     auto remove_cat_for_addmm            = std::make_shared<RemoveCatForAddmm>();
+    auto swap_addmm_inputs               = std::make_shared<SwapAddmmInputs>();
     // 2. TODO(SRCX): add optimization passes, like: base_pass->add(fuse_act);
     base_pass->add(take_in_body_net);
     take_in_body_net->add(construct_list);
@@ -33,6 +37,7 @@ void PassManager::runPasses(std::unique_ptr<nn_compiler::ir::NNModel>& model) {
     remove_get_attr_layers->add(remove_if_with_addmm);
     remove_if_with_addmm->add(remove_cat_for_addmm);
     remove_cat_for_addmm->add(swap_addmm_inputs);
+    swap_addmm_inputs->add(swap_matmul_inputs);
 
     while (base_pass->getSuccessor() != nullptr) {
         base_pass = base_pass->getSuccessor();
