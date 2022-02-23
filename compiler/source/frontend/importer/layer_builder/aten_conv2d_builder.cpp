@@ -72,14 +72,14 @@ void AtenConv2dBuilder::ptTensor2nncompilerDTensor(at::Tensor torch_tensor, DTen
      */
     assert(torch_tensor.dim() == 1 || torch_tensor.dim() == 4);
     if (torch_tensor.dim() == 1) {
-        // bias
-        d_tensor.setTensorShape(STensor(0, 0, 0, torch_tensor.size(0)));
-        DLOG(INFO) << "conv2d: bias: " << torch_tensor.sizes();
+      // bias
+      d_tensor.setTensorShape(STensor(0, 0, 0, torch_tensor.size(0)));
+      Log::NIR::I() <<"conv2d: bias: " << torch_tensor.sizes();
     } else if (torch_tensor.dim() == 4) {
-        // weight
-        d_tensor.setTensorShape(
-            STensor(torch_tensor.size(0), torch_tensor.size(1), torch_tensor.size(2), torch_tensor.size(3)));
-        DLOG(INFO) << "conv2d: weight: " << torch_tensor.sizes();
+      // weight
+      d_tensor.setTensorShape(
+          STensor(torch_tensor.size(0), torch_tensor.size(1), torch_tensor.size(2), torch_tensor.size(3)));
+      Log::NIR::I() <<"conv2d: weight: " << torch_tensor.sizes();
     }
 }
 
