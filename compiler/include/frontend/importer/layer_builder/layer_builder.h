@@ -519,6 +519,463 @@ class AtenLSTM1Builder : public LayerBuilder
                                 std::vector<nn_compiler::ir::DTensor>& bias_tensors);
 };
 
+class AtenLSTM2Builder : public LayerBuilder
+{
+   public:
+    std::shared_ptr<ir::NNLayer> buildLayer(const torch::jit::Node* node_ref);
+
+   private:
+    std::shared_ptr<ir::AtenLSTM2Layer> aten_lstm2_layer_;
+
+   private:
+    void ptTensor2nncompilerDTensor(at::Tensor torch_tensor, nn_compiler::ir::DTensor& d_tensor);
+    void getLearnableParameters(const torch::jit::Node* node_lstm,
+                                std::vector<nn_compiler::ir::DTensor>& weight_tensors,
+                                std::vector<nn_compiler::ir::DTensor>& bias_tensors);
+};
+
+class AtenLtBuilder : public LayerBuilder
+{
+   public:
+    std::shared_ptr<ir::NNLayer> buildLayer(const torch::jit::Node* node_ref);
+
+   private:
+    std::shared_ptr<ir::AtenLtLayer> aten_lt_layer_;
+};
+
+class AtenMaskedFillBuilder : public LayerBuilder
+{
+   public:
+    std::shared_ptr<ir::NNLayer> buildLayer(const torch::jit::Node* node_ref);
+
+   private:
+    std::shared_ptr<ir::AtenMaskedFillLayer> aten_masked_fill_layer_;
+};
+
+class AtenMaskedSelectBuilder : public LayerBuilder
+{
+   public:
+    std::shared_ptr<ir::NNLayer> buildLayer(const torch::jit::Node* node_ref);
+
+   private:
+    std::shared_ptr<ir::AtenMaskedSelectLayer> aten_masked_select_layer_;
+};
+
+class AtenMatmulBuilder : public LayerBuilder
+{
+   public:
+    std::shared_ptr<ir::NNLayer> buildLayer(const torch::jit::Node* node_ref);
+
+   private:
+    std::shared_ptr<ir::AtenMatmulLayer> aten_matmul_layer_;
+};
+
+class AtenMaxBuilder : public LayerBuilder
+{
+   public:
+    std::shared_ptr<ir::NNLayer> buildLayer(const torch::jit::Node* node_ref);
+
+   private:
+    std::shared_ptr<ir::AtenMaxLayer> aten_max_layer_;
+};
+
+class AtenMaxPool2dBuilder : public LayerBuilder
+{
+   public:
+    std::shared_ptr<ir::NNLayer> buildLayer(const torch::jit::Node* node_ref);
+
+   private:
+    std::shared_ptr<ir::AtenMaxPool2dLayer> aten_max_pool2d_layer_;
+};
+
+class AtenMinBuilder : public LayerBuilder
+{
+   public:
+    std::shared_ptr<ir::NNLayer> buildLayer(const torch::jit::Node* node_ref);
+
+   private:
+    std::shared_ptr<ir::AtenMinLayer> aten_min_layer_;
+};
+
+class AtenMulBuilder : public LayerBuilder
+{
+   public:
+    std::shared_ptr<ir::NNLayer> buildLayer(const torch::jit::Node* node_ref);
+
+   private:
+    std::shared_ptr<ir::AtenMulLayer> aten_mul_layer_;
+};
+
+class AtenNeBuilder : public LayerBuilder
+{
+   public:
+    std::shared_ptr<ir::NNLayer> buildLayer(const torch::jit::Node* node_ref);
+
+   private:
+    std::shared_ptr<ir::AtenNeLayer> aten_ne_layer_;
+};
+
+class AtenNegBuilder : public LayerBuilder
+{
+   public:
+    std::shared_ptr<ir::NNLayer> buildLayer(const torch::jit::Node* node_ref);
+
+   private:
+    std::shared_ptr<ir::AtenNeNNLayer> aten_neg_layer_;
+};
+
+class AtenNormBuilder : public LayerBuilder
+{
+   public:
+    std::shared_ptr<ir::NNLayer> buildLayer(const torch::jit::Node* node_ref);
+
+   private:
+    std::shared_ptr<ir::AtenNormLayer> aten_norm_layer_;
+};
+
+class AtenNotBuilder : public LayerBuilder
+{
+   public:
+    std::shared_ptr<ir::NNLayer> buildLayer(const torch::jit::Node* node_ref);
+
+   private:
+    std::shared_ptr<ir::AtenNotLayer> aten_not_layer_;
+};
+
+class AtenOnesBuilder : public LayerBuilder
+{
+   public:
+    std::shared_ptr<ir::NNLayer> buildLayer(const torch::jit::Node* node_ref);
+
+   private:
+    std::shared_ptr<ir::AtenOnesLayer> aten_ones_layer_;
+};
+
+class AtenPackPaddedSequenceBuilder : public LayerBuilder
+{
+   public:
+    std::shared_ptr<ir::NNLayer> buildLayer(const torch::jit::Node* node_ref);
+
+   private:
+    std::shared_ptr<ir::AtenPackPaddedSequenceLayer> aten_pack_padded_sequence_layer_;
+};
+
+class AtenPadPackedSequenceBuilder : public LayerBuilder
+{
+   public:
+    std::shared_ptr<ir::NNLayer> buildLayer(const torch::jit::Node* node_ref);
+
+   private:
+    std::shared_ptr<ir::AtenPadPackedSequenceLayer> aten_pad_packed_sequence_layer_;
+};
+
+class AtenPowBuilder : public LayerBuilder
+{
+   public:
+    std::shared_ptr<ir::NNLayer> buildLayer(const torch::jit::Node* node_ref);
+
+   private:
+    std::shared_ptr<ir::AtenPowLayer> aten_pow_layer_;
+};
+
+class AtenReluBuilder : public LayerBuilder
+{
+   public:
+    std::shared_ptr<ir::NNLayer> buildLayer(const torch::jit::Node* node_ref);
+
+   private:
+    std::shared_ptr<ir::AtenReluLayer> aten_relu_layer_;
+};
+
+class AtenReshapeBuilder : public LayerBuilder
+{
+   public:
+    std::shared_ptr<ir::NNLayer> buildLayer(const torch::jit::Node* node_ref);
+
+   private:
+    std::shared_ptr<ir::AtenReshapeLayer> aten_reshape_layer_;
+};
+class AtenSelectBuilder : public LayerBuilder
+{
+   public:
+    std::shared_ptr<ir::NNLayer> buildLayer(const torch::jit::Node* node_ref);
+
+   private:
+    std::shared_ptr<ir::AtenSelectLayer> aten_select_layer_;
+};
+
+class AtenSqueezeBuilder : public LayerBuilder
+{
+   public:
+    std::shared_ptr<ir::NNLayer> buildLayer(const torch::jit::Node* node_ref);
+
+   private:
+    std::shared_ptr<ir::AtenSqueezeLayer> aten_squeeze_layer_;
+};
+
+class AtenSetItemBuilder : public LayerBuilder
+{
+   public:
+    std::shared_ptr<ir::NNLayer> buildLayer(const torch::jit::Node* node_ref);
+
+   private:
+    std::shared_ptr<ir::AtenSetItemLayer> aten_set_item_layer_;
+};
+
+class AtenSizeBuilder : public LayerBuilder
+{
+   public:
+    std::shared_ptr<ir::NNLayer> buildLayer(const torch::jit::Node* node_ref);
+
+   private:
+    std::shared_ptr<ir::AtenSizeLayer> aten_size_layer_;
+};
+
+class AtenSliceBuilder : public LayerBuilder
+{
+   public:
+    std::shared_ptr<ir::NNLayer> buildLayer(const torch::jit::Node* node_ref);
+
+   private:
+    std::shared_ptr<ir::AtenSliceLayer> aten_slice_layer_;
+};
+
+class AtenSoftmaxBuilder : public LayerBuilder
+{
+   public:
+    std::shared_ptr<ir::NNLayer> buildLayer(const torch::jit::Node* node_ref);
+
+   private:
+    std::shared_ptr<ir::AtenSoftmaxLayer> aten_softmax_layer_;
+};
+
+class AtenSubBuilder : public LayerBuilder
+{
+   public:
+    std::shared_ptr<ir::NNLayer> buildLayer(const torch::jit::Node* node_ref);
+
+   private:
+    std::shared_ptr<ir::AtenSubLayer> aten_sub_layer_;
+};
+
+class AtenSumBuilder : public LayerBuilder
+{
+   public:
+    std::shared_ptr<ir::NNLayer> buildLayer(const torch::jit::Node* node_ref);
+
+   private:
+    std::shared_ptr<ir::AtenSumLayer> aten_sum_layer_;
+};
+
+class AtenTanhBuilder : public LayerBuilder
+{
+   public:
+    std::shared_ptr<ir::NNLayer> buildLayer(const torch::jit::Node* node_ref);
+
+   private:
+    std::shared_ptr<ir::AtenTanhLayer> aten_tanh_layer_;
+};
+
+class AtenTensorBuilder : public LayerBuilder
+{
+   public:
+    std::shared_ptr<ir::NNLayer> buildLayer(const torch::jit::Node* node_ref);
+
+   private:
+    std::shared_ptr<ir::AtenTensorLayer> aten_tensor_layer_;
+};
+
+class AtenTo1Builder : public LayerBuilder
+{
+   public:
+    std::shared_ptr<ir::NNLayer> buildLayer(const torch::jit::Node* node_ref);
+
+   private:
+    std::shared_ptr<ir::AtenTo1Layer> aten_to_layer_;
+};
+
+class AtenTo2Builder : public LayerBuilder
+{
+   public:
+    std::shared_ptr<ir::NNLayer> buildLayer(const torch::jit::Node* node_ref);
+
+   private:
+    std::shared_ptr<ir::AtenTo2Layer> aten_to_layer_;
+};
+
+class AtenTopkBuilder : public LayerBuilder
+{
+   public:
+    std::shared_ptr<ir::NNLayer> buildLayer(const torch::jit::Node* node_ref);
+
+   private:
+    std::shared_ptr<ir::AtenTopkLayer> aten_topk_layer_;
+};
+
+class AtenTransposeBuilder : public LayerBuilder
+{
+   public:
+    std::shared_ptr<ir::NNLayer> buildLayer(const torch::jit::Node* node_ref);
+
+   private:
+    std::shared_ptr<ir::AtenTransposeLayer> aten_transpose_layer_;
+};
+
+class AtenUnsqueezeBuilder : public LayerBuilder
+{
+   public:
+    std::shared_ptr<ir::NNLayer> buildLayer(const torch::jit::Node* node_ref);
+
+   private:
+    std::shared_ptr<ir::AtenUnsqueezeLayer> aten_unsqueeze_layer_;
+};
+
+class AtenViewBuilder : public LayerBuilder
+{
+   public:
+    std::shared_ptr<ir::NNLayer> buildLayer(const torch::jit::Node* node_ref);
+
+   private:
+    std::shared_ptr<ir::AtenViewLayer> aten_view_layer_;
+};
+
+class AtenWarnBuilder : public LayerBuilder
+{
+   public:
+    std::shared_ptr<ir::NNLayer> buildLayer(const torch::jit::Node* node_ref);
+
+   private:
+    std::shared_ptr<ir::AtenWarnLayer> aten_warn_layer_;
+};
+
+class AtenZerosBuilder : public LayerBuilder
+{
+   public:
+    std::shared_ptr<ir::NNLayer> buildLayer(const torch::jit::Node* node_ref);
+
+   private:
+    std::shared_ptr<ir::AtenZerosLayer> aten_zeros_layer_;
+};
+
+class AtenZerosLikeBuilder : public LayerBuilder
+{
+   public:
+    std::shared_ptr<ir::NNLayer> buildLayer(const torch::jit::Node* node_ref);
+
+   private:
+    std::shared_ptr<ir::AtenZerosLikeLayer> aten_zeros_like_layer_;
+};
+
+class PrimBlockBuilder : public LayerBuilder
+{
+   public:
+    std::shared_ptr<ir::NNLayer> buildLayer(const torch::jit::Node* node_ref);
+
+   private:
+    std::shared_ptr<ir::PrimBlockLayer> prim_block_layer_;
+};
+
+class PrimCallMethodBuilder : public LayerBuilder
+{
+   public:
+    std::shared_ptr<ir::NNLayer> buildLayer(const torch::jit::Node* node_ref);
+
+    std::shared_ptr<ir::NNLayer> buildLayerCustom(const std::string target_network_name);
+
+   private:
+    std::shared_ptr<ir::PrimCallMethodLayer> prim_callmethod_layer_;
+};
+
+class PrimConstantBuilder : public LayerBuilder
+{
+   public:
+    std::shared_ptr<ir::NNLayer> buildLayer(const torch::jit::Node* node_ref);
+
+   private:
+    std::shared_ptr<ir::PrimConstantLayer> prim_constant_layer_;
+};
+
+class PrimDataBuilder : public LayerBuilder
+{
+   public:
+    std::shared_ptr<ir::NNLayer> buildLayer(const torch::jit::Node* node_ref);
+
+   private:
+    std::shared_ptr<ir::PrimDataLayer> prim_data_layer_;
+};
+
+class PrimDeviceBuilder : public LayerBuilder
+{
+   public:
+    std::shared_ptr<ir::NNLayer> buildLayer(const torch::jit::Node* node_ref);
+
+   private:
+    std::shared_ptr<ir::PrimDeviceLayer> prim_device_layer_;
+};
+
+class PrimDtypeBuilder : public LayerBuilder
+{
+   public:
+    std::shared_ptr<ir::NNLayer> buildLayer(const torch::jit::Node* node_ref);
+
+   private:
+    std::shared_ptr<ir::PrimDtypeLayer> prim_dtype_layer_;
+};
+
+class PrimEndIfBuilder : public LayerBuilder
+{
+   public:
+    std::shared_ptr<ir::NNLayer> buildLayer(const torch::jit::Node* node_ref);
+
+   private:
+    std::shared_ptr<ir::PrimEndIfLayer> prim_end_if_layer_;
+};
+
+class PrimEndLoopBuilder : public LayerBuilder
+{
+   public:
+    std::shared_ptr<ir::NNLayer> buildLayer(const torch::jit::Node* node_ref);
+
+   private:
+    std::shared_ptr<ir::PrimEndLoopLayer> prim_end_loop_layer_;
+};
+
+class PrimGetAttrBuilder : public LayerBuilder
+{
+   public:
+    std::shared_ptr<ir::NNLayer> buildLayer(const torch::jit::Node* node_ref);
+
+   private:
+    std::shared_ptr<ir::PrimGetAttrLayer> prim_get_attr_layer_;
+};
+
+class PrimIfBuilder : public LayerBuilder
+{
+   public:
+    std::shared_ptr<ir::NNLayer> buildLayer(const torch::jit::Node* node_ref);
+
+   private:
+    std::shared_ptr<ir::PrimIfLayer> prim_if_layer_;
+};
+
+class PrimInputBuilder : public LayerBuilder
+{
+   public:
+    std::shared_ptr<ir::NNLayer> buildLayer(const torch::jit::Node* node_ref);
+
+   private:
+    std::shared_ptr<ir::PrimInputLayer> prim_input_layer_;
+};
+
+class PrimListConstructBuilder : public LayerBuilder
+{
+   public:
+    std::shared_ptr<ir::NNLayer> buildLayer(const torch::jit::Node* node_ref);
+
+   private:
+    std::shared_ptr<ir::PrimListConstructLayer> prim_list_construct_layer_;
+};
+
 class LayerBuilders
 {
    public:
@@ -577,6 +1034,63 @@ class LayerBuilders
         layer_builders_["aten::log"] = std::make_shared<AtenLogBuilder>();
         layer_builders_["aten::log_softmax"] = std::make_shared<AtenLogSoftmaxBuilder>();
         layer_builders_["aten::lstm1"] = std::make_shared<AtenLSTM1Builder>();
+        layer_builders_["aten::lstm2"] = std::make_shared<AtenLSTM2Builder>();
+        layer_builders_["aten::lt"] = std::make_shared<AtenLtBuilder>();
+        layer_builders_["aten::masked_fill"] = std::make_shared<AtenMaskedFillBuilder>();
+        layer_builders_["aten::masked_fill_"] = std::make_shared<AtenMaskedFillBuilder>();
+        layer_builders_["aten::masked_select"] = std::make_shared<AtenMaskedSelectBuilder>();
+        layer_builders_["aten::matmul"] = std::make_shared<AtenMatmulBuilder>();
+        layer_builders_["aten::max"] = std::make_shared<AtenMaxBuilder>();
+        layer_builders_["aten::max_pool2d"] = std::make_shared<AtenMaxPool2dBuilder>();
+        layer_builders_["aten::min"] = std::make_shared<AtenMinBuilder>();
+        layer_builders_["aten::mul"] = std::make_shared<AtenMulBuilder>();
+        layer_builders_["aten::ne"] = std::make_shared<AtenNeBuilder>();
+        layer_builders_["aten::neg"] = std::make_shared<AtenNegBuilder>();
+        layer_builders_["aten::norm"] = std::make_shared<AtenNormBuilder>();
+        layer_builders_["aten::ones"] = std::make_shared<AtenOnesBuilder>();
+
+        layer_builders_["aten::_pack_padded_sequence"] = std::make_shared<AtenPackPaddedSequenceBuilder>();
+        layer_builders_["aten::_pad_packed_sequence"] = std::make_shared<AtenPadPackedSequenceBuilder>();
+
+        layer_builders_["aten::pow"] = std::make_shared<AtenPowBuilder>();
+        layer_builders_["aten::relu"] = std::make_shared<AtenReluBuilder>();
+        layer_builders_["aten::reshape"] = std::make_shared<AtenReshapeBuilder>();
+        layer_builders_["aten::select"] = std::make_shared<AtenSelectBuilder>();
+        layer_builders_["aten::squeeze"] = std::make_shared<AtenSqueezeBuilder>();
+        layer_builders_["aten::_set_item"] = std::make_shared<AtenSetItemBuilder>();
+        layer_builders_["aten::size"] = std::make_shared<AtenSizeBuilder>();
+        layer_builders_["aten::slice"] = std::make_shared<AtenSliceBuilder>();
+        layer_builders_["aten::softmax"] = std::make_shared<AtenSoftmaxBuilder>();
+        layer_builders_["aten::sub"] = std::make_shared<AtenSubBuilder>();
+        layer_builders_["aten::sum"] = std::make_shared<AtenSumBuilder>();
+        layer_builders_["aten::tanh"] = std::make_shared<AtenTanhBuilder>();
+        layer_builders_["aten::tensor"] = std::make_shared<AtenTensorBuilder>();
+        layer_builders_["aten::to1"] = std::make_shared<AtenTo1Builder>();
+        layer_builders_["aten::to2"] = std::make_shared<AtenTo2Builder>();
+        layer_builders_["aten::topk"] = std::make_shared<AtenTopkBuilder>();
+        layer_builders_["aten::transpose"] = std::make_shared<AtenTransposeBuilder>();
+        layer_builders_["aten::unsqueeze"] = std::make_shared<AtenUnsqueezeBuilder>();
+        layer_builders_["aten::unsqueeze_"] = std::make_shared<AtenUnsqueezeBuilder>();
+        layer_builders_["aten::view"] = std::make_shared<AtenViewBuilder>();
+        layer_builders_["aten::warn"] = std::make_shared<AtenWarnBuilder>();
+        layer_builders_["aten::zeros"] = std::make_shared<AtenZerosBuilder>();
+        layer_builders_["aten::zeros_like"] = std::make_shared<AtenZerosLikeBuilder>();
+        layer_builders_["aten::__derive_index"] = std::make_shared<AtenDeriveIndexBuilder>();
+        layer_builders_["aten::__is__"] = std::make_shared<AtenIsBuilder>();
+        layer_builders_["aten::__not__"] = std::make_shared<AtenNotBuilder>();
+
+        layer_builders_["prim::Block"] = std::make_shared<PrimBlockBuilder>();
+        layer_builders_["prim::CallMethod"] = std::make_shared<PrimCallMethodBuilder>();
+        layer_builders_["prim::Constant"] = std::make_shared<PrimConstantBuilder>();
+        layer_builders_["prim::data"] = std::make_shared<PrimDataBuilder>();
+        layer_builders_["prim::device"] = std::make_shared<PrimDeviceBuilder>();
+        layer_builders_["prim::dtype"] = std::make_shared<PrimDtypeBuilder>();
+        layer_builders_["prim::EndIf"] = std::make_shared<PrimEndIfBuilder>();
+        layer_builders_["prim::EndLoop"] = std::make_shared<PrimEndLoopBuilder>();
+        layer_builders_["prim::GetAttr"] = std::make_shared<PrimGetAttrBuilder>();
+        layer_builders_["prim::If"] = std::make_shared<PrimIfBuilder>();
+        layer_builders_["prim::Input"] = std::make_shared<PrimInputBuilder>();
+        layer_builders_["prim::ListConstruct"] = std::make_shared<PrimListConstructBuilder>();
     }
 
     std::shared_ptr<LayerBuilder> get(std::string layer_type)
