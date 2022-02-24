@@ -1,6 +1,6 @@
 set(CMAKE_CXX_FLAGS "-std=c++17 -fPIC")
 file(GLOB_RECURSE frontend_src *.cpp)
-add_library(frontend "STATIC" ${frontend_src})
+add_library(frontend SHARED ${frontend_src})
 
 target_include_directories(frontend PUBLIC
     ${PROJECT_SOURCE_DIR}      

@@ -5,6 +5,7 @@
 #include <vector>
 
 #include "compiler/include/common/log.hpp"
+#include "importer/torchscript_builder.h"
 #include "ir/include/nn_ir.hpp"
 #include "new_ir/include/nn_model.h"
 
@@ -64,7 +65,7 @@ class FrontendDriver {
      * @returns return code
      */
     RetVal optimizer(std::unique_ptr<nn_compiler::ir::NNModel>& model);
-}; // class FrontendDriver
+};  // class FrontendDriver
 
-} // namespace frontend
-} // namespace nn_compiler
+}  // namespace frontend
+}  // namespace nn_compiler

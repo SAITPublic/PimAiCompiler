@@ -5,7 +5,6 @@
 #include "compiler/include/frontend/frontend_driver.hpp"
 #include "compiler/include/frontend/optimizer/pass_manager.h"
 
-#include "ir/include/ir_importer.hpp"
 
 namespace nn_compiler {
 namespace frontend {
@@ -35,8 +34,8 @@ RetVal FrontendDriver::finalize() {
 }
 
 RetVal FrontendDriver::importer(std::unique_ptr<nn_compiler::ir::NNModel>& model) {
-    // TODO(SRCX): model importer
-
+    std::shared_ptr<TorchScriptBuilder> builder = std::make_shared<TorchScriptBuilder>();
+    builder->build(model, in_file_path_);
     return RetVal::SUCCESS;
 }
 

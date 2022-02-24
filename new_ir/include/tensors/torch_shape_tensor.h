@@ -18,7 +18,6 @@ namespace nn_compiler
 {
 namespace ir
 {
-
 class TSSTensor
 {
    public:
@@ -85,7 +84,6 @@ class TSSTensor
     std::vector<int32_t> dims_;
     int32_t dim_size_ = 0;
     uint32_t parent_layer_id_ = 0;
-
     DataType featuremap_type_ = DataType::UNDEFINED;
 };
 
