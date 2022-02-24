@@ -1,11 +1,13 @@
 #include <set>
 
-#include "importer/torchscript_builder.h"
+#include "importer/model_builder.h"
 #include "new_ir/include/utils/graph_print.h"
 
 namespace nn_compiler
 {
-void TorchScriptBuilder::build(std::unique_ptr<ir::NNModel>& nn_model, const std::string& torch_model_path)
+namespace frontend
+{
+void ModelBuilder::build(std::unique_ptr<ir::NNModel>& nn_model, const std::string& torch_model_path)
 {
     torch_model_ = parseTorchScript(torch_model_path);
     // convert torch node to nn-network layer
@@ -15,7 +17,7 @@ void TorchScriptBuilder::build(std::unique_ptr<ir::NNModel>& nn_model, const std
     return;
 }
 
-std::shared_ptr<torch::jit::Module> TorchScriptBuilder::parseTorchScript(const std::string& torch_model_path)
+std::shared_ptr<torch::jit::Module> ModelBuilder::parseTorchScript(const std::string& torch_model_path)
 {
     // ref: https://pytorch.org/tutorials/advanced/cpp_export.html
     torch::jit::Module script_model;
@@ -28,20 +30,20 @@ std::shared_ptr<torch::jit::Module> TorchScriptBuilder::parseTorchScript(const s
     return torch_model;
 }
 
-uint32_t TorchScriptBuilder::getUniqueBlockId()
+uint32_t ModelBuilder::getUniqueBlockId()
 {
     block_counter_++;
     return block_counter_;
 }
 
-uint32_t TorchScriptBuilder::getUniqueTensorId(std::unique_ptr<ir::NNModel>& nn_model)
+uint32_t ModelBuilder::getUniqueTensorId(std::unique_ptr<ir::NNModel>& nn_model)
 {
     auto shape_tensor = std::make_shared<ir::TSSTensor>();
     nn_model->addTSSTensor(std::make_pair(shape_tensor->getID(), shape_tensor));
     return shape_tensor->getID();
 }
 
-void TorchScriptBuilder::getFinalType(c10::TypePtr t, std::set<c10::TypePtr>& type_set)
+void ModelBuilder::getFinalType(c10::TypePtr t, std::set<c10::TypePtr>& type_set)
 {
     if (t->containedTypes().empty()) {
         type_set.insert(t);
@@ -52,7 +54,7 @@ void TorchScriptBuilder::getFinalType(c10::TypePtr t, std::set<c10::TypePtr>& ty
     }
 }
 
-void TorchScriptBuilder::isInplaceNode(std::string op_node, std::shared_ptr<ir::NNLayer>& layer)
+void ModelBuilder::isInplaceNode(std::string op_node, std::shared_ptr<ir::NNLayer>& layer)
 {
     if (op_node == "aten::unsqueeze_") {
         std::shared_ptr<ir::AtenUnsqueezeLayer> attr = std::static_pointer_cast<ir::AtenUnsqueezeLayer>(layer);
@@ -66,7 +68,7 @@ void TorchScriptBuilder::isInplaceNode(std::string op_node, std::shared_ptr<ir::
     }
 }
 
-nn_compiler::ir::DataType TorchScriptBuilder::convertTorchScriptType(const c10::TypePtr& torch_type)
+nn_compiler::ir::DataType ModelBuilder::convertTorchScriptType(const c10::TypePtr& torch_type)
 {
     std::set<c10::TypePtr> type_set;
     type_set.clear();
@@ -181,7 +183,7 @@ void addAttributeToLayer(c10::IValue ival, std::shared_ptr<nn_compiler::ir::Prim
     }
 }
 template <typename T>
-void TorchScriptBuilder::importTorchScriptMethodBlock(std::unique_ptr<ir::NNModel>& nn_model, const std::string& name,
+void ModelBuilder::importTorchScriptMethodBlock(std::unique_ptr<ir::NNModel>& nn_model, const std::string& name,
                                                       const T& method_block, bool is_main_graph)
 {
     std::shared_ptr<ir::NNNetwork> network = std::make_shared<ir::NNNetwork>();
@@ -309,7 +311,276 @@ void TorchScriptBuilder::importTorchScriptMethodBlock(std::unique_ptr<ir::NNMode
                 }
                 break;
             }
+            case c10::prim::SetAttr: {
+                auto attr_symbol = node->attributeNames().at(0);
+                std::string attrMap_key = node->inputs()[0]->type()->str() + "@" + node->s(attr_symbol);
+                auto attr = module_attributes_[attrMap_key];
+                if (!attr.isModule()) {
+                    // Module attr is not our target, we only handle attr that has values
+                    if (attr_layer_map.count(attrMap_key) == 0) {
+                        // Create variable layer
+                        auto variable_builder = this->layer_builders_.get("prim::Variable");
+                        if (variable_builder != nullptr) {
+                            auto variable_layer = std::dynamic_pointer_cast<nn_compiler::ir::PrimVariableLayer>(
+                                variable_builder->buildLayer(node));
+                            variable_layer->setName(variable_layer->getType() + "_" +
+                                                    std::to_string(variable_layer->getID()));
+                            variable_layer->setNType(attr.type()->repr_str());
 
+                            // Store attr
+                            addAttributeToLayer(attr, variable_layer);
+
+                            // No input
+                            // Add output for prim::variable layer
+                            int node_output_id = getUniqueTensorId(nn_model);
+                            auto shape_tensor = nn_model->getTSSTensors()[node_output_id];
+                            shape_tensor->setParentLayer(variable_layer->getID());
+                            shape_tensor->setFeaturemapType(convertTorchScriptType(attr.type()));
+                            shape_tensor->setReprType(variable_layer->getNType());
+                            variable_layer->addOutSTensorID(node_output_id);
+                            attr_layer_map.emplace(attrMap_key, variable_layer);
+                            network->addLayer(variable_layer);
+                        }
+                    }
+                }
+
+                // create SetAttr Layer
+                auto set_attr_builder = this->layer_builders_.get("prim::SetAttr");
+                if (set_attr_builder != nullptr) {
+                    auto set_attr_layer = std::dynamic_pointer_cast<nn_compiler::ir::PrimSetAttrLayer>(
+                        set_attr_builder->buildLayer(node));
+                    set_attr_layer->setName(set_attr_layer->getType() + "_" + std::to_string(set_attr_layer->getID()));
+
+                    // Connect SetAttr and variable
+                    auto variable_layer = attr_layer_map[attrMap_key];
+
+                    // Add input1, target attribute
+                    for (auto oid : variable_layer->getOutSTensorID()) {
+                        set_attr_layer->addInSTensorID(oid);
+                    }
+                    // Add input2, target value
+                    for (unsigned int i = 1; i < node->inputs().size(); i++) {
+                        set_attr_layer->addInSTensorID(value_tensor_map[node->inputs()[i]]);
+                    }
+                    // No output
+                    for (auto node_output : node->outputs()) {
+                        // always create new
+                        if (value_tensor_map.find(node_output) == value_tensor_map.end()) {
+                            int node_output_id = getUniqueTensorId(nn_model);
+                            auto shape_tensor = nn_model->getTSSTensors()[node_output_id];
+                            shape_tensor->setFeaturemapType(convertTorchScriptType(node_output->type()));
+                            shape_tensor->setParentLayer(set_attr_layer->getID());
+                            shape_tensor->setReprType(node_output->type()->repr_str());
+                            value_tensor_map.emplace(node_output, node_output_id);
+                            set_attr_layer->addOutSTensorID(node_output_id);
+                        } else {
+                            set_attr_layer->addOutSTensorID(value_tensor_map[node_output]);
+                        }
+                    }
+                    network->addLayer(set_attr_layer);
+                }
+                break;
+            }
+            case c10::prim::GetAttr: {
+                // Create a prim::variable layer and store attribute values
+                auto attr_symbol = node->attributeNames().at(0);
+                std::string attrMap_key = node->input()->type()->str() + "@" + node->s(attr_symbol);
+                auto attr = module_attributes_[attrMap_key];
+
+                if (!attr.isModule()) {
+                    // Module attr is not our target, we only handle attr that has values
+                    if (attr_layer_map.count(attrMap_key) == 0) {
+                        // Create variable layer
+                        auto variable_builder = this->layer_builders_.get("prim::Variable");
+                        if (variable_builder != nullptr) {
+                            auto variable_layer = std::dynamic_pointer_cast<nn_compiler::ir::PrimVariableLayer>(
+                                variable_builder->buildLayer(node));
+                            variable_layer->setName(variable_layer->getType() + "_" +
+                                                    std::to_string(variable_layer->getID()));
+                            variable_layer->setNType(attr.type()->repr_str());
+
+                            // Store attr
+                            addAttributeToLayer(attr, variable_layer);
+
+                            // No input
+                            // Add output
+                            for (auto node_output : node->outputs()) {
+                                // always create new
+                                if (value_tensor_map.find(node_output) == value_tensor_map.end()) {
+                                    int node_output_id = getUniqueTensorId(nn_model);
+                                    auto shape_tensor = nn_model->getTSSTensors()[node_output_id];
+                                    shape_tensor->setFeaturemapType(convertTorchScriptType(node_output->type()));
+                                    shape_tensor->setParentLayer(variable_layer->getID());
+                                    shape_tensor->setReprType(node_output->type()->repr_str());
+                                    // value_tensor_map.emplace(node_output, node_output_id);
+                                    variable_layer->addOutSTensorID(node_output_id);
+                                } else {
+                                    variable_layer->addOutSTensorID(value_tensor_map[node_output]);
+                                }
+                            }
+                            attr_layer_map.emplace(attrMap_key, variable_layer);
+                            network->addLayer(variable_layer);
+                        }
+                    }
+
+                    // Create GetAttr layer
+                    auto get_attr_builder = this->layer_builders_.get("prim::GetAttr");
+                    if (get_attr_builder != nullptr) {
+                        auto get_attr_layer = std::dynamic_pointer_cast<nn_compiler::ir::PrimGetAttrLayer>(
+                            get_attr_builder->buildLayer(node));
+                        get_attr_layer->setName(get_attr_layer->getType() + "_" +
+                                                std::to_string(get_attr_layer->getID()));
+
+                        // Connect GetAttr and variable
+                        auto variable_layer = attr_layer_map[attrMap_key];
+
+                        // Add input
+                        for (auto oid : variable_layer->getOutSTensorID()) {
+                            get_attr_layer->addInSTensorID(oid);
+                        }
+                        // Add output
+                        for (auto node_output : node->outputs()) {
+                            // always create new
+                            if (value_tensor_map.find(node_output) == value_tensor_map.end()) {
+                                int node_output_id = getUniqueTensorId(nn_model);
+                                auto shape_tensor = nn_model->getTSSTensors()[node_output_id];
+                                shape_tensor->setFeaturemapType(convertTorchScriptType(node_output->type()));
+                                shape_tensor->setParentLayer(get_attr_layer->getID());
+                                shape_tensor->setReprType(node_output->type()->repr_str());
+                                value_tensor_map.emplace(node_output, node_output_id);
+                                get_attr_layer->addOutSTensorID(node_output_id);
+                            } else {
+                                get_attr_layer->addOutSTensorID(value_tensor_map[node_output]);
+                            }
+                        }
+                        network->addLayer(get_attr_layer);
+                    }
+                }
+                break;
+            }
+            case c10::aten::arange: {
+                auto input_num = (node->inputs()).size();
+                std::shared_ptr<frontend::LayerBuilder> builder = nullptr;
+                if (input_num == 5) {
+                    builder = this->layer_builders_.get("aten::arange1");
+                } else if (input_num == 6) {
+                    builder = this->layer_builders_.get("aten::arange2");
+                } else if (input_num == 7) {
+                    builder = this->layer_builders_.get("aten::arange3");
+                } else {
+                    Log::NIR::E() << "Unsupported input number of aten::arange.";
+                }
+
+                if (builder != nullptr) {
+                    auto layer = builder->buildLayer(node);
+                    layer->setName(layer->getType() + "_" + std::to_string(layer->getID()));
+                    // Add input
+                    for (auto node_input : node->inputs()) {
+                        layer->addInSTensorID(value_tensor_map[node_input]);
+                    }
+
+                    // Add output
+                    for (auto node_output : node->outputs()) {
+                        if (value_tensor_map.find(node_output) == value_tensor_map.end()) {
+                            int node_output_id = getUniqueTensorId(nn_model);
+                            auto shape_tensor = nn_model->getTSSTensors()[node_output_id];
+                            shape_tensor->setFeaturemapType(convertTorchScriptType(node_output->type()));
+                            shape_tensor->setParentLayer(layer->getID());
+                            shape_tensor->setReprType(node_output->type()->repr_str());
+                            value_tensor_map.emplace(node_output, node_output_id);
+                            layer->addOutSTensorID(node_output_id);
+                        } else {
+                            layer->addOutSTensorID(value_tensor_map[node_output]);
+                        }
+                    }
+                    network->addLayer(layer);
+                } else {
+                    Log::NIR::E() << kind.toQualString() << " layer builder not found.";
+                }
+                break;
+            }
+            case c10::aten::lstm: {
+                int lstm_type = 1;
+                std::shared_ptr<frontend::LayerBuilder> builder = nullptr;
+                if (node->inputs()[3]->node()->kind() == c10::prim::ListConstruct) {
+                    lstm_type = 2;
+                }
+                if (lstm_type == 1) {
+                    builder = this->layer_builders_.get("aten::lstm1");
+                } else if (lstm_type == 2) {
+                    builder = this->layer_builders_.get("aten::lstm2");
+                } else {
+                    Log::NIR::E() << "Unsupported input number of aten::lstm.";
+                }
+
+                if (builder != nullptr) {
+                    auto layer = builder->buildLayer(node);
+                    layer->setName(layer->getType() + "_" + std::to_string(layer->getID()));
+                    // Add input
+                    for (auto node_input : node->inputs()) {
+                        layer->addInSTensorID(value_tensor_map[node_input]);
+                    }
+
+                    // Add output
+                    for (auto node_output : node->outputs()) {
+                        if (value_tensor_map.find(node_output) == value_tensor_map.end()) {
+                            int node_output_id = getUniqueTensorId(nn_model);
+                            auto shape_tensor = nn_model->getTSSTensors()[node_output_id];
+                            shape_tensor->setFeaturemapType(convertTorchScriptType(node_output->type()));
+                            shape_tensor->setParentLayer(layer->getID());
+                            shape_tensor->setReprType(node_output->type()->repr_str());
+                            value_tensor_map.emplace(node_output, node_output_id);
+                            layer->addOutSTensorID(node_output_id);
+                        } else {
+                            layer->addOutSTensorID(value_tensor_map[node_output]);
+                        }
+                    }
+                    network->addLayer(layer);
+                } else {
+                    Log::NIR::E() << kind.toQualString() << " layer builder not found.";
+                }
+                break;
+            }
+            case c10::aten::to: {
+                auto input_num = (node->inputs()).size();
+                std::shared_ptr<frontend::LayerBuilder> builder = nullptr;
+                std::string type = c10::typeKindToString(node->inputs()[1]->type()->kind());
+                if (type == "TensorType") {
+                    builder = this->layer_builders_.get("aten::to2");
+                } else if (type == "IntType") {
+                    builder = this->layer_builders_.get("aten::to1");
+                } else {
+                    Log::NIR::E() << "Unsupported input type of aten::to.";
+                }
+
+                if (builder != nullptr) {
+                    auto layer = builder->buildLayer(node);
+                    layer->setName(layer->getType() + "_" + std::to_string(layer->getID()));
+                    // Add input
+                    for (auto node_input : node->inputs()) {
+                        layer->addInSTensorID(value_tensor_map[node_input]);
+                    }
+
+                    // Add output
+                    for (auto node_output : node->outputs()) {
+                        if (value_tensor_map.find(node_output) == value_tensor_map.end()) {
+                            int node_output_id = getUniqueTensorId(nn_model);
+                            auto shape_tensor = nn_model->getTSSTensors()[node_output_id];
+                            shape_tensor->setFeaturemapType(convertTorchScriptType(node_output->type()));
+                            shape_tensor->setParentLayer(layer->getID());
+                            shape_tensor->setReprType(node_output->type()->repr_str());
+                            value_tensor_map.emplace(node_output, node_output_id);
+                            layer->addOutSTensorID(node_output_id);
+                        } else {
+                            layer->addOutSTensorID(value_tensor_map[node_output]);
+                        }
+                    }
+                    network->addLayer(layer);
+                } else {
+                    Log::NIR::E() << kind.toQualString() << " layer builder not found.";
+                }
+                break;
+            }
             default: {
                 auto builder = this->layer_builders_.get(std::string(kind.toQualString()));
                 if (builder != nullptr) {
@@ -372,7 +643,7 @@ void TorchScriptBuilder::importTorchScriptMethodBlock(std::unique_ptr<ir::NNMode
     return;
 }
 
-void TorchScriptBuilder::importModuleAttributes(std::shared_ptr<torch::jit::Module> torch_model)
+void ModelBuilder::importModuleAttributes(std::shared_ptr<torch::jit::Module> torch_model)
 {
     for (auto module : torch_model->named_modules()) {
         std::string module_type = module.value.type()->str();
@@ -383,7 +654,7 @@ void TorchScriptBuilder::importModuleAttributes(std::shared_ptr<torch::jit::Modu
     }
 }
 
-void TorchScriptBuilder::torchToNNNnetwork(std::unique_ptr<ir::NNModel>& nn_model,
+void ModelBuilder::torchToNNNnetwork(std::unique_ptr<ir::NNModel>& nn_model,
                                            std::shared_ptr<torch::jit::Module>& torch_model)
 {
     // Get and map all module attributes
@@ -405,4 +676,6 @@ void TorchScriptBuilder::torchToNNNnetwork(std::unique_ptr<ir::NNModel>& nn_mode
     nn_model->reverseGraphs();
     return;
 }
+
+}  // namespace frontend
 }  // namespace nn_compiler

@@ -8,10 +8,12 @@
 
 namespace nn_compiler
 {
-class TorchScriptBuilder
+namespace frontend
+{
+class ModelBuilder
 {
    public:
-    TorchScriptBuilder() {}
+    ModelBuilder() {}
 
     void build(std::unique_ptr<ir::NNModel>& nn_model, const std::string& torch_model_path);
 
@@ -53,4 +55,5 @@ class TorchScriptBuilder
     uint32_t block_counter_ = 0;
 };
 
+}  // namespace frontend
 }  // namespace nn_compiler

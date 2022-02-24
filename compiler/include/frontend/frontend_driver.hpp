@@ -5,15 +5,17 @@
 #include <vector>
 
 #include "compiler/include/common/log.hpp"
-#include "importer/torchscript_builder.h"
+#include "importer/model_builder.h"
 #include "ir/include/nn_ir.hpp"
 #include "new_ir/include/nn_model.h"
 
-namespace nn_compiler {
-namespace frontend {
-
-class FrontendDriver {
- public:
+namespace nn_compiler
+{
+namespace frontend
+{
+class FrontendDriver
+{
+   public:
     FrontendDriver() = default;
 
     FrontendDriver(const FrontendDriver&) = delete;
@@ -44,7 +46,7 @@ class FrontendDriver {
      */
     RetVal finalize();
 
- private:
+   private:
     std::string in_file_path_ = "";
 
     std::string model_name_ = "";
