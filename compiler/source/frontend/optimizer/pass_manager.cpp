@@ -8,6 +8,9 @@
 #include "compiler/include/frontend/optimizer/remove_cat_for_addmm.h"
 #include "compiler/include/frontend/optimizer/remove_get_attr_layers.h"
 #include "compiler/include/frontend/optimizer/remove_if_with_addmm.h"
+
+#include "compiler/include/frontend/optimizer/set_weights_for_embedding.h"
+
 #include "compiler/include/frontend/optimizer/swap_addmm_inputs.h"
 #include "compiler/include/frontend/optimizer/swap_matmul_inputs.h"
 
@@ -33,6 +36,8 @@ void PassManager::runPasses(std::unique_ptr<nn_compiler::ir::NNModel>& model) {
     auto remove_cat_for_addmm = std::make_shared<RemoveCatForAddmm>();
     auto swap_addmm_inputs = std::make_shared<SwapAddmmInputs>();
     auto swap_matmul_inputs = std::make_shared<SwapMatmulInputs>();
+    auto set_weights_for_embedding = std::make_shared<SetWeightsForEmbedding>();
+
     // 2. TODO(SRCX): add optimization passes, like: base_pass->add(fuse_act);
     base_pass->add(take_in_body_net);
     take_in_body_net->add(construct_list);
@@ -43,6 +48,10 @@ void PassManager::runPasses(std::unique_ptr<nn_compiler::ir::NNModel>& model) {
     remove_cat_for_addmm->add(swap_addmm_inputs);
     swap_addmm_inputs->add(swap_matmul_inputs);
     swap_matmul_inputs->add(fuse_act);
+
+    if (model_name_ == "RNNT") {
+        fuse_act->add(set_weights_for_embedding);
+    }
 
     while (base_pass->getSuccessor() != nullptr) {
         base_pass = base_pass->getSuccessor();
