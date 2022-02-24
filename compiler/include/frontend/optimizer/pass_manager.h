@@ -16,5 +16,5 @@ class PassManager {
     std::string model_name_ = "";
 };
 
-} // namespace frontend
-} // namespace nn_compiler
+}  // namespace frontend
+}  // namespace nn_compiler
