@@ -14,61 +14,45 @@
 
 #include "new_ir/include/types.h"
 
-namespace nn_compiler {
-namespace ir {
+namespace nn_compiler
+{
+namespace ir
+{
 
-class STensor {
- public:
+class STensor
+{
+   public:
     STensor(uint32_t batch, uint32_t channel, uint32_t height, uint32_t width)
-            : n_(batch), c_(channel), h_(height), w_(width) {
+        : n_(batch), c_(channel), h_(height), w_(width)
+    {
         setID(getNextId());
     }
 
-    STensor() : STensor{0, 0, 0, 0} {
-    }
+    STensor() : STensor{0, 0, 0, 0} {}
 
-    uint32_t getID() {
-        return id_;
-    }
+    uint32_t getID() { return id_; }
 
-    void setBatch(uint32_t batch) {
-        n_ = batch;
-    }
-    uint32_t getBatch() const {
-        return n_;
-    }
+    void setBatch(uint32_t batch) { n_ = batch; }
+    uint32_t getBatch() const { return n_; }
 
-    void setChannel(uint32_t channel) {
-        c_ = channel;
-    }
-    uint32_t getChannel() const {
-        return c_;
-    }
+    void setChannel(uint32_t channel) { c_ = channel; }
+    uint32_t getChannel() const { return c_; }
 
-    void setHeight(uint32_t height) {
-        h_ = height;
-    }
-    uint32_t getHeight() const {
-        return h_;
-    }
+    void setHeight(uint32_t height) { h_ = height; }
+    uint32_t getHeight() const { return h_; }
 
-    void setWidth(uint32_t width) {
-        w_ = width;
-    }
-    uint32_t getWidth() const {
-        return w_;
-    }
+    void setWidth(uint32_t width) { w_ = width; }
+    uint32_t getWidth() const { return w_; }
 
- private:
-    static uint32_t getNextId() {
+   private:
+    static uint32_t getNextId()
+    {
         static std::atomic<uint32_t> id{0};
         return id++;
     }
 
     uint32_t id_;
-    void setID(uint32_t id) {
-        id_ = id;
-    }
+    void setID(uint32_t id) { id_ = id; }
 
     uint32_t n_ = 0;
     uint32_t c_ = 0;

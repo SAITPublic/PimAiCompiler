@@ -7,19 +7,21 @@
 
 #include "new_ir/include/layers/prim_loop_index_layer.h"
 #include "new_ir/include/layers/prim_loop_layer.h"
-#include "new_ir/include/utils/graph_util.h"
 #include "new_ir/include/types.h"
+#include "new_ir/include/utils/graph_util.h"
 
 #include "ir/include/common/log.hpp"
 
-namespace nn_compiler {
+namespace nn_compiler
+{
 
-namespace frontend {
+namespace frontend
+{
 
-TakeInBodyNet::TakeInBodyNet() {
-}
+TakeInBodyNet::TakeInBodyNet() {}
 
-void TakeInBodyNet::fitIfCondition(std::unique_ptr<nn_compiler::ir::NNModel> &model) {
+void TakeInBodyNet::fitIfCondition(std::unique_ptr<nn_compiler::ir::NNModel>& model)
+{
     auto graphs = model->getGraphs();
     for (auto graph : graphs) {
         for (auto layer : graph->getLayers()) {
@@ -31,7 +33,8 @@ void TakeInBodyNet::fitIfCondition(std::unique_ptr<nn_compiler::ir::NNModel> &mo
     return;
 }
 
-void TakeInBodyNet::fitLoopCondition(std::unique_ptr<nn_compiler::ir::NNModel> &model) {
+void TakeInBodyNet::fitLoopCondition(std::unique_ptr<nn_compiler::ir::NNModel>& model)
+{
     auto graphs = model->getGraphs();
     for (auto graph : graphs) {
         for (auto layer : graph->getLayers()) {
@@ -43,13 +46,15 @@ void TakeInBodyNet::fitLoopCondition(std::unique_ptr<nn_compiler::ir::NNModel> &
     return;
 }
 
-bool TakeInBodyNet::fitCondition(std::unique_ptr<nn_compiler::ir::NNModel> &model) {
+bool TakeInBodyNet::fitCondition(std::unique_ptr<nn_compiler::ir::NNModel>& model)
+{
     fitIfCondition(model);
     fitLoopCondition(model);
     return (prim_if_layers_.size() != 0 || prim_loop_layers_.size() != 0);
 }
 
-void TakeInBodyNet::take_in_if_body(std::unique_ptr<nn_compiler::ir::NNModel>& model) {
+void TakeInBodyNet::take_in_if_body(std::unique_ptr<nn_compiler::ir::NNModel>& model)
+{
     Log::IR::I() << "Take in if body net start.";
     auto graphs = model->getGraphs();
     for (auto layer_pair : prim_if_layers_) {
@@ -105,8 +110,8 @@ void TakeInBodyNet::take_in_if_body(std::unique_ptr<nn_compiler::ir::NNModel>& m
             if (i == 0) {
                 // add a endif layer to mark the end of then net
                 auto end_then_net_marker = std::make_shared<nn_compiler::ir::PrimEndIfLayer>("", "prim::EndIf");
-                end_then_net_marker->setName(
-                    end_then_net_marker->getType() + "_" + std::to_string(end_then_net_marker->getID()));
+                end_then_net_marker->setName(end_then_net_marker->getType() + "_" +
+                                             std::to_string(end_then_net_marker->getID()));
                 main_graph->addLayer2pos(end_then_net_marker, layer_pos_in_main_graph++);
             }
             model->removeGraph(net->getName());
@@ -117,7 +122,8 @@ void TakeInBodyNet::take_in_if_body(std::unique_ptr<nn_compiler::ir::NNModel>& m
     }
 }
 
-void TakeInBodyNet::take_in_loop_body(std::unique_ptr<nn_compiler::ir::NNModel>& model) {
+void TakeInBodyNet::take_in_loop_body(std::unique_ptr<nn_compiler::ir::NNModel>& model)
+{
     Log::IR::I() << "Take in loop body net start.";
     auto graphs = model->getGraphs();
     // need find loop layer belongs to which net. when loop layer in if body net, after take_in_if_body()
@@ -138,7 +144,7 @@ void TakeInBodyNet::take_in_loop_body(std::unique_ptr<nn_compiler::ir::NNModel>&
             }
         }
         if (body_net == nullptr) {
-            Log::IR::E()  << " body block of prim::Loop missed.";
+            Log::IR::E() << " body block of prim::Loop missed.";
         }
 
         std::vector<uint32_t> loop_layer_out_tensor_ids = layer->getOutSTensorID();
@@ -172,8 +178,8 @@ void TakeInBodyNet::take_in_loop_body(std::unique_ptr<nn_compiler::ir::NNModel>&
                 auto index_to_block_id_shape_tensor = model->getTSSTensors()[index_to_block_id];
                 index_to_block_id_shape_tensor->setFeaturemapType(nn_compiler::ir::DataType::UINT8);
                 auto loop_index_layer = std::make_shared<nn_compiler::ir::PrimLoopIndexLayer>("", "prim::LoopIndex");
-                loop_index_layer->setName(loop_index_layer->getType()
-                                          + "_" + std::to_string(loop_index_layer->getID()));
+                loop_index_layer->setName(loop_index_layer->getType() + "_" +
+                                          std::to_string(loop_index_layer->getID()));
 
                 loop_index_layer->addOutSTensorID(index_to_block_id);
 
@@ -220,7 +226,8 @@ void TakeInBodyNet::take_in_loop_body(std::unique_ptr<nn_compiler::ir::NNModel>&
     }
 }
 
-void TakeInBodyNet::run(std::unique_ptr<nn_compiler::ir::NNModel>& model) {
+void TakeInBodyNet::run(std::unique_ptr<nn_compiler::ir::NNModel>& model)
+{
     Log::IR::I() << "TakeInBodyNet::run is called.";
 
     take_in_if_body(model);
@@ -228,11 +235,12 @@ void TakeInBodyNet::run(std::unique_ptr<nn_compiler::ir::NNModel>& model) {
     take_in_loop_body(model);
 }
 
-uint32_t TakeInBodyNet::getUniqueTensorId(std::unique_ptr<nn_compiler::ir::NNModel>& model) {
+uint32_t TakeInBodyNet::getUniqueTensorId(std::unique_ptr<nn_compiler::ir::NNModel>& model)
+{
     auto shape_tensor = std::make_shared<nn_compiler::ir::TSSTensor>();
     model->addTSSTensor(std::make_pair(shape_tensor->getID(), shape_tensor));
     return shape_tensor->getID();
 }
 
-} // namespace frontend
-} // namespace nn_compiler
+}  // namespace frontend
+}  // namespace nn_compiler

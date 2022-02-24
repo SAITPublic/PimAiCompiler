@@ -1,23 +1,25 @@
-#include "new_ir/include/utils/graph_util.h"
 #include "compiler/include/frontend/optimizer/remake_dtensor_of_prim_variable.h"
+#include "new_ir/include/utils/graph_util.h"
 
 #include "ir/include/common/log.hpp"
 
-namespace nn_compiler {
+namespace nn_compiler
+{
 
-namespace frontend {
-
+namespace frontend
+{
 
 bool RemakeDTensorOfPrimVariable::checkVariableUsage(const std::shared_ptr<nn_compiler::ir::NNLayer>& layer,
                                                      const std::shared_ptr<nn_compiler::ir::NNNetwork>& graph,
-                                                     const std::shared_ptr<nn_compiler::ir::DTensor>& data) {
+                                                     const std::shared_ptr<nn_compiler::ir::DTensor>& data)
+{
     auto consumers = ir::searchSuccessors(layer, graph);
     for (auto consumer : consumers) {
         auto cloned_layer_for_check = consumer.first->clone();
         auto cloned_data_for_check = data->clone();
         for (auto inID : consumer.second) {
-            std::pair<const std::shared_ptr<nn_compiler::ir::NNLayer>, unsigned int>
-                                                                layer_inID(cloned_layer_for_check, inID);
+            std::pair<const std::shared_ptr<nn_compiler::ir::NNLayer>, unsigned int> layer_inID(cloned_layer_for_check,
+                                                                                                inID);
 
             if (!helper_->putAttribute(cloned_layer_for_check->getType(), layer_inID, cloned_data_for_check)) {
                 return false;
@@ -28,7 +30,8 @@ bool RemakeDTensorOfPrimVariable::checkVariableUsage(const std::shared_ptr<nn_co
     return true;
 }
 
-bool RemakeDTensorOfPrimVariable::fitCondition(std::unique_ptr<nn_compiler::ir::NNModel>& model) {
+bool RemakeDTensorOfPrimVariable::fitCondition(std::unique_ptr<nn_compiler::ir::NNModel>& model)
+{
     auto graphs = model->getGraphs();
     for (auto graph : graphs) {
         for (auto layer : graph->getLayers()) {
@@ -39,8 +42,7 @@ bool RemakeDTensorOfPrimVariable::fitCondition(std::unique_ptr<nn_compiler::ir::
                     continue;
                 }
 
-                if (checkVariableUsage(layer, graph, data[0]) &&
-                        ir::isSingleValueType(data[0]->getDataType())) {
+                if (checkVariableUsage(layer, graph, data[0]) && ir::isSingleValueType(data[0]->getDataType())) {
                     variable_layers_.push_back(layer);
                 }
             }
@@ -50,7 +52,8 @@ bool RemakeDTensorOfPrimVariable::fitCondition(std::unique_ptr<nn_compiler::ir::
     return (variable_layers_.size() != 0);
 }
 
-void RemakeDTensorOfPrimVariable::run(std::unique_ptr<nn_compiler::ir::NNModel>& model) {
+void RemakeDTensorOfPrimVariable::run(std::unique_ptr<nn_compiler::ir::NNModel>& model)
+{
     Log::IR::I() << "RemakeDTensorOfPrimVariable::run is called.";
 
     // there will be only one graph after take_in_body_net pass.
@@ -62,8 +65,7 @@ void RemakeDTensorOfPrimVariable::run(std::unique_ptr<nn_compiler::ir::NNModel>&
         auto new_dtensor = std::make_shared<nn_compiler::ir::DTensor>();
 
         // TODO(SRCX): support other types
-        if (variable_data.size() > 0 &&
-                variable_data[0]->getDataType() == nn_compiler::ir::DataType::INT64) {
+        if (variable_data.size() > 0 && variable_data[0]->getDataType() == nn_compiler::ir::DataType::INT64) {
             int64_t int_arr[variable_data.size()];
             for (unsigned int idx = 0; idx < variable_data.size(); idx++) {
                 int_arr[idx] = getSingleValue<int64_t>(variable_data[idx]);
@@ -79,5 +81,5 @@ void RemakeDTensorOfPrimVariable::run(std::unique_ptr<nn_compiler::ir::NNModel>&
     }
 }
 
-} // namespace frontend
-} // namespace nn_compiler
+}  // namespace frontend
+}  // namespace nn_compiler

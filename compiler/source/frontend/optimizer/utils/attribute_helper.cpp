@@ -54,16 +54,19 @@
 
 #include "half.hpp"
 
-namespace nn_compiler {
+namespace nn_compiler
+{
 
-namespace frontend {
+namespace frontend
+{
 
-bool AttributeHelper::putAttribute(std::string name, layer_inID_type& layer_inID, dtensor_ptr_type& d_tensor) {
+bool AttributeHelper::putAttribute(std::string name, layer_inID_type& layer_inID, dtensor_ptr_type& d_tensor)
+{
     bool ret_code = false;
     std::map<std::string, putAttributeFunc>::iterator iter = type_to_function_.find(name);
     if (iter == type_to_function_.end()) {
         Log::IR::I() << layer_inID.first->getType()
-                   << " don't require attribute setting, or this prim::Constant is used as input.";
+                     << " don't require attribute setting, or this prim::Constant is used as input.";
     } else {
         ret_code = (this->*(iter->second))(layer_inID, d_tensor);
     }
@@ -71,7 +74,8 @@ bool AttributeHelper::putAttribute(std::string name, layer_inID_type& layer_inID
     return ret_code;
 }
 
-bool AttributeHelper::putAttributeInAtenAdd(layer_inID_type& layer_inID, dtensor_ptr_type& d_tensor) {
+bool AttributeHelper::putAttributeInAtenAdd(layer_inID_type& layer_inID, dtensor_ptr_type& d_tensor)
+{
     auto cur_layer = std::dynamic_pointer_cast<ir::AtenAddLayer>(layer_inID.first);
     auto idx = layer_inID.second;
 
@@ -91,7 +95,8 @@ bool AttributeHelper::putAttributeInAtenAdd(layer_inID_type& layer_inID, dtensor
     return true;
 }
 
-bool AttributeHelper::putAttributeInAtenArange1(layer_inID_type& layer_inID, dtensor_ptr_type& d_tensor) {
+bool AttributeHelper::putAttributeInAtenArange1(layer_inID_type& layer_inID, dtensor_ptr_type& d_tensor)
+{
     auto cur_layer = std::dynamic_pointer_cast<ir::AtenArange1Layer>(layer_inID.first);
     auto idx = layer_inID.second;
     auto layer_type = cur_layer->getType();
@@ -132,7 +137,8 @@ bool AttributeHelper::putAttributeInAtenArange1(layer_inID_type& layer_inID, dte
     return true;
 }
 
-bool AttributeHelper::putAttributeInAtenArange2(layer_inID_type& layer_inID, dtensor_ptr_type& d_tensor) {
+bool AttributeHelper::putAttributeInAtenArange2(layer_inID_type& layer_inID, dtensor_ptr_type& d_tensor)
+{
     auto cur_layer = std::dynamic_pointer_cast<ir::AtenArange2Layer>(layer_inID.first);
     auto idx = layer_inID.second;
     auto layer_type = cur_layer->getType();
@@ -175,7 +181,8 @@ bool AttributeHelper::putAttributeInAtenArange2(layer_inID_type& layer_inID, dte
     return true;
 }
 
-bool AttributeHelper::putAttributeInAtenArange3(layer_inID_type& layer_inID, dtensor_ptr_type& d_tensor) {
+bool AttributeHelper::putAttributeInAtenArange3(layer_inID_type& layer_inID, dtensor_ptr_type& d_tensor)
+{
     auto cur_layer = std::dynamic_pointer_cast<ir::AtenArange3Layer>(layer_inID.first);
     auto idx = layer_inID.second;
     auto layer_type = cur_layer->getType();
@@ -220,7 +227,8 @@ bool AttributeHelper::putAttributeInAtenArange3(layer_inID_type& layer_inID, dte
     return true;
 }
 
-bool AttributeHelper::putAttributeInAtenAsTensor(layer_inID_type& layer_inID, dtensor_ptr_type& d_tensor) {
+bool AttributeHelper::putAttributeInAtenAsTensor(layer_inID_type& layer_inID, dtensor_ptr_type& d_tensor)
+{
     auto cur_layer = std::dynamic_pointer_cast<ir::AtenAsTensorLayer>(layer_inID.first);
     auto idx = layer_inID.second;
     auto layer_type = cur_layer->getType();
@@ -245,7 +253,8 @@ bool AttributeHelper::putAttributeInAtenAsTensor(layer_inID_type& layer_inID, dt
     return true;
 }
 
-bool AttributeHelper::putAttributeInAtenBatchNorm(layer_inID_type& layer_inID, dtensor_ptr_type& d_tensor) {
+bool AttributeHelper::putAttributeInAtenBatchNorm(layer_inID_type& layer_inID, dtensor_ptr_type& d_tensor)
+{
     auto cur_layer = std::dynamic_pointer_cast<ir::AtenBatchNorm2dLayer>(layer_inID.first);
     auto idx = layer_inID.second;
 
@@ -276,7 +285,8 @@ bool AttributeHelper::putAttributeInAtenBatchNorm(layer_inID_type& layer_inID, d
     return true;
 }
 
-bool AttributeHelper::putAttributeInAtenCat(layer_inID_type& layer_inID, dtensor_ptr_type& d_tensor) {
+bool AttributeHelper::putAttributeInAtenCat(layer_inID_type& layer_inID, dtensor_ptr_type& d_tensor)
+{
     auto cur_layer = std::dynamic_pointer_cast<ir::AtenCatLayer>(layer_inID.first);
     auto idx = layer_inID.second;
 
@@ -292,7 +302,8 @@ bool AttributeHelper::putAttributeInAtenCat(layer_inID_type& layer_inID, dtensor
     return true;
 }
 
-bool AttributeHelper::putAttributeInAtenChunk(layer_inID_type& layer_inID, dtensor_ptr_type& d_tensor) {
+bool AttributeHelper::putAttributeInAtenChunk(layer_inID_type& layer_inID, dtensor_ptr_type& d_tensor)
+{
     auto cur_layer = std::dynamic_pointer_cast<ir::AtenChunkLayer>(layer_inID.first);
     auto idx = layer_inID.second;
     auto layer_type = cur_layer->getType();
@@ -312,7 +323,8 @@ bool AttributeHelper::putAttributeInAtenChunk(layer_inID_type& layer_inID, dtens
     return true;
 }
 
-bool AttributeHelper::putAttributeInAtenClamp(layer_inID_type& layer_inID, dtensor_ptr_type& d_tensor) {
+bool AttributeHelper::putAttributeInAtenClamp(layer_inID_type& layer_inID, dtensor_ptr_type& d_tensor)
+{
     auto cur_layer = std::dynamic_pointer_cast<ir::AtenClampLayer>(layer_inID.first);
     auto idx = layer_inID.second;
     auto layer_type = cur_layer->getType();
@@ -332,7 +344,8 @@ bool AttributeHelper::putAttributeInAtenClamp(layer_inID_type& layer_inID, dtens
     return true;
 }
 
-bool AttributeHelper::putAttributeInAtenContiguous(layer_inID_type& layer_inID, dtensor_ptr_type& d_tensor) {
+bool AttributeHelper::putAttributeInAtenContiguous(layer_inID_type& layer_inID, dtensor_ptr_type& d_tensor)
+{
     auto cur_layer = std::dynamic_pointer_cast<ir::AtenContiguousLayer>(layer_inID.first);
     auto idx = layer_inID.second;
 
@@ -349,7 +362,8 @@ bool AttributeHelper::putAttributeInAtenContiguous(layer_inID_type& layer_inID, 
     return true;
 }
 
-bool AttributeHelper::putAttributeInAtenConv2d(layer_inID_type& layer_inID, dtensor_ptr_type& d_tensor) {
+bool AttributeHelper::putAttributeInAtenConv2d(layer_inID_type& layer_inID, dtensor_ptr_type& d_tensor)
+{
     auto cur_layer = std::dynamic_pointer_cast<ir::AtenConv2dLayer>(layer_inID.first);
     auto idx = layer_inID.second;
     auto layer_type = cur_layer->getType();
@@ -381,7 +395,8 @@ bool AttributeHelper::putAttributeInAtenConv2d(layer_inID_type& layer_inID, dten
     return true;
 }
 
-bool AttributeHelper::putAttributeInAtenDeriveIndex(layer_inID_type& layer_inID, dtensor_ptr_type& d_tensor) {
+bool AttributeHelper::putAttributeInAtenDeriveIndex(layer_inID_type& layer_inID, dtensor_ptr_type& d_tensor)
+{
     auto cur_layer = std::dynamic_pointer_cast<ir::AtenDeriveIndexLayer>(layer_inID.first);
     auto idx = layer_inID.second;
     auto layer_type = cur_layer->getType();
@@ -401,8 +416,8 @@ bool AttributeHelper::putAttributeInAtenDeriveIndex(layer_inID_type& layer_inID,
     return true;
 }
 
-
-bool AttributeHelper::putAttributeInAtenDropout(layer_inID_type& layer_inID, dtensor_ptr_type& d_tensor) {
+bool AttributeHelper::putAttributeInAtenDropout(layer_inID_type& layer_inID, dtensor_ptr_type& d_tensor)
+{
     auto cur_layer = std::dynamic_pointer_cast<ir::AtenDropoutLayer>(layer_inID.first);
     auto idx = layer_inID.second;
     auto layer_type = cur_layer->getType();
@@ -422,7 +437,8 @@ bool AttributeHelper::putAttributeInAtenDropout(layer_inID_type& layer_inID, dte
     return true;
 }
 
-bool AttributeHelper::putAttributeInAtenEmbedding(layer_inID_type& layer_inID, dtensor_ptr_type& d_tensor) {
+bool AttributeHelper::putAttributeInAtenEmbedding(layer_inID_type& layer_inID, dtensor_ptr_type& d_tensor)
+{
     auto cur_layer = std::dynamic_pointer_cast<ir::AtenEmbeddingLayer>(layer_inID.first);
     auto idx = layer_inID.second;
     auto layer_type = cur_layer->getType();
@@ -450,7 +466,8 @@ bool AttributeHelper::putAttributeInAtenEmbedding(layer_inID_type& layer_inID, d
     return true;
 }
 
-bool AttributeHelper::putAttributeInAtenExpand(layer_inID_type& layer_inID, dtensor_ptr_type& d_tensor) {
+bool AttributeHelper::putAttributeInAtenExpand(layer_inID_type& layer_inID, dtensor_ptr_type& d_tensor)
+{
     auto cur_layer = std::dynamic_pointer_cast<ir::AtenExpandLayer>(layer_inID.first);
     auto idx = layer_inID.second;
 
@@ -467,7 +484,8 @@ bool AttributeHelper::putAttributeInAtenExpand(layer_inID_type& layer_inID, dten
     return true;
 }
 
-bool AttributeHelper::putAttributeInAtenFormat(layer_inID_type& layer_inID, dtensor_ptr_type& d_tensor) {
+bool AttributeHelper::putAttributeInAtenFormat(layer_inID_type& layer_inID, dtensor_ptr_type& d_tensor)
+{
     auto cur_layer = std::dynamic_pointer_cast<ir::AtenFormatLayer>(layer_inID.first);
     auto idx = layer_inID.second;
 
@@ -484,7 +502,8 @@ bool AttributeHelper::putAttributeInAtenFormat(layer_inID_type& layer_inID, dten
     return true;
 }
 
-bool AttributeHelper::putAttributeInAtenGather(layer_inID_type& layer_inID, dtensor_ptr_type& d_tensor) {
+bool AttributeHelper::putAttributeInAtenGather(layer_inID_type& layer_inID, dtensor_ptr_type& d_tensor)
+{
     auto cur_layer = std::dynamic_pointer_cast<ir::AtenGatherLayer>(layer_inID.first);
     auto idx = layer_inID.second;
     auto layer_type = cur_layer->getType();
@@ -504,7 +523,8 @@ bool AttributeHelper::putAttributeInAtenGather(layer_inID_type& layer_inID, dten
     return true;
 }
 
-bool AttributeHelper::putAttributeInAtenGetItem(layer_inID_type& layer_inID, dtensor_ptr_type& d_tensor) {
+bool AttributeHelper::putAttributeInAtenGetItem(layer_inID_type& layer_inID, dtensor_ptr_type& d_tensor)
+{
     auto cur_layer = std::dynamic_pointer_cast<ir::AtenGetItemLayer>(layer_inID.first);
     auto idx = layer_inID.second;
 
@@ -521,7 +541,8 @@ bool AttributeHelper::putAttributeInAtenGetItem(layer_inID_type& layer_inID, dte
     return true;
 }
 
-bool AttributeHelper::putAttributeInAtenIndexPut(layer_inID_type& layer_inID, dtensor_ptr_type& d_tensor) {
+bool AttributeHelper::putAttributeInAtenIndexPut(layer_inID_type& layer_inID, dtensor_ptr_type& d_tensor)
+{
     auto cur_layer = std::dynamic_pointer_cast<ir::AtenIndexPutLayer>(layer_inID.first);
     auto idx = layer_inID.second;
 
@@ -538,7 +559,8 @@ bool AttributeHelper::putAttributeInAtenIndexPut(layer_inID_type& layer_inID, dt
     return true;
 }
 
-bool AttributeHelper::putAttributeInAtenIndexSelect(layer_inID_type& layer_inID, dtensor_ptr_type& d_tensor) {
+bool AttributeHelper::putAttributeInAtenIndexSelect(layer_inID_type& layer_inID, dtensor_ptr_type& d_tensor)
+{
     auto cur_layer = std::dynamic_pointer_cast<ir::AtenIndexSelectLayer>(layer_inID.first);
     auto idx = layer_inID.second;
 
@@ -555,7 +577,8 @@ bool AttributeHelper::putAttributeInAtenIndexSelect(layer_inID_type& layer_inID,
     return true;
 }
 
-bool AttributeHelper::putAttributeInAtenLeakyRelu(layer_inID_type& layer_inID, dtensor_ptr_type& d_tensor) {
+bool AttributeHelper::putAttributeInAtenLeakyRelu(layer_inID_type& layer_inID, dtensor_ptr_type& d_tensor)
+{
     auto cur_layer = std::dynamic_pointer_cast<ir::AtenLeakyReluLayer>(layer_inID.first);
     auto idx = layer_inID.second;
 
@@ -572,7 +595,8 @@ bool AttributeHelper::putAttributeInAtenLeakyRelu(layer_inID_type& layer_inID, d
     return true;
 }
 
-bool AttributeHelper::putAttributeInAtenLogSoftmax(layer_inID_type& layer_inID, dtensor_ptr_type& d_tensor) {
+bool AttributeHelper::putAttributeInAtenLogSoftmax(layer_inID_type& layer_inID, dtensor_ptr_type& d_tensor)
+{
     auto cur_layer = std::dynamic_pointer_cast<ir::AtenLogSoftmaxLayer>(layer_inID.first);
     auto idx = layer_inID.second;
     auto layer_type = cur_layer->getType();
@@ -598,7 +622,8 @@ bool AttributeHelper::putAttributeInAtenLogSoftmax(layer_inID_type& layer_inID, 
     return true;
 }
 
-bool AttributeHelper::putAttributeInAtenLstm1(layer_inID_type& layer_inID, dtensor_ptr_type& d_tensor) {
+bool AttributeHelper::putAttributeInAtenLstm1(layer_inID_type& layer_inID, dtensor_ptr_type& d_tensor)
+{
     auto cur_layer = std::dynamic_pointer_cast<ir::AtenLSTM1Layer>(layer_inID.first);
     auto idx = layer_inID.second;
     auto layer_type = cur_layer->getType();
@@ -633,7 +658,8 @@ bool AttributeHelper::putAttributeInAtenLstm1(layer_inID_type& layer_inID, dtens
     return true;
 }
 
-bool AttributeHelper::putAttributeInAtenLstm2(layer_inID_type& layer_inID, dtensor_ptr_type& d_tensor) {
+bool AttributeHelper::putAttributeInAtenLstm2(layer_inID_type& layer_inID, dtensor_ptr_type& d_tensor)
+{
     auto cur_layer = std::dynamic_pointer_cast<ir::AtenLSTM2Layer>(layer_inID.first);
     auto idx = layer_inID.second;
     auto layer_type = cur_layer->getType();
@@ -665,7 +691,8 @@ bool AttributeHelper::putAttributeInAtenLstm2(layer_inID_type& layer_inID, dtens
     return true;
 }
 
-bool AttributeHelper::putAttributeInAtenMax(layer_inID_type& layer_inID, dtensor_ptr_type& d_tensor) {
+bool AttributeHelper::putAttributeInAtenMax(layer_inID_type& layer_inID, dtensor_ptr_type& d_tensor)
+{
     auto cur_layer = std::dynamic_pointer_cast<ir::AtenMaxLayer>(layer_inID.first);
     auto idx = layer_inID.second;
     auto layer_type = cur_layer->getType();
@@ -685,7 +712,8 @@ bool AttributeHelper::putAttributeInAtenMax(layer_inID_type& layer_inID, dtensor
     return true;
 }
 
-bool AttributeHelper::putAttributeInAtenMaxPool2d(layer_inID_type& layer_inID, dtensor_ptr_type& d_tensor) {
+bool AttributeHelper::putAttributeInAtenMaxPool2d(layer_inID_type& layer_inID, dtensor_ptr_type& d_tensor)
+{
     auto cur_layer = std::dynamic_pointer_cast<ir::AtenMaxPool2dLayer>(layer_inID.first);
     auto idx = layer_inID.second;
     auto layer_type = cur_layer->getType();
@@ -712,7 +740,8 @@ bool AttributeHelper::putAttributeInAtenMaxPool2d(layer_inID_type& layer_inID, d
     return true;
 }
 
-bool AttributeHelper::putAttributeInAtenMin(layer_inID_type& layer_inID, dtensor_ptr_type& d_tensor) {
+bool AttributeHelper::putAttributeInAtenMin(layer_inID_type& layer_inID, dtensor_ptr_type& d_tensor)
+{
     auto cur_layer = std::dynamic_pointer_cast<ir::AtenMinLayer>(layer_inID.first);
     auto idx = layer_inID.second;
     auto layer_type = cur_layer->getType();
@@ -732,7 +761,8 @@ bool AttributeHelper::putAttributeInAtenMin(layer_inID_type& layer_inID, dtensor
     return true;
 }
 
-bool AttributeHelper::putAttributeInAtenNorm(layer_inID_type& layer_inID, dtensor_ptr_type& d_tensor) {
+bool AttributeHelper::putAttributeInAtenNorm(layer_inID_type& layer_inID, dtensor_ptr_type& d_tensor)
+{
     auto cur_layer = std::dynamic_pointer_cast<ir::AtenNormLayer>(layer_inID.first);
     auto idx = layer_inID.second;
     auto layer_type = cur_layer->getType();
@@ -750,7 +780,8 @@ bool AttributeHelper::putAttributeInAtenNorm(layer_inID_type& layer_inID, dtenso
     return true;
 }
 
-bool AttributeHelper::putAttributeInAtenOnes(layer_inID_type& layer_inID, dtensor_ptr_type& d_tensor) {
+bool AttributeHelper::putAttributeInAtenOnes(layer_inID_type& layer_inID, dtensor_ptr_type& d_tensor)
+{
     auto cur_layer = std::dynamic_pointer_cast<ir::AtenOnesLayer>(layer_inID.first);
     auto idx = layer_inID.second;
     auto layer_type = cur_layer->getType();
@@ -792,7 +823,8 @@ bool AttributeHelper::putAttributeInAtenOnes(layer_inID_type& layer_inID, dtenso
     return true;
 }
 
-bool AttributeHelper::putAttributeInAtenPackPaddedSequence(layer_inID_type& layer_inID, dtensor_ptr_type& d_tensor) {
+bool AttributeHelper::putAttributeInAtenPackPaddedSequence(layer_inID_type& layer_inID, dtensor_ptr_type& d_tensor)
+{
     auto cur_layer = std::dynamic_pointer_cast<ir::AtenPackPaddedSequenceLayer>(layer_inID.first);
     auto idx = layer_inID.second;
 
@@ -809,7 +841,8 @@ bool AttributeHelper::putAttributeInAtenPackPaddedSequence(layer_inID_type& laye
     return true;
 }
 
-bool AttributeHelper::putAttributeInAtenPadPackedSequence(layer_inID_type& layer_inID, dtensor_ptr_type& d_tensor) {
+bool AttributeHelper::putAttributeInAtenPadPackedSequence(layer_inID_type& layer_inID, dtensor_ptr_type& d_tensor)
+{
     auto cur_layer = std::dynamic_pointer_cast<ir::AtenPadPackedSequenceLayer>(layer_inID.first);
     auto idx = layer_inID.second;
     auto layer_type = cur_layer->getType();
@@ -825,8 +858,7 @@ bool AttributeHelper::putAttributeInAtenPadPackedSequence(layer_inID_type& layer
     } else if (idx == 2) {
         cur_layer->setBatchFirst(getValueFromConstant<int>(d_tensor, layer_type, "batch_first"));
     } else if (idx == 3) {
-        cur_layer->setPaddingValue(getValueFromConstant<float>(d_tensor, layer_type,
-                                                               "padding_value"));
+        cur_layer->setPaddingValue(getValueFromConstant<float>(d_tensor, layer_type, "padding_value"));
     } else if (idx == 4) {
         cur_layer->setTotalLength(getValueFromConstant<int64_t>(d_tensor, layer_type, "total_length"));
     } else {
@@ -835,7 +867,8 @@ bool AttributeHelper::putAttributeInAtenPadPackedSequence(layer_inID_type& layer
     return true;
 }
 
-bool AttributeHelper::putAttributeInAtenSelect(layer_inID_type& layer_inID, dtensor_ptr_type& d_tensor) {
+bool AttributeHelper::putAttributeInAtenSelect(layer_inID_type& layer_inID, dtensor_ptr_type& d_tensor)
+{
     auto cur_layer = std::dynamic_pointer_cast<ir::AtenSelectLayer>(layer_inID.first);
     auto idx = layer_inID.second;
 
@@ -854,7 +887,8 @@ bool AttributeHelper::putAttributeInAtenSelect(layer_inID_type& layer_inID, dten
     return true;
 }
 
-bool AttributeHelper::putAttributeInAtenSetItem(layer_inID_type& layer_inID, dtensor_ptr_type& d_tensor) {
+bool AttributeHelper::putAttributeInAtenSetItem(layer_inID_type& layer_inID, dtensor_ptr_type& d_tensor)
+{
     auto cur_layer = std::dynamic_pointer_cast<ir::AtenSetItemLayer>(layer_inID.first);
     auto idx = layer_inID.second;
 
@@ -872,7 +906,8 @@ bool AttributeHelper::putAttributeInAtenSetItem(layer_inID_type& layer_inID, dte
     return true;
 }
 
-bool AttributeHelper::putAttributeInAtenSize(layer_inID_type& layer_inID, dtensor_ptr_type& d_tensor) {
+bool AttributeHelper::putAttributeInAtenSize(layer_inID_type& layer_inID, dtensor_ptr_type& d_tensor)
+{
     auto cur_layer = std::dynamic_pointer_cast<ir::AtenSizeLayer>(layer_inID.first);
     auto idx = layer_inID.second;
 
@@ -889,7 +924,8 @@ bool AttributeHelper::putAttributeInAtenSize(layer_inID_type& layer_inID, dtenso
     return true;
 }
 
-bool AttributeHelper::putAttributeInAtenSlice(layer_inID_type& layer_inID, dtensor_ptr_type& d_tensor) {
+bool AttributeHelper::putAttributeInAtenSlice(layer_inID_type& layer_inID, dtensor_ptr_type& d_tensor)
+{
     auto cur_layer = std::dynamic_pointer_cast<ir::AtenSliceLayer>(layer_inID.first);
     auto idx = layer_inID.second;
     auto layer_type = cur_layer->getType();
@@ -913,7 +949,8 @@ bool AttributeHelper::putAttributeInAtenSlice(layer_inID_type& layer_inID, dtens
     return true;
 }
 
-bool AttributeHelper::putAttributeInAtenSoftmax(layer_inID_type& layer_inID, dtensor_ptr_type& d_tensor) {
+bool AttributeHelper::putAttributeInAtenSoftmax(layer_inID_type& layer_inID, dtensor_ptr_type& d_tensor)
+{
     auto cur_layer = std::dynamic_pointer_cast<ir::AtenSoftmaxLayer>(layer_inID.first);
     auto idx = layer_inID.second;
     auto layer_type = cur_layer->getType();
@@ -939,7 +976,8 @@ bool AttributeHelper::putAttributeInAtenSoftmax(layer_inID_type& layer_inID, dte
     return true;
 }
 
-bool AttributeHelper::putAttributeInAtenSqueeze(layer_inID_type& layer_inID, dtensor_ptr_type& d_tensor) {
+bool AttributeHelper::putAttributeInAtenSqueeze(layer_inID_type& layer_inID, dtensor_ptr_type& d_tensor)
+{
     auto cur_layer = std::dynamic_pointer_cast<ir::AtenSqueezeLayer>(layer_inID.first);
     auto idx = layer_inID.second;
 
@@ -956,7 +994,8 @@ bool AttributeHelper::putAttributeInAtenSqueeze(layer_inID_type& layer_inID, dte
     return true;
 }
 
-bool AttributeHelper::putAttributeInAtenSub(layer_inID_type& layer_inID, dtensor_ptr_type& d_tensor) {
+bool AttributeHelper::putAttributeInAtenSub(layer_inID_type& layer_inID, dtensor_ptr_type& d_tensor)
+{
     auto cur_layer = std::dynamic_pointer_cast<ir::AtenSubLayer>(layer_inID.first);
     auto idx = layer_inID.second;
 
@@ -976,7 +1015,8 @@ bool AttributeHelper::putAttributeInAtenSub(layer_inID_type& layer_inID, dtensor
     return true;
 }
 
-bool AttributeHelper::putAttributeInAtenSum(layer_inID_type& layer_inID, dtensor_ptr_type& d_tensor) {
+bool AttributeHelper::putAttributeInAtenSum(layer_inID_type& layer_inID, dtensor_ptr_type& d_tensor)
+{
     auto cur_layer = std::dynamic_pointer_cast<ir::AtenSumLayer>(layer_inID.first);
     auto idx = layer_inID.second;
     auto layer_type = cur_layer->getType();
@@ -1004,7 +1044,8 @@ bool AttributeHelper::putAttributeInAtenSum(layer_inID_type& layer_inID, dtensor
     return true;
 }
 
-bool AttributeHelper::putAttributeInAtenTo1(layer_inID_type& layer_inID, dtensor_ptr_type& d_tensor) {
+bool AttributeHelper::putAttributeInAtenTo1(layer_inID_type& layer_inID, dtensor_ptr_type& d_tensor)
+{
     auto cur_layer = std::dynamic_pointer_cast<ir::AtenTo1Layer>(layer_inID.first);
     auto idx = layer_inID.second;
     auto layer_type = cur_layer->getType();
@@ -1037,7 +1078,8 @@ bool AttributeHelper::putAttributeInAtenTo1(layer_inID_type& layer_inID, dtensor
     return true;
 }
 
-bool AttributeHelper::putAttributeInAtenTo2(layer_inID_type& layer_inID, dtensor_ptr_type& d_tensor) {
+bool AttributeHelper::putAttributeInAtenTo2(layer_inID_type& layer_inID, dtensor_ptr_type& d_tensor)
+{
     auto cur_layer = std::dynamic_pointer_cast<ir::AtenTo2Layer>(layer_inID.first);
     auto idx = layer_inID.second;
     auto layer_type = cur_layer->getType();
@@ -1068,7 +1110,8 @@ bool AttributeHelper::putAttributeInAtenTo2(layer_inID_type& layer_inID, dtensor
     return true;
 }
 
-bool AttributeHelper::putAttributeInAtenTopk(layer_inID_type& layer_inID, dtensor_ptr_type& d_tensor) {
+bool AttributeHelper::putAttributeInAtenTopk(layer_inID_type& layer_inID, dtensor_ptr_type& d_tensor)
+{
     auto cur_layer = std::dynamic_pointer_cast<ir::AtenTopkLayer>(layer_inID.first);
     auto idx = layer_inID.second;
     auto layer_type = cur_layer->getType();
@@ -1092,7 +1135,8 @@ bool AttributeHelper::putAttributeInAtenTopk(layer_inID_type& layer_inID, dtenso
     return true;
 }
 
-bool AttributeHelper::putAttributeInAtenTranspose(layer_inID_type& layer_inID, dtensor_ptr_type& d_tensor) {
+bool AttributeHelper::putAttributeInAtenTranspose(layer_inID_type& layer_inID, dtensor_ptr_type& d_tensor)
+{
     auto cur_layer = std::dynamic_pointer_cast<ir::AtenTransposeLayer>(layer_inID.first);
     auto idx = layer_inID.second;
 
@@ -1111,7 +1155,8 @@ bool AttributeHelper::putAttributeInAtenTranspose(layer_inID_type& layer_inID, d
     return true;
 }
 
-bool AttributeHelper::putAttributeInAtenUnsqueeze(layer_inID_type& layer_inID, dtensor_ptr_type& d_tensor) {
+bool AttributeHelper::putAttributeInAtenUnsqueeze(layer_inID_type& layer_inID, dtensor_ptr_type& d_tensor)
+{
     auto cur_layer = std::dynamic_pointer_cast<ir::AtenUnsqueezeLayer>(layer_inID.first);
     auto idx = layer_inID.second;
 
@@ -1128,7 +1173,8 @@ bool AttributeHelper::putAttributeInAtenUnsqueeze(layer_inID_type& layer_inID, d
     return true;
 }
 
-bool AttributeHelper::putAttributeInAtenWarn(layer_inID_type& layer_inID, dtensor_ptr_type& d_tensor) {
+bool AttributeHelper::putAttributeInAtenWarn(layer_inID_type& layer_inID, dtensor_ptr_type& d_tensor)
+{
     auto cur_layer = std::dynamic_pointer_cast<ir::AtenWarnLayer>(layer_inID.first);
     auto idx = layer_inID.second;
 
@@ -1145,15 +1191,15 @@ bool AttributeHelper::putAttributeInAtenWarn(layer_inID_type& layer_inID, dtenso
     return true;
 }
 
-bool AttributeHelper::putAttributeInPrimLoop(layer_inID_type& layer_inID, dtensor_ptr_type& d_tensor) {
+bool AttributeHelper::putAttributeInPrimLoop(layer_inID_type& layer_inID, dtensor_ptr_type& d_tensor)
+{
     auto cur_layer = std::dynamic_pointer_cast<ir::PrimLoopLayer>(layer_inID.first);
     auto idx = layer_inID.second;
 
     // e.g. = prim::Loop(%13, %16, inputs)
     // %13 is attribute: trip_count, %16 is attribute: cond.
     if (idx == 0) {
-        cur_layer->setTripCount(getValueFromConstant<int64_t>(d_tensor, cur_layer->getType(),
-                                                                    "trip_count"));
+        cur_layer->setTripCount(getValueFromConstant<int64_t>(d_tensor, cur_layer->getType(), "trip_count"));
     } else if (idx == 1) {
         cur_layer->setCond(getValueFromConstant<int64_t>(d_tensor, cur_layer->getType(), "cond"));
     } else {
@@ -1163,7 +1209,8 @@ bool AttributeHelper::putAttributeInPrimLoop(layer_inID_type& layer_inID, dtenso
     return true;
 }
 
-bool AttributeHelper::putAttributeInPrimTupleIndex(layer_inID_type& layer_inID, dtensor_ptr_type& d_tensor) {
+bool AttributeHelper::putAttributeInPrimTupleIndex(layer_inID_type& layer_inID, dtensor_ptr_type& d_tensor)
+{
     auto cur_layer = std::dynamic_pointer_cast<ir::PrimTupleIndexLayer>(layer_inID.first);
     auto idx = layer_inID.second;
 
@@ -1180,5 +1227,5 @@ bool AttributeHelper::putAttributeInPrimTupleIndex(layer_inID_type& layer_inID, 
     return true;
 }
 
-} // namespace frontend
-} // namespace nn_compiler
+}  // namespace frontend
+}  // namespace nn_compiler

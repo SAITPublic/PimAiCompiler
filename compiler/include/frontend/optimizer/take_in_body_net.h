@@ -2,12 +2,15 @@
 
 #include "compiler/include/frontend/optimizer/pass.h"
 
-namespace nn_compiler {
+namespace nn_compiler
+{
 
-namespace frontend {
+namespace frontend
+{
 
-class TakeInBodyNet : public Pass {
- public:
+class TakeInBodyNet : public Pass
+{
+   public:
     TakeInBodyNet();
 
     void fitIfCondition(std::unique_ptr<nn_compiler::ir::NNModel>& model);
@@ -20,12 +23,12 @@ class TakeInBodyNet : public Pass {
 
     ~TakeInBodyNet() = default;
 
- private:
-    std::vector<std::pair<std::shared_ptr<nn_compiler::ir::NNLayer>,
-            std::shared_ptr<nn_compiler::ir::NNNetwork>>> prim_if_layers_;
+   private:
+    std::vector<std::pair<std::shared_ptr<nn_compiler::ir::NNLayer>, std::shared_ptr<nn_compiler::ir::NNNetwork>>>
+        prim_if_layers_;
 
-    std::vector<std::pair<std::shared_ptr<nn_compiler::ir::NNLayer>,
-            std::shared_ptr<nn_compiler::ir::NNNetwork>>> prim_loop_layers_;
+    std::vector<std::pair<std::shared_ptr<nn_compiler::ir::NNLayer>, std::shared_ptr<nn_compiler::ir::NNNetwork>>>
+        prim_loop_layers_;
 
     void take_in_if_body(std::unique_ptr<nn_compiler::ir::NNModel>& model);
 
@@ -34,5 +37,5 @@ class TakeInBodyNet : public Pass {
     uint32_t getUniqueTensorId(std::unique_ptr<nn_compiler::ir::NNModel>& model);
 };
 
-} // namespace frontend
-} // namespace nn_compiler
+}  // namespace frontend
+}  // namespace nn_compiler

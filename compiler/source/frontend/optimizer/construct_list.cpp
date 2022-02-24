@@ -2,26 +2,28 @@
 
 #include "compiler/include/frontend/optimizer/construct_list.h"
 
-#include "new_ir/include/utils/graph_util.h"
-#include "new_ir/include/tensors/data_tensor.h"
 #include "new_ir/include/layers/aten_lstm1_layer.h"
 #include "new_ir/include/layers/aten_lstm2_layer.h"
 #include "new_ir/include/layers/prim_constant_layer.h"
 #include "new_ir/include/layers/prim_variable_layer.h"
+#include "new_ir/include/tensors/data_tensor.h"
+#include "new_ir/include/utils/graph_util.h"
 
-#include "new_ir/include/utils/graph_search.h"
 #include "new_ir/include/layers/nn_layer.h"
+#include "new_ir/include/utils/graph_search.h"
 
 #include "ir/include/common/log.hpp"
 
-namespace nn_compiler {
+namespace nn_compiler
+{
 
-namespace frontend {
+namespace frontend
+{
 
-ConstructList::ConstructList() {
-}
+ConstructList::ConstructList() {}
 
-bool ConstructList::fitCondition(std::unique_ptr<nn_compiler::ir::NNModel>& model) {
+bool ConstructList::fitCondition(std::unique_ptr<nn_compiler::ir::NNModel>& model)
+{
     /* fit conditions:
      *   List[int]    = prim::ListConstruct(prim::Constant<int>, prim::Constant<int>, ..., prim::Constant<int>)
      *   List[Tensor] = prim::ListConstruct(prim::Constant<Tensor>, prim::Constant<Tensor>,..., prim::Constant<Tensor>)
@@ -30,7 +32,7 @@ bool ConstructList::fitCondition(std::unique_ptr<nn_compiler::ir::NNModel>& mode
      *   the data from prim::Constant will be assembled and set to a new prim::Variable layer.
      *   As prim::Variable can store a vector of DTensor (prim::Constant can only store one DTensor, which could not
      *   tackle with List[Tensor] case).
-    */
+     */
     auto graphs = model->getGraphs();
     for (auto graph : graphs) {
         for (auto layer : graph->getLayers()) {
@@ -60,13 +62,13 @@ bool ConstructList::fitCondition(std::unique_ptr<nn_compiler::ir::NNModel>& mode
                         }
 
                         auto constant_layer =
-                                std::dynamic_pointer_cast<nn_compiler::ir::PrimConstantLayer>(predecessors[idx]);
+                            std::dynamic_pointer_cast<nn_compiler::ir::PrimConstantLayer>(predecessors[idx]);
                         auto dtensor = constant_layer->getAttr();
 
                         // capability check
                         if (idx == 0) {
                             dtensor_type = constant_layer->getNType();
-                            data_type    = dtensor->getDataType();
+                            data_type = dtensor->getDataType();
                         } else if (constant_layer->getNType() != dtensor_type) {
                             Log::IR::E() << "DTensors with different types attempt to construct a list.";
                         } else if (dtensor->getDataType() != data_type) {
@@ -86,22 +88,23 @@ bool ConstructList::fitCondition(std::unique_ptr<nn_compiler::ir::NNModel>& mode
     return (process_layer_and_dtensor_.size() != 0);
 }
 
-void ConstructList::run(std::unique_ptr<nn_compiler::ir::NNModel>& model) {
+void ConstructList::run(std::unique_ptr<nn_compiler::ir::NNModel>& model)
+{
     Log::IR::I() << "ConstructList::run is called.";
     auto graph = model->getGraphs()[0];
 
     for (auto process_layer_and_dtensor : process_layer_and_dtensor_) {
         auto list_construct_layer = process_layer_and_dtensor.first;
-        auto dtensor_vec          = process_layer_and_dtensor.second;
+        auto dtensor_vec = process_layer_and_dtensor.second;
 
         auto predecessors = ir::searchPredecessor(list_construct_layer, graph);
-        auto successors   = ir::searchSuccessor(list_construct_layer, graph);
+        auto successors = ir::searchSuccessor(list_construct_layer, graph);
 
         // Store info
-        auto layer_id     = list_construct_layer->getID();
-        auto layer_name   = "prim::Variable_" + std::to_string(layer_id);
-        auto layer_type   = "prim::Variable";
-        auto ntype        = "List";
+        auto layer_id = list_construct_layer->getID();
+        auto layer_name = "prim::Variable_" + std::to_string(layer_id);
+        auto layer_type = "prim::Variable";
+        auto ntype = "List";
         auto out_stensors = list_construct_layer->getOutSTensorID();
 
         // Tag prim::Constant Ops and remove them in following remove_constant pass
@@ -183,5 +186,5 @@ void ConstructList::run(std::unique_ptr<nn_compiler::ir::NNModel>& model) {
     }
 }
 
-} // namespace frontend
-} // namespace nn_compiler
+}  // namespace frontend
+}  // namespace nn_compiler
