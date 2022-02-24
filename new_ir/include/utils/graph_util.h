@@ -6,8 +6,10 @@
 
 #include "new_ir/include/utils/graph_search.h"
 
-namespace nn_compiler {
-namespace ir {
+namespace nn_compiler
+{
+namespace ir
+{
 
 bool isSingleValueType(DataType data_type);
 

@@ -2,14 +2,17 @@
 
 #include "new_ir/include/utils/graph_util.h"
 
-namespace nn_compiler {
+#include "ir/include/common/log.hpp"
+namespace nn_compiler
+{
 
-namespace frontend {
+namespace frontend
+{
 
-RemoveSetAttrLayers::RemoveSetAttrLayers() {
-}
+RemoveSetAttrLayers::RemoveSetAttrLayers() {}
 
-bool RemoveSetAttrLayers::fitCondition(std::unique_ptr<nn_compiler::ir::NNModel>& model) {
+bool RemoveSetAttrLayers::fitCondition(std::unique_ptr<nn_compiler::ir::NNModel>& model)
+{
     auto graphs = model->getGraphs();
     for (auto graph : graphs) {
         for (auto layer : graph->getLayers()) {
@@ -25,8 +28,9 @@ bool RemoveSetAttrLayers::fitCondition(std::unique_ptr<nn_compiler::ir::NNModel>
     return (remove_layers_.size() != 0);
 }
 
-void RemoveSetAttrLayers::run(std::unique_ptr<nn_compiler::ir::NNModel>& model) {
-    DLOG(INFO) << "RemoveSetAttrLayers::run is called.";
+void RemoveSetAttrLayers::run(std::unique_ptr<nn_compiler::ir::NNModel>& model)
+{
+    Log::FE::I() << "RemoveSetAttrLayers::run is called.";
     // there will be only one graph after take_in_body_net pass.
     auto graph = model->getGraphs()[0];
 
@@ -51,5 +55,5 @@ void RemoveSetAttrLayers::run(std::unique_ptr<nn_compiler::ir::NNModel>& model) 
         graph->deleteSTensor(old_stensor_id);
     }
 }
-} // namespace frontend
-} // namespace nn_compiler
+}  // namespace frontend
+}  // namespace nn_compiler

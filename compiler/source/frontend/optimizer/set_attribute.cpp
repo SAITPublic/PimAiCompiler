@@ -1,15 +1,19 @@
 #include <string>
 
+#include "compiler/include/frontend/optimizer/set_attribute.h"
 #include "new_ir/include/layers/prim_constant_layer.h"
 #include "new_ir/include/layers/prim_variable_layer.h"
 #include "new_ir/include/utils/graph_util.h"
-#include "compiler/include/frontend/optimizer/set_attribute.h"
 
-namespace nn_compiler {
+#include "ir/include/common/log.hpp"
+namespace nn_compiler
+{
 
-namespace frontend {
+namespace frontend
+{
 
-bool SetAttribute::fitCondition(std::unique_ptr<nn_compiler::ir::NNModel>& model) {
+bool SetAttribute::fitCondition(std::unique_ptr<nn_compiler::ir::NNModel> &model)
+{
     auto graphs = model->getGraphs();
     for (auto graph : graphs) {
         for (auto layer : graph->getLayers()) {
@@ -28,8 +32,9 @@ bool SetAttribute::fitCondition(std::unique_ptr<nn_compiler::ir::NNModel>& model
     return (constant_layers_.size() != 0 || variable_layers_.size() != 0);
 }
 
-void SetAttribute::run(std::unique_ptr<nn_compiler::ir::NNModel>& model) {
-    DLOG(INFO) << "SetAttribute::run is called.";
+void SetAttribute::run(std::unique_ptr<nn_compiler::ir::NNModel> &model)
+{
+    Log::FE::I() << "SetAttribute::run is called.";
 
     // there will be only one graph after take_in_body_net pass.
     auto graph = model->getGraphs()[0];
@@ -62,13 +67,12 @@ void SetAttribute::run(std::unique_ptr<nn_compiler::ir::NNModel>& model) {
 
 void SetAttribute::doProcess(const std::shared_ptr<nn_compiler::ir::NNLayer> &layer,
                              const std::shared_ptr<nn_compiler::ir::NNNetwork> &graph,
-                             std::shared_ptr<nn_compiler::ir::DTensor> &data,
-                             bool &remove_layer) {
+                             std::shared_ptr<nn_compiler::ir::DTensor> &data, bool &remove_layer)
+{
     auto consumers = ir::searchSuccessors(layer, graph);
     for (auto consumer : consumers) {
         for (auto inID : consumer.second) {
-            std::pair<const std::shared_ptr<nn_compiler::ir::NNLayer>, unsigned int>
-                                                            layer_inID(consumer.first, inID);
+            std::pair<const std::shared_ptr<nn_compiler::ir::NNLayer>, unsigned int> layer_inID(consumer.first, inID);
 
             if (helper_->putAttribute(consumer.first->getType(), layer_inID, data)) {
                 if (edge_remove_helper_.find(consumer.first) == edge_remove_helper_.end()) {
@@ -84,7 +88,8 @@ void SetAttribute::doProcess(const std::shared_ptr<nn_compiler::ir::NNLayer> &la
     }
 }
 
-void SetAttribute::postProcess() {
+void SetAttribute::postProcess()
+{
     for (auto edge_remover : edge_remove_helper_) {
         auto cur_layer = edge_remover.first;
         auto index_to_remove = edge_remover.second;
@@ -96,5 +101,5 @@ void SetAttribute::postProcess() {
     }
 }
 
-} // namespace frontend
-} // namespace nn_compiler
+}  // namespace frontend
+}  // namespace nn_compiler

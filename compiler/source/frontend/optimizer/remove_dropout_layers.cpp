@@ -2,14 +2,17 @@
 
 #include "new_ir/include/utils/graph_util.h"
 
-namespace nn_compiler {
+#include "ir/include/common/log.hpp"
 
-namespace frontend {
+namespace nn_compiler
+{
+namespace frontend
+{
 
-RemoveDropoutLayers::RemoveDropoutLayers() {
-}
+RemoveDropoutLayers::RemoveDropoutLayers() {}
 
-bool RemoveDropoutLayers::fitCondition(std::unique_ptr<nn_compiler::ir::NNModel>& model) {
+bool RemoveDropoutLayers::fitCondition(std::unique_ptr<nn_compiler::ir::NNModel>& model)
+{
     auto graphs = model->getGraphs();
     for (auto graph : graphs) {
         for (auto layer : graph->getLayers()) {
@@ -22,8 +25,9 @@ bool RemoveDropoutLayers::fitCondition(std::unique_ptr<nn_compiler::ir::NNModel>
     return (remove_layers_.size() != 0);
 }
 
-void RemoveDropoutLayers::run(std::unique_ptr<nn_compiler::ir::NNModel>& model) {
-    DLOG(INFO) << "RemoveDropoutLayers::run is called.";
+void RemoveDropoutLayers::run(std::unique_ptr<nn_compiler::ir::NNModel>& model)
+{
+    Log::FE::I() << "RemoveDropoutLayers::run is called.";
 
     // there will be only one graph after take_in_body_net pass.
     auto graph = model->getGraphs()[0];
@@ -47,5 +51,5 @@ void RemoveDropoutLayers::run(std::unique_ptr<nn_compiler::ir::NNModel>& model) 
     }
 }
 
-} // namespace frontend
-} // namespace nn_compiler
+}  // namespace frontend
+}  // namespace nn_compiler

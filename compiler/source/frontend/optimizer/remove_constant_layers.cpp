@@ -1,15 +1,18 @@
 #include "compiler/include/frontend/optimizer/remove_constant_layers.h"
+
 #include "new_ir/include/utils/graph_util.h"
 
+#include "ir/include/common/log.hpp"
+namespace nn_compiler
+{
 
-namespace nn_compiler {
+namespace frontend
+{
 
-namespace frontend {
+RemoveConstantLayers::RemoveConstantLayers() {}
 
-RemoveConstantLayers::RemoveConstantLayers() {
-}
-
-bool RemoveConstantLayers::fitCondition(std::unique_ptr<nn_compiler::ir::NNModel>& model) {
+bool RemoveConstantLayers::fitCondition(std::unique_ptr<nn_compiler::ir::NNModel>& model)
+{
     auto graphs = model->getGraphs();
     for (auto graph : graphs) {
         for (auto layer : graph->getLayers()) {
@@ -30,8 +33,9 @@ bool RemoveConstantLayers::fitCondition(std::unique_ptr<nn_compiler::ir::NNModel
     return (remove_layers_.size() != 0);
 }
 
-void RemoveConstantLayers::run(std::unique_ptr<nn_compiler::ir::NNModel>& model) {
-    DLOG(INFO) << "RemoveConstantLayers::run is called.";
+void RemoveConstantLayers::run(std::unique_ptr<nn_compiler::ir::NNModel>& model)
+{
+    Log::FE::I() << "RemoveConstantLayers::run is called.";
 
     // there will be only one graph after take_in_body_net pass.
     auto graph = model->getGraphs()[0];
@@ -51,5 +55,5 @@ void RemoveConstantLayers::run(std::unique_ptr<nn_compiler::ir::NNModel>& model)
     }
 }
 
-} // namespace frontend
-} // namespace nn_compiler
+}  // namespace frontend
+}  // namespace nn_compiler
