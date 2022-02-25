@@ -15,42 +15,27 @@ FuseActivation::FuseActivation() {
 }
 
 bool FuseActivation::fitCondition(std::unique_ptr<nn_compiler::ir::NNModel>& model) {
-    // For PIM case. compiler type of graph_model is GModelType::CPUGPU
-    return true;
-}
-
-void FuseActivation::run(std::unique_ptr<nn_compiler::ir::NNModel>& model) {
-    Log::FE::I() << "FuseActivation::run is called.";
-
-    if (this->fitCondition(model)) {
-         auto graphs = model->getGraphs();
-         doFuseActivation(graphs[0]);
-    }
-}
-
-
-void FuseActivation::doFuseActivation(std::shared_ptr<nn_compiler::ir::NNNetwork>& graph) {
-    auto dependCheck = [&] (const std::shared_ptr<nn_compiler::ir::NNNetwork> gnetwork,
-                           const std::shared_ptr<nn_compiler::ir::NNLayer> predecessor,
-                           const std::shared_ptr<nn_compiler::ir::NNLayer> ancestor) {
+    auto dependCheck = [&] (const std::shared_ptr<nn_compiler::ir::NNNetwork> network,
+                            const std::shared_ptr<nn_compiler::ir::NNLayer> predecessor,
+                            const std::shared_ptr<nn_compiler::ir::NNLayer> successor) {
         std::string predecessor_type = predecessor->getType();
         if (!this->feasibleHostType(predecessor_type)) {
             Log::FE::D() << "failed to satisfy with fusion dependency";
             return false;
         }
 
-        auto successors = ir::searchSuccessor(predecessor, gnetwork);
+        auto successors = ir::searchSuccessor(predecessor, network);
         if (successors.size() > 1) {
             Log::FE::D() << "failed to satisfy with fusion dependency";
             return false;
         }
 
         if (predecessor_type.compare("aten::transpose") == 0) {
-            if (ancestor->getType().compare("aten::addmm") != 0) {
-                Log::FE::D() << "the predecessor of transpose layer is not addmm layer";
+            if (successor->getType().compare("aten::addmm") != 0) {
+                Log::FE::D() << "The predecessor of transpose layer is not addmm layer.";
                 return false;
             }
-            auto successors = ir::searchSuccessor(ancestor, gnetwork);
+            auto successors = ir::searchSuccessor(successor, network);
             if (successors.size() > 1) {
                 Log::FE::D() << "failed to satisfy with fusion dependency";
                 return false;
@@ -59,17 +44,37 @@ void FuseActivation::doFuseActivation(std::shared_ptr<nn_compiler::ir::NNNetwork
         return true;
     };
 
+    auto graphs = model->getGraphs();
+    for (auto graph : graphs) {
+        for (auto cur_layer : graph->getLayers()) {
+            std::string type = cur_layer->getType();
+            if (feasibleParasiteType(type)) {
+                auto predecessors = ir::searchPredecessor(cur_layer, graph);
+                auto successors = ir::searchPredecessor(predecessors[0], graph);
+
+                if (predecessors.empty() || !dependCheck(graph, predecessors[0], successors[0])) {
+                    continue;
+                }
+
+                layers_.push_back(cur_layer);
+            }
+        }
+    }
+
+    return (layers_.size() != 0);
+}
+
+void FuseActivation::run(std::unique_ptr<nn_compiler::ir::NNModel>& model) {
+    Log::FE::I() << "FuseActivation::run is called.";
+    auto graph = model->getGraphs()[0];
+
     std::vector<std::shared_ptr<nn_compiler::ir::NNLayer>> layers_to_be_removed;
     std::vector<uint32_t > tensors_to_be_removed;
-    for (auto cur_layer : graph->getLayers()) {
+    for (auto cur_layer : layers_) {
         std::string type = cur_layer->getType();
         if (feasibleParasiteType(type)) {
             auto predecessors = ir::searchPredecessor(cur_layer, graph);
-            auto ancestors = ir::searchPredecessor(predecessors[0], graph);
-
-            if (predecessors.empty() || !dependCheck(graph, predecessors[0], ancestors[0])) {
-                continue;
-            }
+            auto successors = ir::searchPredecessor(predecessors[0], graph);
 
             auto out_ids = cur_layer->getOutSTensorID();
             auto in_ids = cur_layer->getInSTensorID();
@@ -78,7 +83,7 @@ void FuseActivation::doFuseActivation(std::shared_ptr<nn_compiler::ir::NNNetwork
             tensors_to_be_removed.push_back(in_ids[0]);
 
             if (predecessors[0]->getType().compare("aten::transpose") == 0) {
-                auto addmm_layer = std::static_pointer_cast<nn_compiler::ir::AtenAddmmLayer>(ancestors[0]);
+                auto addmm_layer = std::static_pointer_cast<nn_compiler::ir::AtenAddmmLayer>(successors[0]);
                 addmm_layer->set_act_type(cur_layer->getType());
             } else {
                 predecessors[0]->setActivation(cur_layer);
@@ -100,21 +105,15 @@ void FuseActivation::doFuseActivation(std::shared_ptr<nn_compiler::ir::NNNetwork
 }
 
 bool FuseActivation::feasibleHostType(const std::string &type) {
-    return std::find(supported_host_types_.begin(),
-                     supported_host_types_.end(),
-                     type) != supported_host_types_.end() ||
-           std::find(supportd_torch_host_types_.begin(),
-                     supportd_torch_host_types_.end(),
-                     type) != supportd_torch_host_types_.end();
+    return (std::find(supportd_host_types_.begin(),
+                      supportd_host_types_.end(),
+                      type) != supportd_host_types_.end());
 }
 
 bool FuseActivation::feasibleParasiteType(const std::string &type) {
-    return std::find(supported_parasite_types_.begin(),
-                     supported_parasite_types_.end(),
-                     type) != supported_parasite_types_.end() ||
-           std::find(supported_torch_parasite_types_.begin(),
-                     supported_torch_parasite_types_.end(),
-                     type) != supported_torch_parasite_types_.end();
+    return (std::find(supported_parasite_types_.begin(),
+                      supported_parasite_types_.end(),
+                      type) != supported_parasite_types_.end());
 }
 
 }  // namespace frontend
