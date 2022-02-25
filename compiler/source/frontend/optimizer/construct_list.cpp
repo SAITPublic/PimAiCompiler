@@ -12,7 +12,7 @@
 #include "new_ir/include/layers/nn_layer.h"
 #include "new_ir/include/utils/graph_search.h"
 
-#include "ir/include/common/log.hpp"
+#include "compiler/include/common/log.hpp"
 
 namespace nn_compiler
 {
@@ -70,9 +70,9 @@ bool ConstructList::fitCondition(std::unique_ptr<nn_compiler::ir::NNModel>& mode
                             dtensor_type = constant_layer->getNType();
                             data_type = dtensor->getDataType();
                         } else if (constant_layer->getNType() != dtensor_type) {
-                            Log::IR::E() << "DTensors with different types attempt to construct a list.";
+                            Log::FE::E() << "DTensors with different types attempt to construct a list.";
                         } else if (dtensor->getDataType() != data_type) {
-                            Log::IR::E() << "Data from DTensors with different types attempt to construct a list.";
+                            Log::FE::E() << "Data from DTensors with different types attempt to construct a list.";
                         }
 
                         dtensor_vec.push_back(dtensor);
@@ -90,7 +90,7 @@ bool ConstructList::fitCondition(std::unique_ptr<nn_compiler::ir::NNModel>& mode
 
 void ConstructList::run(std::unique_ptr<nn_compiler::ir::NNModel>& model)
 {
-    Log::IR::I() << "ConstructList::run is called.";
+    Log::FE::I() << "ConstructList::run is called.";
     auto graph = model->getGraphs()[0];
 
     for (auto process_layer_and_dtensor : process_layer_and_dtensor_) {

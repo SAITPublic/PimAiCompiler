@@ -2,7 +2,8 @@
 
 #include "new_ir/include/utils/graph_util.h"
 
-#include "ir/include/common/log.hpp"
+#include "compiler/include/common/log.hpp"
+
 namespace nn_compiler
 {
 

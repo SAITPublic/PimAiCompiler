@@ -1,5 +1,6 @@
 #include <string>
 
+#include "compiler/include/common/log.hpp"
 #include "compiler/include/frontend/optimizer/remove_if_with_addmm.h"
 
 #include "new_ir/include/layers/aten_addmm_layer.h"
@@ -39,7 +40,7 @@ bool RemoveIfWithAddmm::fitCondition(std::unique_ptr<nn_compiler::ir::NNModel> &
 }
 
 void RemoveIfWithAddmm::run(std::unique_ptr<nn_compiler::ir::NNModel> &model) {
-    DLOG(INFO) << "RemoveIfWithAddmm::run is called.";
+    Log::FE::I() << "RemoveIfWithAddmm::run is called.";
 
     auto graph = model->getGraphs()[0];
     auto layers = graph->getLayers();

@@ -5,6 +5,8 @@
 #include "new_ir/include/utils/graph_transform.h"
 #include "new_ir/include/utils/graph_util.h"
 
+#include "compiler/include/common/log.hpp"
+
 namespace nn_compiler {
 
 namespace frontend {
@@ -18,7 +20,7 @@ bool FuseActivation::fitCondition(std::unique_ptr<nn_compiler::ir::NNModel>& mod
 }
 
 void FuseActivation::run(std::unique_ptr<nn_compiler::ir::NNModel>& model) {
-    DLOG(INFO) << "FuseActivation::run is called.";
+    Log::FE::I() << "FuseActivation::run is called.";
 
     if (this->fitCondition(model)) {
          auto graphs = model->getGraphs();
@@ -33,24 +35,24 @@ void FuseActivation::doFuseActivation(std::shared_ptr<nn_compiler::ir::NNNetwork
                            const std::shared_ptr<nn_compiler::ir::NNLayer> ancestor) {
         std::string predecessor_type = predecessor->getType();
         if (!this->feasibleHostType(predecessor_type)) {
-            DLOG(WARNING) << "failed to satisfy with fusion dependency";
+            Log::FE::D() << "failed to satisfy with fusion dependency";
             return false;
         }
 
         auto successors = ir::searchSuccessor(predecessor, gnetwork);
         if (successors.size() > 1) {
-            DLOG(WARNING) << "failed to satisfy with fusion dependency";
+            Log::FE::D() << "failed to satisfy with fusion dependency";
             return false;
         }
 
         if (predecessor_type.compare("aten::transpose") == 0) {
             if (ancestor->getType().compare("aten::addmm") != 0) {
-                DLOG(WARNING) << "the predecessor of transpose layer is not addmm layer";
+                Log::FE::D() << "the predecessor of transpose layer is not addmm layer";
                 return false;
             }
             auto successors = ir::searchSuccessor(ancestor, gnetwork);
             if (successors.size() > 1) {
-                DLOG(WARNING) << "failed to satisfy with fusion dependency";
+                Log::FE::D() << "failed to satisfy with fusion dependency";
                 return false;
             }
         }

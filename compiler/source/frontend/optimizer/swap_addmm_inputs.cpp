@@ -2,6 +2,7 @@
 #include <string>
 #include <utility>
 
+#include "compiler/include/common/log.hpp"
 #include "compiler/include/frontend/optimizer/swap_addmm_inputs.h"
 
 #include "new_ir/include/layers/aten_addmm_layer.h"
@@ -34,7 +35,7 @@ bool SwapAddmmInputs::fitCondition(std::unique_ptr<nn_compiler::ir::NNModel>& mo
 }
 
 void SwapAddmmInputs::run(std::unique_ptr<nn_compiler::ir::NNModel>& model) {
-    DLOG(INFO) << "SwapAddmmInputs::run is called.";
+    Log::FE::I() << "SwapAddmmInputs::run is called.";
     auto graph = model->getGraphs()[0];
     for (auto layer : layers_) {
         auto predecessors = ir::searchPredecessor(layer, graph);

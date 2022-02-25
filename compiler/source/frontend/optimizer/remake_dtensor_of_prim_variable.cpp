@@ -1,7 +1,7 @@
 #include "compiler/include/frontend/optimizer/remake_dtensor_of_prim_variable.h"
 #include "new_ir/include/utils/graph_util.h"
 
-#include "ir/include/common/log.hpp"
+#include "compiler/include/common/log.hpp"
 
 namespace nn_compiler
 {
@@ -54,7 +54,7 @@ bool RemakeDTensorOfPrimVariable::fitCondition(std::unique_ptr<nn_compiler::ir::
 
 void RemakeDTensorOfPrimVariable::run(std::unique_ptr<nn_compiler::ir::NNModel>& model)
 {
-    Log::IR::I() << "RemakeDTensorOfPrimVariable::run is called.";
+    Log::FE::I() << "RemakeDTensorOfPrimVariable::run is called.";
 
     // there will be only one graph after take_in_body_net pass.
     auto graph = model->getGraphs()[0];

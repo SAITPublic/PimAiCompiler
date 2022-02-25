@@ -1,11 +1,11 @@
 #include <string>
 
+#include "compiler/include/common/log.hpp"
 #include "compiler/include/frontend/optimizer/remove_get_attr_layers.h"
 
 #include "new_ir/include/utils/graph_search.h"
 #include "new_ir/include/utils/graph_util.h"
 #include "new_ir/include/layers/prim_get_attr_layer.h"
-
 
 namespace nn_compiler {
 
@@ -28,7 +28,7 @@ bool RemoveGetAttrLayers::fitCondition(std::unique_ptr<nn_compiler::ir::NNModel>
 }
 
 void RemoveGetAttrLayers::run(std::unique_ptr<nn_compiler::ir::NNModel>& model) {
-    DLOG(INFO) << "RemoveGetAttrLayers::run is called.";
+    Log::FE::I() << "RemoveGetAttrLayers::run is called.";
     // there will be only one graph after take_in_body_net pass.
     auto graph = model->getGraphs()[0];
 

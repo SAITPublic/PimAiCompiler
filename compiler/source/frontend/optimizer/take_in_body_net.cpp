@@ -10,7 +10,7 @@
 #include "new_ir/include/types.h"
 #include "new_ir/include/utils/graph_util.h"
 
-#include "ir/include/common/log.hpp"
+#include "compiler/include/common/log.hpp"
 
 namespace nn_compiler
 {
@@ -55,7 +55,7 @@ bool TakeInBodyNet::fitCondition(std::unique_ptr<nn_compiler::ir::NNModel>& mode
 
 void TakeInBodyNet::take_in_if_body(std::unique_ptr<nn_compiler::ir::NNModel>& model)
 {
-    Log::IR::I() << "Take in if body net start.";
+    Log::FE::I() << "Take in if body net start.";
     auto graphs = model->getGraphs();
     for (auto layer_pair : prim_if_layers_) {
         std::shared_ptr<nn_compiler::ir::NNNetwork> main_graph = layer_pair.second;

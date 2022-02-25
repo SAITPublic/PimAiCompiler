@@ -7,6 +7,7 @@
 #include "new_ir/include/utils/graph_search.h"
 #include "new_ir/include/utils/graph_util.h"
 
+#include "compiler/include/common/log.hpp"
 #include "compiler/include/frontend/optimizer/remove_cat_for_addmm.h"
 
 namespace nn_compiler {
@@ -43,7 +44,7 @@ bool RemoveCatForAddmm::fitCondition(std::unique_ptr<nn_compiler::ir::NNModel>& 
 }
 
 void RemoveCatForAddmm::run(std::unique_ptr<nn_compiler::ir::NNModel>& model) {
-    DLOG(INFO) << "RemoveCatForAddmm::run is called.";
+    Log::FE::I() << "RemoveCatForAddmm::run is called.";
 
     auto graph = model->getGraphs()[0];
 
