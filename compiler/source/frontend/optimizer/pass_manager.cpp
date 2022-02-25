@@ -31,7 +31,6 @@ void PassManager::runPasses(std::unique_ptr<nn_compiler::ir::NNModel>& model)
     Log::FE::I() << "PassManager::runPasses is called.";
     auto base_pass = std::make_shared<Pass>();
 
-    auto fuse_act = std::make_shared<FuseActivation>();
     auto take_in_body_net = std::make_shared<TakeInBodyNet>();
     auto construct_list = std::make_shared<ConstructList>();
     auto remake_dtensor_of_prim_variable = std::make_shared<RemakeDTensorOfPrimVariable>();
@@ -44,6 +43,7 @@ void PassManager::runPasses(std::unique_ptr<nn_compiler::ir::NNModel>& model)
     auto remove_cat_for_addmm = std::make_shared<RemoveCatForAddmm>();
     auto swap_addmm_inputs = std::make_shared<SwapAddmmInputs>();
     auto swap_matmul_inputs = std::make_shared<SwapMatmulInputs>();
+    auto fuse_act = std::make_shared<FuseActivation>();
 
     auto set_weights_for_embedding = std::make_shared<SetWeightsForEmbedding>();
 

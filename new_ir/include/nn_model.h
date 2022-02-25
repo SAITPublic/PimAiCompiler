@@ -45,7 +45,7 @@ class NNModel {
     }
 
     void reverseGraphs() {
-        graphs_.reserve(graphs_.size());
+        std::reverse(graphs_.begin(), graphs_.end());
     }
 
     std::vector<std::shared_ptr<NNNetwork>> getGraphs() {

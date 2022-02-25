@@ -40,6 +40,7 @@ RetVal FrontendDriver::importer(std::unique_ptr<nn_compiler::ir::NNModel>& model
 {
     std::shared_ptr<ModelBuilder> builder = std::make_shared<ModelBuilder>();
     builder->build(model, in_file_path_);
+
     return RetVal::SUCCESS;
 }
 

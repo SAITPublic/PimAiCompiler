@@ -50,7 +50,7 @@ class ModelBuilder
 
     frontend::LayerBuilders layer_builders_;
 
-    std::map<const torch::jit::Value*, uint32_t> value_tensor_map;
+    std::map<const torch::jit::Value*, uint32_t> value_tensor_map_;
 
     uint32_t block_counter_ = 0;
 };
