@@ -1,6 +1,7 @@
 #include "compiler/include/nn_compiler.hpp"
 
 namespace nn_compiler {
+namespace compiler {
 
 RetVal NNCompiler::initialize(const int& compile_level, const std::string& file_path,
                               const std::string& model_name) {
@@ -127,4 +128,5 @@ RetVal NNCompiler::backend() {
     return RetVal::SUCCESS;
 }
 
+} // namespace compiler
 } //namespace nn_compiler

@@ -15,6 +15,7 @@
 #include "compiler/include/middlend/middlend_driver.hpp"
 
 namespace nn_compiler {
+namespace compiler {
 
 class NNCompiler {
  public:
@@ -125,4 +126,5 @@ class NNCompiler {
 
 }; // class NNCompiler
 
+} // namespace compiler
 } // namespace nn_compiler
