@@ -20,14 +20,16 @@ class StreamExecutor
    public:
     typedef std::unordered_map<int64_t, std::pair<DataType, torch::jit::IValue>> blob_store_type;
 
-    StreamExecutor(std::pair<std::unique_ptr<nn_compiler::ir::NNModel>, blob_store_type> model, std::string model_type);
+    StreamExecutor(blob_store_type pre_loaded_data, std::string model_type);
 
     ~StreamExecutor();
 
-    RetVal inferenceModel(const std::vector<torch::Tensor>& input_tensors,
+    RetVal inferenceModel(std::unique_ptr<nn_compiler::ir::NNModel &model,
+                          const std::vector<torch::Tensor>& input_tensors,
                           std::vector<torch::Tensor>& output_tensors);
 
-    RetVal inferenceModelwithProfiling(const std::vector<torch::Tensor>& input_tensors,
+    RetVal inferenceModelwithProfiling(std::unique_ptr<nn_compiler::ir::NNModel &model,
+                                       const std::vector<torch::Tensor>& input_tensors,
                                        std::vector<torch::Tensor>& output_tensors);
 
     void updateBlob(int64_t blob_id, DataType dtype, const torch::jit::IValue& iv);
@@ -51,8 +53,6 @@ class StreamExecutor
     }
 
    public:
-    std::unique_ptr<nn_compiler::ir::NNModel> model_ = nullptr;
-
     // Global input & output vars
     blob_store_type global_blobs_;
     // Op Register
@@ -65,6 +65,8 @@ class StreamExecutor
 
     std::stack<int64_t> loop_condition_stack_;
     std::unordered_map<int, std::pair<int, int>> releation_blob_ids_map_;
+
+    std::string model_type_ = "";
 };
 
 }  // namespace runtime

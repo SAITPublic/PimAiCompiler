@@ -8,20 +8,25 @@
 
 namespace nn_compiler {
 namespace runtime {
-StreamExecutor::StreamExecutor(std::pair<std::unique_ptr<nn_compiler::ir::NNModel>,
-                               blob_store_type> model, std::string model_type){
+StreamExecutor::StreamExecutor(blob_store_type pre_loaded_data, std::string model_type){
+    global_blobs_ = pre_loaded_data;
+    model_type_ = model_type;
+
+    this->registerOp();
 }
 
 StreamExecutor::~StreamExecutor() {
 }
 
-RetVal StreamExecutor::inferenceModel(const std::vector<torch::Tensor>& input_tensors,
+RetVal StreamExecutor::inferenceModel(std::unique_ptr<nn_compiler::ir::NNModel &model,
+                                      const std::vector<torch::Tensor>& input_tensors,
                                       std::vector<torch::Tensor>& output_tensors) {
 
     return RetVal::SUCCESS;
 }
 
-RetVal StreamExecutor::inferenceModelwithProfiling(const std::vector<torch::Tensor>& input_tensors,
+RetVal StreamExecutor::inferenceModelwithProfiling(std::unique_ptr<nn_compiler::ir::NNModel &model,
+                                                   const std::vector<torch::Tensor>& input_tensors,
                                                    std::vector<torch::Tensor>& output_tensors) {
 
     return RetVal::SUCCESS;

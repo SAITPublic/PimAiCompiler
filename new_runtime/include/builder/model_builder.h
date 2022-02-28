@@ -12,23 +12,15 @@ class ModelBuilder
    public:
     typedef std::unordered_map<int64_t, std::pair<nnrt::DataType, torch::jit::IValue>> blob_store_type;
 
-    ModelBuilder(std::string model_path) {
-        this->model_path_ = model_path;
-    }
+    RetVal preProcess(std::unique_ptr<nn_compiler::ir::NNModel> &model);
 
-    RetVal preProcess();
-
-    RetVal compileModel(int compile_level, const std::string model_type);
-
-    RetVal preloadModel();
+    RetVal preloadModel(std::unique_ptr<nn_compiler::ir::NNModel> &model);
 
     RetVal loadWeightAndBias();
 
-    std::pair<std::unique_ptr<nn_compiler::ir::NNModel>, blob_store_type> getModel();
+    blob_store_type getPreLoadedData() { return preloaded_blobs_container_; }
 
    private:
-    std::unique_ptr<nn_compiler::ir::NNModel> model_ = nullptr;
-
     blob_store_type preloaded_blobs_container_;
 
     std::string model_path_;
