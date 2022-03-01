@@ -1,6 +1,7 @@
 #include <sys/time.h>
 
 #include "c10/hip/HIPFunctions.h"
+#include "common/log.hpp"
 #include "new_runtime/include/executor/stream_executor.h"
 #include "new_runtime/include/executor/utils.h"
 #include "types.h"

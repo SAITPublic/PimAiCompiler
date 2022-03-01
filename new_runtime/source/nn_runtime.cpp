@@ -1,4 +1,3 @@
-#include <glog/logging.h>
 #include <cstdio>
 #include <memory>
 #include <tuple>
@@ -28,9 +27,9 @@ std::vector<torch::Tensor> NNRuntime::inferenceModel(std::unique_ptr<nn_compiler
                                                      const std::vector<torch::Tensor>& input_tensors,
                                                      bool profiling)
 {
-    DLOG(INFO) << "numInputs:" << input_tensors.size();
+    Log::RT::D() << "numInputs:" << input_tensors.size();
     for (auto& item : input_tensors) {
-        DLOG(INFO) << "shape:" << item.sizes() << " dtype:" << item.dtype() << " device:" << item.device();
+        Log::RT::D() << "shape:" << item.sizes() << " dtype:" << item.dtype() << " device:" << item.device();
     }
 
     std::vector<torch::Tensor> output_tensors;
@@ -46,12 +45,12 @@ std::vector<torch::Tensor> NNRuntime::inferenceModel(std::unique_ptr<nn_compiler
     }
 
     if (status != RetVal::SUCCESS) {
-        LOG(ERROR) << " inference model fail!";
+        Log::RT::E() << " inference model fail!";
     }
 
     // for simple test, fill zeros to outputs
     // output_tensors.push_back(torch::zeros({10, 10}, torch::kF16));
-    DLOG(INFO) << "numOutps:" << output_tensors.size() << std::endl;
+    Log::RT::D() << "numOutps:" << output_tensors.size();
 
     return output_tensors;
 }
@@ -72,13 +71,13 @@ int NNRuntime::rocblas_init(void)
 
 int NNRuntime::test(void)
 {
-    DLOG(INFO) << "hello NNRuntime::test!";
+    Log::RT::D() << "hello NNRuntime::test!";
 
     return 0;
 }
 
 NNRuntime::~NNRuntime() {
-    DLOG(INFO) << "NNRuntime Destructor is called";
+    Log::RT::D() << "NNRuntime Destructor is called";
     PimDeinitialize();
 }
 

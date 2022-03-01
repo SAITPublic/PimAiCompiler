@@ -3,6 +3,7 @@
 #include <torch/script.h>
 #include <vector>
 
+#include "common/log.hpp"
 #include "executor/utils.h"
 #include "types.h"
 
@@ -50,7 +51,7 @@ DataType convertATScalarTypeToDType(at::ScalarType dtype)
             data_type = DataType::BOOL;
             break;
         default:
-            DLOG(FATAL) << "Complex type has not been supported.";
+            Log::RT::E() << "Complex type has not been supported.";
     }
     return data_type;
 }
@@ -117,7 +118,7 @@ at::Device convertIntToATDevice(const int& value) {
             device = at::Device(at::DeviceType::COMPILE_TIME_MAX_DEVICE_TYPES);
             break;
         default:
-            DLOG(FATAL) << "Unsupported device type.";
+            Log::RT::E() << "Unsupported device type.";
     }
     return device;
 }
@@ -140,7 +141,7 @@ at::MemoryFormat getMemoryFormat(int optional_memory_format)
             memory_format = at::MemoryFormat::ChannelsLast3d;
             break;
         default:
-            DLOG(FATAL) << "Wrong reference to aten MemoryFormat.";
+            Log::RT::E() << "Wrong reference to aten MemoryFormat.";
     }
     return memory_format;
 }
@@ -209,7 +210,7 @@ DataType inferDataType(torch::jit::IValue ival)
     } else if (ival.isTuple()) {
         type = DataType::TUPLE;
     } else {
-        DLOG(INFO) << ival.type()->repr_str() << " is not supported yet.";
+        Log::RT::D() << ival.type()->repr_str() << " is not supported yet.";
     }
     return type;
 }
@@ -239,7 +240,7 @@ at::ListTypePtr inferTypeFromDataType(DataType type)
             list_type = at::ListType::ofTensors();
             break;
         default:
-            DLOG(INFO) << "DataType do not support! ";
+            Log::RT::D() << "DataType do not support! ";
             break;
     }
     return list_type;

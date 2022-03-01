@@ -4,6 +4,7 @@
 #include <tuple>
 #include <vector>
 
+#include "common/log.hpp"
 #include "builder/model_builder.h"
 #include "executor/stream_executor.h"
 #include "new_ir/include/nn_model.h"

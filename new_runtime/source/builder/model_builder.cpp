@@ -1,3 +1,4 @@
+#include "common/log.hpp"
 #include "new_runtime/include/builder/model_builder.h"
 
 namespace nn_compiler {

@@ -1,6 +1,8 @@
 #pragma once
 
 #include <torch/script.h>
+
+#include "common/log.hpp"
 #include "types.h"
 
 namespace nn_compiler {
@@ -53,7 +55,7 @@ at::ArrayRef<T> parseIValueArrayRef(const at::ArrayRef<at::IValue>& ivalue_array
             vec.push_back(item.toDouble());
         }
     } else {
-        DLOG(ERROR) << "Unsupported data type occurs in parseIValueInArrayRef().";
+        Log::RT::E() << "Unsupported data type occurs in parseIValueInArrayRef().";
     }
 
     at::ArrayRef<T> array_ref(vec);
@@ -75,7 +77,7 @@ std::vector<T> parseIValueVector(const at::ArrayRef<at::IValue>& ivalue_array)
             vec.push_back(item.toDouble());
         }
     } else {
-        DLOG(ERROR) << "Unsupported data type occurs in parseIValueVector().";
+        Log::RT::E() << "Unsupported data type occurs in parseIValueVector().";
     }
     return vec;
 }
@@ -97,7 +99,7 @@ void parseIValueList(at::IValue& list_iv, std::vector<T>& value_vec, std::vector
                     dim[dim_idx]++;
                 }
             } else {
-                DLOG(ERROR) << "Unsupported data type occurs in parseIValueList().";
+                Log::RT::E() << "Unsupported data type occurs in parseIValueList().";
             }
         } else {
             dim.push_back(1);
@@ -111,7 +113,7 @@ void parseIValueList(at::IValue& list_iv, std::vector<T>& value_vec, std::vector
     } else if (list_iv.isDouble()) {
         value_vec.push_back(list_iv.toDouble());
     } else {
-        DLOG(ERROR) << "Unsupported data type occurs in parseIValueList().";
+        Log::RT::E() << "Unsupported data type occurs in parseIValueList().";
     }
 }
 
