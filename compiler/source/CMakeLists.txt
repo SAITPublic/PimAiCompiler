@@ -10,7 +10,7 @@ file(GLOB nncompiler_src *.cpp)
 add_library(nncompiler SHARED ${nncompiler_src})
 
 target_link_libraries(nncompiler common)
-target_link_libraries(nncompiler ir new_ir)
 target_link_libraries(nncompiler frontend)
 target_link_libraries(nncompiler middlend)
+target_link_libraries(nncompiler torch torch_cpu c10)
 # target_link_libraries(nncompiler backend)

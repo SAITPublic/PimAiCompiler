@@ -7,4 +7,4 @@ target_include_directories(frontend PUBLIC
     ${PROJECT_SOURCE_DIR}/compiler/include/frontend
     ${TORCH_INCLUDE_DIRS})
 
-target_link_libraries(frontend common ir new_ir torch c10)
+target_link_libraries(frontend common ir new_ir)
