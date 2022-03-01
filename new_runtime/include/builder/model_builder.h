@@ -3,6 +3,7 @@
 #include <torch/script.h>
 
 #include "new_ir/include/nn_model.h"
+#include "types.h"
 
 namespace nn_compiler {
 namespace runtime {
@@ -10,7 +11,7 @@ namespace runtime {
 class ModelBuilder
 {
    public:
-    typedef std::unordered_map<int64_t, std::pair<nnrt::DataType, torch::jit::IValue>> blob_store_type;
+    typedef std::unordered_map<int64_t, std::pair<DataType, torch::jit::IValue>> blob_store_type;
 
     RetVal preProcess(std::unique_ptr<nn_compiler::ir::NNModel> &model);
 

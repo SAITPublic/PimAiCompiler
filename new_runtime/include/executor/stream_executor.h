@@ -24,11 +24,11 @@ class StreamExecutor
 
     ~StreamExecutor();
 
-    RetVal inferenceModel(std::unique_ptr<nn_compiler::ir::NNModel &model,
+    RetVal inferenceModel(std::unique_ptr<nn_compiler::ir::NNModel> &model,
                           const std::vector<torch::Tensor>& input_tensors,
                           std::vector<torch::Tensor>& output_tensors);
 
-    RetVal inferenceModelwithProfiling(std::unique_ptr<nn_compiler::ir::NNModel &model,
+    RetVal inferenceModelwithProfiling(std::unique_ptr<nn_compiler::ir::NNModel> &model,
                                        const std::vector<torch::Tensor>& input_tensors,
                                        std::vector<torch::Tensor>& output_tensors);
 

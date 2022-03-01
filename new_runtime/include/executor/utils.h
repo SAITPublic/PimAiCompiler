@@ -3,9 +3,9 @@
 #include <torch/script.h>
 #include "types.h"
 
-namespace nn_compiler
-namespace runtime
-{
+namespace nn_compiler {
+namespace runtime {
+
 torch::jit::IValue boolToIValue(const bool& value);
 template <typename T>
 torch::jit::IValue scalarToIValue(const T& scalar)

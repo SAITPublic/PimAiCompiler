@@ -84,12 +84,36 @@ at::Device convertIntToATDevice(const int& value) {
             device = at::Device(at::DeviceType::FPGA);
             break;
         case 8:
-            device = at::Device(at::DeviceType::MSNPU);
+            device = at::Device(at::DeviceType::ORT);
             break;
         case 9:
             device = at::Device(at::DeviceType::XLA);
             break;
         case 10:
+            device = at::Device(at::DeviceType::Vulkan);
+            break;
+        case 11:
+            device = at::Device(at::DeviceType::Metal);
+            break;
+        case 12:
+            device = at::Device(at::DeviceType::XPU);
+            break;
+        case 13:
+            device = at::Device(at::DeviceType::MLC);
+            break;
+        case 14:
+            device = at::Device(at::DeviceType::Meta);
+            break;
+        case 15:
+            device = at::Device(at::DeviceType::HPU);
+            break;
+        case 16:
+            device = at::Device(at::DeviceType::VE);
+            break;
+        case 17:
+            device = at::Device(at::DeviceType::Lazy);
+            break;
+        case 18:
             device = at::Device(at::DeviceType::COMPILE_TIME_MAX_DEVICE_TYPES);
             break;
         default:

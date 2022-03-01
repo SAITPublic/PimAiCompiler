@@ -1,4 +1,4 @@
-#include "builder/model_builder.h"
+#include "new_runtime/include/builder/model_builder.h"
 
 namespace nn_compiler {
 namespace runtime {

@@ -29,7 +29,7 @@ int main(int argc, char* argv[]) {
     cl_opt::CommandLineParser::getInstance().parseCommandLine(argc, argv);
 
     // get a compiler instance (singleton)
-    nn_compiler::NNCompiler compiler;
+    nn_compiler::compiler::NNCompiler compiler;
 
     // initialize
     compiler.initialize(static_cast<int>(compile_level), static_cast<std::string>(input_file_path),

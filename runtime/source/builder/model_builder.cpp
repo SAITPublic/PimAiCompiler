@@ -7,7 +7,7 @@ namespace nnrt
 {
 RetVal ModelBuilder::compileModel(const int compile_level, const std::string model_type)
 {
-    nn_compiler::NNCompiler compiler;
+    nn_compiler::compiler::NNCompiler compiler;
     std::vector<std::shared_ptr<nncir::NNIR>> NNIR_graphs;
     compiler.initialize(compile_level, this->model_path_, model_type);
     compiler.compile(NNIR_graphs);

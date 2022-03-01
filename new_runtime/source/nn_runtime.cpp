@@ -4,7 +4,7 @@
 #include <tuple>
 
 #include "c10/hip/HIPFunctions.h"
-#include "nn_runtime.h"
+#include "new_runtime/include/nn_runtime.h"
 #include "pim_runtime_api.h"
 
 namespace nn_compiler {
@@ -63,7 +63,8 @@ int NNRuntime::rocblas_init(void)
     int K = 4096;
     auto l_gpu = at::randn({M, K}, at::kCUDA);
     auto r_gpu = at::randn({K, N}, at::kCUDA);
-    auto result = nnrt::atenMatmul(l_gpu, r_gpu);
+    // TODO(SRCX): release API when it gets ready
+    // auto result = atenMatmul(l_gpu, r_gpu);
     at::hip::device_synchronize();
 
     return 0;
@@ -81,4 +82,5 @@ NNRuntime::~NNRuntime() {
     PimDeinitialize();
 }
 
-}  // namespace nnrt
+}  // namespace runtime
+}  // namespace nn_compiler
