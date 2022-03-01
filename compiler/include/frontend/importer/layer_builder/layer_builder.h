@@ -3,9 +3,8 @@
 #include <torch/script.h>
 #include <vector>
 
-#include "importer/layer_builder/all_layers.h"
 #include "importer/utils/attr_parser.h"
-#include "new_ir/include/layers/nn_layer.h"
+#include "new_ir/include/layers/all_layers.h"
 #include "new_ir/include/nn_network.h"
 #include "new_ir/include/tensors/data_tensor.h"
 
