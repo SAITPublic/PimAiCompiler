@@ -8,3 +8,5 @@ target_include_directories(frontend PUBLIC
     ${TORCH_INCLUDE_DIRS})
 
 target_link_libraries(frontend common ir new_ir)
+
+install (TARGETS frontend LIBRARY DESTINATION ${ROCM_PATH}/lib/)
