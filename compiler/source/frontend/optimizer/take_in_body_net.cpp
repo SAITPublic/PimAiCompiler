@@ -12,6 +12,9 @@
 
 #include "compiler/include/common/log.hpp"
 
+#include "new_ir/include/layers/prim_end_if_layer.h"
+#include "new_ir/include/layers/prim_end_loop_layer.h"
+
 namespace nn_compiler
 {
 

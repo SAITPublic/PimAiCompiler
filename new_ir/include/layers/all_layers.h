@@ -60,3 +60,6 @@
 #include "new_ir/include/layers/prim_loop_layer.h"
 #include "new_ir/include/layers/prim_tuple_index_layer.h"
 #include "new_ir/include/layers/prim_variable_layer.h"
+
+#include "new_ir/include/layers/prim_end_if_layer.h"
+#include "new_ir/include/layers/prim_end_loop_layer.h"

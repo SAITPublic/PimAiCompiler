@@ -18,6 +18,8 @@
 #include "compiler/include/frontend/optimizer/remove_set_attr_layers.h"
 #include "compiler/include/frontend/optimizer/set_attribute.h"
 #include "compiler/include/frontend/optimizer/take_in_body_net.h"
+#include "compiler/include/frontend/optimizer/control_layer_execution.h"
+#include "compiler/include/frontend/optimizer/update_layer_id.h"
 
 namespace nn_compiler
 {
@@ -47,6 +49,10 @@ void PassManager::runPasses(std::unique_ptr<nn_compiler::ir::NNModel>& model)
 
     auto set_weights_for_embedding = std::make_shared<SetWeightsForEmbedding>();
 
+    /*TODO: add middlend passes*/
+    auto update_layer_id = std::make_shared<UpdateLayerId>();
+    auto control_layer_execution = std::make_shared<ControlLayerExecution>();
+
     base_pass->add(take_in_body_net);
     take_in_body_net->add(construct_list);
     construct_list->add(remake_dtensor_of_prim_variable);
@@ -60,6 +66,9 @@ void PassManager::runPasses(std::unique_ptr<nn_compiler::ir::NNModel>& model)
     remove_cat_for_addmm->add(swap_addmm_inputs);
     swap_addmm_inputs->add(swap_matmul_inputs);
     swap_matmul_inputs->add(fuse_act);
+
+    fuse_act->add(update_layer_id);
+    update_layer_id->add(control_layer_execution);
 
     if (model_name_ == "RNNT") {
         fuse_act->add(set_weights_for_embedding);
