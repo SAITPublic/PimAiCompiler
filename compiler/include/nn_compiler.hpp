@@ -48,6 +48,15 @@ class NNCompiler {
     /**
      * @brief   run compiler.
      * @details This function runs compilation pipeline.
+     * @inputs  model graph container.
+     * @returns return code: success or failure.
+     */
+    RetVal compile(std::unique_ptr<ir::NNModel>& model);
+
+    // TODO(SRCX): remove this interface after refactor.
+    /**
+     * @brief   run compiler.
+     * @details This function runs compilation pipeline.
      * @inputs  an empty vector ready to put NNIR(LLO) graphs
      * @returns const NNIR vector
      */
@@ -64,11 +73,12 @@ class NNCompiler {
     /**
      * @brief   Frontend compilation pipeline.
      * @details This function runs frontend compilation pipeline with torchscript IR input.
-     * @inputs  torchscript IR file path and model name[RNNT, GNMT, HWR]
+     * @inputs  torchscript IR file path, model type[RNNT, GNMT, HWR] and model graph container.
      * @returns return code: success or failure.
      */
-    RetVal frontend(const std::string& file_path, const std::string& model_name);
+    RetVal frontend(const std::string& file_path, const std::string& model_name, std::unique_ptr<ir::NNModel>& model);
 
+    // TODO(SRCX): remove this interface after refactor.
     /**
      * @brief   Milddlend compilation pipeline.
      * @details This function runs middlend compilation pipeline with NNIR input.
@@ -79,20 +89,11 @@ class NNCompiler {
 
     /**
      * @brief   Milddlend compilation pipeline.
-     * @details This function runs middlend compilation pipeline with no input,
-     *          NNIR graphs have been parsed and get prepared by frontend.
-     * @inputs  .
+     * @details This function runs middlend compilation pipeline.
+     * @inputs  Model graph container.
      * @returns return code: success or failure.
      */
-    RetVal middlend();
-
-    /**
-     * @brief   Backend compilation pipeline.
-     * @details This function runs backend compilation pipeline with NNIR input.
-     * @inputs  NNIR file path
-     * @returns return code: success or failure.
-     */
-    RetVal backend(const std::string& file_path);
+    RetVal middlend(std::unique_ptr<ir::NNModel>& model);
 
     /**
      * @brief   Backend compilation pipeline.
@@ -103,6 +104,7 @@ class NNCompiler {
      */
     RetVal backend();
 
+    // TODO(SRCX): remove compile_level option after refactor.
     /**
      * @details Compile level, possible values(0, 1, 2), which stands for different components of compilation pipeline.
      *          0 : frontend->middlend->backend;
@@ -119,8 +121,6 @@ class NNCompiler {
 
     // TODO(SRCX): remove NNIR graphs when refactor successfully
     std::vector<std::shared_ptr<nn_compiler::nn_ir::NNIR>> NNIR_graphs_;
-
-    std::unique_ptr<ir::NNModel> model_ = nullptr;
 
     std::string model_name_ = "";
 
