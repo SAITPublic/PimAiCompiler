@@ -73,12 +73,12 @@ class AttributeHelper
     bool putAttribute(std::string name, layer_inID_type& layer_inID, dtensor_ptr_type& d_tensor);
 
     template <typename T>
-    T getValueFromConstant(dtensor_ptr_type& d_tensor, std::string layer_type, std::string attr_type)
+    T getValueFromConstant(dtensor_ptr_type& d_tensor, nn_compiler::ir::LayerType layer_type, std::string attr_type)
     {
         T ret_value;
         auto data = d_tensor->getData<T>();
         if ((*data).size() == 0) {
-            Log::IR::E() << attr_type << " of " << layer_type << " cannot be NONE";
+            Log::IR::E() << attr_type << " of " << convertLayerTypeToString(layer_type) << " cannot be NONE";
         } else {
             ret_value = (*data)[0];
         }
@@ -86,12 +86,12 @@ class AttributeHelper
     }
 
     template <typename T>
-    std::vector<T> getVectorFromConstant(dtensor_ptr_type& d_tensor, std::string layer_type, std::string attr_type)
+    std::vector<T> getVectorFromConstant(dtensor_ptr_type& d_tensor, nn_compiler::ir::LayerType layer_type, std::string attr_type)
     {
         std::vector<T> ret_vec;
         auto data = d_tensor->getData<T>();
         if ((*data).size() == 0) {
-            Log::IR::E() << attr_type << " of " << layer_type << " cannot be NONE";
+            Log::IR::E() << attr_type << " of " << convertLayerTypeToString(layer_type) << " cannot be NONE";
         } else {
             for (auto item : *data) {
                 ret_vec.push_back(item);
@@ -100,7 +100,7 @@ class AttributeHelper
         return ret_vec;
     }
 
-    std::string getStringFromConstant(dtensor_ptr_type& d_tensor, std::string layer_type, std::string attr_type)
+    std::string getStringFromConstant(dtensor_ptr_type& d_tensor, nn_compiler::ir::LayerType layer_type, std::string attr_type)
     {
         std::string str = "";
         auto data = d_tensor->getData<uint8_t>();
@@ -109,7 +109,7 @@ class AttributeHelper
                 str += static_cast<char>((*data)[i]);
             }
         } else {
-            Log::IR::E() << attr_type << " of " << layer_type << " cannot be NONE";
+            Log::IR::E() << attr_type << " of " << convertLayerTypeToString(layer_type) << " cannot be NONE";
         }
         return str;
     }

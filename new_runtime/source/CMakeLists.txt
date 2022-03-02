@@ -9,7 +9,7 @@ include_directories(${PROJECT_SOURCE_DIR}/new_runtime/include)
 
 add_library(new_nn_runtime SHARED ${new_runtime_source})
 target_include_directories(new_nn_runtime PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include)
-target_link_libraries (new_nn_runtime hsakmt glog torch c10 PimRuntime)
+target_link_libraries (new_nn_runtime hsakmt glog torch c10 nncompiler PimRuntime)
 
 install (TARGETS new_nn_runtime LIBRARY DESTINATION ${ROCM_PATH}/lib/)
 install (FILES ${CMAKE_CURRENT_SOURCE_DIR}/../include/nn_runtime.h DESTINATION ${ROCM_PATH}/include )

@@ -16,7 +16,7 @@ bool RemoveDropoutLayers::fitCondition(std::unique_ptr<nn_compiler::ir::NNModel>
     auto graphs = model->getGraphs();
     for (auto graph : graphs) {
         for (auto layer : graph->getLayers()) {
-            if (layer->getType() == "aten::dropout") {
+            if (layer->getType() == nn_compiler::ir::LayerType::ATENDROPOUT) {
                 remove_layers_.push_back(layer);
             }
         }

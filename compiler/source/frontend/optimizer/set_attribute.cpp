@@ -18,9 +18,9 @@ bool SetAttribute::fitCondition(std::unique_ptr<nn_compiler::ir::NNModel> &model
     auto graphs = model->getGraphs();
     for (auto graph : graphs) {
         for (auto layer : graph->getLayers()) {
-            if (layer->getType() == "prim::Constant") {
+            if (layer->getType() == nn_compiler::ir::LayerType::PRIMCONSTANT) {
                 constant_layers_.push_back(layer);
-            } else if (layer->getType() == "prim::Variable") {
+            } else if (layer->getType() == nn_compiler::ir::LayerType::PRIMVARIABLE) {
                 auto variable_layer = std::dynamic_pointer_cast<nn_compiler::ir::PrimVariableLayer>(layer);
                 if (variable_layer->getSingleDTensor()) {
                     // variable layer with single DTensor
@@ -75,7 +75,7 @@ void SetAttribute::doProcess(const std::shared_ptr<nn_compiler::ir::NNLayer> &la
         for (auto inID : consumer.second) {
             std::pair<const std::shared_ptr<nn_compiler::ir::NNLayer>, unsigned int> layer_inID(consumer.first, inID);
 
-            if (helper_->putAttribute(consumer.first->getType(), layer_inID, data)) {
+            if (helper_->putAttribute(convertLayerTypeToString(consumer.first->getType()), layer_inID, data)) {
                 if (edge_remove_helper_.find(consumer.first) == edge_remove_helper_.end()) {
                     std::vector<uint32_t> vec_of_index = {inID};
                     edge_remove_helper_[consumer.first] = vec_of_index;

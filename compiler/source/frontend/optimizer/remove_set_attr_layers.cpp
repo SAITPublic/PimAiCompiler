@@ -17,9 +17,9 @@ bool RemoveSetAttrLayers::fitCondition(std::unique_ptr<nn_compiler::ir::NNModel>
     auto graphs = model->getGraphs();
     for (auto graph : graphs) {
         for (auto layer : graph->getLayers()) {
-            if (layer->getType() == "prim::SetAttr") {
+            if (layer->getType() == nn_compiler::ir::LayerType::PRIMSETATTR) {
                 auto predecessors = ir::searchPredecessor(layer, graph);
-                if (predecessors.size() == 2 && predecessors[0]->getType() == "prim::Variable") {
+                if (predecessors.size() == 2 && predecessors[0]->getType() == nn_compiler::ir::LayerType::PRIMVARIABLE) {
                     remove_layers_.push_back(layer);
                 }
             }

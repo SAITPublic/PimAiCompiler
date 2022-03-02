@@ -21,7 +21,8 @@ bool RemakeDTensorOfPrimVariable::checkVariableUsage(const std::shared_ptr<nn_co
             std::pair<const std::shared_ptr<nn_compiler::ir::NNLayer>, unsigned int> layer_inID(cloned_layer_for_check,
                                                                                                 inID);
 
-            if (!helper_->putAttribute(cloned_layer_for_check->getType(), layer_inID, cloned_data_for_check)) {
+            if (!helper_->putAttribute(convertLayerTypeToString(cloned_layer_for_check->getType()),
+                                                                layer_inID, cloned_data_for_check)) {
                 return false;
             }
         }
@@ -35,7 +36,7 @@ bool RemakeDTensorOfPrimVariable::fitCondition(std::unique_ptr<nn_compiler::ir::
     auto graphs = model->getGraphs();
     for (auto graph : graphs) {
         for (auto layer : graph->getLayers()) {
-            if (layer->getType() == "prim::Variable") {
+            if (layer->getType() == nn_compiler::ir::LayerType::PRIMVARIABLE) {
                 auto variable_layer = std::dynamic_pointer_cast<nn_compiler::ir::PrimVariableLayer>(layer);
                 auto data = variable_layer->getAttr();
                 if (data.size() == 0) {

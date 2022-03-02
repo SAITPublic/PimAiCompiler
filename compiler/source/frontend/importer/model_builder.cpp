@@ -210,7 +210,7 @@ void ModelBuilder::importTorchScriptMethodBlock(std::unique_ptr<ir::NNModel>& nn
             auto input_layer_builder = this->layer_builders_.get("prim::Input");
             auto layer =
                 std::dynamic_pointer_cast<nn_compiler::ir::PrimInputLayer>(input_layer_builder->buildLayer(nullptr));
-            layer->setName(layer->getType() + "_" + std::to_string(layer->getID()));
+            layer->setName(convertLayerTypeToString(layer->getType()) + "_" + std::to_string(layer->getID()));
             layer->addOutSTensorID(value_tensor_map_[input]);
 
             network->addLayer(layer);
@@ -231,7 +231,7 @@ void ModelBuilder::importTorchScriptMethodBlock(std::unique_ptr<ir::NNModel>& nn
                 auto builder = this->layer_builders_.get("prim::If");
                 if (builder != nullptr) {
                     auto layer = std::dynamic_pointer_cast<nn_compiler::ir::PrimIfLayer>(builder->buildLayer(node));
-                    layer->setName(layer->getType() + "_" + std::to_string(layer->getID()));
+                    layer->setName(convertLayerTypeToString(layer->getType()) + "_" + std::to_string(layer->getID()));
                     // Add two GNetworks(ThenNet, ElseNet) for then/else blocks.
                     auto then_block = node->blocks()[0];
                     std::string then_block_name = name + "_" + std::to_string(getUniqueBlockId());
@@ -280,7 +280,7 @@ void ModelBuilder::importTorchScriptMethodBlock(std::unique_ptr<ir::NNModel>& nn
                     importTorchScriptMethodBlock(nn_model, body_block_name, body_block);
 
                     auto layer = std::dynamic_pointer_cast<nn_compiler::ir::PrimLoopLayer>(builder->buildLayer(node));
-                    layer->setName(layer->getType() + "_" + std::to_string(layer->getID()));
+                    layer->setName(convertLayerTypeToString(layer->getType()) + "_" + std::to_string(layer->getID()));
                     layer->setBodyNet(body_block_name);
 
                     // Add input
@@ -320,7 +320,7 @@ void ModelBuilder::importTorchScriptMethodBlock(std::unique_ptr<ir::NNModel>& nn
                         if (variable_builder != nullptr) {
                             auto variable_layer = std::dynamic_pointer_cast<nn_compiler::ir::PrimVariableLayer>(
                                 variable_builder->buildLayer(node));
-                            variable_layer->setName(variable_layer->getType() + "_" +
+                            variable_layer->setName(convertLayerTypeToString(variable_layer->getType()) + "_" +
                                                     std::to_string(variable_layer->getID()));
                             variable_layer->setNType(attr.type()->repr_str());
 
@@ -346,7 +346,8 @@ void ModelBuilder::importTorchScriptMethodBlock(std::unique_ptr<ir::NNModel>& nn
                 if (set_attr_builder != nullptr) {
                     auto set_attr_layer = std::dynamic_pointer_cast<nn_compiler::ir::PrimSetAttrLayer>(
                         set_attr_builder->buildLayer(node));
-                    set_attr_layer->setName(set_attr_layer->getType() + "_" + std::to_string(set_attr_layer->getID()));
+                    set_attr_layer->setName(convertLayerTypeToString(set_attr_layer->getType()) + "_" +
+                                            std::to_string(set_attr_layer->getID()));
 
                     // Connect SetAttr and variable
                     auto variable_layer = attr_layer_map[attrMap_key];
@@ -392,7 +393,7 @@ void ModelBuilder::importTorchScriptMethodBlock(std::unique_ptr<ir::NNModel>& nn
                         if (variable_builder != nullptr) {
                             auto variable_layer = std::dynamic_pointer_cast<nn_compiler::ir::PrimVariableLayer>(
                                 variable_builder->buildLayer(node));
-                            variable_layer->setName(variable_layer->getType() + "_" +
+                            variable_layer->setName(convertLayerTypeToString(variable_layer->getType()) + "_" +
                                                     std::to_string(variable_layer->getID()));
                             variable_layer->setNType(attr.type()->repr_str());
 
@@ -425,7 +426,7 @@ void ModelBuilder::importTorchScriptMethodBlock(std::unique_ptr<ir::NNModel>& nn
                     if (get_attr_builder != nullptr) {
                         auto get_attr_layer = std::dynamic_pointer_cast<nn_compiler::ir::PrimGetAttrLayer>(
                             get_attr_builder->buildLayer(node));
-                        get_attr_layer->setName(get_attr_layer->getType() + "_" +
+                        get_attr_layer->setName(convertLayerTypeToString(get_attr_layer->getType()) + "_" +
                                                 std::to_string(get_attr_layer->getID()));
 
                         // Connect GetAttr and variable
@@ -470,7 +471,7 @@ void ModelBuilder::importTorchScriptMethodBlock(std::unique_ptr<ir::NNModel>& nn
 
                 if (builder != nullptr) {
                     auto layer = builder->buildLayer(node);
-                    layer->setName(layer->getType() + "_" + std::to_string(layer->getID()));
+                    layer->setName(convertLayerTypeToString(layer->getType()) + "_" + std::to_string(layer->getID()));
                     // Add input
                     for (auto node_input : node->inputs()) {
                         layer->addInSTensorID(value_tensor_map_[node_input]);
@@ -512,7 +513,7 @@ void ModelBuilder::importTorchScriptMethodBlock(std::unique_ptr<ir::NNModel>& nn
 
                 if (builder != nullptr) {
                     auto layer = builder->buildLayer(node);
-                    layer->setName(layer->getType() + "_" + std::to_string(layer->getID()));
+                    layer->setName(convertLayerTypeToString(layer->getType()) + "_" + std::to_string(layer->getID()));
                     // Add input
                     for (auto node_input : node->inputs()) {
                         layer->addInSTensorID(value_tensor_map_[node_input]);
@@ -552,7 +553,7 @@ void ModelBuilder::importTorchScriptMethodBlock(std::unique_ptr<ir::NNModel>& nn
 
                 if (builder != nullptr) {
                     auto layer = builder->buildLayer(node);
-                    layer->setName(layer->getType() + "_" + std::to_string(layer->getID()));
+                    layer->setName(convertLayerTypeToString(layer->getType()) + "_" + std::to_string(layer->getID()));
                     // Add input
                     for (auto node_input : node->inputs()) {
                         layer->addInSTensorID(value_tensor_map_[node_input]);
@@ -582,7 +583,7 @@ void ModelBuilder::importTorchScriptMethodBlock(std::unique_ptr<ir::NNModel>& nn
                 auto builder = this->layer_builders_.get(std::string(kind.toQualString()));
                 if (builder != nullptr) {
                     auto layer = builder->buildLayer(node);
-                    layer->setName(layer->getType() + "_" + std::to_string(layer->getID()));
+                    layer->setName(convertLayerTypeToString(layer->getType()) + "_" + std::to_string(layer->getID()));
                     isInplaceNode(std::string(kind.toQualString()), layer);
                     // Add input
                     for (auto node_input : node->inputs()) {
@@ -630,7 +631,7 @@ void ModelBuilder::importTorchScriptMethodBlock(std::unique_ptr<ir::NNModel>& nn
             auto output_layer_builder = this->layer_builders_.get("prim::Output");
             auto layer =
                 std::dynamic_pointer_cast<nn_compiler::ir::PrimOutputLayer>(output_layer_builder->buildLayer(nullptr));
-            layer->setName(layer->getType() + "_" + std::to_string(layer->getID()));
+            layer->setName(convertLayerTypeToString(layer->getType()) + "_" + std::to_string(layer->getID()));
             layer->addInSTensorID(value_tensor_map_[output]);
 
             network->addLayer(layer);

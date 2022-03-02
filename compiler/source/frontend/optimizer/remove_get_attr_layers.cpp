@@ -18,7 +18,7 @@ bool RemoveGetAttrLayers::fitCondition(std::unique_ptr<nn_compiler::ir::NNModel>
     auto graphs = model->getGraphs();
     for (auto graph : graphs) {
         for (auto layer : graph->getLayers()) {
-            if (layer->getType() == "prim::GetAttr") {
+            if (layer->getType() == nn_compiler::ir::LayerType::PRIMGETATTR) {
                 remove_layers_.push_back(layer);
             }
         }

@@ -5,7 +5,6 @@
 #include "new_runtime/include/executor/stream_executor.h"
 #include "new_runtime/include/executor/utils.h"
 #include "types.h"
-#include "tv_tools.h"
 
 namespace nn_compiler {
 namespace runtime {

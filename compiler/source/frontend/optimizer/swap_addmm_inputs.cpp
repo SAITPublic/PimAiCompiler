@@ -23,10 +23,10 @@ bool SwapAddmmInputs::fitCondition(std::unique_ptr<nn_compiler::ir::NNModel>& mo
     // there will be only one graph after take_in_body_net pass.
     auto graph = model->getGraphs()[0];
     for (auto layer : graph->getLayers()) {
-        if (layer->getType() == "aten::addmm") {
+        if (layer->getType() == nn_compiler::ir::LayerType::ATENADDMM) {
             auto predecessors = ir::searchPredecessor(layer, graph);
             // at least: bias, input, weight.
-            if (predecessors.size() > 3 && predecessors[2]->getType() == "prim::Constant") {
+            if (predecessors.size() > 3 && predecessors[2]->getType() == nn_compiler::ir::LayerType::PRIMCONSTANT) {
                 layers_.push_back(layer);
             }
         }
@@ -41,7 +41,8 @@ void SwapAddmmInputs::run(std::unique_ptr<nn_compiler::ir::NNModel>& model) {
         auto predecessors = ir::searchPredecessor(layer, graph);
 
         // create transpose layer and insert for addmm's input
-        auto transpose_layer_for_input = std::make_shared<nn_compiler::ir::AtenTransposeLayer>("", "aten::transpose");
+        auto transpose_layer_for_input =
+            std::make_shared<nn_compiler::ir::AtenTransposeLayer>("", nn_compiler::ir::LayerType::ATENTRANSPOSE);
         transpose_layer_for_input->setName("aten::transpose_" + std::to_string(transpose_layer_for_input->getID()));
         // transpose with height and width
         transpose_layer_for_input->setDim0(-2);
@@ -66,7 +67,8 @@ void SwapAddmmInputs::run(std::unique_ptr<nn_compiler::ir::NNModel>& model) {
         layer->renewInSTensorID(2, in_stensor_ids[1]);
 
         // create transpose layer and insert for addmm's output
-        auto transpose_layer_for_output = std::make_shared<nn_compiler::ir::AtenTransposeLayer>("", "aten::transpose");
+        auto transpose_layer_for_output =
+            std::make_shared<nn_compiler::ir::AtenTransposeLayer>("", nn_compiler::ir::LayerType::ATENTRANSPOSE);
         transpose_layer_for_output->setName("aten::transpose_" + std::to_string(transpose_layer_for_output->getID()));
         // transpose with height and width
         transpose_layer_for_output->setDim0(-2);

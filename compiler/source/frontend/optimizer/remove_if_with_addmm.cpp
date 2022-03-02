@@ -28,9 +28,9 @@ bool RemoveIfWithAddmm::fitCondition(std::unique_ptr<nn_compiler::ir::NNModel> &
     for (auto idx = 1; idx < layers.size() - 1; idx++) {
         auto cur_layer = layers[idx];
         auto next_layer = layers[idx + 1];
-        if (pre_layer->getType() == "prim::If" &&
-                cur_layer->getType() == "aten::addmm" &&
-                    next_layer->getType() == "prim::EndIf") {
+        if (pre_layer->getType() == nn_compiler::ir::LayerType::PRIMIF &&
+                cur_layer->getType() == nn_compiler::ir::LayerType::ATENADDMM &&
+                    next_layer->getType() == nn_compiler::ir::LayerType::PRIMENDIF) {
             if_layer_idx_.push_back(idx - 1);
         }
         pre_layer = cur_layer;

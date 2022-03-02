@@ -155,14 +155,7 @@ enum class LayerType {
     PRIMVARIABLE
 };
 
-std::string convertLayerTypeToString(LayerType type) {
-    static std::unordered_map<LayerType, std::string> converter;
-    converter.insert({LayerType::ATENADD, "aten::add"});
-
-    auto iter = converter.find(type);
-    assert(iter != converter.end());
-    return iter->second;
-}
+std::string convertLayerTypeToString(LayerType type);
 
 }  // namespace ir
 }  // namespace nn_compiler

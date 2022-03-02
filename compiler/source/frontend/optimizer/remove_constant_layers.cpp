@@ -17,12 +17,12 @@ bool RemoveConstantLayers::fitCondition(std::unique_ptr<nn_compiler::ir::NNModel
     auto graphs = model->getGraphs();
     for (auto graph : graphs) {
         for (auto layer : graph->getLayers()) {
-            if (layer->getType() == "prim::Constant") {
+            if (layer->getType() == nn_compiler::ir::LayerType::PRIMCONSTANT) {
                 auto constant_layer = std::dynamic_pointer_cast<nn_compiler::ir::PrimConstantLayer>(layer);
                 if (constant_layer->getToRemove()) {
                     remove_layers_.push_back(layer);
                 }
-            } else if (layer->getType() == "prim::Variable") {
+            } else if (layer->getType() == nn_compiler::ir::LayerType::PRIMVARIABLE) {
                 auto variable_layer = std::dynamic_pointer_cast<nn_compiler::ir::PrimVariableLayer>(layer);
                 if (variable_layer->getToRemove()) {
                     remove_layers_.push_back(layer);

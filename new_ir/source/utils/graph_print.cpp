@@ -3,6 +3,8 @@
 #include "new_ir/include/layers/prim_if_layer.h"
 #include "new_ir/include/layers/prim_loop_layer.h"
 
+#include "new_ir/include/types.h"
+
 namespace nn_compiler {
 namespace ir {
 
@@ -26,7 +28,7 @@ void printGraphModel(std::unique_ptr<ir::NNModel>& nn_model) {
         for (auto layer : graph->getLayers()) {
             layer_line.clear();
             std::string attr = "";
-            if (layer->getType() == "prim::If") {
+            if (layer->getType() == LayerType::PRIMIF) {
                 attr =
                     "[ThenNet = " +
                     std::dynamic_pointer_cast<nn_compiler::ir::PrimIfLayer>(
@@ -38,7 +40,7 @@ void printGraphModel(std::unique_ptr<ir::NNModel>& nn_model) {
                         ->getElseNet() +
                     "]";
             }
-            if (layer->getType() == "prim::Loop") {
+            if (layer->getType() == LayerType::PRIMLOOP) {
                 attr = "[BodyNet = " +
                     std::dynamic_pointer_cast<
                         nn_compiler::ir::PrimLoopLayer>(layer)
@@ -53,7 +55,7 @@ void printGraphModel(std::unique_ptr<ir::NNModel>& nn_model) {
                     std::to_string(oid) + " : " +
                     nn_model->getTSSTensors()[oid]->getReprType() + ", ");
             }
-            layer_line.append(" = " + layer->getType() + attr + " (");
+            layer_line.append(" = " + convertLayerTypeToString(layer->getType()) + attr + " (");
             for (auto iid : in_ids) {
                 layer_line.append(std::to_string(iid) + ", ");
             }

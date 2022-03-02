@@ -36,16 +36,16 @@ bool ConstructList::fitCondition(std::unique_ptr<nn_compiler::ir::NNModel>& mode
     auto graphs = model->getGraphs();
     for (auto graph : graphs) {
         for (auto layer : graph->getLayers()) {
-            if (layer->getType() == "prim::ListConstruct") {
+            if (layer->getType() == nn_compiler::ir::LayerType::PRIMLISTCONSTRUCT) {
                 auto predecessors = ir::searchPredecessor(layer, graph);
                 bool all_constant = true;
                 for (unsigned int idx = 0; idx < predecessors.size(); idx++) {
                     // An extra connection has been added between prim::If and the first Op of its then/else body.
                     // In this case, the ListConstruct (as the first Op of prim::If's body) also fit the condition.
-                    if (idx == predecessors.size() - 1 && predecessors[idx]->getType() == "prim::If") {
+                    if (idx == predecessors.size() - 1 && predecessors[idx]->getType() == nn_compiler::ir::LayerType::PRIMIF) {
                         continue;
                     }
-                    if (predecessors[idx]->getType() != "prim::Constant") {
+                    if (predecessors[idx]->getType() != nn_compiler::ir::LayerType::PRIMCONSTANT) {
                         all_constant = false;
                         break;
                     }
@@ -57,7 +57,7 @@ bool ConstructList::fitCondition(std::unique_ptr<nn_compiler::ir::NNModel>& mode
                     nn_compiler::ir::DataType data_type = nn_compiler::ir::DataType::UNDEFINED;
 
                     for (unsigned int idx = 0; idx < predecessors.size(); idx++) {
-                        if (idx == predecessors.size() - 1 && predecessors[idx]->getType() == "prim::If") {
+                        if (idx == predecessors.size() - 1 && predecessors[idx]->getType() == nn_compiler::ir::LayerType::PRIMIF) {
                             continue;
                         }
 
@@ -103,13 +103,13 @@ void ConstructList::run(std::unique_ptr<nn_compiler::ir::NNModel>& model)
         // Store info
         auto layer_id = list_construct_layer->getID();
         auto layer_name = "prim::Variable_" + std::to_string(layer_id);
-        auto layer_type = "prim::Variable";
+        auto layer_type = nn_compiler::ir::LayerType::PRIMVARIABLE;
         auto ntype = "List";
         auto out_stensors = list_construct_layer->getOutSTensorID();
 
         // Tag prim::Constant Ops and remove them in following remove_constant pass
         for (unsigned int idx = 0; idx < predecessors.size(); idx++) {
-            if (idx == predecessors.size() - 1 && predecessors[idx]->getType() == "prim::If") {
+            if (idx == predecessors.size() - 1 && predecessors[idx]->getType() == nn_compiler::ir::LayerType::PRIMIF) {
                 continue;
             }
 
@@ -125,7 +125,7 @@ void ConstructList::run(std::unique_ptr<nn_compiler::ir::NNModel>& model)
         //    prim::If -> prim::ListConstruct -> aten::lstm changes to: prim::If -> aten::lstm
         // which_body_net = "" means no connection with prim::If
         std::string which_body_net = "";
-        if (predecessors[predecessors.size() - 1]->getType() == "prim::If") {
+        if (predecessors[predecessors.size() - 1]->getType() == nn_compiler::ir::LayerType::PRIMIF) {
             auto if_layer = predecessors[predecessors.size() - 1];
             auto in_stensor_id = list_construct_layer->getInSTensorID()[predecessors.size() - 1];
             auto out_stensor_ids = if_layer->getOutSTensorID();
@@ -148,9 +148,10 @@ void ConstructList::run(std::unique_ptr<nn_compiler::ir::NNModel>& model)
         bool only_for_lstm_weight = true;
         if ((std::dynamic_pointer_cast<nn_compiler::ir::PrimConstantLayer>(predecessors[0])->getNType()) == "Tensor") {
             for (auto iter = successors.begin(); iter != successors.end(); iter++) {
-                if ((iter->first->getType() != "aten::lstm1" && iter->first->getType() != "aten::lstm2") ||
-                    (iter->first->getType() == "aten::lstm1" && iter->second != 2) ||
-                    (iter->first->getType() == "aten::lstm2" && iter->second != 3)) {
+                if ((iter->first->getType() != nn_compiler::ir::LayerType::ATENLSTM1 &&
+                        iter->first->getType() != nn_compiler::ir::LayerType::ATENLSTM2) ||
+                    (iter->first->getType() == nn_compiler::ir::LayerType::ATENLSTM1 && iter->second != 2) ||
+                    (iter->first->getType() == nn_compiler::ir::LayerType::ATENLSTM2 && iter->second != 3)) {
                     only_for_lstm_weight = false;
                     break;
                 }

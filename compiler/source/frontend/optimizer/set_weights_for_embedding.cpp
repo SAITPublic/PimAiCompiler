@@ -15,7 +15,7 @@ bool SetWeightsForEmbedding::fitCondition(std::unique_ptr<nn_compiler::ir::NNMod
     auto graphs = graph_model->getGraphs();
     for (auto graph : graphs) {
         for (auto layer : graph->getLayers()) {
-            if (layer->getType() == "aten::embedding") {
+            if (layer->getType() == nn_compiler::ir::LayerType::ATENEMBEDDING) {
                 layers_.push_back(layer);
             }
         }
@@ -32,7 +32,7 @@ void SetWeightsForEmbedding::run(std::unique_ptr<nn_compiler::ir::NNModel>& grap
         auto cur_layer = std::dynamic_pointer_cast<nn_compiler::ir::AtenEmbeddingLayer>(layer);
         auto predecessors = ir::searchPredecessor(layer, graph);
         assert(predecessors.size() > 0);
-        if (predecessors[0]->getType() == "prim::Constant") {
+        if (predecessors[0]->getType() == nn_compiler::ir::LayerType::PRIMCONSTANT) {
             auto constant_g_layer = predecessors[0];
             auto idx = 0;
 

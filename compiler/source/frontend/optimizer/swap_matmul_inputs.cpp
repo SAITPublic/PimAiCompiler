@@ -23,10 +23,12 @@ bool SwapMatmulInputs::fitCondition(std::unique_ptr<nn_compiler::ir::NNModel>& m
     // there will be only one graph after take_in_body_net pass.
     auto graph = model->getGraphs()[0];
     for (auto layer : graph->getLayers()) {
-        if (layer->getType() == "aten::matmul") {
+        if (layer->getType() == nn_compiler::ir::LayerType::ATENMATMUL) {
             auto predecessors = ir::searchPredecessor(layer, graph);
-            if (predecessors.size() == 2 && predecessors[1]->getType() == "prim::Constant") {
-                auto constant_layer = std::dynamic_pointer_cast<nn_compiler::ir::PrimConstantLayer>(predecessors[1]);
+            if (predecessors.size() == 2 &&
+                    predecessors[1]->getType() == nn_compiler::ir::LayerType::PRIMCONSTANT) {
+                auto constant_layer =
+                    std::dynamic_pointer_cast<nn_compiler::ir::PrimConstantLayer>(predecessors[1]);
                 auto dtensor = constant_layer->getAttr();
                 std::vector<int> shape;
                 auto b = dtensor->getTensorShape().getBatch();
@@ -54,7 +56,8 @@ void SwapMatmulInputs::run(std::unique_ptr<nn_compiler::ir::NNModel>& model) {
         auto predecessors = ir::searchPredecessor(layer, graph);
         assert(predecessors.size() == 2);
         // create transpose layer and insert for matmul's input
-        auto transpose_layer_for_input = std::make_shared<nn_compiler::ir::AtenTransposeLayer>("", "aten::transpose");
+        auto transpose_layer_for_input =
+            std::make_shared<nn_compiler::ir::AtenTransposeLayer>("", nn_compiler::ir::LayerType::ATENTRANSPOSE);
         transpose_layer_for_input->setName("aten::transpose_" + std::to_string(transpose_layer_for_input->getID()));
         // transpose with height and width
         transpose_layer_for_input->setDim0(-2);
@@ -80,7 +83,8 @@ void SwapMatmulInputs::run(std::unique_ptr<nn_compiler::ir::NNModel>& model) {
         layer->renewInSTensorID(1, in_stensor_ids[0]);
 
         // create transpose layer and insert for matmul's output
-        auto transpose_layer_for_output = std::make_shared<nn_compiler::ir::AtenTransposeLayer>("", "aten::transpose");
+        auto transpose_layer_for_output =
+            std::make_shared<nn_compiler::ir::AtenTransposeLayer>("", nn_compiler::ir::LayerType::ATENTRANSPOSE);
         transpose_layer_for_output->setName("aten::transpose_" + std::to_string(transpose_layer_for_output->getID()));
         // transpose with height and width
         transpose_layer_for_output->setDim0(-2);

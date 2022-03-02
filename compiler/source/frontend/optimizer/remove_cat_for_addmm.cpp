@@ -20,17 +20,17 @@ RemoveCatForAddmm::RemoveCatForAddmm() {
 bool RemoveCatForAddmm::fitCondition(std::unique_ptr<nn_compiler::ir::NNModel>& model) {
     auto graph = model->getGraphs()[0];
     for (auto layer : graph->getLayers()) {
-        if (layer->getType() == "prim::ListConstruct") {
+        if (layer->getType() == nn_compiler::ir::LayerType::PRIMLISTCONSTRUCT) {
             auto predecessors = ir::searchPredecessor(layer, graph);
             if (predecessors.size() != 2) {
                 continue;
             }
             auto successors = ir::searchSuccessorLayerOnly(layer, graph);
-            if (successors.size() == 1 && successors[0]->getType() == "aten::cat") {
+            if (successors.size() == 1 && successors[0]->getType() == nn_compiler::ir::LayerType::ATENCAT) {
                 auto cat_layer = successors[0];
                 auto successors_of_cat = ir::searchSuccessorLayerOnly(cat_layer, graph);
                 if (successors_of_cat.size() == 1 &&
-                        successors_of_cat[0]->getType() == "aten::addmm") {
+                        successors_of_cat[0]->getType() == nn_compiler::ir::LayerType::ATENADDMM) {
                     auto addmm_layer = successors_of_cat[0];
                     std::vector<std::shared_ptr<nn_compiler::ir::NNLayer>>
                                 layer_set = {layer, cat_layer, addmm_layer};
@@ -98,7 +98,7 @@ RemoveCatForAddmm::create_new_constants(std::shared_ptr<nn_compiler::ir::PrimCon
     }
 
     for (auto idx = 0; idx < new_data.size(); idx++) {
-        auto type = "prim::Constant";
+        auto type = nn_compiler::ir::LayerType::PRIMCONSTANT;
         auto name = "splitted_" + std::to_string(idx) + "_" + old_constant_layer->getName();
         auto ntype = old_constant_layer->getNType();
         auto new_dtensor = std::make_shared<nn_compiler::ir::DTensor>();
@@ -143,7 +143,7 @@ void RemoveCatForAddmm::reorganize_graph(std::unique_ptr<nn_compiler::ir::NNMode
         addmm_layer->renewInSTensorID(2, constant_out_stensor1->getID());
 
         // create second addmm Op
-        auto new_addmm_layer = std::make_shared<nn_compiler::ir::AtenAddmmLayer>("", "aten::addmm");
+        auto new_addmm_layer = std::make_shared<nn_compiler::ir::AtenAddmmLayer>("", nn_compiler::ir::LayerType::ATENADDMM);
         new_addmm_layer->setName("splitted_" + addmm_layer->getName());
         graph->addLayer2pos(new_addmm_layer, graph->getLayerPos(addmm_layer));
         auto new_addmm_out_stensor = std::make_shared<nn_compiler::ir::TSSTensor>();
