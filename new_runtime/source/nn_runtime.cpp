@@ -17,7 +17,8 @@ NNRuntime::NNRuntime(std::unique_ptr<nn_compiler::ir::NNModel> &model, std::stri
     mbuilder_->preProcess(model);
     mbuilder_->preloadModel(model);
 
-    this->executor_ = std::make_shared<StreamExecutor>(mbuilder_->getPreLoadedData(), model_type_);
+    executor_ = std::make_shared<StreamExecutor>(mbuilder_->getPreLoadedData(), model_type_);
+    executor_->preProcess(model);
 
     rocblas_init();
     PimInitialize(RT_TYPE_HIP, PIM_FP16);

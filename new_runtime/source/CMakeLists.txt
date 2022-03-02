@@ -1,4 +1,7 @@
-file(GLOB_RECURSE new_runtime_source *.cpp)
+add_subdirectory(builder)
+add_subdirectory(executor)
+
+file(GLOB new_runtime_source nn_runtime.cpp)
 set(CMAKE_CXX_COMPILER "${ROCM_PATH}/bin/hipcc")
 set(HIPCC_FLAGS "--amdgpu-target=gfx906")
 set(CXX_FLAGS "-std=c++17 -fPIC")
@@ -8,8 +11,7 @@ include_directories(${PROJECT_SOURCE_DIR})
 include_directories(${PROJECT_SOURCE_DIR}/new_runtime/include)
 
 add_library(new_nn_runtime SHARED ${new_runtime_source})
-target_include_directories(new_nn_runtime PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include)
-target_link_libraries (new_nn_runtime hsakmt glog torch c10 nncompiler PimRuntime)
+target_link_libraries(new_nn_runtime nncompiler runtime_builder stream_executor PimRuntime)
 
 install (TARGETS new_nn_runtime LIBRARY DESTINATION ${ROCM_PATH}/lib/)
-install (FILES ${CMAKE_CURRENT_SOURCE_DIR}/../include/nn_runtime.h DESTINATION ${ROCM_PATH}/include )
+install (FILES ${CMAKE_CURRENT_SOURCE_DIR}/../include/nn_runtime.h DESTINATION ${ROCM_PATH}/include)

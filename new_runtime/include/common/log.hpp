@@ -13,4 +13,4 @@
 #include "common/include/common.hpp"
 #include "common/include/log.hpp"
 
-DEFINE_LOGGER(RT, "[RT]")
+DEFINE_LOGGER(RT, "[Runtime]")
