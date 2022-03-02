@@ -28,7 +28,7 @@ class AtenLSTM1Layer : public NNLayer {
      * @param name the name of the layer
      * @param type the type of the layer
      */
-    AtenLSTM1Layer(std::string name, std::string type) : NNLayer(name, type) {}
+    AtenLSTM1Layer(std::string name, LayerType type) : NNLayer(name, type) {}
 
     explicit AtenLSTM1Layer(const AtenLSTM1Layer &aten_lstm1_layer) : NNLayer(aten_lstm1_layer) {
         this->setAttr(aten_lstm1_layer._has_biases, aten_lstm1_layer._num_layers,

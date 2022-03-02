@@ -14,7 +14,7 @@ class AtenPadPackedSequenceLayer : public NNLayer {
      * @param name the name of the layer
      * @param type the type of the layer
      */
-    AtenPadPackedSequenceLayer(std::string name, std::string type)
+    AtenPadPackedSequenceLayer(std::string name, LayerType type)
             : NNLayer(name, type) {
     }
 

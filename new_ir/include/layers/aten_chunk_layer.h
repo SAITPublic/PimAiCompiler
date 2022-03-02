@@ -10,7 +10,7 @@ class AtenChunkLayer : public NNLayer {
  public:
     AtenChunkLayer() {}
 
-    AtenChunkLayer(std::string name, std::string type)
+    AtenChunkLayer(std::string name, LayerType type)
                      : NNLayer(name, type) {
     }
 

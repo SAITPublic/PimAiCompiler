@@ -10,7 +10,7 @@ class AtenAsTensorLayer : public NNLayer {
  public:
     AtenAsTensorLayer() {}
 
-    AtenAsTensorLayer(std::string name, std::string type)
+    AtenAsTensorLayer(std::string name, LayerType type)
                      : NNLayer(name, type) {
     }
 

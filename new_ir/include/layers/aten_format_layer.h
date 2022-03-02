@@ -9,7 +9,7 @@ class AtenFormatLayer : public NNLayer {
  public:
     AtenFormatLayer() {}
 
-    AtenFormatLayer(std::string name, std::string type)
+    AtenFormatLayer(std::string name, LayerType type)
             : NNLayer(name, type) {
     }
 

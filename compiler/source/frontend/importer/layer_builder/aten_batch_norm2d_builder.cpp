@@ -14,7 +14,7 @@ std::shared_ptr<ir::NNLayer> AtenBatchNorm2dBuilder::buildLayer(const torch::jit
 {
     Log::NIR::I() << "build aten::batch_norm";
 
-    std::string type = "aten::batch_norm";
+    nn_compiler::ir::LayerType type = nn_compiler::ir::LayerType::ATENBATCHNORM2D;
     std::string name = "";
 
     aten_batch_norm2d_layer_ = std::make_shared<ir::AtenBatchNorm2dLayer>(name, type);

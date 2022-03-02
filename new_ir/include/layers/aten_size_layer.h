@@ -10,7 +10,7 @@ class AtenSizeLayer : public NNLayer {
  public:
     AtenSizeLayer() {}
 
-    AtenSizeLayer(std::string name, std::string type)
+    AtenSizeLayer(std::string name, LayerType type)
             : NNLayer(name, type) {
     }
 

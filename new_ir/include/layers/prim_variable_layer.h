@@ -14,7 +14,7 @@ class PrimVariableLayer : public NNLayer {
      * @param type the type of the layer
      */
 
-    PrimVariableLayer(std::string name, std::string type)
+    PrimVariableLayer(std::string name, LayerType type)
             : NNLayer(name, type) {
     }
 

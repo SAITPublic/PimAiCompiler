@@ -13,7 +13,7 @@ namespace frontend
 std::shared_ptr<ir::NNLayer> PrimConstantBuilder::buildLayer(const torch::jit::Node *node_ref)
 {
     Log::NIR::I() << "build prim::Constant";
-    std::string type = "prim::Constant";
+    nn_compiler::ir::LayerType type = nn_compiler::ir::LayerType::PRIMCONSTANT;
     std::string name = "";
     prim_constant_layer_ = std::make_shared<ir::PrimConstantLayer>(name, type);
     std::string ntype = node_ref->output()->type()->str();

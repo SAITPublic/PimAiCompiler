@@ -13,7 +13,7 @@ std::shared_ptr<ir::NNLayer> AtenLSTM1Builder::buildLayer(const torch::jit::Node
 {
     Log::NIR::I() << "build aten::lstm1";
 
-    std::string type = "aten::lstm1";
+    nn_compiler::ir::LayerType type = nn_compiler::ir::LayerType::ATENLSTM1;
     std::string name = "";
 
     aten_lstm1_layer_ = std::make_shared<ir::AtenLSTM1Layer>(name, type);

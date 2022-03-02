@@ -12,7 +12,7 @@ namespace ir {
  */
 class AtenArange1Layer : public NNLayer {
  public:
-    AtenArange1Layer(std::string name, std::string type) : NNLayer(name, type) {
+    AtenArange1Layer(std::string name, LayerType type) : NNLayer(name, type) {
     }
 
     explicit AtenArange1Layer(const AtenArange1Layer& aten_arange_layer) :  NNLayer(aten_arange_layer) {

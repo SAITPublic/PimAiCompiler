@@ -15,7 +15,7 @@ class AtenWarnLayer : public NNLayer {
      * @param type the type of the layer
      */
 
-    AtenWarnLayer(std::string name, std::string type) : NNLayer(name, type) {
+    AtenWarnLayer(std::string name, LayerType type) : NNLayer(name, type) {
     }
 
     explicit AtenWarnLayer(const AtenWarnLayer& aten_warn_layer) :

@@ -18,7 +18,7 @@ std::shared_ptr<ir::NNLayer> AtenLinearBuilder::buildLayer(const torch::jit::Nod
 {
     Log::NIR::I() << "build aten::linear";
 
-    std::string type = "aten::linear";
+    nn_compiler::ir::LayerType type = nn_compiler::ir::LayerType::ATENLINEAR;
     std::string name = "";
 
     aten_linear_layer_ = std::make_shared<ir::AtenLinearLayer>(name, type);

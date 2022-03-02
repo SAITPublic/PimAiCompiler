@@ -33,7 +33,7 @@ class NNLayer {
     NNLayer() {
     }
 
-    NNLayer(std::string name, std::string type)
+    NNLayer(std::string name, LayerType type)
             : name_(name), type_(type) {
         static uint32_t increased_cnt = 0;
         id_ = increased_cnt++;
@@ -121,11 +121,11 @@ class NNLayer {
         return name_;
     }
 
-    void setType(std::string type) {
+    void setType(LayerType type) {
         type_ = type;
     }
 
-    const std::string &getType() const {
+    const LayerType& getType() const {
         return type_;
     }
 
@@ -136,7 +136,7 @@ class NNLayer {
     void printInfo() {
         Log::IR::I() << name_;
         Log::IR::I() << "{";
-        Log::IR::I() << "    Type is      " << type_;
+        Log::IR::I() << "    Type is      " << convertLayerTypeToString(type_);
         Log::IR::I() << "input ZP ";
         Log::IR::I() << "}";
     }
@@ -153,7 +153,7 @@ class NNLayer {
 
     std::string name_;
 
-    std::string type_;
+    LayerType type_;
 
     std::shared_ptr<NNLayer> activation_attr_ = nullptr;
 };

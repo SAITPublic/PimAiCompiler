@@ -12,7 +12,7 @@ class PrimTupleIndexLayer : public NNLayer {
      * @param name the name of the layer
      * @param type the type of the layer
      */
-    PrimTupleIndexLayer(std::string name, std::string type)
+    PrimTupleIndexLayer(std::string name, LayerType type)
             : NNLayer(name, type) {
     }
 

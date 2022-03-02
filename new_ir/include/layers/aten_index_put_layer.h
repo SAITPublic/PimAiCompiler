@@ -9,7 +9,7 @@ class AtenIndexPutLayer : public NNLayer {
  public:
     AtenIndexPutLayer() {}
 
-    AtenIndexPutLayer(std::string name, std::string type)
+    AtenIndexPutLayer(std::string name, LayerType type)
             : NNLayer(name, type) {
     }
 

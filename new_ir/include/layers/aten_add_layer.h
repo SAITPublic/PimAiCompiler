@@ -12,7 +12,7 @@ class AtenAddLayer : public NNLayer {
      * @param name the name of the layer
      * @param type the type of the layer
      */
-    AtenAddLayer(std::string name, std::string type)
+    AtenAddLayer(std::string name, LayerType type)
             : NNLayer(name, type) {
     }
 

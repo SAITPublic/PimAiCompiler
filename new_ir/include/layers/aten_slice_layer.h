@@ -16,7 +16,7 @@ class AtenSliceLayer : public NNLayer {
      * @param name the name of the layer
      * @param type the type of the layer
      */
-    AtenSliceLayer(std::string name, std::string type)
+    AtenSliceLayer(std::string name, LayerType type)
             : NNLayer(name, type) {
     }
 

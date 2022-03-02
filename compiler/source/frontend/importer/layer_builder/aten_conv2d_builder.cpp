@@ -13,7 +13,7 @@ std::shared_ptr<ir::NNLayer> AtenConv2dBuilder::buildLayer(const torch::jit::Nod
 {
     Log::NIR::I() << "build aten::conv2d";
 
-    std::string type = "aten::conv2d";
+    nn_compiler::ir::LayerType type = nn_compiler::ir::LayerType::ATENCONV2D;
     std::string name = "";
 
     aten_conv2d_layer_ = std::make_shared<ir::AtenConv2dLayer>(name, type);

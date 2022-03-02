@@ -9,7 +9,7 @@ class AtenEmbeddingLayer : public NNLayer {
  public:
     AtenEmbeddingLayer() {}
 
-    AtenEmbeddingLayer(std::string name, std::string type)
+    AtenEmbeddingLayer(std::string name, LayerType type)
             : NNLayer(name, type) {
     }
 

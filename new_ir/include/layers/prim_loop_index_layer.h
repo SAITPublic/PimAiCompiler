@@ -12,7 +12,7 @@ class PrimLoopIndexLayer : public NNLayer {
      * @param name the name of the layer
      * @param type the type of the layer
      */
-    PrimLoopIndexLayer(std::string name, std::string type)
+    PrimLoopIndexLayer(std::string name, LayerType type)
             : NNLayer(name, type) {
     }
 

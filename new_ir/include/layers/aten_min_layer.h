@@ -9,7 +9,7 @@ class AtenMinLayer : public NNLayer {
  public:
     AtenMinLayer() {}
 
-    AtenMinLayer(std::string name, std::string type)
+    AtenMinLayer(std::string name, LayerType type)
         : NNLayer(name, type) {
     }
 

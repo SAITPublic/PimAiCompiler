@@ -9,7 +9,7 @@ class AtenTo2Layer : public NNLayer {
  public:
     AtenTo2Layer() {}
 
-    AtenTo2Layer(std::string name, std::string type)
+    AtenTo2Layer(std::string name, LayerType type)
             : NNLayer(name, type) {
     }
 

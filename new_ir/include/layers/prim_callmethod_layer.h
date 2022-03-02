@@ -8,7 +8,7 @@ namespace ir {
 // prim::CallMethod(targetNetworkName, inputs)
 class PrimCallMethodLayer : public NNLayer {
  public:
-    PrimCallMethodLayer(std::string name, std::string type)
+    PrimCallMethodLayer(std::string name, LayerType type)
             : NNLayer(name, type) {
     }
 

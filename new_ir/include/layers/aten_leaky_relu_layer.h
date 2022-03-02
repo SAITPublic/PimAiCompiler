@@ -10,7 +10,7 @@ class AtenLeakyReluLayer : public NNLayer {
  public:
     AtenLeakyReluLayer() {}
 
-    AtenLeakyReluLayer(std::string name, std::string type)
+    AtenLeakyReluLayer(std::string name, LayerType type)
             : NNLayer(name, type) {
     }
 

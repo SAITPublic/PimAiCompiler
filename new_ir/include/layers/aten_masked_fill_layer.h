@@ -10,7 +10,7 @@ class AtenMaskedFillLayer : public NNLayer {
  public:
     AtenMaskedFillLayer() {}
 
-    AtenMaskedFillLayer(std::string name, std::string type)
+    AtenMaskedFillLayer(std::string name, LayerType type)
             : NNLayer(name, type) {
     }
 

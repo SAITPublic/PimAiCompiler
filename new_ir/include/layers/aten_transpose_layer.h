@@ -13,7 +13,7 @@ class AtenTransposeLayer : public NNLayer {
      * @param name the name of the layer
      * @param type the type of the layer
      */
-    AtenTransposeLayer(std::string name, std::string type)
+    AtenTransposeLayer(std::string name, LayerType type)
             : NNLayer(name, type) {
     }
 

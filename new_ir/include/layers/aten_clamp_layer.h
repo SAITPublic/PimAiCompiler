@@ -10,7 +10,7 @@ class AtenClampLayer : public NNLayer {
  public:
     AtenClampLayer() {}
 
-    AtenClampLayer(std::string name, std::string type)
+    AtenClampLayer(std::string name, LayerType type)
                      : NNLayer(name, type) {
     }
 

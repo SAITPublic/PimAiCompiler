@@ -9,7 +9,7 @@ class AtenMaxPool2dLayer : public NNLayer {
  public:
     AtenMaxPool2dLayer() {}
 
-    AtenMaxPool2dLayer(std::string name, std::string type)
+    AtenMaxPool2dLayer(std::string name, LayerType type)
             : NNLayer(name, type) {
     }
 

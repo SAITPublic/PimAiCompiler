@@ -8,6 +8,7 @@
 #include <vector>
 
 #include "builder/model_builder.h"
+#include "new_ir/include/layers/all_layers.h"
 #include "new_ir/include/nn_model.h"
 #include "new_runtime/include/types.h"
 #include "new_runtime/include/executor/utils.h"
@@ -36,7 +37,7 @@ class StreamExecutor
 
     std::pair<DataType, torch::jit::IValue>& findBlob(int64_t blob_id);
 
-    // OpExecutorFn findOpExecutor(node_type);
+    // OpExecutorFn findOpExecutor(nn_compiler::ir::LayerType op_type);
 
     void registerOp();
 
@@ -56,7 +57,7 @@ class StreamExecutor
     // Global input & output vars
     blob_store_type global_blobs_;
     // Op Register
-    //std::unordered_map<nncir::NodeType, OpExecutorFn> global_op_register_;
+    // std::unordered_map<nn_compiler::ir::NodeType, OpExecutorFn> global_op_register_;
 
     std::vector<int64_t> input_blob_ids_;
     std::vector<int64_t> output_blob_ids_;

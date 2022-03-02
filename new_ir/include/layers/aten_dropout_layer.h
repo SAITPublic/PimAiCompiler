@@ -10,7 +10,7 @@ class AtenDropoutLayer : public NNLayer {
  public:
     AtenDropoutLayer() {}
 
-    AtenDropoutLayer(std::string name, std::string type)
+    AtenDropoutLayer(std::string name, LayerType type)
             : NNLayer(name, type) {
     }
 

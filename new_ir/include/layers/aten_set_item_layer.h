@@ -13,7 +13,7 @@ class AtenSetItemLayer : public NNLayer {
      * @param name the name of the layer
      * @param type the type of the layer
      */
-    AtenSetItemLayer(std::string name, std::string type) : NNLayer(name, type) {
+    AtenSetItemLayer(std::string name, LayerType type) : NNLayer(name, type) {
     }
 
     explicit AtenSetItemLayer(const AtenSetItemLayer& aten_set_item_layer) :

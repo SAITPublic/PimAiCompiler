@@ -10,7 +10,7 @@ class AtenExpandLayer : public NNLayer {
  public:
     AtenExpandLayer() {}
 
-    AtenExpandLayer(std::string name, std::string type)
+    AtenExpandLayer(std::string name, LayerType type)
             : NNLayer(name, type) {
     }
 

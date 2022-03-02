@@ -14,7 +14,7 @@ std::shared_ptr<ir::NNLayer> PrimCallMethodBuilder::buildLayer(const torch::jit:
 std::shared_ptr<ir::NNLayer> PrimCallMethodBuilder::buildLayerCustom(const std::string target_network_name)
 {
     Log::NIR::I() << "build prim::callmethod";
-    std::string type = "prim::callmethod";
+    nn_compiler::ir::LayerType type = nn_compiler::ir::LayerType::PRIMCALLMETHOD;
     std::string name = "";
 
     prim_callmethod_layer_ = std::make_shared<ir::PrimCallMethodLayer>(name, type);

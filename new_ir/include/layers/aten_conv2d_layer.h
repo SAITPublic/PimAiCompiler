@@ -16,7 +16,7 @@ class AtenConv2dLayer : public NNLayer {
      * @param name the name of the layer
      * @param type the type of the layer
      */
-    AtenConv2dLayer(std::string name, std::string type)
+    AtenConv2dLayer(std::string name, LayerType type)
             : NNLayer(name, type) {
     }
 

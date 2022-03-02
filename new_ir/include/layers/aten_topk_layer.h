@@ -13,7 +13,7 @@ class AtenTopkLayer : public NNLayer {
      * @param name the name of the layer
      * @param type the type of the layer
      */
-    AtenTopkLayer(std::string name, std::string type) : NNLayer(name, type) {
+    AtenTopkLayer(std::string name, LayerType type) : NNLayer(name, type) {
     }
 
     explicit AtenTopkLayer(const AtenTopkLayer& aten_topk_layer) :

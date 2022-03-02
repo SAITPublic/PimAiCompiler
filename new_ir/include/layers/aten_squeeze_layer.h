@@ -9,7 +9,7 @@ class AtenSqueezeLayer : public NNLayer {
  public:
     AtenSqueezeLayer() {}
 
-    AtenSqueezeLayer(std::string name, std::string type) : NNLayer(name, type) {
+    AtenSqueezeLayer(std::string name, LayerType type) : NNLayer(name, type) {
     }
 
     explicit AtenSqueezeLayer(const AtenSqueezeLayer& aten_squeeze_layer) :

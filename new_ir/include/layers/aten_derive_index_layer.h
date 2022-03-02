@@ -12,7 +12,7 @@ class AtenDeriveIndexLayer : public NNLayer {
      * @param name the name of the layer
      * @param type the type of the layer
      */
-    AtenDeriveIndexLayer(std::string name, std::string type)
+    AtenDeriveIndexLayer(std::string name, LayerType type)
             : NNLayer(name, type) {
     }
 

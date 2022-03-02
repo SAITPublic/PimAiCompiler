@@ -9,7 +9,7 @@ class AtenGatherLayer : public NNLayer {
  public:
     AtenGatherLayer() {}
 
-    AtenGatherLayer(std::string name, std::string type)
+    AtenGatherLayer(std::string name, LayerType type)
             : NNLayer(name, type) {
     }
 

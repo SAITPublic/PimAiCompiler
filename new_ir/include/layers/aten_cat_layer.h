@@ -10,7 +10,7 @@ class AtenCatLayer : public NNLayer {
  public:
     AtenCatLayer() {}
 
-    AtenCatLayer(std::string name, std::string type)
+    AtenCatLayer(std::string name, LayerType type)
             : NNLayer(name, type) {
     }
 

@@ -12,7 +12,7 @@ class AtenUnsqueezeLayer : public NNLayer {
      * @param name the name of the layer
      * @param type the type of the layer
      */
-    AtenUnsqueezeLayer(std::string name, std::string type)
+    AtenUnsqueezeLayer(std::string name, LayerType type)
             : NNLayer(name, type) {
     }
 

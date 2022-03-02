@@ -2,21 +2,21 @@
 
 #include "new_ir/include/layers/nn_layer.h"
 
-#define DECLARE_TORCH_OP_LAYER(op_name)                                           \
-  namespace nn_compiler {                                                            \
-  namespace ir {                                                         \
-  class op_name##Layer : public NNLayer {                                          \
-   public:                                                                        \
-      op_name##Layer(std::string name, std::string type) : NNLayer(name, type) {}  \
-      explicit op_name##Layer(const op_name##Layer &op) : NNLayer(op) {}           \
-      virtual ~op_name##Layer() {}                                                \
-      virtual std::shared_ptr<NNLayer> clone() {                      \
-          return std::shared_ptr<op_name##Layer>(new op_name##Layer(*this));      \
-      }                                                                           \
-      void printAttr() { Log::IR::I() << "     " << #op_name << "Attr   "; }        \
-                                                                                  \
-  };                                                                              \
-  }                                                                               \
+#define DECLARE_TORCH_OP_LAYER(op_name)                                                           \
+  namespace nn_compiler {                                                                         \
+  namespace ir {                                                                                  \
+  class op_name##Layer : public NNLayer {                                                         \
+   public:                                                                                        \
+      op_name##Layer(std::string name, nn_compiler::ir::LayerType type) : NNLayer(name, type) {}  \
+      explicit op_name##Layer(const op_name##Layer &op) : NNLayer(op) {}                          \
+      virtual ~op_name##Layer() {}                                                                \
+      virtual std::shared_ptr<NNLayer> clone() {                                                  \
+          return std::shared_ptr<op_name##Layer>(new op_name##Layer(*this));                      \
+      }                                                                                           \
+      void printAttr() { Log::IR::I() << "     " << #op_name << "Attr   "; }                      \
+                                                                                                  \
+  };                                                                                              \
+  }                                                                                               \
   }
 
 DECLARE_TORCH_OP_LAYER(AtenAnd)

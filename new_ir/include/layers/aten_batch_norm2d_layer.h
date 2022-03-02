@@ -11,7 +11,7 @@ class AtenBatchNorm2dLayer : public NNLayer {
  public:
     AtenBatchNorm2dLayer() {}
 
-    AtenBatchNorm2dLayer(std::string name, std::string type)
+    AtenBatchNorm2dLayer(std::string name, LayerType type)
                      : NNLayer(name, type) {
     }
 

@@ -11,7 +11,7 @@ class AtenIndexSelectLayer : public NNLayer {
  public:
     AtenIndexSelectLayer() {}
 
-    AtenIndexSelectLayer(std::string name, std::string type)
+    AtenIndexSelectLayer(std::string name, LayerType type)
             : NNLayer(name, type) {
     }
 

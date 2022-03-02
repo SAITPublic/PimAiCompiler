@@ -11,7 +11,7 @@ class AtenOnesLayer : public NNLayer {
  public:
     AtenOnesLayer() {}
 
-    AtenOnesLayer(std::string name, std::string type)
+    AtenOnesLayer(std::string name, LayerType type)
             : NNLayer(name, type) {
     }
 

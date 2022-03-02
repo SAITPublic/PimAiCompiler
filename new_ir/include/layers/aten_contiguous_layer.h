@@ -10,7 +10,7 @@ class AtenContiguousLayer : public NNLayer {
  public:
     AtenContiguousLayer() {}
 
-    AtenContiguousLayer(std::string name, std::string type)
+    AtenContiguousLayer(std::string name, LayerType type)
                      : NNLayer(name, type) {
     }
 

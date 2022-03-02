@@ -10,7 +10,7 @@ class AtenSumLayer : public NNLayer {
  public:
     AtenSumLayer() {}
 
-    AtenSumLayer(std::string name, std::string type)
+    AtenSumLayer(std::string name, LayerType type)
             : NNLayer(name, type) {
     }
 
