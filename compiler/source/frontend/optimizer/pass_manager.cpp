@@ -13,6 +13,7 @@
 #include "compiler/include/frontend/optimizer/swap_addmm_inputs.h"
 #include "compiler/include/frontend/optimizer/swap_matmul_inputs.h"
 
+#include "compiler/include/frontend/optimizer/lstm_labeling.h"
 #include "compiler/include/frontend/optimizer/remove_constant_layers.h"
 #include "compiler/include/frontend/optimizer/remove_dropout_layers.h"
 #include "compiler/include/frontend/optimizer/remove_set_attr_layers.h"
@@ -52,6 +53,7 @@ void PassManager::runPasses(std::unique_ptr<nn_compiler::ir::NNModel>& model)
     /*TODO: add middlend passes*/
     auto update_layer_id = std::make_shared<UpdateLayerId>();
     auto control_layer_execution = std::make_shared<ControlLayerExecution>();
+    auto lstm_labeling = std::make_shared<LstmLabeling>();
 
     base_pass->add(take_in_body_net);
     take_in_body_net->add(construct_list);
@@ -69,6 +71,7 @@ void PassManager::runPasses(std::unique_ptr<nn_compiler::ir::NNModel>& model)
 
     fuse_act->add(update_layer_id);
     update_layer_id->add(control_layer_execution);
+    control_layer_execution->add(lstm_labeling);
 
     if (model_name_ == "RNNT") {
         fuse_act->add(set_weights_for_embedding);
