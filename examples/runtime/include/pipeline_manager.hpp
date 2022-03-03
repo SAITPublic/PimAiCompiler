@@ -1,6 +1,6 @@
 #pragma once
 
-#include "common/include/log.hpp"
+#include "examples/runtime/include/common/log.hpp"
 
 namespace examples
 {

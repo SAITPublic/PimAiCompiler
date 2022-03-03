@@ -2,7 +2,7 @@
 
 #include <torch/script.h>
 
-#include "common/log.hpp"
+#include "new_runtime/include/common/log.hpp"
 #include "types.h"
 
 namespace nn_compiler

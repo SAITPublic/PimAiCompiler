@@ -1,4 +1,3 @@
-#include <glog/logging.h>
 #include <cstdio>
 #include <cstring>
 #include <experimental/filesystem>
@@ -7,14 +6,16 @@
 #include <memory>
 #include <set>
 
-#include "ir/include/nn_ir.hpp"
-#include "nn_runtime.h"
-#include "runtime/include/executor/prim_utils.h"
-#include "runtime/include/tv_tools.h"
+#include "compiler/include/nn_compiler.hpp"
+#include "new_ir/include/nn_model.h"
+#include "new_runtime/include/executor/prim_utils.h"
+#include "new_runtime/include/nn_runtime.h"
+#include "new_runtime/include/tv_tools.h"
 
 #include "pipeline_manager.hpp"
 
-using namespace nnrt;
+using namespace nn_compiler::compiler;
+using namespace nn_compiler::runtime;
 namespace fs = std::experimental::filesystem;
 
 namespace examples
@@ -29,7 +30,7 @@ RetVal PipelineManager::initialize(const std::string& input_file, const int& com
     } else if (model_type == "HWR") {
         model_type_ = ModelType::HWR;
     } else {
-        DLOG(FATAL) << "Unsupported model type.";
+        Log::EG::E() << "Unsupported model type.";
     }
     input_file_path_ = input_file;
     compile_level_ = compile_level;
@@ -69,10 +70,17 @@ void PipelineManager::load_and_run_rnnt()
         feature_file = "../" + feature_file;
     }
     if (access(feature_len_file.c_str(), F_OK) == -1 || access(feature_file.c_str(), F_OK) == -1) {
-        DLOG(ERROR) << "Please run at base or build directory.";
+        Log::EG::E() << "Please run at base or build directory.";
     }
 
-    NNRuntime runtime(input_file_path_, compile_level_, "RNNT");
+    std::unique_ptr<nn_compiler::ir::NNModel> model = std::make_unique<nn_compiler::ir::NNModel>();
+
+    NNCompiler compiler;
+    compiler.initialize(0, input_file_path_, "RNNT");
+    compiler.compile(model);
+
+    NNRuntime runtime(model, "RNNT");
+
     std::vector<torch::Tensor> input_tensors;
     // load inputs from files
     auto tensor_feature = loadTensor(feature_file, {341, 1, 240}, DataType::FLOAT16).cuda();
@@ -81,11 +89,11 @@ void PipelineManager::load_and_run_rnnt()
     input_tensors.push_back(tensor_feature_len);
 
     for (auto item : input_tensors) {
-        DLOG(INFO) << "Input: "
-                   << "size: " << item.sizes() << " dtype:" << item.dtype() << " device:" << item.device();
+        Log::EG::I() << "Input: "
+                     << "size: " << item.sizes() << " dtype:" << item.dtype() << " device:" << item.device();
     }
     // Inference
-    runtime.inferenceModel(input_tensors, is_profiling_);
+    runtime.inferenceModel(model, input_tensors, is_profiling_);
 }
 
 void PipelineManager::load_and_run_gnmt()
@@ -101,10 +109,17 @@ void PipelineManager::load_and_run_gnmt()
     }
     if (access(src_file.c_str(), F_OK) == -1 || access(src_length_file.c_str(), F_OK) == -1 ||
         access(bos_file.c_str(), F_OK) == -1) {
-        DLOG(ERROR) << "Please run at base or build directory.";
+        Log::EG::E() << "Please run at base or build directory.";
     }
 
-    NNRuntime runtime(input_file_path_, compile_level_, "GNMT");
+    std::unique_ptr<nn_compiler::ir::NNModel> model = std::make_unique<nn_compiler::ir::NNModel>();
+
+    NNCompiler compiler;
+    compiler.initialize(0, input_file_path_, "GNMT");
+    compiler.compile(model);
+
+    NNRuntime runtime(model, "GNMT");
+
     std::vector<torch::Tensor> input_tensors;
     // load inputs from files
     auto tensor_src = loadTensor(src_file, {1, 12}, DataType::INT64).cuda();
@@ -116,11 +131,11 @@ void PipelineManager::load_and_run_gnmt()
     input_tensors.push_back(tensor_bos);
 
     for (auto item : input_tensors) {
-        DLOG(INFO) << "Input: "
-                   << "size: " << item.sizes() << " dtype:" << item.dtype() << " device:" << item.device();
+        Log::EG::I() << "Input: "
+                     << "size: " << item.sizes() << " dtype:" << item.dtype() << " device:" << item.device();
     }
     // Inference
-    runtime.inferenceModel(input_tensors, is_profiling_);
+    runtime.inferenceModel(model, input_tensors, is_profiling_);
 }
 
 void PipelineManager::load_and_run_hwr()
@@ -131,29 +146,36 @@ void PipelineManager::load_and_run_hwr()
         input_file = "../" + input_file;
     }
     if (access(input_file.c_str(), F_OK) == -1) {
-        DLOG(ERROR) << "Please run at base or build directory.";
+        Log::EG::E() << "Please run at base or build directory.";
     }
 
-    NNRuntime runtime(input_file_path_, compile_level_, "HWR");
+    std::unique_ptr<nn_compiler::ir::NNModel> model = std::make_unique<nn_compiler::ir::NNModel>();
+
+    NNCompiler compiler;
+    compiler.initialize(0, input_file_path_, "HWR");
+    compiler.compile(model);
+
+    NNRuntime runtime(model, "HWR");
+
     std::vector<torch::Tensor> input_tensors;
     // load inputs from files
     auto tensor_ = loadTensor(input_file, {1, 1, 1024, 128}, DataType::FLOAT16).cuda();
     input_tensors.push_back(tensor_);
 
     for (auto item : input_tensors) {
-        DLOG(INFO) << "Input: "
-                   << "size: " << item.sizes() << " dtype:" << item.dtype() << " device:" << item.device();
+        Log::EG::I() << "Input: "
+                     << "size: " << item.sizes() << " dtype:" << item.dtype() << " device:" << item.device();
     }
     // Inference
-    auto output_tensors = runtime.inferenceModel(input_tensors, is_profiling_);
+    auto output_tensors = runtime.inferenceModel(model, input_tensors, is_profiling_);
     // check outputs
     TVComparator& tv_comp = TVComparator::getInstance();
     tv_comp.loadTV("./examples/runtime/resource/hwr/inputs/output_hwr_y_hat_128_1_98.bin", {128, 1, 98},
                    DataType::FLOAT16, "hwr_final_output");
     if (tv_comp.compare(output_tensors.at(0).cpu(), "hwr_final_output")) {
-        LOG(INFO) << "HWR run successfully, output is correct !";
+        Log::EG::I() << "HWR run successfully, output is correct !";
     } else {
-        LOG(INFO) << "HWR run failed, output is incorrect !";
+        Log::EG::I() << "HWR run failed, output is incorrect !";
     }
 }
 
