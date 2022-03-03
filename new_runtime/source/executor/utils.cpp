@@ -4,7 +4,7 @@
 #include <vector>
 
 #include "common/log.hpp"
-#include "executor/utils.h"
+#include "new_runtime/include/executor/utils.h"
 #include "types.h"
 
 namespace nn_compiler
@@ -246,6 +246,19 @@ at::ListTypePtr inferTypeFromDataType(DataType type)
             break;
     }
     return list_type;
+}
+
+std::vector<int64_t> getUniqueOutStensorIds(std::shared_ptr<nn_compiler::ir::NNLayer>& layer)
+{
+    std::vector<int64_t> ret;
+    auto out_stensor_id = layer->getOutSTensorID();
+    for (int i = 0; i < out_stensor_id.size(); i++) {
+        if(std::find(ret.begin(), ret.end(), out_stensor_id[i]) == ret.end()){
+            // not exist, insert
+            ret.push_back(out_stensor_id[i]);
+        }
+    }
+    return ret;
 }
 
 }  // namespace runtime

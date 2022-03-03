@@ -2,8 +2,9 @@
 
 #include <torch/script.h>
 
+#include "common/log.hpp"
+#include "new_ir/include/layers/nn_layer.h"
 #include "new_runtime/include/common/log.hpp"
-#include "types.h"
 
 namespace nn_compiler
 {
@@ -132,5 +133,7 @@ std::string getDataTypeStr(DataType dtype);
 DataType inferDataType(torch::jit::IValue ival);
 
 at::ListTypePtr inferTypeFromDataType(DataType type);
+
+std::vector<int64_t> getUniqueOutStensorIds(std::shared_ptr<nn_compiler::ir::NNLayer>& layer);
 }  // namespace runtime
 }  // namespace nn_compiler
