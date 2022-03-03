@@ -55,6 +55,35 @@ torch::Tensor createPtTensor(void* data_ptr, const std::vector<int64_t>& shape, 
     }
 }
 
+std::vector<int64_t> getDataShapeFromSTensor(nn_compiler::ir::STensor& value)
+{
+    std::vector<int64_t> value_;
+    if (value.getBatch() != 0) {
+        value_.push_back(value.getBatch());
+    }
+    if (value.getChannel() != 0) {
+        value_.push_back(value.getChannel());
+    }
+    if (value.getHeight() != 0) {
+        value_.push_back(value.getHeight());
+    }
+    if (value.getWidth() != 0) {
+        value_.push_back(value.getWidth());
+    }
+    return value_;
+}
+
+std::vector<int64_t> getDataShapeFromVector(std::vector<int64_t>& value)
+{
+    std::vector<int64_t> value_;
+    for (auto item : value) {
+        if (item != 0) {
+            value_.push_back(item);
+        }
+    }
+    return value_;
+}
+
 torch::Tensor loadTensor(const std::string& bin_file, const std::vector<int64_t>& shape, DataType dtype)
 {
     if(!fs::is_regular_file(fs::path(bin_file))) {
@@ -85,6 +114,33 @@ torch::Tensor loadTensor(const std::string& bin_file, const std::vector<int64_t>
     auto tensor = createPtTensor((void*)buffer, shape, dtype).clone();
     delete[] buffer;
     return tensor;
+}
+
+std::pair<int, DataType> parseNtype(std::string& ntype)
+{
+    // presupposition: same datatype in a single tuple
+
+    auto ntypeParser = [](const std::string& ntype) -> std::pair<int, DataType> {
+        auto element_type = DataType::UNDEFINED;
+        int element_num = 0;
+        if (ntype.find("int") != std::string::npos) {
+            for (int i = 0; (i = ntype.find("int", i)) != std::string::npos; element_num++, i += 3)
+                ;
+            element_type = DataType::INT64;
+        } else if (ntype.find("float") != std::string::npos) {
+            for (int i = 0; (i = ntype.find("float", i)) != std::string::npos; element_num++, i += 5)
+                ;
+            element_type = DataType::FLOAT64;
+        } else if (ntype.find("bool") != std::string::npos) {
+            for (int i = 0; (i = ntype.find("bool", i)) != std::string::npos; element_num++, i += 4)
+                ;
+            element_type = DataType::INT64;
+        } else {
+            Log::RT::E() << "unspported datatype for tuple.";
+        }
+        return std::make_pair(element_num, element_type);
+    };
+    return ntypeParser(ntype);
 }
 
 std::pair<torch::jit::IValue, std::pair<int, DataType>>

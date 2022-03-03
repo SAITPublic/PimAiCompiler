@@ -10,7 +10,6 @@ namespace nn_compiler
 {
 namespace runtime
 {
-
 NNRuntime::NNRuntime(std::unique_ptr<nn_compiler::ir::NNModel>& model, std::string model_type)
 {
     model_type_ = model_type;
@@ -18,8 +17,8 @@ NNRuntime::NNRuntime(std::unique_ptr<nn_compiler::ir::NNModel>& model, std::stri
     mbuilder_ = std::make_shared<ModelBuilder>();
     mbuilder_->preProcess(model);
     mbuilder_->preloadModel(model);
-
-    executor_ = std::make_shared<StreamExecutor>(mbuilder_->getPreLoadedData(), model_type_);
+    executor_ = std::make_shared<StreamExecutor>(std::make_pair(model->getGraphs()[0], mbuilder_->getPreLoadedData()),
+                                                 model_type_);
     executor_->preProcess(model);
 
     rocblas_init();
@@ -27,8 +26,7 @@ NNRuntime::NNRuntime(std::unique_ptr<nn_compiler::ir::NNModel>& model, std::stri
 }
 
 std::vector<torch::Tensor> NNRuntime::inferenceModel(std::unique_ptr<nn_compiler::ir::NNModel>& model,
-                                                     const std::vector<torch::Tensor>& input_tensors,
-                                                     bool profiling)
+                                                     const std::vector<torch::Tensor>& input_tensors, bool profiling)
 {
     Log::RT::D() << "numInputs:" << input_tensors.size();
     for (auto& item : input_tensors) {
@@ -39,7 +37,7 @@ std::vector<torch::Tensor> NNRuntime::inferenceModel(std::unique_ptr<nn_compiler
     auto status = RetVal::FAILURE;
     if (profiling) {
         // profiling result of the first running time is not accurate.
-        for (int i = 0; i < 10; i ++) {
+        for (int i = 0; i < 10; i++) {
             status = executor_->inferenceModel(model, input_tensors, output_tensors);
         }
         status = executor_->inferenceModelwithProfiling(model, input_tensors, output_tensors);
@@ -79,7 +77,8 @@ int NNRuntime::test(void)
     return 0;
 }
 
-NNRuntime::~NNRuntime() {
+NNRuntime::~NNRuntime()
+{
     Log::RT::D() << "NNRuntime Destructor is called";
     PimDeinitialize();
 }

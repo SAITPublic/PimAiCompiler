@@ -1,41 +1,42 @@
 #pragma once
 
-#include <functional>
 #include <miopen/miopen.h>
+#include <torch/script.h>
+#include <functional>
 #include <stack>
 #include <string>
-#include <torch/script.h>
 #include <vector>
 
 #include "builder/model_builder.h"
 #include "new_ir/include/layers/all_layers.h"
 #include "new_ir/include/nn_model.h"
+#include "new_ir/include/nn_network.h"
 #include "new_ir/include/types.h"
-#include "new_runtime/include/types.h"
 #include "new_runtime/include/executor/utils.h"
+#include "new_runtime/include/types.h"
 
 namespace nn_compiler
 {
 namespace runtime
 {
 class StreamExecutor;
-using OpExecutorFn = std::function<void(const std::shared_ptr<nn_compiler::ir::NNLayer>& layer,
-                                        StreamExecutor& stream_executor)>;
+using OpExecutorFn =
+    std::function<void(const std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)>;
 
 class StreamExecutor
 {
    public:
     typedef std::unordered_map<int64_t, std::pair<DataType, torch::jit::IValue>> blob_store_type;
 
-    StreamExecutor(blob_store_type pre_loaded_data, std::string model_type);
+    StreamExecutor(std::pair<std::shared_ptr<nn_compiler::ir::NNNetwork>, blob_store_type> model,
+                   std::string model_type);
 
     ~StreamExecutor();
 
     RetVal preProcess(std::unique_ptr<nn_compiler::ir::NNModel>& model);
 
     RetVal inferenceModel(std::unique_ptr<nn_compiler::ir::NNModel>& model,
-                          const std::vector<torch::Tensor>& input_tensors,
-                          std::vector<torch::Tensor>& output_tensors);
+                          const std::vector<torch::Tensor>& input_tensors, std::vector<torch::Tensor>& output_tensors);
 
     RetVal inferenceModelwithProfiling(std::unique_ptr<nn_compiler::ir::NNModel>& model,
                                        const std::vector<torch::Tensor>& input_tensors,
@@ -43,7 +44,7 @@ class StreamExecutor
 
     void updateBlob(int64_t blob_id, DataType dtype, const torch::jit::IValue& iv);
 
-    std::pair<DataType, torch::jit::IValue>& findBlob(int64_t& blob_id);
+    std::pair<DataType, torch::jit::IValue>& findBlob(int64_t blob_id);
 
     OpExecutorFn findOpExecutor(nn_compiler::ir::LayerType& op_type);
 
@@ -52,7 +53,9 @@ class StreamExecutor
     void setInputTensors(const std::vector<torch::Tensor>& input_tensors);
 
     void getOutputTensors(std::vector<torch::Tensor>& output_tensors);
-    
+
+    const std::shared_ptr<nn_compiler::ir::NNNetwork> getGraph();
+
     std::vector<torch::Tensor> iValueParser(torch::jit::IValue& iv);
 
     void setCursor(int64_t& cursor)
@@ -62,6 +65,8 @@ class StreamExecutor
     }
 
    public:
+    std::shared_ptr<nn_compiler::ir::NNNetwork> ir_graph_;
+
     // Global input & output vars
     blob_store_type global_blobs_;
     // Op Register

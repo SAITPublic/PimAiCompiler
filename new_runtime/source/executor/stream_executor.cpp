@@ -15,8 +15,12 @@ namespace nn_compiler
 {
 namespace runtime
 {
-StreamExecutor::StreamExecutor(blob_store_type pre_loaded_data, std::string model_type){
-    global_blobs_ = pre_loaded_data;
+StreamExecutor::StreamExecutor(std::pair<std::shared_ptr<nn_compiler::ir::NNNetwork>, blob_store_type> model,
+                               std::string model_type)
+{
+    this->ir_graph_ = model.first;
+    this->global_blobs_ = model.second;
+
     model_type_ = model_type;
 
     miopenCreate(&handle_);
@@ -29,7 +33,8 @@ StreamExecutor::StreamExecutor(blob_store_type pre_loaded_data, std::string mode
     this->registerOp();
 }
 
-StreamExecutor::~StreamExecutor() {
+StreamExecutor::~StreamExecutor()
+{
     miopenDestroyTensorDescriptor(output_tensor_);
     miopenDestroyTensorDescriptor(weight_tensor_);
     miopenDestroyTensorDescriptor(hidden_tensor_);
@@ -39,13 +44,14 @@ StreamExecutor::~StreamExecutor() {
     miopenDestroy(handle_);
 }
 
-RetVal StreamExecutor::preProcess(std::unique_ptr<nn_compiler::ir::NNModel>& model) {
+RetVal StreamExecutor::preProcess(std::unique_ptr<nn_compiler::ir::NNModel>& model)
+{
     input_blob_ids_.clear();
     output_blob_ids_.clear();
 
     auto graph = model->getGraphs()[0];
     for (auto layer : graph->getLayers()) {
-        if (model_type_ == "GNMT" && layer->getType()== nn_compiler::ir::LayerType::ATENCAT) {
+        if (model_type_ == "GNMT" && layer->getType() == nn_compiler::ir::LayerType::ATENCAT) {
             // TODO(SRCX): Implement this part with new IR.
             /***
             auto cat_node = cast_if<nncir::AtenCatNode>(op_node);
@@ -65,19 +71,18 @@ RetVal StreamExecutor::preProcess(std::unique_ptr<nn_compiler::ir::NNModel>& mod
             ***/
         }
 
-        if (layer->getType()== nn_compiler::ir::LayerType::PRIMINPUT) {
+        if (layer->getType() == nn_compiler::ir::LayerType::PRIMINPUT) {
             auto out_stensor_ids = layer->getOutSTensorID();
             input_blob_ids_.push_back(out_stensor_ids[0]);
-        } else if (layer->getType()== nn_compiler::ir::LayerType::PRIMOUTPUT) {
+        } else if (layer->getType() == nn_compiler::ir::LayerType::PRIMOUTPUT) {
             auto in_stensor_ids = layer->getInSTensorID();
             output_blob_ids_.push_back(in_stensor_ids[0]);
-        } else if (layer->getType()== nn_compiler::ir::LayerType::PRIMCONSTANT) {
+        } else if (layer->getType() == nn_compiler::ir::LayerType::PRIMCONSTANT) {
             // to speed up, runtime only load Constant data once, all constants are reused
             // in every inference forward
             executePrimConstant(layer, *this);
-        } else if (layer->getType()== nn_compiler::ir::LayerType::PRIMVARIABLE) {
-            auto variable_layer =
-                std::dynamic_pointer_cast<nn_compiler::ir::PrimVariableLayer>(layer);
+        } else if (layer->getType() == nn_compiler::ir::LayerType::PRIMVARIABLE) {
+            auto variable_layer = std::dynamic_pointer_cast<nn_compiler::ir::PrimVariableLayer>(layer);
             if (variable_layer->getIsConstant()) {
                 // to speed up, runtime only load variable data once, all constants inside are reused
                 // in every inference forward
@@ -96,7 +101,8 @@ RetVal StreamExecutor::preProcess(std::unique_ptr<nn_compiler::ir::NNModel>& mod
 
 RetVal StreamExecutor::inferenceModel(std::unique_ptr<nn_compiler::ir::NNModel>& model,
                                       const std::vector<torch::Tensor>& input_tensors,
-                                      std::vector<torch::Tensor>& output_tensors) {
+                                      std::vector<torch::Tensor>& output_tensors)
+{
     auto graph = model->getGraphs()[0];
     auto layers = graph->getLayers();
 
@@ -122,8 +128,8 @@ RetVal StreamExecutor::inferenceModel(std::unique_ptr<nn_compiler::ir::NNModel>&
     for (cursor_ = cursor_begin; cursor_ < cursor_end;) {
         auto layer = layers[cursor_];
         auto layer_type = layer->getType();
-        Log::RT::D() << "Layer id:" << layer->getID() << " name: " << layer->getName() <<
-                        " type: " << convertLayerTypeToString(layer_type);
+        Log::RT::D() << "Layer id:" << layer->getID() << " name: " << layer->getName()
+                     << " type: " << convertLayerTypeToString(layer_type);
 
         if (layer_type == nn_compiler::ir::LayerType::PRIMCONSTANT) {
             // skip PrimConstant, constant are pre-loaded
@@ -150,7 +156,8 @@ RetVal StreamExecutor::inferenceModel(std::unique_ptr<nn_compiler::ir::NNModel>&
 
 RetVal StreamExecutor::inferenceModelwithProfiling(std::unique_ptr<nn_compiler::ir::NNModel>& model,
                                                    const std::vector<torch::Tensor>& input_tensors,
-                                                   std::vector<torch::Tensor>& output_tensors) {
+                                                   std::vector<torch::Tensor>& output_tensors)
+{
     ProfileWriter::beginSession("start");
 
     auto graph = model->getGraphs()[0];
@@ -179,8 +186,8 @@ RetVal StreamExecutor::inferenceModelwithProfiling(std::unique_ptr<nn_compiler::
         auto layer = layers[cursor_];
         auto layer_name = layer->getName();
         auto layer_type = layer->getType();
-        Log::RT::D() << "Layer id:" << layer->getID() << " name: " << layer->getName() <<
-                        " type: " << convertLayerTypeToString(layer_type);
+        Log::RT::D() << "Layer id:" << layer->getID() << " name: " << layer->getName()
+                     << " type: " << convertLayerTypeToString(layer_type);
 
         if (layer_type == nn_compiler::ir::LayerType::PRIMCONSTANT) {
             // skip PrimConstant, constant are pre-loaded
@@ -210,7 +217,8 @@ RetVal StreamExecutor::inferenceModelwithProfiling(std::unique_ptr<nn_compiler::
     return RetVal::SUCCESS;
 }
 
-void StreamExecutor::updateBlob(int64_t blob_id, DataType dtype, const torch::jit::IValue& iv) {
+void StreamExecutor::updateBlob(int64_t blob_id, DataType dtype, const torch::jit::IValue& iv)
+{
     auto it = this->global_blobs_.find(blob_id);
     if (it == this->global_blobs_.end()) {
         this->global_blobs_.insert({blob_id, {dtype, iv}});
@@ -220,7 +228,8 @@ void StreamExecutor::updateBlob(int64_t blob_id, DataType dtype, const torch::ji
     }
 }
 
-std::pair<DataType, torch::jit::IValue>& StreamExecutor::findBlob(int64_t& blob_id) {
+std::pair<DataType, torch::jit::IValue>& StreamExecutor::findBlob(int64_t blob_id)
+{
     auto it = global_blobs_.find(blob_id);
     assert(it != this->global_blobs_.end());
     return it->second;
@@ -230,13 +239,15 @@ OpExecutorFn StreamExecutor::findOpExecutor(nn_compiler::ir::LayerType& type)
 {
     auto it = global_op_register_.find(type);
     if (it == global_op_register_.end()) {
-        Log::RT::E() << "Runtime error, Unregistered Op found: " << convertLayerTypeToString(type);;
+        Log::RT::E() << "Runtime error, Unregistered Op found: " << convertLayerTypeToString(type);
+        ;
     }
     assert(it != global_op_register_.end());
     return it->second;
 }
 
-void StreamExecutor::setInputTensors(const std::vector<torch::Tensor>& input_tensors) {
+void StreamExecutor::setInputTensors(const std::vector<torch::Tensor>& input_tensors)
+{
     if (input_tensors.size() != input_blob_ids_.size()) {
         Log::RT::E() << "Num tensors must match the num inputs of Graph,"
                      << "the Graph needs " << input_blob_ids_.size() << " inputs !";
@@ -248,16 +259,18 @@ void StreamExecutor::setInputTensors(const std::vector<torch::Tensor>& input_ten
     }
 }
 
-std::vector<torch::Tensor> StreamExecutor::iValueParser(torch::jit::IValue& iv) {
+std::vector<torch::Tensor> StreamExecutor::iValueParser(torch::jit::IValue& iv)
+{
     std::vector<torch::Tensor> out_tensor;
     std::vector<int64_t> out_list;
-    
+
     // TODO(SRCX): implementation
 
     return out_tensor;
 }
 
-void StreamExecutor::getOutputTensors(std::vector<torch::Tensor>& output_tensors) {
+void StreamExecutor::getOutputTensors(std::vector<torch::Tensor>& output_tensors)
+{
     output_tensors.clear();
     std::vector<std::vector<int64_t>> out_list;
 
@@ -273,8 +286,9 @@ void StreamExecutor::getOutputTensors(std::vector<torch::Tensor>& output_tensors
     }
 }
 
-void StreamExecutor::registerOp() {
-}
+const std::shared_ptr<nn_compiler::ir::NNNetwork> StreamExecutor::getGraph() { return this->ir_graph_; }
+
+void StreamExecutor::registerOp() {}
 
 }  // namespace runtime
 }  // namespace nn_compiler

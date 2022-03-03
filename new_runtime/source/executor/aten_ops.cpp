@@ -397,7 +397,6 @@ at::Tensor atenReshape(const at::Tensor & self, at::IntArrayRef shape)
     return at::reshape(self, shape);
 }
 
-<<<<<<< HEAD
 at::Tensor atenSelect(const at::Tensor &self, at::Dimname dim, int64_t index) { return at::select(self, dim, index); }
 
 at::Tensor atenSelect(const at::Tensor &self, int64_t dim, int64_t index) { return at::select(self, dim, index); }
@@ -504,10 +503,3 @@ at::Tensor atenZeroslike(const at::Tensor &self, at::TensorOptions options,
 }
 }  // namespace runtime
 }  // namespace nn_compiler
-=======
-}  // namespace runtime
-}  // namespace nn_compiler
-<<<<<<< HEAD
->>>>>>> 6893b3b... refactor: 💡 Add atenreshape op in new_runtime for refactoring
-=======
->>>>>>> 9c443a3... refactor: 💡 Add prim ops in new_runtime for refactoring

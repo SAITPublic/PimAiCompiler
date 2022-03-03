@@ -7,7 +7,7 @@ namespace runtime
 
 void executorAtenReshape(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
-    Log::RT::D() << "execute Aten Reshape node";
+    Log::RT::D() << "execute AtenReshape";
     auto in_stensor_id = layer->getInSTensorID();
     auto out_stensor_id = layer->getOutSTensorID();
     torch::jit::IValue iv_tensor = stream_executor.findBlob(in_stensor_id[0]).second;

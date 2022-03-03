@@ -6,6 +6,7 @@
 #include <vector>
 
 #include "new_ir/include/types.h"
+#include "new_ir/include/tensors/data_tensor.h"
 #include "new_runtime/include/types.h"
 #include "new_runtime/include/executor/utils.h"
 
@@ -44,7 +45,13 @@ void push(std::vector<torch::jit::IValue>& stack, Types&&... args)
 torch::Tensor createPtTensor(void* data_ptr, const std::vector<int64_t>& shape, DataType dtype,
                              const std::vector<int64_t>& stride = {});
 
+std::vector<int64_t> getDataShapeFromSTensor(nn_compiler::ir::STensor& value);
+
+std::vector<int64_t> getDataShapeFromVector(std::vector<int64_t>& value);
+
 torch::Tensor loadTensor(const std::string& bin_file, const std::vector<int64_t>& shape, DataType dtype);
+
+std::pair<int, DataType> parseNtype(std::string& ntype);
 
 std::pair<torch::jit::IValue, std::pair<int, DataType>> getVariableInfo(uint8_t* ptr,
                                                                         const std::string tensor_data_type,
