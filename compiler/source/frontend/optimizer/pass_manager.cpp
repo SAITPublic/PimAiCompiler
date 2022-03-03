@@ -22,11 +22,12 @@
 #include "compiler/include/frontend/optimizer/control_layer_execution.h"
 #include "compiler/include/frontend/optimizer/update_layer_id.h"
 
+#include "compiler/include/frontend/optimizer/cat_labeling.h"
+
 namespace nn_compiler
 {
 namespace frontend
 {
-
 PassManager::PassManager(const std::string& model_name) { model_name_ = model_name; }
 
 void PassManager::runPasses(std::unique_ptr<nn_compiler::ir::NNModel>& model)
@@ -54,6 +55,7 @@ void PassManager::runPasses(std::unique_ptr<nn_compiler::ir::NNModel>& model)
     auto update_layer_id = std::make_shared<UpdateLayerId>();
     auto control_layer_execution = std::make_shared<ControlLayerExecution>();
     auto lstm_labeling = std::make_shared<LstmLabeling>();
+    auto cat_labeling = std::make_shared<CatLabeling>();
 
     base_pass->add(take_in_body_net);
     take_in_body_net->add(construct_list);
@@ -72,6 +74,7 @@ void PassManager::runPasses(std::unique_ptr<nn_compiler::ir::NNModel>& model)
     fuse_act->add(update_layer_id);
     update_layer_id->add(control_layer_execution);
     control_layer_execution->add(lstm_labeling);
+    lstm_labeling->add(cat_labeling);
 
     if (model_name_ == "RNNT") {
         fuse_act->add(set_weights_for_embedding);
