@@ -6,6 +6,7 @@
 #include "new_ir/include/types.h"
 #include "new_runtime/include/executor/aten_ops_executor.h"
 #include "new_runtime/include/executor/prim_ops_executor.h"
+#include "new_runtime/include/executor/profiler.h"
 #include "new_runtime/include/executor/stream_executor.h"
 #include "new_runtime/include/executor/utils.h"
 #include "new_runtime/include/types.h"
@@ -150,6 +151,61 @@ RetVal StreamExecutor::inferenceModel(std::unique_ptr<nn_compiler::ir::NNModel>&
 RetVal StreamExecutor::inferenceModelwithProfiling(std::unique_ptr<nn_compiler::ir::NNModel>& model,
                                                    const std::vector<torch::Tensor>& input_tensors,
                                                    std::vector<torch::Tensor>& output_tensors) {
+    ProfileWriter::beginSession("start");
+
+    auto graph = model->getGraphs()[0];
+    auto layers = graph->getLayers();
+
+    // Set Input Tensors
+    for (auto& in : input_tensors) {
+        Log::RT::D() << "Input Tensor:" << in.sizes() << " data:" << in;
+    }
+    setInputTensors(input_tensors);
+
+    // cursor skiped the InputNode and OutputNode
+    // [cursor_begin, cursor_end)
+    int cursor_begin = input_tensors.size();
+    int cursor_end = layers.size() - output_blob_ids_.size();
+
+    // control_op will move cursor by itself
+    auto is_control_op = [](nn_compiler::ir::LayerType type) {
+        return (type == nn_compiler::ir::LayerType::PRIMIF || type == nn_compiler::ir::LayerType::PRIMENDIF ||
+                type == nn_compiler::ir::LayerType::PRIMLOOP || type == nn_compiler::ir::LayerType::PRIMENDLOOP ||
+                type == nn_compiler::ir::LayerType::PRIMBLOCK);
+    };
+
+    // Execute Graph
+    for (cursor_ = cursor_begin; cursor_ < cursor_end;) {
+        auto layer = layers[cursor_];
+        auto layer_name = layer->getName();
+        auto layer_type = layer->getType();
+        Log::RT::D() << "Layer id:" << layer->getID() << " name: " << layer->getName() <<
+                        " type: " << convertLayerTypeToString(layer_type);
+
+        if (layer_type == nn_compiler::ir::LayerType::PRIMCONSTANT) {
+            // skip PrimConstant, constant are pre-loaded
+            cursor_++;
+            continue;
+        } else {
+            auto op_executor = findOpExecutor(layer_type);
+            PROFILE_SCOPE(layer_name);
+            op_executor(layer, *this);
+            at::hip::device_synchronize();
+        }
+
+        if (!is_control_op(layer_type)) {
+            cursor_++;
+        }
+    }
+
+    ProfileWriter::endSession();
+    ProfileWriter::get().generate_chrome_trace("trace.json");
+
+    // Read Output Tensors
+    getOutputTensors(output_tensors);
+    for (auto& out : output_tensors) {
+        Log::RT::D() << "Output Tensor size: " << out.sizes();
+    }
 
     return RetVal::SUCCESS;
 }
