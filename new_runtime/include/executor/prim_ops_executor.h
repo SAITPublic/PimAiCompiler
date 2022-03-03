@@ -1,6 +1,7 @@
 #pragma once
 
 #include <torch/script.h>
+#include "new_runtime/include/executor/prim_ops.h"
 #include "new_runtime/include/executor/stream_executor.h"
 #include "new_ir/include/layers/all_layers.h"
 
