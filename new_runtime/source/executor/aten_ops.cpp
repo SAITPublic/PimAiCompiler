@@ -507,4 +507,7 @@ at::Tensor atenZeroslike(const at::Tensor &self, at::TensorOptions options,
 =======
 }  // namespace runtime
 }  // namespace nn_compiler
+<<<<<<< HEAD
 >>>>>>> 6893b3b... refactor: 💡 Add atenreshape op in new_runtime for refactoring
+=======
+>>>>>>> 9c443a3... refactor: 💡 Add prim ops in new_runtime for refactoring
