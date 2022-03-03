@@ -1,5 +1,5 @@
 #pragma once
-
+#include <torch/script.h>
 #include "new_ir/include/tensors/data_tensor.h"
 #include "new_ir/include/layers/nn_layer.h"
 
@@ -29,15 +29,15 @@ class AtenLinearLayer : public NNLayer {
         return  std::shared_ptr<AtenLinearLayer>(new AtenLinearLayer(*this));
     }
 
-    std::vector<DTensor> getWeights() { return this->weights_; }
+    std::vector<at::Tensor> getWeights() { return this->weights_; }
 
-    std::vector<DTensor> getBiases() { return this->biases_; }
+    std::vector<at::Tensor> getBiases() { return this->biases_; }
 
-    void setWeights(const std::vector<DTensor> &weights) {
+    void setWeights(const std::vector<at::Tensor> &weights) {
         this->weights_ = weights;
     }
 
-    void setBiases(const std::vector<DTensor> &biases) {
+    void setBiases(const std::vector<at::Tensor> &biases) {
         this->biases_ = biases;
     }
 
@@ -46,8 +46,8 @@ class AtenLinearLayer : public NNLayer {
     }
 
  private:
-    std::vector<DTensor> weights_;
-    std::vector<DTensor> biases_;
+    std::vector<at::Tensor> weights_;
+    std::vector<at::Tensor> biases_;
 };
 
 }  // namespace ir

@@ -127,11 +127,6 @@ class AtenBatchNorm2dBuilder : public LayerBuilder
 
    private:
     std::shared_ptr<ir::AtenBatchNorm2dLayer> aten_batch_norm2d_layer_;
-
-    void ptTensor2nncompilerDTensor(at::Tensor torch_tensor, nn_compiler::ir::DTensor& d_tensor);
-    void getLearnableParameters(const torch::jit::Node* node_conv2d,
-                                std::vector<nn_compiler::ir::DTensor>& weight_tensors,
-                                std::vector<nn_compiler::ir::DTensor>& bias_tensors);
 };
 
 class AtenBitwiseNotBuilder : public LayerBuilder
@@ -222,12 +217,6 @@ class AtenConv2dBuilder : public LayerBuilder
 
    private:
     std::shared_ptr<ir::AtenConv2dLayer> aten_conv2d_layer_;
-
-   private:
-    void ptTensor2nncompilerDTensor(at::Tensor torch_tensor, nn_compiler::ir::DTensor& d_tensor);
-    void getLearnableParameters(const torch::jit::Node* node_conv2d,
-                                std::vector<nn_compiler::ir::DTensor>& weight_tensors,
-                                std::vector<nn_compiler::ir::DTensor>& bias_tensors);
 };
 
 class AtenCopyBuilder : public LayerBuilder
@@ -471,9 +460,6 @@ class AtenLinearBuilder : public LayerBuilder
 
    private:
     std::shared_ptr<ir::AtenLinearLayer> aten_linear_layer_;
-    void ptTensor2nncompilerDTensor(at::Tensor torch_tensor, nn_compiler::ir::DTensor& d_tensor);
-    void getLearnableParameters(const torch::jit::Node* node_def, std::vector<nn_compiler::ir::DTensor>& weight_tensors,
-                                std::vector<nn_compiler::ir::DTensor>& bias_tensors);
 };
 
 class AtenListBuilder : public LayerBuilder
@@ -510,12 +496,6 @@ class AtenLSTM1Builder : public LayerBuilder
 
    private:
     std::shared_ptr<ir::AtenLSTM1Layer> aten_lstm1_layer_;
-
-   private:
-    void ptTensor2nncompilerDTensor(at::Tensor torch_tensor, nn_compiler::ir::DTensor& d_tensor);
-    void getLearnableParameters(const torch::jit::Node* node_lstm,
-                                std::vector<nn_compiler::ir::DTensor>& weight_tensors,
-                                std::vector<nn_compiler::ir::DTensor>& bias_tensors);
 };
 
 class AtenLSTM2Builder : public LayerBuilder
@@ -525,12 +505,6 @@ class AtenLSTM2Builder : public LayerBuilder
 
    private:
     std::shared_ptr<ir::AtenLSTM2Layer> aten_lstm2_layer_;
-
-   private:
-    void ptTensor2nncompilerDTensor(at::Tensor torch_tensor, nn_compiler::ir::DTensor& d_tensor);
-    void getLearnableParameters(const torch::jit::Node* node_lstm,
-                                std::vector<nn_compiler::ir::DTensor>& weight_tensors,
-                                std::vector<nn_compiler::ir::DTensor>& bias_tensors);
 };
 
 class AtenLtBuilder : public LayerBuilder

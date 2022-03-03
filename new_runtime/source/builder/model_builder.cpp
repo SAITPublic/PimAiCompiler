@@ -37,37 +37,8 @@ RetVal ModelBuilder::preloadModel(std::unique_ptr<nn_compiler::ir::NNModel>& mod
             type == nn_compiler::ir::LayerType::ATENCONV2D || type == nn_compiler::ir::LayerType::ATENBATCHNORM2D ||
             type == nn_compiler::ir::LayerType::ATENLINEAR) {
             // For Ops' with weight/bias, preload weights/bias to data_container.
-            std::vector<nn_compiler::ir::DTensor> weight_data;
-            std::vector<nn_compiler::ir::DTensor> bias_data;
-
-            if (type == nn_compiler::ir::LayerType::ATENLSTM1) {
-                auto lstm_layer = std::dynamic_pointer_cast<nn_compiler::ir::AtenLSTM1Layer>(layer);
-                weight_data = lstm_layer->getWeights();
-                bias_data = lstm_layer->getBiases();
-            } else if (type == nn_compiler::ir::LayerType::ATENLSTM2) {
-                auto lstm_layer = std::dynamic_pointer_cast<nn_compiler::ir::AtenLSTM2Layer>(layer);
-                weight_data = lstm_layer->getWeights();
-                bias_data = lstm_layer->getBiases();
-            } else if (type == nn_compiler::ir::LayerType::ATENCONV2D) {
-                auto conv2d_layer = std::dynamic_pointer_cast<nn_compiler::ir::AtenConv2dLayer>(layer);
-                weight_data = conv2d_layer->getWeights();
-                bias_data = conv2d_layer->getBiases();
-            } else if (type == nn_compiler::ir::LayerType::ATENBATCHNORM2D) {
-                auto bn2d_layer = std::dynamic_pointer_cast<nn_compiler::ir::AtenBatchNorm2dLayer>(layer);
-                weight_data = bn2d_layer->getWeights();
-                bias_data = bn2d_layer->getBiases();
-            } else if (type == nn_compiler::ir::LayerType::ATENLINEAR) {
-                auto linear_layer = std::dynamic_pointer_cast<nn_compiler::ir::AtenLinearLayer>(layer);
-                weight_data = linear_layer->getWeights();
-                bias_data = linear_layer->getBiases();
-            }
-
-            for (auto idx = 0; idx < weight_data.size(); idx++) {
-                this->loadWeightAndBias(weight_data[idx]);
-            }
-            for (auto idx = 0; idx < bias_data.size(); idx++) {
-                this->loadWeightAndBias(bias_data[idx]);
-            }
+            
+            //TODO(SRCX): determine whether model builder is necessary.
         }
     }
 

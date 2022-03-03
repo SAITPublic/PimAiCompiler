@@ -1,5 +1,5 @@
 #pragma once
-
+#include <torch/script.h>
 #include "new_ir/include/layers/nn_layer.h"
 #include "new_ir/include/tensors/data_tensor.h"
 
@@ -31,15 +31,15 @@ class AtenBatchNorm2dLayer : public NNLayer {
         return  std::shared_ptr<AtenBatchNorm2dLayer>(new AtenBatchNorm2dLayer(*this));
     }
 
-    std::vector<DTensor> getWeights() { return this->weights_; }
+    std::vector<at::Tensor> getWeights() { return this->weights_; }
 
-    void setWeights(const std::vector<DTensor> &weights) {
+    void setWeights(const std::vector<at::Tensor> &weights) {
         this->weights_ = weights;
     }
 
-    std::vector<DTensor> getBiases() { return this->bias_; }
+    std::vector<at::Tensor> getBiases() { return this->bias_; }
 
-    void setBiases(const std::vector<DTensor> &bias) {
+    void setBiases(const std::vector<at::Tensor> &bias) {
         this->bias_ = bias;
     }
 
@@ -68,8 +68,8 @@ class AtenBatchNorm2dLayer : public NNLayer {
     }
 
  private:
-    std::vector<DTensor> weights_;
-    std::vector<DTensor> bias_;
+    std::vector<at::Tensor> weights_;
+    std::vector<at::Tensor> bias_;
     int training_  = INT32_MAX;
     double momentum_ = DBL_MAX;
     double eps_ = DBL_MAX;

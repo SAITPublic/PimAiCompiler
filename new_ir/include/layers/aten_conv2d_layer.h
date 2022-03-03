@@ -1,5 +1,5 @@
 #pragma once
-
+#include <torch/script.h>
 #include "new_ir/include/tensors/data_tensor.h"
 #include "new_ir/include/layers/nn_layer.h"
 
@@ -36,15 +36,15 @@ class AtenConv2dLayer : public NNLayer {
         return  std::shared_ptr<AtenConv2dLayer>(new AtenConv2dLayer(*this));
     }
 
-    std::vector<DTensor> getWeights() { return this->_weights; }
+    std::vector<at::Tensor> getWeights() { return this->_weights; }
 
-    void setWeights(const std::vector<DTensor> &weights) {
+    void setWeights(const std::vector<at::Tensor> &weights) {
         this->_weights = weights;
     }
 
-    std::vector<DTensor> getBiases() { return this->_bias; }
+    std::vector<at::Tensor> getBiases() { return this->_bias; }
 
-    void setBiases(const std::vector<DTensor> &bias) {
+    void setBiases(const std::vector<at::Tensor> &bias) {
         this->_bias = bias;
     }
 
@@ -76,8 +76,8 @@ class AtenConv2dLayer : public NNLayer {
     }
 
  private:
-    std::vector<DTensor> _weights;
-    std::vector<DTensor> _bias;
+    std::vector<at::Tensor> _weights;
+    std::vector<at::Tensor> _bias;
     std::vector<int64_t> _stride = {1, 1};
     std::vector<int64_t> _padding = {0, 0};
     std::vector<int64_t> _dialation = {1, 1};

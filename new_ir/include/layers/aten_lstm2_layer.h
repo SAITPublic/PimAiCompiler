@@ -1,5 +1,5 @@
 #pragma once
-
+#include <torch/script.h>
 #include "new_ir/include/layers/nn_layer.h"
 #include "new_ir/include/tensors/data_tensor.h"
 
@@ -58,8 +58,8 @@ class AtenLSTM2Layer : public NNLayer {
     int     _train         = INT32_MAX;
     int     _bidirectional = INT32_MAX;
     // weights & bias, 8 or 12 tensors
-    std::vector<DTensor> _weights;     // only weight, dim > 1
-    std::vector<DTensor> _biases;        // bias, dim == 1
+    std::vector<at::Tensor> _weights;     // only weight, dim > 1
+    std::vector<at::Tensor> _biases;        // bias, dim == 1
 
  public:
     void setAttr(int has_biases, int64_t num_layers, double dropout, int train,
@@ -71,15 +71,15 @@ class AtenLSTM2Layer : public NNLayer {
         this->_bidirectional = bidirectional;
     }
 
-    std::vector<DTensor> getWeights() { return this->_weights; }
+    std::vector<at::Tensor> getWeights() { return this->_weights; }
 
-    void setWeights(const std::vector<DTensor> &weights) {
+    void setWeights(const std::vector<at::Tensor> &weights) {
         this->_weights = weights;
     }
 
-    std::vector<DTensor> getBiases() { return this->_biases; }
+    std::vector<at::Tensor> getBiases() { return this->_biases; }
 
-    void setBiases(const std::vector<DTensor> &biases) {
+    void setBiases(const std::vector<at::Tensor> &biases) {
         this->_biases = biases;
     }
 

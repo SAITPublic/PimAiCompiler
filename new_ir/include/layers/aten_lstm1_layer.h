@@ -1,5 +1,5 @@
 #pragma once
-
+#include <torch/script.h>
 #include "new_ir/include/layers/nn_layer.h"
 #include "new_ir/include/tensors/data_tensor.h"
 
@@ -68,8 +68,8 @@ class AtenLSTM1Layer : public NNLayer
     int _bidirectional = INT32_MAX;
     int _batch_first = INT32_MAX;
     // weights & bias, 8 or 12 tensors
-    std::vector<DTensor> _weights;  // only weight, dim > 1
-    std::vector<DTensor> _biases;   // bias, dim == 1
+    std::vector<at::Tensor> _weights;     // only weight, dim > 1
+    std::vector<at::Tensor> _biases;        // bias, dim == 1
 
     // LSTM type, helper info for building ir, it will not be saved to ir file
     int _lstm_type = 0;
@@ -87,13 +87,17 @@ class AtenLSTM1Layer : public NNLayer
         this->_batch_first = batch_first;
     }
 
-    std::vector<DTensor> getWeights() { return this->_weights; }
+    std::vector<at::Tensor> getWeights() { return this->_weights; }
 
-    void setWeights(const std::vector<DTensor> &weights) { this->_weights = weights; }
+    void setWeights(const std::vector<at::Tensor> &weights) {
+        this->_weights = weights;
+    }
 
-    std::vector<DTensor> getBiases() { return this->_biases; }
+    std::vector<at::Tensor> getBiases() { return this->_biases; }
 
-    void setBiases(const std::vector<DTensor> &biases) { this->_biases = biases; }
+    void setBiases(const std::vector<at::Tensor> &biases) {
+        this->_biases = biases;
+    }
 
     int getHasBiases() { return this->_has_biases; }
 
