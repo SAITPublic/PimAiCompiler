@@ -52,6 +52,15 @@ at::Tensor atenAsTensor(at::Tensor &self, at::ScalarType dtype, at::Device devic
     return self.to(device, dtype);
 }
 
+at::Tensor atenBatchNorm2d(const at::Tensor &input, const c10::optional<at::Tensor> &weight,
+                           const c10::optional<at::Tensor> &bias, const c10::optional<at::Tensor> &running_mean,
+                           const c10::optional<at::Tensor> &running_var, bool training, double momentum, double eps,
+                           bool cudnn_enabled)
+{
+    return at::batch_norm(input, weight, bias, running_mean, running_var, training, momentum, eps, cudnn_enabled);
+}
+
+
 at::Tensor atenBitwiseNot(const at::Tensor &self) { return at::bitwise_not(self); }
 
 at::Tensor atenBmm(const at::Tensor &self, const at::Tensor &other) { return at::bmm(self, other); }
@@ -280,5 +289,217 @@ std::tuple<at::Tensor, at::Tensor, at::Tensor> atenLstm2(const at::Tensor &data,
 at::Tensor atenLt(const at::Tensor &self, const at::Scalar &other) { return at::lt(self, other); }
 
 at::Tensor atenLt(const at::Tensor &self, const at::Tensor &other) { return at::lt(self, other); }
+
+at::Tensor atenMaskedFill(const at::Tensor &self, const at::Tensor &mask, at::Scalar value) {
+    return at::masked_fill(self, mask, value);
+}
+
+at::Tensor atenMaskedFill(const at::Tensor &self, const at::Tensor &mask, const at::Tensor &value) {
+    return at::masked_fill(self, mask, value);
+}
+
+at::Tensor atenMaskedSelect(const at::Tensor &self, const at::Tensor &mask) { return at::masked_select(self, mask); }
+
+at::Tensor atenMatmul(const at::Tensor &self, const at::Tensor &other) { return at::matmul(self, other); }
+
+at::Tensor atenMax(const at::Tensor &self) { return at::max(self); }
+
+at::Tensor atenMax(const at::Tensor &self, const at::Tensor &other) { return at::max(self, other); }
+
+std::tuple<at::Tensor, at::Tensor> atenMax(const at::Tensor &self, int64_t dim, bool keepdim)
+{
+    return at::max(self, dim, keepdim);
+}
+
+std::tuple<at::Tensor, at::Tensor> atenMax(const at::Tensor &self, at::Dimname dim, bool keepdim)
+{
+    return at::max(self, dim, keepdim);
+}
+
+at::Tensor atenMaxPool2d(const at::Tensor &self, at::IntArrayRef kernel_size, at::IntArrayRef stride,
+                         at::IntArrayRef padding, at::IntArrayRef dilation, bool ceil_mode) {
+    return at::max_pool2d(self, kernel_size, stride, padding, dilation, ceil_mode);
+}
+
+at::Tensor atenMin(const at::Tensor &self) { return at::min(self); }
+
+at::Tensor atenMin(const at::Tensor &self, const at::Tensor &other) { return at::min(self, other); }
+
+std::tuple<at::Tensor, at::Tensor> atenMin(const at::Tensor &self, int64_t dim, bool keepdim) {
+    return at::min(self, dim, keepdim);
+}
+
+int64_t atenMul(const int64_t &self, const int64_t &other) { return self * other; }
+
+double atenMul(const double &self, const double &other) { return self * other; }
+
+at::Tensor atenMul(const at::Tensor &self, const at::Tensor &other) {
+    return at::mul(self, other);
+}
+
+at::Tensor atenMul(const at::Tensor &self, const at::Scalar &other) {
+    return at::mul(self, other);
+}
+
+at::Tensor atenNe(const at::Tensor &self, const at::Tensor &other) { return at::ne(self, other); }
+
+at::Tensor atenNe(const at::Tensor &self, const at::Scalar &other) { return at::ne(self, other); }
+
+bool atenNe(const std::string a, const std::string b) { return a != b; }
+
+bool atenNe(const at::Scalar &self, const at::Scalar &other)
+{
+    if (self.type() != other.type()) {
+        return false;
+    }
+    if (self.isIntegral(true)) {
+        return (self.to<int>() != other.to<int>());
+    } else if (self.isBoolean()) {
+        return (self.to<bool>() != other.to<bool>());
+    } else if (self.isFloatingPoint()) {
+        return (self.to<double>() != other.to<double>());
+    }
+}
+
+at::Tensor atenNeg(const at::Tensor &self) { return at::neg(self); }
+
+at::Tensor atenNorm(const at::Tensor &self, at::Scalar p) { return at::norm(self, p); }
+
+at::Tensor atenNot(const at::Tensor &self) { return at::logical_not(self); }
+
+bool atenNot(const bool &input) { return !input; };
+
+at::Tensor atenOnes(at::IntArrayRef size, const at::TensorOptions &options) { return at::ones(size, options); }
+
+std::tuple<at::Tensor, at::Tensor> atenPackPaddedSequence(const at::Tensor &input,
+                                                          const at::Tensor &lengths, bool batch_first) {
+    return at::_pack_padded_sequence(input, lengths, batch_first);
+}
+
+std::tuple<at::Tensor, at::Tensor> atenPadPackedSequence(const at::Tensor &data,
+                                                         const at::Tensor &batch_sizes,
+                                                         bool batch_first,
+                                                         at::Scalar padding_value,
+                                                         int64_t total_length) {
+    return at::_pad_packed_sequence(data, batch_sizes, batch_first, padding_value, total_length);
+}
+
+at::Tensor atenPow(const at::Tensor &self, const at::Tensor &exponent) { return at::pow(self, exponent); }
+
+at::Tensor atenPow(at::Scalar self, const at::Tensor &exponent) { return at::pow(self, exponent); }
+
+at::Tensor atenPow(const at::Tensor &self, at::Scalar exponent) { return at::pow(self, exponent); }
+
+at::Tensor atenRelu(const at::Tensor &self) { return at::relu(self); }
+
+at::Tensor atenReshape(const at::Tensor & self, at::IntArrayRef shape) 
+{
+    return at::reshape(self, shape);
+}
+
+at::Tensor atenSelect(const at::Tensor &self, at::Dimname dim, int64_t index) { return at::select(self, dim, index); }
+
+at::Tensor atenSelect(const at::Tensor &self, int64_t dim, int64_t index) { return at::select(self, dim, index); }
+
+std::vector<int64_t> atenSize(const at::Tensor &tensor) { return tensor.sizes().vec(); }
+
+int64_t atenSize(const at::Tensor &tensor, int64_t dim) { return at::size(tensor, dim); }
+
+int64_t atenSize(const at::Tensor &self, at::Dimname dim) { return at::size(self, dim); }
+
+at::Tensor atenSlice(const at::Tensor &self, int64_t dim, int64_t start, int64_t end, int64_t step)
+{
+    return at::slice(self, dim, start, end, step);
+}
+
+at::Tensor atenSoftmax(const at::Tensor &self, int64_t dim, c10::optional<at::ScalarType> dtype) {
+    return at::softmax(self, dim, dtype);
+}
+
+at::Tensor atenSqueeze(const at::Tensor &self, int64_t dim) { return at::squeeze(self, dim); }
+
+at::Tensor atenSub(const at::Tensor &self, at::Scalar other, at::Scalar alpha) { return at::sub(self, other, alpha); }
+
+at::Tensor atenSub(const at::Tensor &self, const at::Tensor &other, at::Scalar alpha)
+{
+    return at::sub(self, other, alpha);
+}
+
+at::Tensor atenSum(const at::Tensor &self, at::IntArrayRef dim, bool keepdim, c10::optional<at::ScalarType> dtype)
+{
+    return at::sum(self, dim, keepdim, dtype);
+}
+
+at::Tensor atenTanh(const at::Tensor &self) { return at::tanh(self); }
+
+at::Tensor atenTensor(int64_t value) { return at::tensor(value); }
+
+at::Tensor atenTensor(float value) { return at::tensor(value); }
+
+at::Tensor atenTensor(at::ArrayRef<int64_t> array, const at::TensorOptions &options)
+{
+    return at::tensor(array, options);
+}
+
+at::Tensor atenTensor(at::ArrayRef<double> array, const at::TensorOptions &options)
+{
+    return at::tensor(array, options);
+}
+
+at::Tensor atenTo(const at::Tensor & self, c10::optional<at::ScalarType> dtype, c10::optional<at::Layout> layout,
+                  c10::optional<at::Device> device, c10::optional<bool> pin_memory, bool non_blocking,
+                  bool copy, c10::optional<at::MemoryFormat> memory_format) {
+    return at::native::to(self, dtype, layout, device, pin_memory, non_blocking, copy, memory_format);
+}
+
+at::Tensor atenTo(const at::Tensor &self, at::Device device, at::ScalarType dtype, bool non_blocking, bool copy,
+                  c10::optional<at::MemoryFormat> memory_format)
+{
+    return at::native::to(self, device, dtype, non_blocking, copy, memory_format);
+}
+
+at::Tensor atenTo(const at::Tensor &self, at::ScalarType dtype, bool non_blocking, bool copy,
+                  c10::optional<at::MemoryFormat> memory_format)
+{
+    return at::native::to(self, dtype, non_blocking, copy, memory_format);
+}
+
+at::Tensor atenTo(const at::Tensor &self, const at::Tensor &other, bool non_blocking, bool copy,
+                  c10::optional<at::MemoryFormat> memory_format)
+{
+    return at::native::to(self, other, non_blocking, copy, memory_format);
+}
+
+std::tuple<at::Tensor, at::Tensor> atenTopk(const at::Tensor &self, int64_t k, int64_t dim, bool largest, bool sorted) {
+    return at::topk(self, k, dim, largest, sorted);
+}
+
+at::Tensor atenTranspose(const at::Tensor &self, int64_t dim0, int64_t dim1) { return at::transpose(self, dim0, dim1); }
+
+at::Tensor atenTranspose(const at::Tensor &self, at::Dimname dim0, at::Dimname dim1)
+{
+    return at::transpose(self, dim0, dim1);
+}
+
+at::Tensor atenUnsqueeze(const at::Tensor &self, int64_t dim) { return at::unsqueeze(self, dim); }
+
+at::Tensor atenView(const at::Tensor &self, at::IntArrayRef size) {
+    return at::native::view(self, size);
+}
+
+void atenWarn(const std::string &str) { LOG(WARNING) << str; }
+
+at::Tensor atenZeros(at::IntArrayRef size, c10::optional<at::DimnameList> names, at::TensorOptions options)
+{
+    return at::zeros(size, names, options);
+}
+
+at::Tensor atenZeros(at::IntArrayRef size, at::TensorOptions options) { return at::zeros(size, options); }
+
+at::Tensor atenZeroslike(const at::Tensor &self, at::TensorOptions options,
+                         c10::optional<at::MemoryFormat> memory_format)
+{
+    return at::zeros_like(self, options, memory_format);
+}
 }  // namespace runtime
 }  // namespace nn_compiler
