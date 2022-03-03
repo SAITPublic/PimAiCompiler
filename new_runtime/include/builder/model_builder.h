@@ -5,17 +5,19 @@
 #include "new_ir/include/nn_model.h"
 #include "types.h"
 
-namespace nn_compiler {
-namespace runtime {
+namespace nn_compiler
+{
+namespace runtime
+{
 
 class ModelBuilder
 {
    public:
     typedef std::unordered_map<int64_t, std::pair<DataType, torch::jit::IValue>> data_store_type;
 
-    RetVal preProcess(std::unique_ptr<nn_compiler::ir::NNModel> &model);
+    RetVal preProcess(std::unique_ptr<nn_compiler::ir::NNModel>& model);
 
-    RetVal preloadModel(std::unique_ptr<nn_compiler::ir::NNModel> &model);
+    RetVal preloadModel(std::unique_ptr<nn_compiler::ir::NNModel>& model);
 
     RetVal loadWeightAndBias(nn_compiler::ir::DTensor &data);
 

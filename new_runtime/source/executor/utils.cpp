@@ -7,8 +7,10 @@
 #include "executor/utils.h"
 #include "types.h"
 
-namespace nn_compiler {
-namespace runtime {
+namespace nn_compiler
+{
+namespace runtime
+{
 
 torch::jit::IValue deviceToIValue(const c10::Device& device) { return torch::jit::IValue(device); }
 

@@ -6,10 +6,12 @@
 #include "new_runtime/include/nn_runtime.h"
 #include "pim_runtime_api.h"
 
-namespace nn_compiler {
-namespace runtime {
+namespace nn_compiler
+{
+namespace runtime
+{
 
-NNRuntime::NNRuntime(std::unique_ptr<nn_compiler::ir::NNModel> &model, std::string model_type)
+NNRuntime::NNRuntime(std::unique_ptr<nn_compiler::ir::NNModel>& model, std::string model_type)
 {
     model_type_ = model_type;
 
@@ -24,7 +26,7 @@ NNRuntime::NNRuntime(std::unique_ptr<nn_compiler::ir::NNModel> &model, std::stri
     PimInitialize(RT_TYPE_HIP, PIM_FP16);
 }
 
-std::vector<torch::Tensor> NNRuntime::inferenceModel(std::unique_ptr<nn_compiler::ir::NNModel> &model,
+std::vector<torch::Tensor> NNRuntime::inferenceModel(std::unique_ptr<nn_compiler::ir::NNModel>& model,
                                                      const std::vector<torch::Tensor>& input_tensors,
                                                      bool profiling)
 {

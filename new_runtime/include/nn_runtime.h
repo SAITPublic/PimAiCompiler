@@ -10,8 +10,10 @@
 #include "new_ir/include/nn_model.h"
 #include "types.h"
 
-namespace nn_compiler {
-namespace runtime {
+namespace nn_compiler
+{
+namespace runtime
+{
 
 class NNRuntime
 {
@@ -20,7 +22,7 @@ class NNRuntime
 
     NNRuntime(std::unique_ptr<nn_compiler::ir::NNModel> &model, std::string model_type = "");
 
-    std::vector<torch::Tensor> inferenceModel(std::unique_ptr<nn_compiler::ir::NNModel> &model,
+    std::vector<torch::Tensor> inferenceModel(std::unique_ptr<nn_compiler::ir::NNModel>& model,
                                               const std::vector<torch::Tensor>& input_tensors,
                                               bool profiling = false);
 

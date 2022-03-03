@@ -5,10 +5,12 @@
 #include "new_ir/include/types.h"
 #include "new_runtime/include/builder/model_builder.h"
 
-namespace nn_compiler {
-namespace runtime {
+namespace nn_compiler
+{
+namespace runtime
+{
 
-RetVal ModelBuilder::preProcess(std::unique_ptr<nn_compiler::ir::NNModel> &model) {
+RetVal ModelBuilder::preProcess(std::unique_ptr<nn_compiler::ir::NNModel>& model) {
     Log::RT::I() << "ModelBuilder::preProcess() is called";
 
     auto graph = model->getGraphs()[0];
@@ -25,7 +27,7 @@ RetVal ModelBuilder::preProcess(std::unique_ptr<nn_compiler::ir::NNModel> &model
     return RetVal::SUCCESS;
 }
 
-RetVal ModelBuilder::preloadModel(std::unique_ptr<nn_compiler::ir::NNModel> &model) {
+RetVal ModelBuilder::preloadModel(std::unique_ptr<nn_compiler::ir::NNModel>& model) {
     Log::RT::I() << "ModelBuilder::preloadModel() is called";
 
     auto graph = model->getGraphs()[0];
@@ -72,7 +74,7 @@ RetVal ModelBuilder::preloadModel(std::unique_ptr<nn_compiler::ir::NNModel> &mod
     return RetVal::SUCCESS;
 }
 
-RetVal ModelBuilder::loadWeightAndBias(nn_compiler::ir::DTensor &data){
+RetVal ModelBuilder::loadWeightAndBias(nn_compiler::ir::DTensor& data){
     auto this_id = preload_start_id_++;
     auto stensor = data.getTensorShape();
     auto bit_width = data.getBitWidth();

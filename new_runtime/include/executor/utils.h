@@ -5,8 +5,10 @@
 #include "common/log.hpp"
 #include "types.h"
 
-namespace nn_compiler {
-namespace runtime {
+namespace nn_compiler
+{
+namespace runtime
+{
 
 torch::jit::IValue boolToIValue(const bool& value);
 template <typename T>
@@ -15,7 +17,7 @@ torch::jit::IValue scalarToIValue(const T& scalar)
     return torch::jit::IValue(scalar);
 }
 
-torch::jit::IValue deviceToIValue(const c10::Device& device );
+torch::jit::IValue deviceToIValue(const c10::Device& device);
 
 torch::jit::IValue tensorToIValue(const torch::Tensor& tensor);
 

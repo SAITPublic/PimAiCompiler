@@ -3,7 +3,8 @@
 #include "common/include/types.hpp"
 #include "osal_types.h"
 
-namespace nn_compiler {
+namespace nn_compiler
+{
 namespace runtime
 {
 // these dtype are same with Frontend
