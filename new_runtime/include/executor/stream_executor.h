@@ -58,7 +58,7 @@ class StreamExecutor
 
     std::vector<torch::Tensor> iValueParser(torch::jit::IValue& iv);
 
-    void setCursor(int64_t& cursor)
+    void setCursor(int64_t cursor)
     {
         assert(cursor >= 0);
         cursor_ = cursor;

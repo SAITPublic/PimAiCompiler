@@ -265,7 +265,7 @@ void executePrimIf(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecu
         // next_node = if_node.id + 1
         next_layer_id = layer->getID() + 1;
     } else {
-         Log::RT::D() << "PrimIf(False branch)";
+        Log::RT::D() << "PrimIf(False branch)";
         // getElseNetStartNode
         next_layer_id = if_layer->getElseNetStartLayer();
     }
@@ -321,7 +321,7 @@ void executePrimLoopIndex(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, Stre
 {
     Log::RT::D() << "executePrimLoopIndex";
 
-    // cast Node
+    // cast Layer
     auto loop_index_layer = std::dynamic_pointer_cast<nn_compiler::ir::PrimLoopIndexLayer>(layer);
     int64_t loop_index = loop_index_layer->getIndex();
     if (loop_index < 0) {
@@ -334,9 +334,31 @@ void executePrimLoopIndex(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, Stre
         loop_index = 0;
     }
 
-    // LoopIndexNode only has one blob
+    // LoopIndexLayer only has one blob
     auto out_stensor_id = layer->getOutSTensorID()[0];
     stream_executor.updateBlob(out_stensor_id, DataType::INT64, scalarToIValue<int64_t>(loop_index));
+}
+
+void executePrimRaiseException(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
+{
+    Log::RT::D() << "execute PrimRaiseException";
+
+    auto in_stensor_ids = layer->getInSTensorID();
+    // Find the input blob
+    torch::jit::IValue iv = stream_executor.findBlob(in_stensor_ids[0]).second;
+    // Call OpKernel
+    primRaiseException(iv.toString()->string());
+}
+
+void executePrimSetAttr(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
+{
+    Log::RT::D() << "execute PrimSetAttr";
+
+    auto in_stensor_ids = layer->getInSTensorID();
+    // first edge is variable node, second edge is the data saved to the variable node.
+    auto type = stream_executor.findBlob(in_stensor_ids[1]).first;
+    torch::jit::IValue iv = stream_executor.findBlob(in_stensor_ids[1]).second;
+    stream_executor.updateBlob(in_stensor_ids[0], type, iv);
 }
 
 void executePrimTupleConstruct(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
@@ -358,9 +380,368 @@ void executePrimTupleConstruct(std::shared_ptr<nn_compiler::ir::NNLayer>& layer,
     stream_executor.updateBlob(out_stensor_id, DataType::TUPLE, scalarToIValue(inputs.at(0)));
 }
 
+void executePrimTupleIndex(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
+{
+    Log::RT::D() << "execute PrimTupleIndex";
+
+    auto tuple_index_layer = std::dynamic_pointer_cast<nn_compiler::ir::PrimTupleIndexLayer>(layer);
+    auto in_stensor_ids = layer->getInSTensorID();
+    // Find the input data blob
+    torch::jit::IValue data_iv = stream_executor.findBlob(in_stensor_ids[0]).second;
+
+    auto out_stensor_id = layer->getOutSTensorID()[0];
+    std::vector<torch::IValue> inputs;
+    if (data_iv.isNone()) {
+        torch::jit::IValue iv;
+        stream_executor.updateBlob(out_stensor_id, DataType::NONE, iv);
+    } else {
+        auto ivalues = data_iv.toTuple()->elements();
+        for (auto iv : ivalues) {
+            inputs.push_back(iv);
+        }
+        int64_t index = tuple_index_layer->getIndex();
+        if (nn_compiler::ir::isDefaultValue(index)) {
+            // Find the input index blob
+            torch::jit::IValue index_iv = stream_executor.findBlob(in_stensor_ids[1]).second;
+            index = index_iv.toInt();
+        }
+        // Call OpKernel
+        auto output_iv = primTupleIndex(inputs, index);
+        // update output
+        if (output_iv.isTensor()) {
+            stream_executor.updateBlob(out_stensor_id, DataType::TENSOR, output_iv);
+        } else if (output_iv.isTuple()) {
+            stream_executor.updateBlob(out_stensor_id, DataType::TUPLE, output_iv);
+        } else {
+            Log::RT::E() << "Unsupported input for PrimTupleIndex.";
+        }
+    }
+}
+
+void executePrimTupleUnpack(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
+{
+    Log::RT::D() << "execute PrimTupleUnpack";
+    auto in_stensor_ids = layer->getInSTensorID();
+    torch::jit::IValue iv = stream_executor.findBlob(in_stensor_ids[0]).second;
+
+    // Call OpKernel
+    auto output = primTupleUnpack(iv.toTuple());
+
+    // update output
+    auto out_stensor_ids = getUniqueOutStensorIds(layer);
+    for (int i = 0; i < output.size(); i++) {
+        auto type = inferDataType(output.at(i));
+        stream_executor.updateBlob(out_stensor_ids.at(i), type, output.at(i));
+    }
+}
+
+void executePrimType(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
+{
+    Log::RT::D() << "execute PrimType";
+
+    auto in_stensor_ids = layer->getInSTensorID();
+    auto map_value = stream_executor.findBlob(in_stensor_ids[0]);
+    torch::jit::IValue iv = map_value.second;
+    std::string device_type = "cpu";
+    // FIXME: need to ensure PrimType op how to executor
+    if (iv.isDevice()) {
+        device_type = iv.toDevice().str();
+    } else {
+        Log::RT::E() << "PrimType op's input data is incorrect!";
+    }
+
+    // update output
+    auto out_stensor_id = layer->getOutSTensorID()[0];
+    stream_executor.updateBlob(out_stensor_id, DataType::STRING, strToIValue(device_type));
+}
+
+void executePrimUncheckedCast(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
+{
+    Log::RT::D() << "execute PrimUncheckedCast";
+
+    auto in_stensor_ids = layer->getInSTensorID();
+    auto map_value = stream_executor.findBlob(in_stensor_ids[0]);
+    auto type = map_value.first;
+    // Find the input blob
+    torch::jit::IValue iv = map_value.second;
+    // Call OpKernel
+    auto output = primUncheckedCast(iv);
+    // update output
+    auto out_stensor_id = layer->getOutSTensorID()[0];
+    stream_executor.updateBlob(out_stensor_id, type, output);
+}
+
+void executePrimUninitialized(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
+{
+    Log::RT::D() << "execute PrimUninitialized";
+
+    // Call OpKernel
+    auto output = primUninitialized();
+    // update output
+    auto out_stensor_id = layer->getOutSTensorID()[0];
+    auto type = inferDataType(output);
+    stream_executor.updateBlob(out_stensor_id, type, output);
+}
+
 void executePrimVariable(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
+    Log::RT::D() << "execute PrimVariable";
 
+    auto variable_layer = std::dynamic_pointer_cast<nn_compiler::ir::PrimVariableLayer>(layer);
+}
+
+/**
+ * @brief check Loop has (x1, x2, ...xr) inputs
+ * according to torch::loop, %y_1, ..., %y_r = prim::Loop(%max_trip_count, %initial_condition, %x_1, ..., %x_r)
+ * https://github.com/pytorch/pytorch/blob/master/torch/csrc/jit/OVERVIEW.md#loops
+ * @param loop_layer
+ * @return true
+ * @return false
+ */
+static bool loopHasExtraInputs(std::shared_ptr<nn_compiler::ir::PrimLoopLayer>& loop_layer)
+{
+    int64_t loop_cond = loop_layer->getCond();
+    int64_t max_trip_cnt = loop_layer->getTripCount();
+    bool trip_cnt_invalid = nn_compiler::ir::isDefaultValue(max_trip_cnt);
+    bool loop_cond_invalid = nn_compiler::ir::isDefaultValue(loop_cond);
+
+    int64_t num_inputs = loop_layer->getInSTensorID().size();
+
+    if (trip_cnt_invalid && loop_cond_invalid) {
+        if (num_inputs == 2) return false;
+    } else if (!trip_cnt_invalid && loop_cond_invalid) {
+        if (num_inputs == 1) return false;
+    } else if (trip_cnt_invalid && !loop_cond_invalid) {
+        if (num_inputs == 1) return false;
+    } else if (!trip_cnt_invalid && !loop_cond_invalid) {
+        if (num_inputs == 0) return false;
+    }
+
+    return true;
+}
+
+std::unordered_map<std::string, int64_t> getMatchedLoopInfo(int64_t loop_block_id, StreamExecutor& stream_executor)
+{
+    // Get LoopNode
+    int64_t loop_id = loop_block_id - 2;
+    assert(loop_id >= 0);
+    auto graph = stream_executor.getGraph();
+    auto layer = graph->getLayer(loop_id);
+    auto loop_layer = std::dynamic_pointer_cast<nn_compiler::ir::PrimLoopLayer>(layer);
+
+    // max_cnt & cond
+    int64_t max_trip_cnt = loop_layer->getTripCount();
+    int64_t cond = loop_layer->getCond();
+
+    // check default
+    auto in_stensor_ids = layer->getInSTensorID();
+    if (nn_compiler::ir::isDefaultValue(max_trip_cnt)) {
+        // Get from loop's input[0]
+        max_trip_cnt = stream_executor.findBlob(in_stensor_ids[0]).second.toInt();
+    }
+    if (nn_compiler::ir::isDefaultValue(cond)) {
+        // Get from loop's input[1]
+        cond = stream_executor.findBlob(in_stensor_ids[1]).second.toInt();
+    }
+
+    int64_t loop_index_id = loop_block_id - 1;
+    auto loop_index_layer_ = graph->getLayer(loop_index_id);
+    int blob_id = loop_index_layer_->getOutSTensorID()[0];
+    auto blob = stream_executor.findBlob(blob_id);
+    assert(blob.first == DataType::INT64);
+    int64_t loop_index = blob.second.toInt();
+
+    // get loopEndNode.id + 1
+    int end_loop_next_id = loop_layer->getGotoLayer();
+
+    std::unordered_map<std::string, int64_t> umap;
+    umap.insert({{"max_trip_cnt", max_trip_cnt},
+                 {"cond", cond},
+                 {"loop_index", loop_index},
+                 {"end_loop_next_id", end_loop_next_id}});
+    umap.insert({"loop_id", loop_layer->getID()});
+    return umap;
+}
+
+void executePrimBlock(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
+{
+    Log::RT::D() << "execute PrimBlock";
+
+    // Prim Blcok only transfer input -- block --> outputs
+    // Block( loopIndex: int,  x1, x2.....xr : IValue)
+
+    auto in_stensor_ids = layer->getInSTensorID();
+    auto out_stensor_ids = layer->getOutSTensorID();
+
+    auto umap = getMatchedLoopInfo(layer->getID(), stream_executor);
+    int64_t max_trip_cnt = umap["max_trip_cnt"];
+    int64_t cond = umap["cond"];
+    int64_t loop_index = umap["loop_index"];
+    int64_t end_loop_next_id = umap["end_loop_next_id"];
+    int64_t loop_layer_id = umap["loop_id"];
+
+    if (loop_index >= max_trip_cnt || cond == 0) {
+        // Get EndLoop's input
+        // transfer EndLoop's input --> output
+        auto end_loop_layer = stream_executor.getGraph()->getLayer(end_loop_next_id - 1);
+        auto end_loop_in_stensor_ids = end_loop_layer->getInSTensorID();
+        auto end_loop_out_stensor_ids = end_loop_layer->getOutSTensorID();
+
+        /**
+         * %4 : bool = prim::Constant[value=1]()
+         * block0(%i.1 : int, %y1.10 : Tensor):
+         * %y1.2 : Tensor = aten::add(%y1.10, %x2.1, %3)
+         * %y1.5 : Tensor = aten::add(%y1.2, %i.1, %3)
+         * -> (%4, %y1.5) --> PrimEndLoop
+         *
+         * Here is an example of PrimEndLoop, actually the output is %y1.5, exclude %4  in GraphIR
+         *
+         */
+
+        assert(end_loop_in_stensor_ids.size() == end_loop_out_stensor_ids.size() + 1);
+        for (int i = 0; i < end_loop_out_stensor_ids.size(); i++) {
+            auto in_blob = stream_executor.findBlob(end_loop_in_stensor_ids.at(i + 1));
+            stream_executor.updateBlob(end_loop_out_stensor_ids.at(i), in_blob.first, in_blob.second);
+        }
+        // Jump to End Loop'next
+        int64_t temp_cond = stream_executor.loop_condition_stack_.top();
+        stream_executor.loop_condition_stack_.pop();
+        auto loop_op_layer = stream_executor.getGraph()->getLayer(loop_layer_id);
+        auto loop_layer = std::dynamic_pointer_cast<nn_compiler::ir::PrimLoopLayer>(loop_op_layer);
+        loop_layer->setCond(temp_cond);
+        stream_executor.setCursor(end_loop_next_id);
+    } else {
+        auto graph = stream_executor.getGraph();
+        auto loop_layer = std::dynamic_pointer_cast<nn_compiler::ir::PrimLoopLayer>(graph->getLayer(loop_layer_id));
+        if (!loopHasExtraInputs(loop_layer)) {
+            // the in_stensor_ids[0] is invalid, only is maintain linkage
+            // only need to pass LoopIndex into Block's inner
+            // auto in_blob = stream_executor.findBlob(in_stensor_ids.at(1));
+            // stream_executor.updateBlob(out_blob_ids.at(0), DataType::INT64, loop_index);
+        } else {
+            std::vector<int64_t> temp_out_blob_ids(in_stensor_ids.size(), -1);
+            int out_id = 0;
+            for (int i = 0; i < out_stensor_ids.size(); i++) {
+                if (std::find(temp_out_blob_ids.begin(), temp_out_blob_ids.end(), out_stensor_ids.at(i)) ==
+                    temp_out_blob_ids.end()) {
+                    temp_out_blob_ids[out_id++] = out_stensor_ids.at(i);
+                }
+            }
+
+            for (int i = 0; i < in_stensor_ids.size(); i++) {
+                auto in_blob = stream_executor.findBlob(in_stensor_ids.at(i));
+                stream_executor.updateBlob(temp_out_blob_ids.at(i), in_blob.first, in_blob.second);
+            }
+        }
+        stream_executor.updateBlob(out_stensor_ids.at(0), DataType::INT64, intToIValue(loop_index));
+        stream_executor.setCursor(layer->getID() + 1);
+    }
+}
+
+void executePrimLoop(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
+{
+    Log::RT::D() << "execute PrimLoop";
+
+    auto loop_layer = std::dynamic_pointer_cast<nn_compiler::ir::PrimLoopLayer>(layer);
+    int64_t loop_layer_id = layer->getID();
+
+    // ref: torch_jit Loop: https://github.com/pytorch/pytorch/blob/master/torch/csrc/jit/OVERVIEW.md#loops
+    int64_t loop_cond = loop_layer->getCond();
+    stream_executor.loop_condition_stack_.push(loop_cond);
+    int64_t max_trip_cnt = loop_layer->getTripCount();
+
+    int edge_id = 0;
+    auto in_stensor_ids = layer->getInSTensorID();
+    auto out_stensor_ids = layer->getOutSTensorID();
+    // check default
+    if (nn_compiler::ir::isDefaultValue(max_trip_cnt)) {
+        // Get from loop's input[0]
+        max_trip_cnt = stream_executor.findBlob(in_stensor_ids[edge_id++]).second.toInt();
+    }
+    if (nn_compiler::ir::isDefaultValue(loop_cond)) {
+        // Get from loop's input[1]
+        loop_cond = stream_executor.findBlob(in_stensor_ids[edge_id++]).second.toInt();
+    }
+
+    // loop_layer.id + 1 ---> loopIndex_layer
+    // loop_layer.id + 2 ---> PrimBlockLayer
+
+    // Get LoopIndex
+    auto loop_index_layer_ = stream_executor.getGraph()->getLayer(loop_layer_id + 1);
+    int64_t loop_index_blob_id = loop_index_layer_->getOutSTensorID()[0];
+    //
+    executePrimLoopIndex(loop_index_layer_, stream_executor);  // BUG: this will reset loop_index
+
+    Log::RT::D() << "loop_index_blob_id: " << loop_index_blob_id;
+    int64_t loop_index = stream_executor.findBlob(loop_index_layer_->getOutSTensorID()[0]).second.toInt();
+
+    // Get LoopBlockNode.id
+    int loop_block_id = loop_layer_id + 2;
+    auto loop_block_layer_ = stream_executor.getGraph()->getLayer(loop_block_id);
+
+    // the Loop's input maybe empty
+    // loopHasExtraInputs(loop_node)
+    if (loopHasExtraInputs(loop_layer)) {
+        // assert(in_stensor_ids.size() == out_stensor_ids.size() + 1);
+        for (int i = 0; i < out_stensor_ids.size(); i++) {
+            int64_t in_id = in_stensor_ids.at(i + edge_id);
+            int64_t out_id = out_stensor_ids.at(i);
+            auto in_blob = stream_executor.findBlob(in_id);
+            stream_executor.updateBlob(out_id, in_blob.first, in_blob.second);
+        }
+    }
+
+    executePrimBlock(loop_block_layer_, stream_executor);
+    Log::RT::D() << "PrimLoop: loop_index = " << loop_index;
+}
+
+void executePrimEndLoop(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
+{
+    Log::RT::D() << "execute PrimEndLoop";
+
+    auto end_loop_layer = std::dynamic_pointer_cast<nn_compiler::ir::PrimEndLoopLayer>(layer);
+
+    // get the matched StartLoopNode
+    int64_t loop_start_layer_id = end_loop_layer->getGotoLayer();
+    auto loop_index_layer_ = stream_executor.getGraph()->getLayer(loop_start_layer_id + 1);
+
+    // Get newset LoopIndex
+    int loop_index_blob_id = loop_index_layer_->getOutSTensorID()[0];
+    Log::RT::D() << "LoopIndexBlobId:" << loop_index_blob_id;
+    int64_t loop_index = stream_executor.findBlob(loop_index_blob_id).second.toInt();
+
+    // loop_index ++
+    loop_index++;
+
+    // update loop_index blob
+    stream_executor.updateBlob(loop_index_blob_id, DataType::INT64, scalarToIValue<int64_t>(loop_index));
+
+    Log::RT::D() << "PrimEndLoop: loop_index=" << loop_index;
+
+    // jump to loopStart
+    // LoopBlock
+    stream_executor.setCursor(loop_start_layer_id + 2);
+
+    // update EndLoop's input Blobs --> PrimBlock's input
+    auto end_loop_input_blob_ids = layer->getInSTensorID();
+    auto prim_block_layer_ = stream_executor.getGraph()->getLayer(loop_start_layer_id + 2);
+    auto prim_block_input_blob_ids = prim_block_layer_->getInSTensorID();
+
+    // the 0 element is condition
+    auto prim_loop_layer_ = stream_executor.getGraph()->getLayer(loop_start_layer_id);
+    auto prim_loop_layer = std::dynamic_pointer_cast<nn_compiler::ir::PrimLoopLayer>(prim_loop_layer_);
+    auto cond_iv = stream_executor.findBlob(end_loop_input_blob_ids.at(0)).second;
+    if (cond_iv.isInt()) {
+        prim_loop_layer->setCond(cond_iv.toInt());
+    } else {
+        prim_loop_layer->setCond(cond_iv.toBool());
+    }
+
+    for (int i = 1; i < end_loop_input_blob_ids.size(); i++) {
+        auto end_loop_input_blob = stream_executor.findBlob(end_loop_input_blob_ids.at(i));
+        stream_executor.updateBlob(prim_block_input_blob_ids.at(i), end_loop_input_blob.first,
+                                   end_loop_input_blob.second);
+    }
 }
 
 }  // namespace runtime
