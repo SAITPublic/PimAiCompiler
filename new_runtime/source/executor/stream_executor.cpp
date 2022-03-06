@@ -287,7 +287,33 @@ void StreamExecutor::getOutputTensors(std::vector<torch::Tensor>& output_tensors
 
 const std::shared_ptr<nn_compiler::ir::NNNetwork> StreamExecutor::getGraph() { return this->ir_graph_; }
 
-void StreamExecutor::registerOp() {}
+void StreamExecutor::registerOp()
+{
+    this->global_op_register_.insert({LayerType::ATENRESHAPE, executorAtenReshape});
+
+    this->global_op_register_.insert({LayerType::PRIMBLOCK, executePrimBlock});
+    this->global_op_register_.insert({LayerType::PRIMCONSTANT, executePrimConstant});
+    this->global_op_register_.insert({LayerType::PRIMDATA, executePrimData});
+    this->global_op_register_.insert({LayerType::PRIMDEVICE, executePrimDevice});
+    this->global_op_register_.insert({LayerType::PRIMDTYPE, executePrimDtype});
+    this->global_op_register_.insert({LayerType::PRIMENDLOOP, executePrimEndLoop});
+    this->global_op_register_.insert({LayerType::PRIMIF, executePrimIf});
+    this->global_op_register_.insert({LayerType::PRIMGETATTR, executePrimGetAttr});
+    this->global_op_register_.insert({LayerType::PRIMENDIF, executePrimEndIf});
+    this->global_op_register_.insert({LayerType::PRIMLOOP, executePrimLoop});
+    this->global_op_register_.insert({LayerType::PRIMLOOPINDEX, executePrimLoopIndex});
+    this->global_op_register_.insert({LayerType::PRIMLISTCONSTRUCT, executePrimListConstruct});
+    this->global_op_register_.insert({LayerType::PRIMLISTUNPACK, executePrimListUnpack});
+    this->global_op_register_.insert({LayerType::PRIMRAISEEXCEPTION, executePrimRaiseException});
+    this->global_op_register_.insert({LayerType::PRIMSETATTR, executePrimSetAttr});
+    this->global_op_register_.insert({LayerType::PRIMTUPLECONSTRUCT, executePrimTupleConstruct});
+    this->global_op_register_.insert({LayerType::PRIMTUPLEINDEX, executePrimTupleIndex});
+    this->global_op_register_.insert({LayerType::PRIMTUPLEUNPACK, executePrimTupleUnpack});
+    this->global_op_register_.insert({LayerType::PRIMTYPE, executePrimType});
+    this->global_op_register_.insert({LayerType::PRIMUNCHECKEDCAST, executePrimUncheckedCast});
+    this->global_op_register_.insert({LayerType::PRIMUNINITIALIZED, executePrimUninitialized});
+    this->global_op_register_.insert({LayerType::PRIMVARIABLE, executePrimVariable});
+}
 
 }  // namespace runtime
 }  // namespace nn_compiler

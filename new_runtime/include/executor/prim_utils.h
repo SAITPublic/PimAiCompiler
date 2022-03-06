@@ -8,7 +8,6 @@
 #include "new_ir/include/tensors/data_tensor.h"
 #include "new_ir/include/types.h"
 #include "new_runtime/include/executor/utils.h"
-// #include "new_runtime/include/types.h"
 
 namespace nn_compiler
 {

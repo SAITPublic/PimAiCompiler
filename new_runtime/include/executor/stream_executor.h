@@ -13,7 +13,6 @@
 #include "new_ir/include/nn_network.h"
 #include "new_ir/include/types.h"
 #include "new_runtime/include/executor/utils.h"
-// #include "new_runtime/include/types.h"
 
 namespace nn_compiler
 {
@@ -22,7 +21,7 @@ namespace runtime
 using namespace nn_compiler::ir;
 class StreamExecutor;
 using OpExecutorFn =
-    std::function<void(const std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)>;
+    std::function<void(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)>;
 
 class StreamExecutor
 {

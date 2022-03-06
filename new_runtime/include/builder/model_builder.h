@@ -5,8 +5,6 @@
 #include "new_ir/include/nn_model.h"
 #include "new_ir/include/types.h"
 
-// namespace nn_ir = nn_compiler::ir;
-
 namespace nn_compiler
 {
 namespace runtime
