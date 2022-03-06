@@ -2,7 +2,6 @@
 #include "half.hpp"
 #include "new_ir/include/layers/all_layers.h"
 #include "new_ir/include/tensors/data_tensor.h"
-#include "new_ir/include/types.h"
 #include "new_runtime/include/builder/model_builder.h"
 
 namespace nn_compiler

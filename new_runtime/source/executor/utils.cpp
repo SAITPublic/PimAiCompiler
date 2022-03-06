@@ -1,17 +1,15 @@
+#include <torch/script.h>
 #include <ostream>
 #include <string>
-#include <torch/script.h>
 #include <vector>
 
 #include "common/log.hpp"
 #include "new_runtime/include/executor/utils.h"
-#include "types.h"
 
 namespace nn_compiler
 {
 namespace runtime
 {
-
 torch::jit::IValue deviceToIValue(const c10::Device& device) { return torch::jit::IValue(device); }
 
 torch::jit::IValue tensorToIValue(const torch::Tensor& tensor) { return torch::jit::IValue(tensor); }
@@ -58,7 +56,8 @@ DataType convertATScalarTypeToDType(at::ScalarType dtype)
     return data_type;
 }
 
-at::Device convertIntToATDevice(const int& value) {
+at::Device convertIntToATDevice(const int& value)
+{
     // according to: pytorch/c10/core/DeviceType.h
     at::Device device(at::DeviceType::CPU);
     switch (value) {
@@ -253,7 +252,7 @@ std::vector<int64_t> getUniqueOutStensorIds(std::shared_ptr<nn_compiler::ir::NNL
     std::vector<int64_t> ret;
     auto out_stensor_id = layer->getOutSTensorID();
     for (int i = 0; i < out_stensor_id.size(); i++) {
-        if(std::find(ret.begin(), ret.end(), out_stensor_id[i]) == ret.end()){
+        if (std::find(ret.begin(), ret.end(), out_stensor_id[i]) == ret.end()) {
             // not exist, insert
             ret.push_back(out_stensor_id[i]);
         }

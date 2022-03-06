@@ -34,7 +34,9 @@ enum DataType {
     DEVICE,
     TENSOR,
     NONE,
-    LIST
+    LIST,
+    TUPLE,
+    IVALUE
 };
 
 enum class LayerType {

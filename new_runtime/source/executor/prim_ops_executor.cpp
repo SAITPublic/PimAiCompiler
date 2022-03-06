@@ -488,6 +488,75 @@ void executePrimVariable(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, Strea
     Log::RT::D() << "execute PrimVariable";
 
     auto variable_layer = std::dynamic_pointer_cast<nn_compiler::ir::PrimVariableLayer>(layer);
+    auto ntype = variable_layer->getNType();
+    auto variable_attrs = variable_layer->getAttr();
+    at::ListTypePtr list_type = at::ListType::ofTensors();
+
+    if (ntype.find("List") != std::string::npos) {  // list type  list[scalar,scalar] list[tensor,tensor]
+        auto d_type = variable_attrs.at(0)->getDataType();
+        auto tensor_shape = variable_attrs.at(0)->getTensorShape();
+        auto shape = getDataShapeFromSTensor(tensor_shape);
+        int size = 1;
+        for (auto item : shape) {
+            size *= item;
+        }
+        std::vector<torch::IValue> inputs;
+        torch::jit::IValue iv;
+
+        for (unsigned int i = 0; i < variable_attrs.size(); i++) {
+            auto t_dtensor = variable_attrs.at(i);
+            auto d_type = t_dtensor->getDataType();
+            auto tensor_shape = t_dtensor->getTensorShape();
+            auto stride_ = t_dtensor->getStride();
+            auto shape = getDataShapeFromSTensor(tensor_shape);
+            auto stride = getDataShapeFromVector(stride_);
+            auto cur_data = *(t_dtensor->getData<uint8_t>());
+            uint8_t* ptr = const_cast<uint8_t*>(cur_data.data());
+            if (size != 1) {
+                auto tensor = createPtTensor((void*)(ptr), shape, d_type, stride).cuda();
+                iv = tensorToIValue(tensor);
+                list_type = at::ListType::ofTensors();
+            } else {
+                iv = convertVaraibleData2IValve(ptr, d_type);
+                list_type = inferTypeFromDataType(d_type);
+            }
+            inputs.push_back(iv);
+        }
+        auto out_stensor_id = layer->getOutSTensorID()[0];
+
+        // ntype = "List[Tuple[Tensor,Tensor]]" for variable op created by getattr or set attr;
+        if (ntype.length() > 4) {
+            torch::jit::IValue iv = primVariable(ntype, inputs);
+            stream_executor.updateBlob(out_stensor_id, DataType::LIST, iv);
+        } else {
+            primListConstruct(inputs, inputs.size(), list_type);
+            stream_executor.updateBlob(out_stensor_id, DataType::LIST, inputs.at(0));
+        }
+    } else if (ntype.find("bool") != std::string::npos) {  // bool type
+        auto data_ptr = variable_attrs.at(0)->getData<uint8_t>();
+        auto d_type = variable_attrs.at(0)->getDataType();
+        uint8_t* ptr = const_cast<uint8_t*>(data_ptr->data());
+        torch::jit::IValue iv = convertVaraibleData2IValve(ptr, d_type);
+
+        auto out_stensor_id = layer->getOutSTensorID()[0];
+        stream_executor.updateBlob(out_stensor_id, DataType::BOOL, iv);
+    } else if (ntype.find("Tensor") != std::string::npos) {  // tesnor type
+        auto t_dtensor = variable_attrs.at(0);
+        auto d_type = t_dtensor->getDataType();
+        auto tensor_shape = t_dtensor->getTensorShape();
+        auto stride_ = t_dtensor->getStride();
+        auto shape = getDataShapeFromSTensor(tensor_shape);
+        auto stride = getDataShapeFromVector(stride_);
+
+        auto cur_data = *(t_dtensor->getData<uint8_t>());
+        uint8_t* ptr = const_cast<uint8_t*>(cur_data.data());
+        auto tensor = createPtTensor((void*)(ptr), shape, d_type, stride).cuda();
+        torch::jit::IValue iv = tensorToIValue(tensor);
+        auto out_stensor_id = layer->getOutSTensorID()[0];
+        stream_executor.updateBlob(out_stensor_id, DataType::TENSOR, iv);
+    } else {
+        Log::RT::E() << "Variable op data type: " << ntype << "do not support! ";
+    }
 }
 
 /**

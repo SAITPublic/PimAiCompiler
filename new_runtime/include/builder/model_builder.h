@@ -3,13 +3,16 @@
 #include <torch/script.h>
 
 #include "new_ir/include/nn_model.h"
-#include "types.h"
+#include "new_ir/include/types.h"
+
+// namespace nn_ir = nn_compiler::ir;
 
 namespace nn_compiler
 {
 namespace runtime
 {
 
+using namespace nn_compiler::ir;
 class ModelBuilder
 {
    public:

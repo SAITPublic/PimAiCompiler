@@ -1,19 +1,20 @@
 #pragma once
 
+#include <torch/script.h>
 #include <exception>
 #include <stack>
-#include <torch/script.h>
 #include <vector>
 
-#include "new_ir/include/types.h"
 #include "new_ir/include/tensors/data_tensor.h"
-#include "new_runtime/include/types.h"
+#include "new_ir/include/types.h"
 #include "new_runtime/include/executor/utils.h"
+// #include "new_runtime/include/types.h"
 
 namespace nn_compiler
 {
 namespace runtime
 {
+using namespace nn_compiler::ir;
 class NNRuntimeException : std::exception
 {
     using std::exception::what;
@@ -53,8 +54,7 @@ torch::Tensor loadTensor(const std::string& bin_file, const std::vector<int64_t>
 
 std::pair<int, DataType> parseNtype(std::string& ntype);
 
-std::pair<torch::jit::IValue, std::pair<int, DataType>> getVariableInfo(uint8_t* ptr,
-                                                                        const std::string tensor_data_type,
-                                                                        int total_size);
+torch::jit::IValue convertVaraibleData2IValve(uint8_t* ptr, DataType d_type);
+
 }  // namespace runtime
 }  // namespace nn_compiler

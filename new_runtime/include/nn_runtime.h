@@ -8,7 +8,6 @@
 #include "builder/model_builder.h"
 #include "executor/stream_executor.h"
 #include "new_ir/include/nn_model.h"
-#include "types.h"
 
 namespace nn_compiler
 {

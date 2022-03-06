@@ -9,7 +9,6 @@
 #include "new_runtime/include/executor/profiler.h"
 #include "new_runtime/include/executor/stream_executor.h"
 #include "new_runtime/include/executor/utils.h"
-#include "new_runtime/include/types.h"
 
 namespace nn_compiler
 {

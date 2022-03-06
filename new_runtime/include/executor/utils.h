@@ -4,13 +4,14 @@
 
 #include "common/log.hpp"
 #include "new_ir/include/layers/nn_layer.h"
+#include "new_ir/include/types.h"
 #include "new_runtime/include/common/log.hpp"
 
 namespace nn_compiler
 {
 namespace runtime
 {
-
+using namespace nn_compiler::ir;
 torch::jit::IValue boolToIValue(const bool& value);
 template <typename T>
 torch::jit::IValue scalarToIValue(const T& scalar)
@@ -135,5 +136,6 @@ DataType inferDataType(torch::jit::IValue ival);
 at::ListTypePtr inferTypeFromDataType(DataType type);
 
 std::vector<int64_t> getUniqueOutStensorIds(std::shared_ptr<nn_compiler::ir::NNLayer>& layer);
+
 }  // namespace runtime
 }  // namespace nn_compiler
