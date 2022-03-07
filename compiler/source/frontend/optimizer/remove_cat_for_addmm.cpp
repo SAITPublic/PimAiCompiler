@@ -107,6 +107,7 @@ RemoveCatForAddmm::create_new_constants(std::shared_ptr<nn_compiler::ir::PrimCon
         std::copy(new_data[idx].begin(), new_data[idx].end(), new_data_arr);
         new_dtensor->setData(new_data_arr, new_data[idx].size() * sizeof(float16));
         new_dtensor->setTensorShape(data_shapes[idx]);
+        new_dtensor->setBitWidth(16);
 
         auto new_prim_constant_layer = std::make_shared<nn_compiler::ir::PrimConstantLayer>(name, type);
         new_prim_constant_layer->setNType(ntype);
