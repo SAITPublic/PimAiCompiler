@@ -25,14 +25,29 @@ void executorAtenAdd(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExe
 
     auto add_layer = std::dynamic_pointer_cast<nn_compiler::ir::AtenAddLayer>(layer);
 
+    int in_id = 0;
     auto in_stensor_id = layer->getInSTensorID();
     auto out_stensor_id = layer->getOutSTensorID();
+    // Find the input blob
+    torch::jit::IValue iv_self = stream_executor.findBlob(in_stensor_id[in_id++]).second;
+    torch::jit::IValue iv_other = stream_executor.findBlob(in_stensor_id[in_id++]).second;
 
     int64_t alpha = add_layer->getAlpha();
+    if (nn_compiler::ir::isDefaultValue(alpha)) {
+        if (in_stensor_id.size() == 3) {
+            // if "prim::if" layer linked to current, this edge has no practical meaning
+            if (stream_executor.checkValidBlobID(in_id)) {
+                auto alpha_iv = stream_executor.findBlob(in_stensor_id[in_id++]).second;
+                assert(alpha_iv.isInt());
+                alpha = alpha_iv.toInt();
+            } else {
+                alpha = 1;
+            }
+        } else {
+            alpha = 1;
+        }
+    }
 
-    // Find the input blob
-    torch::jit::IValue iv_self = stream_executor.findBlob(in_stensor_id[0]).second;
-    torch::jit::IValue iv_other = stream_executor.findBlob(in_stensor_id[1]).second;
     if (iv_self.isInt() && iv_other.isInt()) {
         int64_t in_self = iv_self.toInt();
         auto output = atenAdd(in_self, iv_other.toInt(), alpha);
@@ -981,17 +996,16 @@ void executorAtenEmbedding(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, Str
 
         stream_executor.updateBlob(out_stensor_id[0], DataType::TENSOR, tensorToIValue(output));
     } else {
-        // TODO(SRCX) : Release this part of code when aten::embedding optimization is enabled.
-        // auto weights = embedding_layer->getWeights();
-        // assert(weights.size() > 0);
+        auto weights = embedding_layer->getWeights();
+        assert(weights.size() > 0);
 
-        // torch::jit::IValue iv_indices = stream_executor.findBlob(in_stensor_id[0]).second;
-        // assert(iv_indices.isTensor());
-        // auto indices_tensor = iv_indices.toTensor();
-        // assert(indices_tensor.item().type() == torch::kInt64);
+        torch::jit::IValue iv_indices = stream_executor.findBlob(in_stensor_id[0]).second;
+        assert(iv_indices.isTensor());
+        auto indices_tensor = iv_indices.toTensor();
+        assert(indices_tensor.item().type() == torch::kInt64);
 
-        // auto output = weights[indices_tensor.item().toInt()];
-        // stream_executor.updateBlob(out_stensor_id[0], DataType::TENSOR, tensorToIValue(output));
+        auto output = weights[indices_tensor.item().toInt()];
+        stream_executor.updateBlob(out_stensor_id[0], DataType::TENSOR, tensorToIValue(output));
     }
 }
 

@@ -236,6 +236,11 @@ std::pair<DataType, torch::jit::IValue>& StreamExecutor::findBlob(int64_t blob_i
     return it->second;
 }
 
+bool StreamExecutor::checkValidBlobID(int64_t blob_id)
+{
+    return (global_blobs_.find(blob_id) != global_blobs_.end());
+}
+
 OpExecutorFn StreamExecutor::findOpExecutor(nn_compiler::ir::LayerType& type)
 {
     auto it = global_op_register_.find(type);

@@ -46,6 +46,8 @@ class StreamExecutor
 
     std::pair<DataType, torch::jit::IValue>& findBlob(int64_t blob_id);
 
+    bool checkValidBlobID(int64_t blob_id);
+
     OpExecutorFn findOpExecutor(nn_compiler::ir::LayerType& op_type);
 
     void registerOp();

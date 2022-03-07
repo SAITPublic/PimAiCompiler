@@ -69,16 +69,17 @@ void PassManager::runPasses(std::unique_ptr<nn_compiler::ir::NNModel>& model)
     remove_if_with_addmm->add(remove_cat_for_addmm);
     remove_cat_for_addmm->add(swap_addmm_inputs);
     swap_addmm_inputs->add(swap_matmul_inputs);
-    swap_matmul_inputs->add(fuse_act);
-
-    fuse_act->add(update_layer_id);
-    update_layer_id->add(control_layer_execution);
-    control_layer_execution->add(lstm_labeling);
-    lstm_labeling->add(cat_labeling);
+    swap_matmul_inputs->add(fuse_act);    
 
     if (model_name_ == "RNNT") {
         fuse_act->add(set_weights_for_embedding);
+        set_weights_for_embedding->add(update_layer_id);
+    } else {
+        fuse_act->add(update_layer_id);
     }
+    update_layer_id->add(control_layer_execution);
+    control_layer_execution->add(lstm_labeling);
+    lstm_labeling->add(cat_labeling);
 
     while (base_pass->getSuccessor() != nullptr) {
         base_pass = base_pass->getSuccessor();
