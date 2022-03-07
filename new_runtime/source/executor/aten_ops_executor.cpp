@@ -5,7 +5,7 @@
 // #include "common/include/cast.hpp"
 #include "new_runtime/include/executor/aten_ops_executor.h"
 #include "new_runtime/include/executor/aten_ops.h"
-#include "new_runtime/include/executor/custom_ops.hpp"
+#include "runtime/include/executor/custom_ops.hpp"
 #include "new_runtime/include/executor/stream_executor.h"
 #include "new_runtime/include/executor/utils.h"
 #include "glog/logging.h"
@@ -22,7 +22,7 @@ namespace runtime {
 
 void executorAtenAdd(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
-    DLOG(INFO) << "execute Aten Add node";
+    Log::RT::D() << "execute Aten Add node";
 
     auto add_layer = std::dynamic_pointer_cast<nn_compiler::ir::AtenAddLayer>(layer);
 
@@ -76,7 +76,7 @@ void executorAtenAdd(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExe
 
 void executorAtenAddmm(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
-    DLOG(INFO) << "execute Aten Addmm node";
+    Log::RT::D() << "execute Aten Addmm node";
 
     auto addmm_layer = std::dynamic_pointer_cast<nn_compiler::ir::AtenAddmmLayer>(layer);
     auto act_type = addmm_layer->get_act_type();
@@ -226,7 +226,7 @@ void executorAtenAddmm(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamE
 
 void executorAtenAnd(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
-    DLOG(INFO) << "execute Aten And node";
+    Log::RT::D() << "execute Aten And node";
     
     auto in_stensor_id = layer->getInSTensorID();
     auto out_stensor_id = layer->getOutSTensorID();
@@ -253,7 +253,7 @@ void executorAtenAnd(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExe
 
 void executorAtenAny(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
-    DLOG(INFO) << "execute Aten Any node";
+    Log::RT::D() << "execute Aten Any node";
 
     auto in_stensor_id = layer->getInSTensorID();
     auto out_stensor_id = layer->getOutSTensorID();
@@ -269,7 +269,7 @@ void executorAtenAny(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExe
 
 void executorAtenAppend(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
-    DLOG(INFO) << "execute Aten Append node";
+    Log::RT::D() << "execute Aten Append node";
 
     auto in_stensor_id = layer->getInSTensorID();
     auto out_stensor_id = layer->getOutSTensorID();
@@ -289,7 +289,7 @@ void executorAtenAppend(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, Stream
 
 void executorAtenArange1(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
-    DLOG(INFO) << "execute Aten Arange1 node";
+    Log::RT::D() << "execute Aten Arange1 node";
 
     auto arange1_layer = std::dynamic_pointer_cast<nn_compiler::ir::AtenArange1Layer>(layer);
 
@@ -349,7 +349,7 @@ void executorAtenArange1(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, Strea
 
 void executorAtenArange2(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
-    DLOG(INFO) << "execute Aten Arange2 node";
+    Log::RT::D() << "execute Aten Arange2 node";
 
     auto arange2_layer = std::dynamic_pointer_cast<nn_compiler::ir::AtenArange2Layer>(layer);
 
@@ -415,7 +415,7 @@ void executorAtenArange2(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, Strea
 
 void executorAtenArange3(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
-    DLOG(INFO) << "execute Aten Arange3 node";
+    Log::RT::D() << "execute Aten Arange3 node";
 
     auto arange3_layer = std::dynamic_pointer_cast<nn_compiler::ir::AtenArange3Layer>(layer);
 
@@ -487,7 +487,7 @@ void executorAtenArange3(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, Strea
 
 void executorAtenAsTensor(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
-    DLOG(INFO) << "execute Aten AsTensor node";
+    Log::RT::D() << "execute Aten AsTensor node";
 
     auto as_tensor_layer = std::dynamic_pointer_cast<nn_compiler::ir::AtenAsTensorLayer>(layer);
 
@@ -523,7 +523,7 @@ void executorAtenAsTensor(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, Stre
 
 void executorAtenBitwiseNot(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
-    DLOG(INFO) << "execute Aten BitwiseNot node";
+    Log::RT::D() << "execute Aten BitwiseNot node";
     auto in_stensor_id = layer->getInSTensorID();
     auto out_stensor_id = layer->getOutSTensorID();
 
@@ -538,7 +538,7 @@ void executorAtenBitwiseNot(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, St
 
 void executorAtenBmm(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
-    DLOG(INFO) << "execute Aten Bmm node";
+    Log::RT::D() << "execute Aten Bmm node";
     auto in_stensor_id = layer->getInSTensorID();
     auto out_stensor_id = layer->getOutSTensorID();
 
@@ -555,7 +555,7 @@ void executorAtenBmm(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExe
 
 void executorAtenBool(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
-    DLOG(INFO) << "execute Aten Bool node";
+    Log::RT::D() << "execute Aten Bool node";
     auto in_stensor_id = layer->getInSTensorID();
     auto out_stensor_id = layer->getOutSTensorID();
 
@@ -578,10 +578,13 @@ void executorAtenBool(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamEx
 
 void executorAtenCat(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
-    DLOG(INFO) << "execute Aten Cat node";
+    Log::RT::D() << "execute Aten Cat node";
+
     auto in_stensor_id = layer->getInSTensorID();
     auto out_stensor_id = layer->getOutSTensorID();
     
+    auto cat_layer = std::dynamic_pointer_cast<nn_compiler::ir::AtenCatLayer>(layer);
+
     std::vector<at::Tensor> tensor_vec;
 
     // auto& input_list_edge = cast<nncir::DataEdge>(cat_node.getInEdge(0));
@@ -614,7 +617,7 @@ void executorAtenCat(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExe
     }
     at::TensorList tensor_list(tensor_vec);
 
-    auto dim = cat_node.getDim();
+    auto dim = cat_layer->getDim();
     if (nn_compiler::ir::isDefaultValue(dim)) {
         auto dim_iv = stream_executor.findBlob(in_stensor_id[1]).second;
         assert(dim_iv.isInt());
@@ -628,7 +631,7 @@ void executorAtenCat(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExe
 
 void executorAtenCeil(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
-    DLOG(INFO) << "execute Aten Ceil node";
+    Log::RT::D() << "execute Aten Ceil node";
     auto in_stensor_id = layer->getInSTensorID();
     auto out_stensor_id = layer->getOutSTensorID();
 
@@ -644,7 +647,7 @@ void executorAtenCeil(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamEx
 
 void executorAtenChunk(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
-    DLOG(INFO) << "execute Aten Chunk node";
+    Log::RT::D() << "execute Aten Chunk node";
 
     auto chunk_layer = std::dynamic_pointer_cast<nn_compiler::ir::AtenChunkLayer>(layer);
 
@@ -673,7 +676,7 @@ void executorAtenChunk(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamE
 
 void executorAtenClamp(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
-    DLOG(INFO) << "execute Aten Clamp node";
+    Log::RT::D() << "execute Aten Clamp node";
 
     auto clamp_layer = std::dynamic_pointer_cast<nn_compiler::ir::AtenClampLayer>(layer);
 
@@ -702,7 +705,7 @@ void executorAtenClamp(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamE
 
 void executorAtenClear(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
-    DLOG(INFO) << "execute Aten Clear node";
+    Log::RT::D() << "execute Aten Clear node";
     auto in_stensor_id = layer->getInSTensorID();
     auto out_stensor_id = layer->getOutSTensorID();
 
@@ -717,7 +720,7 @@ void executorAtenClear(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamE
 
 void executorAtenContiguous(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
-    DLOG(INFO) << "execute Aten Contiguous node";
+    Log::RT::D() << "execute Aten Contiguous node";
 
     auto contiguous_layer = std::dynamic_pointer_cast<nn_compiler::ir::AtenContiguousLayer>(layer);
 
@@ -741,7 +744,7 @@ void executorAtenContiguous(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, St
 
 void executorAtenConv2d(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
-    DLOG(INFO) << "execute Aten Conv2d node";
+    Log::RT::D() << "execute Aten Conv2d node";
 
     auto con2d_layer = std::dynamic_pointer_cast<nn_compiler::ir::AtenConv2dLayer>(layer);
 
@@ -765,15 +768,15 @@ void executorAtenConv2d(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, Stream
     // are set as same as default values in aten::conv2d.
     auto stride = con2d_layer->getStride();
     auto padding = con2d_layer->getPadding();
-    auto dilation = con2d_layer->getDilation();
+    auto dilation = con2d_layer->getDialation();
     auto groups = con2d_layer->getGroups();
 
-    std::vector<int64_t> stride_vec = {static_cast<int64_t>(stride.h), static_cast<int64_t>(stride.w)};
-    std::vector<int64_t> padding_vec = {static_cast<int64_t>(padding.l), static_cast<int64_t>(padding.r)};
-    std::vector<int64_t> dilation_vec = {static_cast<int64_t>(dilation.h), static_cast<int64_t>(dilation.w)};
+    std::vector<int64_t> stride_vec = {static_cast<int64_t>(stride[0]), static_cast<int64_t>(stride[1])};
+    std::vector<int64_t> padding_vec = {static_cast<int64_t>(padding[0]), static_cast<int64_t>(padding[1])};
+    std::vector<int64_t> dilation_vec = {static_cast<int64_t>(dilation[0]), static_cast<int64_t>(dilation[1])};
 
-    // DLOG(INFO) << "weight: " << weight_tensor;
-    // DLOG(INFO) << "bias: " << bias_tensor;
+    // Log::RT::D() << "weight: " << weight_tensor;
+    // Log::RT::D() << "bias: " << bias_tensor;
 
     auto output = atenConv2d(self_tensor, weight_tensor, bias_tensor, at::ArrayRef<int64_t>(stride_vec),
                                    at::ArrayRef<int64_t>(padding_vec), at::ArrayRef<int64_t>(dilation_vec), groups);
@@ -783,7 +786,7 @@ void executorAtenConv2d(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, Stream
 
 void executorAtenCopy(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
-    DLOG(INFO) << "execute Aten Copy node";
+    Log::RT::D() << "execute Aten Copy node";
 
     auto copy_layer = std::dynamic_pointer_cast<nn_compiler::ir::AtenCopyLayer>(layer);
 
@@ -801,7 +804,7 @@ void executorAtenCopy(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamEx
     at::Tensor src_tensor = iv_src.toTensor();
 
     int non_blocking = copy_layer->getNonBlocking();
-    if (nncir::isDefaultValue(non_blocking)) {
+    if (nn_compiler::ir::isDefaultValue(non_blocking)) {
         auto non_blocking_iv = stream_executor.findBlob(in_stensor_id[2]).second;
         non_blocking = non_blocking_iv.toInt();
     }
@@ -813,7 +816,7 @@ void executorAtenCopy(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamEx
 
 void executorAtenCpu(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
-    DLOG(INFO) << "execute Aten Cpu node";
+    Log::RT::D() << "execute Aten Cpu node";
 
     auto in_stensor_id = layer->getInSTensorID();
     auto out_stensor_id = layer->getOutSTensorID();
@@ -829,7 +832,7 @@ void executorAtenCpu(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExe
 
 void executorAtenCuda(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
-    DLOG(INFO) << "execute Aten Cuda node";
+    Log::RT::D() << "execute Aten Cuda node";
 
     auto in_stensor_id = layer->getInSTensorID();
     auto out_stensor_id = layer->getOutSTensorID();
@@ -845,7 +848,7 @@ void executorAtenCuda(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamEx
 
 void executorAtenDeriveIndex(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
-    DLOG(INFO) << "execute Aten derive_index node";
+    Log::RT::D() << "execute Aten derive_index node";
 
     auto derive_index_layer = std::dynamic_pointer_cast<nn_compiler::ir::AtenDeriveIndexLayer>(layer);
 
@@ -876,7 +879,7 @@ void executorAtenDeriveIndex(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, S
 
 void executorAtenDim(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
-    DLOG(INFO) << "execute Aten Dim node";
+    Log::RT::D() << "execute Aten Dim node";
 
     auto in_stensor_id = layer->getInSTensorID();
     auto out_stensor_id = layer->getOutSTensorID();
@@ -894,7 +897,7 @@ void executorAtenDim(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExe
 
 void executorAtenDiv(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
-    DLOG(INFO) << "execute Aten Div node";
+    Log::RT::D() << "execute Aten Div node";
 
     auto in_stensor_id = layer->getInSTensorID();
     auto out_stensor_id = layer->getOutSTensorID();
@@ -926,7 +929,7 @@ void executorAtenDiv(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExe
 
 void executorAtenDropout(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
-    DLOG(INFO) << "execute Aten Dropout node";
+    Log::RT::D() << "execute Aten Dropout node";
 
     auto dropout_layer = std::dynamic_pointer_cast<nn_compiler::ir::AtenDropoutLayer>(layer);
     
@@ -959,7 +962,7 @@ void executorAtenDropout(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, Strea
 
 void executorAtenEmbedding(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
-    DLOG(INFO) << "execute Aten Embedding node";
+    Log::RT::D() << "execute Aten Embedding node";
 
     auto embedding_layer = std::dynamic_pointer_cast<nn_compiler::ir::AtenEmbeddingLayer>(layer);
 
@@ -1000,22 +1003,22 @@ void executorAtenEmbedding(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, Str
 
         stream_executor.updateBlob(out_stensor_id[0], DataType::TENSOR, tensorToIValue(output));
     } else {
-        auto& weights = embedding_layer->getWeights();
-        assert(weights.size() > 0);
+        // auto& weights = embedding_layer->getWeights();
+        // assert(weights.size() > 0);
 
-        torch::jit::IValue iv_indices = stream_executor.findBlob(in_stensor_id[5]).second;
-        assert(iv_indices.isTensor());
-        auto indices_tensor = iv_indices.toTensor();
-        assert(indices_tensor.item().type() == torch::kInt64);
+        // torch::jit::IValue iv_indices = stream_executor.findBlob(in_stensor_id[5]).second;
+        // assert(iv_indices.isTensor());
+        // auto indices_tensor = iv_indices.toTensor();
+        // assert(indices_tensor.item().type() == torch::kInt64);
 
-        auto output = weights[indices_tensor.item().toInt()];
-        stream_executor.updateBlob(out_stensor_id[0], DataType::TENSOR, tensorToIValue(output));
+        // auto output = weights[indices_tensor.item().toInt()];
+        // stream_executor.updateBlob(out_stensor_id[0], DataType::TENSOR, tensorToIValue(output));
     }
 }
 
 void executorAtenEq(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
-    DLOG(INFO) << "execute Aten Eq node";
+    Log::RT::D() << "execute Aten Eq node";
 
     auto in_stensor_id = layer->getInSTensorID();
     auto out_stensor_id = layer->getOutSTensorID();
@@ -1054,7 +1057,7 @@ void executorAtenEq(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExec
 
 void executorAtenEqual(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
-    DLOG(INFO) << "execute Aten Equal node";
+    Log::RT::D() << "execute Aten Equal node";
 
     auto in_stensor_id = layer->getInSTensorID();
     auto out_stensor_id = layer->getOutSTensorID();
@@ -1073,7 +1076,7 @@ void executorAtenEqual(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamE
 
 void executorAtenExpand(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
-    DLOG(INFO) << "execute Aten Expand node";
+    Log::RT::D() << "execute Aten Expand node";
 
     auto expand_layer = std::dynamic_pointer_cast<nn_compiler::ir::AtenExpandLayer>(layer);
 
@@ -1104,7 +1107,7 @@ void executorAtenExpand(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, Stream
 
 void executorAtenFill(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
-    DLOG(INFO) << "execute Aten Fill node";
+    Log::RT::D() << "execute Aten Fill node";
 
     auto in_stensor_id = layer->getInSTensorID();
     auto out_stensor_id = layer->getOutSTensorID();
@@ -1134,7 +1137,7 @@ void executorAtenFill(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamEx
 
 void executorAtenFloorDivide(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
-    DLOG(INFO) << "execute Aten FloorDivide node";
+    Log::RT::D() << "execute Aten FloorDivide node";
 
     auto in_stensor_id = layer->getInSTensorID();
     auto out_stensor_id = layer->getOutSTensorID();
@@ -1162,7 +1165,7 @@ void executorAtenFloorDivide(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, S
 
 void executorAtenFormat(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
-    DLOG(INFO) << "execute Aten Format node";
+    Log::RT::D() << "execute Aten Format node";
 
     auto format_layer = std::dynamic_pointer_cast<nn_compiler::ir::AtenFormatLayer>(layer);
 
@@ -1223,7 +1226,7 @@ void executorAtenFormat(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, Stream
 
 void executorAtenGather(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
-    DLOG(INFO) << "execute Aten Gather node";
+    Log::RT::D() << "execute Aten Gather node";
 
     auto gather_layer = std::dynamic_pointer_cast<nn_compiler::ir::AtenGatherLayer>(layer);
 
@@ -1259,7 +1262,7 @@ void executorAtenGather(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, Stream
 
 void executorAtenGe(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
-    DLOG(INFO) << "execute Aten Ge node";
+    Log::RT::D() << "execute Aten Ge node";
 
     auto in_stensor_id = layer->getInSTensorID();
     auto out_stensor_id = layer->getOutSTensorID();
@@ -1287,7 +1290,7 @@ void executorAtenGe(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExec
 
 void executorAtenGetItem(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
-    DLOG(INFO) << "execute Aten GetItem node";
+    Log::RT::D() << "execute Aten GetItem node";
 
     auto get_item_layer = std::dynamic_pointer_cast<nn_compiler::ir::AtenGetItemLayer>(layer);
 
@@ -1307,13 +1310,13 @@ void executorAtenGetItem(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, Strea
 
     auto output = atenGetItem(self_list, idx);
     // update output
-    stream_executor.releation_blob_ids_map_.insert({out_edge.getBlobId(), {in_stensor_id[0], idx}});
+    stream_executor.releation_blob_ids_map_.insert({out_stensor_id[0], {in_stensor_id[0], idx}});
     stream_executor.updateBlob(out_stensor_id[0], DataType::IVALUE, output);
 }
 
 void executorAtenGt(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
-    DLOG(INFO) << "execute Aten Gt node";
+    Log::RT::D() << "execute Aten Gt node";
     
     auto in_stensor_id = layer->getInSTensorID();
     auto out_stensor_id = layer->getOutSTensorID();
@@ -1346,7 +1349,7 @@ void executorAtenGt(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExec
 
 void executorAtenIndex(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
-    DLOG(INFO) << "execute Aten Index node";
+    Log::RT::D() << "execute Aten Index node";
 
     auto in_stensor_id = layer->getInSTensorID();
     auto out_stensor_id = layer->getOutSTensorID();
@@ -1370,7 +1373,7 @@ void executorAtenIndex(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamE
 
 void executorAtenIndexPut(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
-    DLOG(INFO) << "execute Aten IndexPut node";
+    Log::RT::D() << "execute Aten IndexPut node";
 
     auto index_put_layer = std::dynamic_pointer_cast<nn_compiler::ir::AtenIndexPutLayer>(layer);
     
@@ -1409,7 +1412,9 @@ void executorAtenIndexPut(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, Stre
 
 void executorAtenIndexSelect(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
-    DLOG(INFO) << "execute Aten IndexSelect node";
+    Log::RT::D() << "execute Aten IndexSelect node";
+
+    auto index_select_layer = std::dynamic_pointer_cast<nn_compiler::ir::AtenIndexSelectLayer>(layer);
 
     auto in_stensor_id = layer->getInSTensorID();
     auto out_stensor_id = layer->getOutSTensorID();
@@ -1418,7 +1423,7 @@ void executorAtenIndexSelect(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, S
     assert(iv_self.isTensor());
     auto self_tensor = iv_self.toTensor();
 
-    auto dim = node.getDim();
+    auto dim = index_select_layer->getDim();
     if (nn_compiler::ir::isDefaultValue(dim)) {
         auto dim_iv = stream_executor.findBlob(in_stensor_id[1]).second;
         assert(dim_iv.isInt());
@@ -1436,7 +1441,7 @@ void executorAtenIndexSelect(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, S
 
 void executorAtenInt(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
-    DLOG(INFO) << "execute Aten Int node";
+    Log::RT::D() << "execute Aten Int node";
 
     auto in_stensor_id = layer->getInSTensorID();
     auto out_stensor_id = layer->getOutSTensorID();
@@ -1459,7 +1464,7 @@ void executorAtenInt(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExe
 
 void executorAtenIs(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
-    DLOG(INFO) << "execute Aten Is node";
+    Log::RT::D() << "execute Aten Is node";
 
     auto in_stensor_id = layer->getInSTensorID();
     auto out_stensor_id = layer->getOutSTensorID();
@@ -1478,7 +1483,7 @@ void executorAtenIs(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExec
 
 void executorAtenItem(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
-    DLOG(INFO) << "execute Aten Item node";
+    Log::RT::D() << "execute Aten Item node";
 
     auto in_stensor_id = layer->getInSTensorID();
     auto out_stensor_id = layer->getOutSTensorID();
@@ -1498,7 +1503,7 @@ void executorAtenItem(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamEx
 
 void executorAtenLeakyRelu(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
-    DLOG(INFO) << "execute Aten LeakyRelu node";
+    Log::RT::D() << "execute Aten LeakyRelu node";
 
     auto leaky_relu_layer = std::dynamic_pointer_cast<nn_compiler::ir::AtenLeakyReluLayer>(layer);
 
@@ -1524,7 +1529,7 @@ void executorAtenLeakyRelu(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, Str
 
 void executorAtenLen(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
-    DLOG(INFO) << "execute Aten Len node";
+    Log::RT::D() << "execute Aten Len node";
 
     auto in_stensor_id = layer->getInSTensorID();
     auto out_stensor_id = layer->getOutSTensorID();
@@ -1555,7 +1560,7 @@ void executorAtenLen(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExe
 
 void executorAtenLinear(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
-    DLOG(INFO) << "execute Aten Linear node";
+    Log::RT::D() << "execute Aten Linear node";
 
     auto linear_layer = std::dynamic_pointer_cast<nn_compiler::ir::AtenLinearLayer>(layer);
 
@@ -1573,12 +1578,12 @@ void executorAtenLinear(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, Stream
     auto weight_tensor = linear_layer->getWeights()[0];
 
     at::Tensor output;
-    if (!layer->getBias().empty()) {
+    if (!linear_layer->getBiases().empty()) {
         // auto bias_blob_id = (layer->getBiasBlobIds())[0];
         std::vector<at::Tensor> bias;
         // auto bias_iv = stream_executor.findBlob(bias_blob_id).second;
         // assert(bias_iv.isTensor());
-        auto bias_tensor = lalinear_layerer->getBias()[0];
+        auto bias_tensor = linear_layer->getBiases()[0];
         output = atenLinear(tensor, weight_tensor, bias_tensor);
     } else {
         output = atenLinear(tensor, weight_tensor);
@@ -1589,7 +1594,7 @@ void executorAtenLinear(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, Stream
 
 void executorAtenList(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
-    DLOG(INFO) << "execute Aten List node";
+    Log::RT::D() << "execute Aten List node";
 
     auto in_stensor_id = layer->getInSTensorID();
     auto out_stensor_id = layer->getOutSTensorID();
@@ -1605,7 +1610,7 @@ void executorAtenList(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamEx
 
 void executorAtenLog(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
-    DLOG(INFO) << "execute Aten Log node";
+    Log::RT::D() << "execute Aten Log node";
 
     auto in_stensor_id = layer->getInSTensorID();
     auto out_stensor_id = layer->getOutSTensorID();
@@ -1621,7 +1626,7 @@ void executorAtenLog(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExe
 
 void executorAtenLogSoftmax(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
-    DLOG(INFO) << "execute Aten LogSoftmax node";
+    Log::RT::D() << "execute Aten LogSoftmax node";
 
     auto log_softmax_layer = std::dynamic_pointer_cast<nn_compiler::ir::AtenLogSoftmaxLayer>(layer);
 
@@ -1639,7 +1644,7 @@ void executorAtenLogSoftmax(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, St
         dim = data_iv.toInt();
     }
 
-    auto log_softmax_layer = layer->getDtype();
+    auto ori_dtype = log_softmax_layer->getDType();
     bool dtype_is_none = false;
     if (nn_compiler::ir::isDefaultValue(ori_dtype)) {
         auto ori_dtype_iv = stream_executor.findBlob(in_stensor_id[2]).second;
@@ -1663,7 +1668,7 @@ void executorAtenLogSoftmax(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, St
 
 void executorAtenLSTM1(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
-    DLOG(INFO) << "execute Aten LSTM1 node";
+    Log::RT::D() << "execute Aten LSTM1 node";
 
     auto lstm1_layer = std::dynamic_pointer_cast<nn_compiler::ir::AtenLSTM1Layer>(layer);
 
@@ -1695,7 +1700,7 @@ void executorAtenLSTM1(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamE
     // edge_idx++;
 
     // Check and skip, will handle params after getting all arguments
-    if (in_stensor_id.size() > edge_idx) {
+    if (in_stensor_id.size() > 2) {
         // auto& params_edge = cast<nncir::DataEdge>(lstm1_node.getInEdge(edge_idx));
         // int params_blob_id = params_edge.getBlobId();
         auto params_iv = stream_executor.findBlob(in_stensor_id[2]).second;
@@ -1776,7 +1781,7 @@ void executorAtenLSTM1(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamE
     // layers
 
     auto weight_blob = lstm1_layer->getWeights();
-    auto bias_blob = lstm1_layer->getBias();
+    auto bias_blob = lstm1_layer->getBiases();
     std::vector<at::Tensor> param_vector;
     assert((bidirectional == 0 || bidirectional == 1));
     int hash_id = 0;
@@ -1784,26 +1789,26 @@ void executorAtenLSTM1(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamE
         // w_ih
         auto w_ih_iv = weight_blob[i * 2];
         hash_id += in_stensor_id[0];
-        if (w_ih_iv.isTensor()) {
+        if (1) {
             param_vector.push_back(w_ih_iv);
         }
         // w_hh
         auto w_hh_iv = weight_blob[i * 2 + 1];
         hash_id += in_stensor_id[1];
-        if (w_hh_iv.isTensor()) {
+        if (1) {
             param_vector.push_back(w_hh_iv);
         }
         if (has_biases) {
             // b_ih? (optional)
             auto b_ih_iv = bias_blob[i * 2];
             // hash_id += bias_blob_ids[i * 2];
-            if (b_ih_iv.isTensor()) {
+            if (1) {
                 param_vector.push_back(b_ih_iv);
             }
             // b_hh? (optional)
             auto b_hh_iv = bias_blob[i * 2 + 1];
             // hash_id += bias_blob_ids[i * 2 + 1];
-            if (b_hh_iv.isTensor()) {
+            if (1) {
                 param_vector.push_back(b_hh_iv);
             }
         }
@@ -1818,8 +1823,8 @@ void executorAtenLSTM1(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamE
         if (!static_cast<bool>(batch_first)) input = input.transpose(0, 1);
         void *in_dev, *hx_dev, *out_dev, *wei_dev, *cx_dev, *workspace_dev, *hy_dev, *cy_dev;
 
-        stream_executor.input_tensors.clear();
-        stream_executor.output_tensors.clear();
+        stream_executor.input_tensors_.clear();
+        stream_executor.output_tensors_.clear();
 
         int batch_size = 1;
         int in_dim = input.dim();
@@ -1837,17 +1842,17 @@ void executorAtenLSTM1(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamE
         int dims = 2;
         for (int i = 0; i < seq_len; i++) {
             std::array<int, 2> in_lens = {in_len[0],  in_len.back() };
-            miopenCreateTensorDescriptor(&stream_executor.input_tensor);
-            miopenSetTensorDescriptor(stream_executor.input_tensor, miopenHalf, dims, in_lens.data(), nullptr);
-            stream_executor.input_tensors.push_back(stream_executor.input_tensor);
+            miopenCreateTensorDescriptor(&stream_executor.input_tensor_);
+            miopenSetTensorDescriptor(stream_executor.input_tensor_, miopenHalf, dims, in_lens.data(), nullptr);
+            stream_executor.input_tensors_.push_back(stream_executor.input_tensor_);
 
             std::array<int, 2> out_lens = {{in_len[0], out_len[0]}};
-            miopenCreateTensorDescriptor(&stream_executor.output_tensor);
-            miopenSetTensorDescriptor(stream_executor.output_tensor, miopenHalf, dims, out_lens.data(), nullptr);
-            stream_executor.output_tensors.push_back(stream_executor.output_tensor);
+            miopenCreateTensorDescriptor(&stream_executor.output_tensor_);
+            miopenSetTensorDescriptor(stream_executor.output_tensor_, miopenHalf, dims, out_lens.data(), nullptr);
+            stream_executor.output_tensors_.push_back(stream_executor.output_tensor_);
         }
         std::array<int, 3> hid_lens = {{hid_len[0], in_len[0], hid_len[1]}};
-        miopenSetTensorDescriptor(stream_executor.hidden_tensor, miopenHalf, 3, hid_lens.data(), nullptr);
+        miopenSetTensorDescriptor(stream_executor.hidden_tensor_, miopenHalf, 3, hid_lens.data(), nullptr);
 
         miopenRNNMode_t mode = miopenRNNMode_t::miopenLSTM;;
         miopenRNNBiasMode_t biasMode = static_cast<bool>(has_biases) ? miopenRNNwithBias : miopenRNNNoBias;
@@ -1855,10 +1860,10 @@ void executorAtenLSTM1(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamE
         miopenRNNInputMode_t inMode = miopenRNNlinear;
         miopenRNNAlgo_t algo = miopenRNNdefault;
 
-        miopenSetRNNDescriptor(stream_executor.rnnDesc, hidden_size, num_layers, inMode, directionMode, mode, biasMode, algo, miopenHalf);
-        miopenGetRNNParamsDescriptor(stream_executor.handle, stream_executor.rnnDesc, stream_executor.input_tensor, stream_executor.weight_tensor, miopenHalf);
+        miopenSetRNNDescriptor(stream_executor.rnn_desc_, hidden_size, num_layers, inMode, directionMode, mode, biasMode, algo, miopenHalf);
+        miopenGetRNNParamsDescriptor(stream_executor.handle_, stream_executor.rnn_desc_, stream_executor.input_tensor_, stream_executor.weight_tensor_, miopenHalf);
         size_t workspace_size;
-        miopenGetRNNWorkspaceSize(stream_executor.handle, stream_executor.rnnDesc, seq_len, stream_executor.input_tensors.data(), &workspace_size);
+        miopenGetRNNWorkspaceSize(stream_executor.handle_, stream_executor.rnn_desc_, seq_len, stream_executor.input_tensors_.data(), &workspace_size);
         auto workspace = at::empty(workspace_size, input.options().dtype(at::kByte));
 
         int datasize = 2; //miopenHalf
@@ -1869,7 +1874,7 @@ void executorAtenLSTM1(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamE
         auto it = stream_executor.global_blobs_.find(hash_id);
         if (it == stream_executor.global_blobs_.end()) {
             size_t weight_size = 0;
-            miopenGetRNNParamsSize(stream_executor.handle, stream_executor.rnnDesc, stream_executor.input_tensor, &weight_size, miopenHalf);
+            miopenGetRNNParamsSize(stream_executor.handle_, stream_executor.rnn_desc_, stream_executor.input_tensor_, &weight_size, miopenHalf);
             auto weight_buf = at::empty(weight_size / datasize, input.options());
             int expected_weight_size = hidden_size * 4 * (input_size + hidden_size + 2) * bidirectional_int + hidden_size * 4 * (hidden_size + hidden_size + 2) * (num_layers - 1) * bidirectional_int;
             assert((weight_size / datasize) == expected_weight_size);
@@ -1995,15 +2000,15 @@ void executorAtenLSTM1(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamE
         cx_dev = hx_list_tensor_vector[1].data_ptr();
         workspace_dev = workspace.data_ptr();
 
-        auto it0 = stream_executor.global_blobs_.find(out_blob_ids[0]);
+        auto it0 = stream_executor.global_blobs_.find(out_stensor_id[0]);
 
-        if (0 && stream_executor.modelType == "GNMT" && it0 != stream_executor.global_blobs_.end() && seq_len == 1) {
+        if (0 && stream_executor.model_type_ == "GNMT" && it0 != stream_executor.global_blobs_.end() && seq_len == 1) {
             out_dev = it0->second.second.toTensor().data_ptr();
-            hy_dev = stream_executor.global_blobs_.find(out_blob_ids[1])->second.second.toTensor().data_ptr();
-            cy_dev = stream_executor.global_blobs_.find(out_blob_ids[2])->second.second.toTensor().data_ptr();
-            miopenRNNForwardInference(stream_executor.handle, stream_executor.rnnDesc, seq_len, stream_executor.input_tensors.data(), in_dev,
-                                  stream_executor.hidden_tensor, hx_dev, stream_executor.hidden_tensor, cx_dev, stream_executor.weight_tensor, wei_dev,
-                                  stream_executor.output_tensors.data(), out_dev, stream_executor.hidden_tensor, hy_dev, stream_executor.hidden_tensor, cy_dev,
+            hy_dev = stream_executor.global_blobs_.find(out_stensor_id[1])->second.second.toTensor().data_ptr();
+            cy_dev = stream_executor.global_blobs_.find(out_stensor_id[2])->second.second.toTensor().data_ptr();
+            miopenRNNForwardInference(stream_executor.handle_, stream_executor.rnn_desc_, seq_len, stream_executor.input_tensors_.data(), in_dev,
+                                  stream_executor.hidden_tensor_, hx_dev, stream_executor.hidden_tensor_, cx_dev, stream_executor.weight_tensor_, wei_dev,
+                                  stream_executor.output_tensors_.data(), out_dev, stream_executor.hidden_tensor_, hy_dev, stream_executor.hidden_tensor_, cy_dev,
                                   workspace_dev, workspace_size);
 
         } else {
@@ -2066,9 +2071,9 @@ void executorAtenLSTM1(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamE
                 //     }
                 // }
             }
-            miopenRNNForwardInference(stream_executor.handle, stream_executor.rnnDesc, seq_len, stream_executor.input_tensors.data(), in_dev,
-                                    stream_executor.hidden_tensor, hx_dev, stream_executor.hidden_tensor, cx_dev, stream_executor.weight_tensor, wei_dev,
-                                    stream_executor.output_tensors.data(), out_dev, stream_executor.hidden_tensor, hy_dev, stream_executor.hidden_tensor, cy_dev,
+            miopenRNNForwardInference(stream_executor.handle_, stream_executor.rnn_desc_, seq_len, stream_executor.input_tensors_.data(), in_dev,
+                                    stream_executor.hidden_tensor_, hx_dev, stream_executor.hidden_tensor_, cx_dev, stream_executor.weight_tensor_, wei_dev,
+                                    stream_executor.output_tensors_.data(), out_dev, stream_executor.hidden_tensor_, hy_dev, stream_executor.hidden_tensor_, cy_dev,
                                     workspace_dev, workspace_size);
 
             if (!static_cast<bool>(batch_first)) output = output.transpose(0, 1);
@@ -2081,7 +2086,7 @@ void executorAtenLSTM1(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamE
 
 void executorAtenLSTM2(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
-    DLOG(INFO) << "execute Aten LSTM2 node";
+    Log::RT::D() << "execute Aten LSTM2 node";
 
     auto lstm2_layer = std::dynamic_pointer_cast<nn_compiler::ir::AtenLSTM2Layer>(layer);
 
@@ -2123,7 +2128,7 @@ void executorAtenLSTM2(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamE
 
     // at::TensorList params
     // Check and skip, will handle params after getting all arguments
-    if (in_stensor_id.size() > edge_idx) {
+    if (in_stensor_id.size() > 2) {
         // auto& params_edge = cast<nncir::DataEdge>(lstm2_node.getInEdge(edge_idx));
         // int params_blob_id = params_edge.getBlobId();
         auto params_iv = stream_executor.findBlob(in_stensor_id[3]).second;
@@ -2178,7 +2183,7 @@ void executorAtenLSTM2(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamE
 
     // bool bidirectional
     int bidirectional = lstm2_layer->getBidirectional();
-    if (nncir::isDefaultValue(bidirectional)) {
+    if (nn_compiler::ir::isDefaultValue(bidirectional)) {
         // auto& bidirectional_edge = cast<nncir::DataEdge>(lstm2_node.getInEdge(edge_idx));
         // int bidirectional_blob_id = bidirectional_edge.getBlobId();
         auto bidirectional_iv = stream_executor.findBlob(in_stensor_id[8]).second;
@@ -2193,7 +2198,7 @@ void executorAtenLSTM2(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamE
     // layers
 
     auto weight_blob = lstm2_layer->getWeights();
-    auto bias_blob = lstm2_layer->getBias();
+    auto bias_blob = lstm2_layer->getBiases();
     std::vector<at::Tensor> param_vector;
     assert((bidirectional == 0 || bidirectional == 1));
 
@@ -2202,26 +2207,26 @@ void executorAtenLSTM2(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamE
         // w_ih
         auto w_ih_iv = weight_blob[i * 2];
         hash_id += in_stensor_id[0];
-        if (w_ih_iv.isTensor()) {
+        if (1) {
             param_vector.push_back(w_ih_iv);
         }
         // w_hh
         auto w_hh_iv = weight_blob[i * 2 + 1];
         hash_id += in_stensor_id[1];
-        if (w_hh_iv.isTensor()) {
+        if (1) {
             param_vector.push_back(w_hh_iv);
         }
         if (has_biases) {
             // b_ih? (optional)
             auto b_ih_iv = bias_blob[i * 2];
             // hash_id += bias_blob_ids[i * 2];
-            if (b_ih_iv.isTensor()) {
+            if (1) {
                 param_vector.push_back(b_ih_iv);
             }
             // b_hh? (optional)
             auto b_hh_iv = bias_blob[i * 2 + 1];
             // hash_id += bias_blob_ids[i * 2 + 1];
-            if (b_hh_iv.isTensor()) {
+            if (1) {
                 param_vector.push_back(b_hh_iv);
             }
         }
@@ -2235,8 +2240,8 @@ void executorAtenLSTM2(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamE
     {
         if (!input.is_contiguous()) input = input.contiguous();
         void *in_dev, *hx_dev, *out_dev, *wei_dev, *cx_dev, *workspace_dev, *hy_dev, *cy_dev;
-        stream_executor.input_tensors.clear();
-        stream_executor.output_tensors.clear();
+        stream_executor.input_tensors_.clear();
+        stream_executor.output_tensors_.clear();
 
         int batch_size = 1;
         int in_dim = input.dim();
@@ -2254,17 +2259,17 @@ void executorAtenLSTM2(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamE
         int dims = 2;
         for (int i = 0; i < seq_len; i++) {
             std::array<int, 2> in_lens = {in_len[0],  in_len.back() };
-            miopenCreateTensorDescriptor(&stream_executor.input_tensor);
-            miopenSetTensorDescriptor(stream_executor.input_tensor, miopenHalf, dims, in_lens.data(), nullptr);
-            stream_executor.input_tensors.push_back(stream_executor.input_tensor);
+            miopenCreateTensorDescriptor(&stream_executor.input_tensor_);
+            miopenSetTensorDescriptor(stream_executor.input_tensor_, miopenHalf, dims, in_lens.data(), nullptr);
+            stream_executor.input_tensors_.push_back(stream_executor.input_tensor_);
 
             std::array<int, 2> out_lens = {{in_len[0], out_len[0]}};
-            miopenCreateTensorDescriptor(&stream_executor.output_tensor);
-            miopenSetTensorDescriptor(stream_executor.output_tensor, miopenHalf, dims, out_lens.data(), nullptr);
-            stream_executor.output_tensors.push_back(stream_executor.output_tensor);
+            miopenCreateTensorDescriptor(&stream_executor.output_tensor_);
+            miopenSetTensorDescriptor(stream_executor.output_tensor_, miopenHalf, dims, out_lens.data(), nullptr);
+            stream_executor.output_tensors_.push_back(stream_executor.output_tensor_);
         }
         std::array<int, 3> hid_lens = {{hid_len[0], in_len[0], hid_len[1]}};
-        miopenSetTensorDescriptor(stream_executor.hidden_tensor, miopenHalf, 3, hid_lens.data(), nullptr);
+        miopenSetTensorDescriptor(stream_executor.hidden_tensor_, miopenHalf, 3, hid_lens.data(), nullptr);
 
         miopenRNNMode_t mode = miopenRNNMode_t::miopenLSTM;;
         miopenRNNBiasMode_t biasMode = static_cast<bool>(has_biases) ? miopenRNNwithBias : miopenRNNNoBias;
@@ -2272,10 +2277,10 @@ void executorAtenLSTM2(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamE
         miopenRNNInputMode_t inMode = miopenRNNlinear;
         miopenRNNAlgo_t algo = miopenRNNdefault;
 
-        miopenSetRNNDescriptor(stream_executor.rnnDesc, hidden_size, num_layers, inMode, directionMode, mode, biasMode, algo, miopenHalf);
-        miopenGetRNNParamsDescriptor(stream_executor.handle, stream_executor.rnnDesc, stream_executor.input_tensor, stream_executor.weight_tensor, miopenHalf);
+        miopenSetRNNDescriptor(stream_executor.rnn_desc_, hidden_size, num_layers, inMode, directionMode, mode, biasMode, algo, miopenHalf);
+        miopenGetRNNParamsDescriptor(stream_executor.handle_, stream_executor.rnn_desc_, stream_executor.input_tensor_, stream_executor.weight_tensor_, miopenHalf);
         size_t workspace_size;
-        miopenGetRNNWorkspaceSize(stream_executor.handle, stream_executor.rnnDesc, seq_len, stream_executor.input_tensors.data(), &workspace_size);
+        miopenGetRNNWorkspaceSize(stream_executor.handle_, stream_executor.rnn_desc_, seq_len, stream_executor.input_tensors_.data(), &workspace_size);
         auto workspace = at::empty(workspace_size, input.options().dtype(at::kByte));
 
         int datasize = 2; //miopenHalf
@@ -2285,7 +2290,7 @@ void executorAtenLSTM2(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamE
         auto it = stream_executor.global_blobs_.find(hash_id);
         if (it == stream_executor.global_blobs_.end()) {
             size_t weight_size = 0;
-            miopenGetRNNParamsSize(stream_executor.handle, stream_executor.rnnDesc, stream_executor.input_tensor, &weight_size, miopenHalf);
+            miopenGetRNNParamsSize(stream_executor.handle_, stream_executor.rnn_desc_, stream_executor.input_tensor_, &weight_size, miopenHalf);
             auto weight_buf = at::empty(weight_size / datasize, input.options());
             int expected_weight_size = hidden_size * 4 * (input_size + hidden_size + 2) * bidirectional_int + hidden_size * 4 * (hidden_size + hidden_size + 2) * (num_layers - 1) * bidirectional_int;
             assert((weight_size / datasize) == expected_weight_size);
@@ -2409,15 +2414,15 @@ void executorAtenLSTM2(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamE
         hx_dev = hx_list_tensor_vector[0].data_ptr();
         cx_dev = hx_list_tensor_vector[1].data_ptr();
         workspace_dev = workspace.data_ptr();
-        auto it0 = stream_executor.global_blobs_.find(out_blob_ids[0]);
+        auto it0 = stream_executor.global_blobs_.find(out_stensor_id[0]);
 
-        if (0 && stream_executor.modelType == "GNMT" && it0 != stream_executor.global_blobs_.end() && seq_len == 1) {
+        if (0 && stream_executor.model_type_ == "GNMT" && it0 != stream_executor.global_blobs_.end() && seq_len == 1) {
             out_dev = it0->second.second.toTensor().data_ptr();
-            hy_dev = stream_executor.global_blobs_.find(out_blob_ids[1])->second.second.toTensor().data_ptr();
-            cy_dev = stream_executor.global_blobs_.find(out_blob_ids[2])->second.second.toTensor().data_ptr();
-            miopenRNNForwardInference(stream_executor.handle, stream_executor.rnnDesc, seq_len, stream_executor.input_tensors.data(), in_dev,
-                                  stream_executor.hidden_tensor, hx_dev, stream_executor.hidden_tensor, cx_dev, stream_executor.weight_tensor, wei_dev,
-                                  stream_executor.output_tensors.data(), out_dev, stream_executor.hidden_tensor, hy_dev, stream_executor.hidden_tensor, cy_dev,
+            hy_dev = stream_executor.global_blobs_.find(out_stensor_id[1])->second.second.toTensor().data_ptr();
+            cy_dev = stream_executor.global_blobs_.find(out_stensor_id[2])->second.second.toTensor().data_ptr();
+            miopenRNNForwardInference(stream_executor.handle_, stream_executor.rnn_desc_, seq_len, stream_executor.input_tensors_.data(), in_dev,
+                                  stream_executor.hidden_tensor_, hx_dev, stream_executor.hidden_tensor_, cx_dev, stream_executor.weight_tensor_, wei_dev,
+                                  stream_executor.output_tensors_.data(), out_dev, stream_executor.hidden_tensor_, hy_dev, stream_executor.hidden_tensor_, cy_dev,
                                   workspace_dev, workspace_size);
 
         } else {
@@ -2433,9 +2438,9 @@ void executorAtenLSTM2(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamE
                 hy_dev = hy.data_ptr();
                 cy_dev = cy.data_ptr();
             }
-            miopenRNNForwardInference(stream_executor.handle, stream_executor.rnnDesc, seq_len, stream_executor.input_tensors.data(), in_dev,
-                                    stream_executor.hidden_tensor, hx_dev, stream_executor.hidden_tensor, cx_dev, stream_executor.weight_tensor, wei_dev,
-                                    stream_executor.output_tensors.data(), out_dev, stream_executor.hidden_tensor, hy_dev, stream_executor.hidden_tensor, cy_dev,
+            miopenRNNForwardInference(stream_executor.handle_, stream_executor.rnn_desc_, seq_len, stream_executor.input_tensors_.data(), in_dev,
+                                    stream_executor.hidden_tensor_, hx_dev, stream_executor.hidden_tensor_, cx_dev, stream_executor.weight_tensor_, wei_dev,
+                                    stream_executor.output_tensors_.data(), out_dev, stream_executor.hidden_tensor_, hy_dev, stream_executor.hidden_tensor_, cy_dev,
                                     workspace_dev, workspace_size);
 
             stream_executor.updateBlob(out_stensor_id[0], DataType::TENSOR, tensorToIValue(output));
@@ -2447,10 +2452,13 @@ void executorAtenLSTM2(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamE
 
 void executorAtenLt(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
-    DLOG(INFO) << "execute Aten Lt node";
+    Log::RT::D() << "execute Aten Lt node";
 
     auto in_stensor_id = layer->getInSTensorID();
     auto out_stensor_id = layer->getOutSTensorID();
+
+    torch::jit::IValue iv_self = stream_executor.findBlob(in_stensor_id[0]).second;
+    torch::jit::IValue iv_other = stream_executor.findBlob(in_stensor_id[1]).second;
 
     assert(out_stensor_id.size() == 1);
 
@@ -2475,10 +2483,12 @@ void executorAtenLt(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExec
 
 void executorAtenMaskedFill(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
-    DLOG(INFO) << "execute Aten MaskedFill node";
+    Log::RT::D() << "execute Aten MaskedFill node";
 
     auto in_stensor_id = layer->getInSTensorID();
     auto out_stensor_id = layer->getOutSTensorID();
+
+    auto mask_fill_layer = std::dynamic_pointer_cast<nn_compiler::ir::AtenMaskedFillLayer>(layer);
 
     // Find the input blob
     auto iv_self = stream_executor.findBlob(in_stensor_id[0]).second;
@@ -2501,7 +2511,7 @@ void executorAtenMaskedFill(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, St
 
     // update output
     stream_executor.updateBlob(out_stensor_id[0], DataType::TENSOR, tensorToIValue(output));
-    bool is_inplace = node.getIsInplace();
+    bool is_inplace = mask_fill_layer->getIsInplace();
     if (is_inplace) {
         auto releation_blob_id = stream_executor.releation_blob_ids_map_.find(in_stensor_id[0]);
         assert(releation_blob_id != stream_executor.releation_blob_ids_map_.end());
@@ -2512,12 +2522,12 @@ void executorAtenMaskedFill(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, St
 
 void executorAtenMaskedSelect(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
-    DLOG(INFO) << "execute Aten MaskedSelect node";
+    Log::RT::D() << "execute Aten MaskedSelect node";
 
     auto in_stensor_id = layer->getInSTensorID();
     auto out_stensor_id = layer->getOutSTensorID();
 
-    auto node = cast<nncir::AtenMaskedSelectNode>(op_node);
+    // auto node = cast<nncir::AtenMaskedSelectNode>(op_node);
 
     // Find the input blob
     auto iv_self = stream_executor.findBlob(in_stensor_id[0]).second;
@@ -2533,7 +2543,7 @@ void executorAtenMaskedSelect(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, 
 
 void executorAtenMatmul(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
-    DLOG(INFO) << "execute Aten Matmul node";
+    Log::RT::D() << "execute Aten Matmul node";
 
     auto in_stensor_id = layer->getInSTensorID();
     auto out_stensor_id = layer->getOutSTensorID();
@@ -2697,7 +2707,7 @@ void executorAtenMatmul(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, Stream
 
 void executorAtenMax(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
-    DLOG(INFO) << "execute Aten Max node";
+    Log::RT::D() << "execute Aten Max node";
 
     auto max_layer = std::dynamic_pointer_cast<nn_compiler::ir::AtenMaxLayer>(layer);
 
@@ -2778,7 +2788,7 @@ void executorAtenMax(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExe
 
 void executorAtenMaxPool2d(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
-    DLOG(INFO) << "execute Aten MaxPool2d node";
+    Log::RT::D() << "execute Aten MaxPool2d node";
 
     auto max_pool_2d_layer = std::dynamic_pointer_cast<nn_compiler::ir::AtenMaxPool2dLayer>(layer);
 
@@ -2795,9 +2805,9 @@ void executorAtenMaxPool2d(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, Str
     auto self_tensor = iv_self.toTensor();
     // edge_id++;
 
-    auto kernel_size = max_pool_2d_layer->getKernelSize();
+    auto kernel_size =  getDataShapeFromVector(max_pool_2d_layer->getKernelSize());
     std::vector<int64_t> kernel_size_vec;
-    if (kernel_size.h == INT64_MIN && kernel_size.w == INT64_MIN) {
+    if (kernel_size[0] == INT64_MIN && kernel_size[1] == INT64_MIN) {
         // auto& data_edge = cast<nncir::DataEdge>(node.getInEdge(edge_id++));
         // int data_blob_id = data_edge.getBlobId();
         auto data_iv = stream_executor.findBlob(in_stensor_id[1]).second;
@@ -2805,13 +2815,13 @@ void executorAtenMaxPool2d(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, Str
         auto data_list = data_iv.toListRef();
         kernel_size_vec = parseIValueVector<int64_t>(data_list);
     } else {
-        kernel_size_vec.push_back(kernel_size.h);
-        kernel_size_vec.push_back(kernel_size.w);
+        kernel_size_vec.push_back(kernel_size[0]);
+        kernel_size_vec.push_back(kernel_size[1]);
     }
 
-    auto stride = max_pool_2d_layer->getStride();
+    auto stride = getDataShapeFromVector(max_pool_2d_layer->getStride());
     std::vector<int64_t> stride_vec;
-    if (stride.h == INT64_MIN && stride.w == INT64_MIN) {
+    if (stride[0] == INT64_MIN && stride[1] == INT64_MIN) {
         // auto& data_edge = cast<nncir::DataEdge>(node.getInEdge(edge_id++));
         // int data_blob_id = data_edge.getBlobId();
         auto data_iv = stream_executor.findBlob(in_stensor_id[2]).second;
@@ -2819,14 +2829,14 @@ void executorAtenMaxPool2d(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, Str
         auto data_list = data_iv.toListRef();
         stride_vec = parseIValueVector<int64_t>(data_list);
     } else {
-        stride_vec.push_back(stride.h);
-        stride_vec.push_back(stride.w);
+        stride_vec.push_back(stride[0]);
+        stride_vec.push_back(stride[1]);
     }
 
     // In PyTorch, Pad is a tuple(int, int)
-    auto padding = max_pool_2d_layer->getPad();
+    auto padding = getDataShapeFromVector(max_pool_2d_layer->getPad());
     std::vector<int64_t> padding_vec;
-    if (padding.l == INT64_MIN && padding.r == INT64_MIN) {
+    if (padding[0] == INT64_MIN && padding[1] == INT64_MIN) {
         // auto& data_edge = cast<nncir::DataEdge>(node.getInEdge(edge_id++));
         // int data_blob_id = data_edge.getBlobId();
         auto data_iv = stream_executor.findBlob(in_stensor_id[3]).second;
@@ -2834,13 +2844,13 @@ void executorAtenMaxPool2d(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, Str
         auto data_list = data_iv.toListRef();
         padding_vec = parseIValueVector<int64_t>(data_list);
     } else {
-        padding_vec.push_back(padding.l);
-        padding_vec.push_back(padding.r);
+        padding_vec.push_back(padding[0]);
+        padding_vec.push_back(padding[1]);
     }
 
-    auto dilation = max_pool_2d_layer->getDilation();
+    auto dilation = getDataShapeFromVector(max_pool_2d_layer->getDilation());
     std::vector<int64_t> dilation_vec;
-    if (dilation.h == INT64_MIN && dilation.w == INT64_MIN) {
+    if (dilation[0] == INT64_MIN && dilation[1] == INT64_MIN) {
         // auto& data_edge = cast<nncir::DataEdge>(node.getInEdge(edge_id++));
         // int data_blob_id = data_edge.getBlobId();
         auto data_iv = stream_executor.findBlob(in_stensor_id[4]).second;
@@ -2848,8 +2858,8 @@ void executorAtenMaxPool2d(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, Str
         auto data_list = data_iv.toListRef();
         dilation_vec = parseIValueVector<int64_t>(data_list);
     } else {
-        dilation_vec.push_back(dilation.h);
-        dilation_vec.push_back(dilation.w);
+        dilation_vec.push_back(dilation[0]);
+        dilation_vec.push_back(dilation[1]);
     }
 
     auto ceil_mode = max_pool_2d_layer->getCeilMode();
@@ -2871,7 +2881,7 @@ void executorAtenMaxPool2d(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, Str
 
 void executorAtenMin(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
-    DLOG(INFO) << "execute Aten Min node";
+    Log::RT::D() << "execute Aten Min node";
 
     auto min_layer = std::dynamic_pointer_cast<nn_compiler::ir::AtenMinLayer>(layer);
 
@@ -2933,7 +2943,7 @@ void executorAtenMin(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExe
 
 void executorAtenMul(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
-    DLOG(INFO) << "execute Aten Mul node";
+    Log::RT::D() << "execute Aten Mul node";
 
     auto in_stensor_id = layer->getInSTensorID();
     auto out_stensor_id = layer->getOutSTensorID();
@@ -2974,7 +2984,7 @@ void executorAtenMul(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExe
 
 void executorAtenNe(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
-    DLOG(INFO) << "execute Aten Ne node";
+    Log::RT::D() << "execute Aten Ne node";
 
     auto in_stensor_id = layer->getInSTensorID();
     auto out_stensor_id = layer->getOutSTensorID();
@@ -3019,7 +3029,7 @@ void executorAtenNe(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExec
 
 void executorAtenNeg(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
-    DLOG(INFO) << "execute Aten Neg node";
+    Log::RT::D() << "execute Aten Neg node";
 
     auto in_stensor_id = layer->getInSTensorID();
     auto out_stensor_id = layer->getOutSTensorID();
@@ -3052,7 +3062,7 @@ void executorAtenNeg(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExe
 
 void executorAtenNorm(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
-    DLOG(INFO) << "execute Aten Norm node";
+    Log::RT::D() << "execute Aten Norm node";
 
     auto norm_layer = std::dynamic_pointer_cast<nn_compiler::ir::AtenNormLayer>(layer);
 
@@ -3076,7 +3086,7 @@ void executorAtenNorm(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamEx
 
 void executorAtenNot(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
-    DLOG(INFO) << "execute Aten Not node";
+    Log::RT::D() << "execute Aten Not node";
 
     auto in_stensor_id = layer->getInSTensorID();
     auto out_stensor_id = layer->getOutSTensorID();
@@ -3097,7 +3107,7 @@ void executorAtenNot(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExe
 
 void executorAtenOnes(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
-    DLOG(INFO) << "execute Aten Ones node";
+    Log::RT::D() << "execute Aten Ones node";
 
     auto ones_layer = std::dynamic_pointer_cast<nn_compiler::ir::AtenOnesLayer>(layer);
 
@@ -3115,7 +3125,7 @@ void executorAtenOnes(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamEx
     auto array_ref = parseIValueVector<int64_t>(self_list);
 
     at::TensorOptions options;
-    auto dtype = ones_layer->getDtype();
+    auto dtype = ones_layer->getDType();
     if (nn_compiler::ir::isDefaultValue(dtype)) {
         // auto& edge_dtype = cast<nncir::DataEdge>(node.getInEdge(edge_id++));
         // auto dtype_id = edge_dtype.getBlobId();
@@ -3169,7 +3179,7 @@ void executorAtenOnes(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamEx
 
 void executorAtenPackPaddedSequence(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
-    DLOG(INFO) << "execute Aten PackPaddedSequence node";
+    Log::RT::D() << "execute Aten PackPaddedSequence node";
 
     auto pack_padded_sequence_layer = std::dynamic_pointer_cast<nn_compiler::ir::AtenPackPaddedSequenceLayer>(layer);
 
@@ -3202,7 +3212,7 @@ void executorAtenPackPaddedSequence(std::shared_ptr<nn_compiler::ir::NNLayer>& l
 
 void executorAtenPadPackedSequence(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
-    DLOG(INFO) << "execute Aten PadPackedSequence node";
+    Log::RT::D() << "execute Aten PadPackedSequence node";
 
     auto pad_packed_sequence_layer = std::dynamic_pointer_cast<nn_compiler::ir::AtenPadPackedSequenceLayer>(layer);
 
@@ -3253,7 +3263,7 @@ void executorAtenPadPackedSequence(std::shared_ptr<nn_compiler::ir::NNLayer>& la
 
 void executorAtenPow(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
-    DLOG(INFO) << "execute Aten Pow node";
+    Log::RT::D() << "execute Aten Pow node";
 
     auto in_stensor_id = layer->getInSTensorID();
     auto out_stensor_id = layer->getOutSTensorID();
@@ -3287,7 +3297,7 @@ void executorAtenPow(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExe
 
 void executorAtenRelu(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
-    DLOG(INFO) << "execute Aten Relu node";
+    Log::RT::D() << "execute Aten Relu node";
 
     auto in_stensor_id = layer->getInSTensorID();
     auto out_stensor_id = layer->getOutSTensorID();
@@ -3306,7 +3316,7 @@ void executorAtenRelu(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamEx
 
 void executorAtenSelect(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
-    DLOG(INFO) << "execute Aten Select node";
+    Log::RT::D() << "execute Aten Select node";
 
     auto select_layer = std::dynamic_pointer_cast<nn_compiler::ir::AtenSelectLayer>(layer);
 
@@ -3342,7 +3352,7 @@ void executorAtenSelect(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, Stream
 
 void executorAtenSetItem(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
-    DLOG(INFO) << "execute Aten SetItem node";
+    Log::RT::D() << "execute Aten SetItem node";
 
     auto set_item_layer = std::dynamic_pointer_cast<nn_compiler::ir::AtenSetItemLayer>(layer);
 
@@ -3370,7 +3380,7 @@ void executorAtenSetItem(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, Strea
 
 void executorAtenSize(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
-    DLOG(INFO) << "execute Aten Size node";
+    Log::RT::D() << "execute Aten Size node";
 
     auto size_layer = std::dynamic_pointer_cast<nn_compiler::ir::AtenSizeLayer>(layer);
 
@@ -3381,7 +3391,7 @@ void executorAtenSize(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamEx
     assert(iv_tensor.isTensor());
     at::Tensor tensor = iv_tensor.toTensor();
 
-    int inedges_cnt = size_node.getInEdgeIds().size();
+    // int inedges_cnt = size_layer->getInEdgeIds().size();
     auto dim = size_layer->getDim();
     if (in_stensor_id.size() == 1 && nn_compiler::ir::isDefaultValue(dim)) {
         auto output = atenSize(tensor);
@@ -3399,7 +3409,7 @@ void executorAtenSize(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamEx
 
 void executorAtenSlice(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
-    DLOG(INFO) << "execute Aten Slice node";
+    Log::RT::D() << "execute Aten Slice node";
 
     auto slice_layer = std::dynamic_pointer_cast<nn_compiler::ir::AtenSliceLayer>(layer);
 
@@ -3410,7 +3420,7 @@ void executorAtenSlice(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamE
     assert(iv_tensor.isTensor());
     // edge_id++;
 
-    auto input_cnts = slice_node.getNumInputs();
+    // auto input_cnts = slice_layer->getNumInputs();
 
     auto dim = slice_layer->getDim();
     if (nn_compiler::ir::isDefaultValue(dim)) {
@@ -3443,7 +3453,7 @@ void executorAtenSlice(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamE
 
 void executorAtenSoftmax(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
-    DLOG(INFO) << "execute Aten Softmax node";
+    Log::RT::D() << "execute Aten Softmax node";
 
     auto softmax_layer = std::dynamic_pointer_cast<nn_compiler::ir::AtenSoftmaxLayer>(layer);
 
@@ -3473,13 +3483,13 @@ void executorAtenSoftmax(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, Strea
         }
     }
 
-    auto& out_edge = cast<nncir::DataEdge>(node.getFirstOutEdge());
-    stream_executor.updateBlob(out_edge.getBlobId(), DataType::TENSOR, tensorToIValue(output));
+    // auto& out_edge = cast<nncir::DataEdge>(node.getFirstOutEdge());
+    stream_executor.updateBlob(out_stensor_id[0], DataType::TENSOR, tensorToIValue(output));
 }
 
 void executorAtenSqueeze(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
-    DLOG(INFO) << "execute Aten Squeeze node";
+    Log::RT::D() << "execute Aten Squeeze node";
 
     auto squeeze_layer = std::dynamic_pointer_cast<nn_compiler::ir::AtenSqueezeLayer>(layer);
 
@@ -3503,7 +3513,7 @@ void executorAtenSqueeze(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, Strea
 
 void executorAtenSub(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
-    DLOG(INFO) << "execute Aten Sub node";
+    Log::RT::D() << "execute Aten Sub node";
 
     auto sub_layer = std::dynamic_pointer_cast<nn_compiler::ir::AtenSubLayer>(layer);
 
@@ -3542,7 +3552,7 @@ void executorAtenSub(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExe
 
 void executorAtenSum(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
-    DLOG(INFO) << "execute Aten Sum node";
+    Log::RT::D() << "execute Aten Sum node";
 
     auto sum_layer = std::dynamic_pointer_cast<nn_compiler::ir::AtenSumLayer>(layer);
 
@@ -3583,12 +3593,12 @@ void executorAtenSum(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExe
         output =
             atenSum(self_tensor, at::ArrayRef<int64_t>(dims), static_cast<bool>(keepdim), at::ScalarType(dtype));
     }
-    stream_executor.updateBlob(out_stensor_id[0]), DataType::TENSOR, tensorToIValue(output));
+    stream_executor.updateBlob(out_stensor_id[0], DataType::TENSOR, tensorToIValue(output));
 }
 
 void executorAtenTanh(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
-    DLOG(INFO) << "execute Aten Tanh node";
+    Log::RT::D() << "execute Aten Tanh node";
 
     auto in_stensor_id = layer->getInSTensorID();
     auto out_stensor_id = layer->getOutSTensorID();
@@ -3598,13 +3608,12 @@ void executorAtenTanh(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamEx
     auto self_tensor = iv_tensor.toTensor();
 
     auto output = atenTanh(self_tensor);
-    auto& out_edge = cast<nncir::DataEdge>(node.getFirstOutEdge());
     stream_executor.updateBlob(out_stensor_id[0], DataType::TENSOR, tensorToIValue(output));
 }
 
 void executorAtenTensor(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
-    DLOG(INFO) << "execute Aten Tensor node";
+    Log::RT::D() << "execute Aten Tensor node";
 
     auto in_stensor_id = layer->getInSTensorID();
     auto out_stensor_id = layer->getOutSTensorID();
@@ -3650,12 +3659,12 @@ void executorAtenTensor(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, Stream
     if (value_item.isInt()) {
         std::vector<int64_t> value_vec;
         std::vector<int64_t> dim = {1};
-        parseIValueList<int64_t>(stream_executor.findBlob(input_self_blob_id).second, value_vec, dim, 1);
+        parseIValueList<int64_t>(stream_executor.findBlob(in_stensor_id[0]).second, value_vec, dim, 1);
         output = atenTensor(at::ArrayRef<int64_t>(value_vec), options).reshape(at::ArrayRef<int64_t>(dim));
     } else if (value_item.isDouble()) {
         std::vector<double> value_vec;
         std::vector<int64_t> dim = {1};
-        parseIValueList<double>(stream_executor.findBlob(input_self_blob_id).second, value_vec, dim, 1);
+        parseIValueList<double>(stream_executor.findBlob(in_stensor_id[0]).second, value_vec, dim, 1);
         output = atenTensor(at::ArrayRef<double>(value_vec), options).reshape(at::ArrayRef<int64_t>(dim));
     } else {
         DLOG(FATAL) << "Unsupported data type to parse IValue list.";
@@ -3665,7 +3674,7 @@ void executorAtenTensor(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, Stream
 
 void executorAtenTo1(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
-    DLOG(INFO) << "execute Aten To1 node";
+    Log::RT::D() << "execute Aten To1 node";
 
     auto to1_layer = std::dynamic_pointer_cast<nn_compiler::ir::AtenTo1Layer>(layer);
 
@@ -3727,7 +3736,7 @@ void executorAtenTo1(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExe
 
 void executorAtenTo2(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
-    DLOG(INFO) << "execute Aten To2 node";
+    Log::RT::D() << "execute Aten To2 node";
 
     auto to2_layer = std::dynamic_pointer_cast<nn_compiler::ir::AtenTo2Layer>(layer);
 
@@ -3785,7 +3794,7 @@ void executorAtenTo2(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExe
 
 void executorAtenTopk(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
-    DLOG(INFO) << "execute Aten Topk node";
+    Log::RT::D() << "execute Aten Topk node";
 
     auto topk_layer = std::dynamic_pointer_cast<nn_compiler::ir::AtenTopkLayer>(layer);
 
@@ -3797,7 +3806,7 @@ void executorAtenTopk(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamEx
     auto self_tensor = iv_tensor.toTensor();
 
     auto k = topk_layer->getK();
-    if (nncir::isDefaultValue(k)) {
+    if (nn_compiler::ir::isDefaultValue(k)) {
         auto data_iv = stream_executor.findBlob(in_stensor_id[1]).second;
         assert(data_iv.isInt());
         k = data_iv.toInt();
@@ -3833,7 +3842,7 @@ void executorAtenTopk(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamEx
 
 void executorAtenTranspose(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
-    DLOG(INFO) << "execute Aten Transpose node";
+    Log::RT::D() << "execute Aten Transpose node";
 
     auto transpose_layer = std::dynamic_pointer_cast<nn_compiler::ir::AtenTransposeLayer>(layer);
 
@@ -3864,7 +3873,7 @@ void executorAtenTranspose(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, Str
 
 void executorAtenUnsqueeze(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
-    DLOG(INFO) << "execute Aten Unsqueeze node";
+    Log::RT::D() << "execute Aten Unsqueeze node";
 
     auto unsqueeze_layer = std::dynamic_pointer_cast<nn_compiler::ir::AtenUnsqueezeLayer>(layer);
 
@@ -3901,7 +3910,7 @@ void executorAtenUnsqueeze(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, Str
             }
         }
         at::ListTypePtr type = inferTypeFromDataType(inferDataType(output));
-        primListConstruct(inputs, inputs.size(), type);
+        nnrt::primListConstruct(inputs, inputs.size(), type);
         stream_executor.updateBlob(list_blob_id, DataType::LIST, inputs.at(0));
     } else {
         stream_executor.updateBlob(out_stensor_id[0], DataType::TENSOR, tensorToIValue(output));
@@ -3910,7 +3919,7 @@ void executorAtenUnsqueeze(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, Str
 
 void executorAtenView(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
-    DLOG(INFO) << "execute Aten View node";
+    Log::RT::D() << "execute Aten View node";
 
     auto in_stensor_id = layer->getInSTensorID();
     auto out_stensor_id = layer->getOutSTensorID();
@@ -3930,7 +3939,7 @@ void executorAtenView(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamEx
 
 void executorAtenWarn(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
-    DLOG(INFO) << "execute AtenWarn node";
+    Log::RT::D() << "execute AtenWarn node";
 
     auto in_stensor_id = layer->getInSTensorID();
     auto out_stensor_id = layer->getOutSTensorID();
@@ -3942,7 +3951,7 @@ void executorAtenWarn(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamEx
 
 void executorAtenZeros(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
-    DLOG(INFO) << "execute Aten Zeros node";
+    Log::RT::D() << "execute Aten Zeros node";
 
     auto in_stensor_id = layer->getInSTensorID();
     auto out_stensor_id = layer->getOutSTensorID();
@@ -3979,6 +3988,154 @@ void executorAtenZeros(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamE
     stream_executor.updateBlob(out_stensor_id[0], DataType::TENSOR, tensorToIValue(output));
 }
 
+void executorAtenZerosLike(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
+{
+    Log::RT::D() << "execute Aten ZerosLike node";
+
+    auto in_stensor_id = layer->getInSTensorID();
+    auto out_stensor_id = layer->getOutSTensorID();
+
+    assert(in_stensor_id.size() == 6);
+
+    torch::jit::IValue iv_tensor = stream_executor.findBlob(in_stensor_id[0]).second;
+    at::Tensor tensor = iv_tensor.toTensor();
+
+    at::TensorOptions options;
+    auto iv_dtype = stream_executor.findBlob(in_stensor_id[1]).second;
+    auto iv_layout = stream_executor.findBlob(in_stensor_id[2]).second;
+    auto iv_device = stream_executor.findBlob(in_stensor_id[3]).second;
+    auto iv_pin_memory = stream_executor.findBlob(in_stensor_id[4]).second;
+
+    if (!iv_dtype.isNone()) {
+        options = options.dtype(iv_dtype.toScalarType());
+    }
+
+    if (!iv_layout.isNone()) {
+        options = options.layout(iv_layout.toLayout());
+    }
+    if (iv_device.isDevice()) {
+        options = options.device(iv_device.toDevice());
+    } else if (iv_device.isString()) {
+        options = options.device(iv_device.toStringRef());
+    }
+    if (!iv_pin_memory.isNone()) {
+        options = options.pinned_memory(iv_pin_memory.toBool());
+    }
+
+    auto iv_memory_format = stream_executor.findBlob(in_stensor_id[5]).second;
+    at::Tensor output;
+    if (iv_memory_format.isNone()) {
+        output = atenZeroslike(tensor, options);
+    } else {
+        output = atenZeroslike(tensor, options, iv_memory_format.toMemoryFormat());
+    }
+
+    // update output
+    stream_executor.updateBlob(out_stensor_id[0], DataType::TENSOR, tensorToIValue(output));
+}
+
+void executorAtenBatchNorm2d(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
+{
+    Log::RT::D() << "execute Aten BN2d node";
+
+    auto batch_norm_2d_layer = std::dynamic_pointer_cast<nn_compiler::ir::AtenBatchNorm2dLayer>(layer);
+
+    auto in_stensor_id = layer->getInSTensorID();
+    auto out_stensor_id = layer->getOutSTensorID();
+
+    auto get_tensor = [&stream_executor](int id) {
+        auto blob = stream_executor.findBlob(id);
+        assert(blob.second.isTensor());
+        return blob.second.toTensor();
+    };
+    at::Tensor input = get_tensor(in_stensor_id[0]);
+    at::Tensor running_mean = get_tensor(in_stensor_id[1]);
+    at::Tensor running_var = get_tensor(in_stensor_id[2]);
+
+    auto weight_ = batch_norm_2d_layer->getWeights();
+    auto bias_ = batch_norm_2d_layer->getBiases();
+    assert(weight_.size() == 1 && bias_.size() == 1);
+    at::Tensor weight = weight_[0];
+    at::Tensor bias = bias_[0];
+
+    // Get input attrs
+    int training = batch_norm_2d_layer->getTraining();
+    double monentum = batch_norm_2d_layer->getMomentum();
+    double eps = batch_norm_2d_layer->getEps();
+    int cudnn_enabled = batch_norm_2d_layer->getCudnnEnabled();
+
+    int offest = 3;
+    if (nn_compiler::ir::isDefaultValue(training)) {
+        auto iv = stream_executor.findBlob(in_stensor_id[3]).second;
+        assert(iv.isInt());
+        training = static_cast<int>(iv.toInt());
+    }
+    if (nn_compiler::ir::isDefaultValue(monentum)) {
+        auto iv = stream_executor.findBlob(in_stensor_id[4]).second;
+        assert(iv.isDouble());
+        monentum = iv.toDouble();
+    }
+    if (nn_compiler::ir::isDefaultValue(eps)) {
+        auto iv = stream_executor.findBlob(in_stensor_id[5]).second;
+        assert(iv.isDouble());
+        eps = iv.toDouble();
+    }
+    if (nn_compiler::ir::isDefaultValue(cudnn_enabled)) {
+        auto iv = stream_executor.findBlob(in_stensor_id[6]).second;
+        assert(iv.isInt());
+        cudnn_enabled = static_cast<int>(iv.toInt());
+    }
+
+    if (training == 1) {
+        DLOG(FATAL) << "Currently, NNRuntime only support inference !";
+    }
+
+    // Call kernel
+    auto output = atenBatchNorm2d(input, weight, bias, running_mean, running_var, static_cast<bool>(training), monentum,
+                                  eps, static_cast<bool>(cudnn_enabled));
+    // save outputs
+    stream_executor.updateBlob(out_stensor_id[0], DataType::TENSOR, tensorToIValue(output));
+}
+
+void executorAtenReshape(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
+{
+    Log::RT::D() << "execute Aten Reshape node";
+
+    auto in_stensor_id = layer->getInSTensorID();
+    auto out_stensor_id = layer->getOutSTensorID();
+
+    auto get_tensor = [&stream_executor](int id) {
+        auto blob = stream_executor.findBlob(id);
+        assert(blob.second.isTensor());
+        return blob.second.toTensor();
+    };
+    at::Tensor input_tensor = get_tensor(in_stensor_id[0]);
+
+    // Get shape
+    auto iv = stream_executor.findBlob(in_stensor_id[1]).second;
+    assert(iv.isList());
+    std::vector<int64_t> shape;
+    int size = 1;
+    for (auto item : iv.toList().vec()) {
+        int64_t val = item.toInt();
+        shape.push_back(val);
+        size *= val;
+    }
+    auto output_tensor = atenReshape(input_tensor, at::IntArrayRef(shape));
+    // save outputs
+    stream_executor.updateBlob(out_stensor_id[0], DataType::TENSOR, tensorToIValue(output_tensor));
+}
+
+std::vector<int64_t> getDataShapeFromVector(const std::vector<int64_t>& value)
+{
+    std::vector<int64_t> value_;
+    for (auto item : value) {
+        if (item != 0) {
+            value_.push_back(item);
+        }
+    }
+    return value_;
+}
 
 }  // namespace runtime
 }  // namespace nn_compiler

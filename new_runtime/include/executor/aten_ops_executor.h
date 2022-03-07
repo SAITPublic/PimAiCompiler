@@ -102,6 +102,6 @@ void executorAtenView(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamEx
 void executorAtenWarn(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor);
 void executorAtenZeros(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor);
 void executorAtenZerosLike(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor);
-
+std::vector<int64_t> getDataShapeFromVector(const std::vector<int64_t>& value);
 }  // namespace runtime
 }  // namespace nn_compiler
