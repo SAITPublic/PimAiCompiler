@@ -3501,5 +3501,484 @@ void executorAtenSqueeze(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, Strea
     stream_executor.updateBlob(out_stensor_id[0], DataType::TENSOR, tensorToIValue(output));
 }
 
+void executorAtenSub(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
+{
+    DLOG(INFO) << "execute Aten Sub node";
+
+    auto sub_layer = std::dynamic_pointer_cast<nn_compiler::ir::AtenSubLayer>(layer);
+
+    auto in_stensor_id = layer->getInSTensorID();
+    auto out_stensor_id = layer->getOutSTensorID();
+
+    int64_t alpha = sub_layer->getAlpha();
+    if (nn_compiler::ir::isDefaultValue(alpha)) {
+        auto alpha_iv = stream_executor.findBlob(in_stensor_id[2]).second;
+        assert(alpha_iv.isInt());
+        alpha = alpha_iv.toInt();
+    }
+
+    // Find the input blob
+    torch::jit::IValue iv_self = stream_executor.findBlob(in_stensor_id[0]).second;
+    torch::jit::IValue iv_other = stream_executor.findBlob(in_stensor_id[1]).second;
+    assert(iv_self.isTensor());
+    at::Tensor self_tensor = iv_self.toTensor();
+    auto dtype = stream_executor.findBlob(in_stensor_id[1]).first;
+    if (dtype == DataType::TENSOR) {
+        assert(iv_other.isTensor());
+        at::Tensor other_tensor = iv_other.toTensor();
+        auto output = atenSub(self_tensor, other_tensor, alpha);
+        // update output
+        stream_executor.updateBlob(out_stensor_id[0], DataType::TENSOR, tensorToIValue(output));
+    } else if (isScalarType(dtype)) {
+        assert(iv_other.isScalar());
+        at::Scalar other_scalar = iv_other.toScalar();
+        auto output = atenSub(self_tensor, other_scalar, alpha);
+        // update output
+        stream_executor.updateBlob(out_stensor_id[0], DataType::TENSOR, tensorToIValue(output));
+    } else {
+        DLOG(FATAL) << "Unsupported input type for aten::sub";
+    }
+}
+
+void executorAtenSum(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
+{
+    DLOG(INFO) << "execute Aten Sum node";
+
+    auto sum_layer = std::dynamic_pointer_cast<nn_compiler::ir::AtenSumLayer>(layer);
+
+    auto in_stensor_id = layer->getInSTensorID();
+    auto out_stensor_id = layer->getOutSTensorID();
+
+    torch::jit::IValue iv_tensor = stream_executor.findBlob(in_stensor_id[0]).second;
+    assert(iv_tensor.isTensor());
+    auto self_tensor = iv_tensor.toTensor();
+
+    auto dims = sum_layer->getDim();
+    if (dims.size() == 0) {
+        auto data_iv = stream_executor.findBlob(in_stensor_id[1]).second;
+        assert(data_iv.isList());
+        auto dims_list = data_iv.toListRef();
+        dims = parseIValueVector<int64_t>(dims_list);
+    }
+
+    auto keepdim = sum_layer->getKeepdim();
+    if (nn_compiler::ir::isDefaultValue(keepdim)) {
+        auto data_iv = stream_executor.findBlob(in_stensor_id[2]).second;
+        assert(data_iv.isInt());
+        keepdim = static_cast<int>(data_iv.toInt());
+    }
+
+    auto dtype = sum_layer->getDtype();
+    if (nn_compiler::ir::isDefaultValue(dtype)) {
+        auto data_iv = stream_executor.findBlob(in_stensor_id[3]).second;
+        if (!data_iv.isNone()) {
+            dtype = data_iv.toInt();
+        }
+    }
+
+    at::Tensor output;
+    if (nn_compiler::ir::isDefaultValue(dtype)) {
+        output = atenSum(self_tensor, at::ArrayRef<int64_t>(dims), static_cast<bool>(keepdim), c10::nullopt);
+    } else {
+        output =
+            atenSum(self_tensor, at::ArrayRef<int64_t>(dims), static_cast<bool>(keepdim), at::ScalarType(dtype));
+    }
+    stream_executor.updateBlob(out_stensor_id[0]), DataType::TENSOR, tensorToIValue(output));
+}
+
+void executorAtenTanh(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
+{
+    DLOG(INFO) << "execute Aten Tanh node";
+
+    auto in_stensor_id = layer->getInSTensorID();
+    auto out_stensor_id = layer->getOutSTensorID();
+
+    torch::jit::IValue iv_tensor = stream_executor.findBlob(in_stensor_id[0]).second;
+    assert(iv_tensor.isTensor());
+    auto self_tensor = iv_tensor.toTensor();
+
+    auto output = atenTanh(self_tensor);
+    auto& out_edge = cast<nncir::DataEdge>(node.getFirstOutEdge());
+    stream_executor.updateBlob(out_stensor_id[0], DataType::TENSOR, tensorToIValue(output));
+}
+
+void executorAtenTensor(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
+{
+    DLOG(INFO) << "execute Aten Tensor node";
+
+    auto in_stensor_id = layer->getInSTensorID();
+    auto out_stensor_id = layer->getOutSTensorID();
+
+    torch::jit::IValue iv_self = stream_executor.findBlob(in_stensor_id[0]).second;
+
+    at::TensorOptions options;
+    auto iv_dtype = stream_executor.findBlob(in_stensor_id[1]).second;
+    auto iv_device = stream_executor.findBlob(in_stensor_id[2]).second;
+    auto iv_pin_memory = stream_executor.findBlob(in_stensor_id[3]).second;
+
+    if (!iv_dtype.isNone()) {
+        options = options.dtype(iv_dtype.toScalarType());
+    }
+    if (!iv_device.isNone()) {
+        options = options.device(iv_device.toDevice());
+    }
+    if (!iv_pin_memory.isNone()) {
+        if (iv_pin_memory.isInt()) {
+            options = options.pinned_memory(iv_pin_memory.toInt());
+        } else if (iv_pin_memory.isBool()) {
+            options = options.pinned_memory(iv_pin_memory.toBool());
+        } else {
+            DLOG(FATAL) << "Unsupported data type to parse iv_pin_memory.";
+        }
+    }
+    // FIXME(SRCX): To get list item type, is there a better way?
+    torch::jit::IValue value_item;
+    if (iv_self.isList()) {
+        while (iv_self.isList()) {
+            if (!iv_self.toListRef()[0].isList()) {
+                value_item = iv_self.toListRef()[0];
+            }
+            iv_self = iv_self.toListRef()[0];
+        }
+    } else if (iv_self.isScalar()) {
+        value_item = iv_self;
+    } else {
+        DLOG(FATAL) << "Unsupported data type to IValue.";
+    }
+
+    at::Tensor output;
+    if (value_item.isInt()) {
+        std::vector<int64_t> value_vec;
+        std::vector<int64_t> dim = {1};
+        parseIValueList<int64_t>(stream_executor.findBlob(input_self_blob_id).second, value_vec, dim, 1);
+        output = atenTensor(at::ArrayRef<int64_t>(value_vec), options).reshape(at::ArrayRef<int64_t>(dim));
+    } else if (value_item.isDouble()) {
+        std::vector<double> value_vec;
+        std::vector<int64_t> dim = {1};
+        parseIValueList<double>(stream_executor.findBlob(input_self_blob_id).second, value_vec, dim, 1);
+        output = atenTensor(at::ArrayRef<double>(value_vec), options).reshape(at::ArrayRef<int64_t>(dim));
+    } else {
+        DLOG(FATAL) << "Unsupported data type to parse IValue list.";
+    }
+    stream_executor.updateBlob(out_stensor_id[0], DataType::TENSOR, tensorToIValue(output));
+}
+
+void executorAtenTo1(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
+{
+    DLOG(INFO) << "execute Aten To1 node";
+
+    auto to1_layer = std::dynamic_pointer_cast<nn_compiler::ir::AtenTo1Layer>(layer);
+
+    auto in_stensor_id = layer->getInSTensorID();
+    auto out_stensor_id = layer->getOutSTensorID();
+
+    torch::jit::IValue iv_self = stream_executor.findBlob(in_stensor_id[0]).second;
+    assert(iv_self.isTensor());
+    at::Tensor self_tensor = iv_self.toTensor();
+
+    auto ori_dtype = to1_layer->getDType();
+    if (nn_compiler::ir::isDefaultValue(ori_dtype)) {
+        auto ori_dtype_iv = stream_executor.findBlob(in_stensor_id[1]).second;
+        assert(ori_dtype_iv.isInt());
+        ori_dtype = ori_dtype_iv.toInt();
+    }
+    auto dtype = at::ScalarType(ori_dtype);
+
+    int non_blocking_val = to1_layer->getNonBlocking();
+    if (nn_compiler::ir::isDefaultValue(non_blocking_val)) {
+        auto non_blocking_iv = stream_executor.findBlob(in_stensor_id[2]).second;
+        if (non_blocking_iv.isNone()) {
+            non_blocking_val = 0;
+        } else {
+            non_blocking_val = non_blocking_iv.toInt();
+        }
+    }
+    bool non_blocking = static_cast<bool>(non_blocking_val);
+
+    int copy_val = to1_layer->getCopy();
+    if (nn_compiler::ir::isDefaultValue(copy_val)) {
+        auto copy_iv = stream_executor.findBlob(in_stensor_id[3]).second;
+        if (copy_iv.isNone()) {
+            copy_val = 0;
+        } else {
+            copy_val = copy_iv.toInt();
+        }
+    }
+    bool copy = static_cast<bool>(copy_val);
+
+    auto optional_memory_format = to1_layer->getOptionalMemoryFormat();
+    if (nn_compiler::ir::isDefaultValue(optional_memory_format)) {
+        auto optional_memory_format_iv = stream_executor.findBlob(in_stensor_id[4]).second;
+        assert(optional_memory_format_iv.isInt());
+        optional_memory_format = optional_memory_format_iv.toInt();
+    }
+
+    if (optional_memory_format == -1) {  // optional_memory_format = NONE
+        auto output = atenTo(self_tensor, dtype, non_blocking, copy);
+        // update output
+        stream_executor.updateBlob(out_stensor_id[0], DataType::TENSOR, tensorToIValue(output));
+    } else {
+        auto memory_format = getMemoryFormat(optional_memory_format);
+        auto output = atenTo(self_tensor, dtype, non_blocking, copy, memory_format);
+        // update output
+        stream_executor.updateBlob(out_stensor_id[0], DataType::TENSOR, tensorToIValue(output));
+    }
+}
+
+void executorAtenTo2(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
+{
+    DLOG(INFO) << "execute Aten To2 node";
+
+    auto to2_layer = std::dynamic_pointer_cast<nn_compiler::ir::AtenTo2Layer>(layer);
+
+    auto in_stensor_id = layer->getInSTensorID();
+    auto out_stensor_id = layer->getOutSTensorID();
+
+    torch::jit::IValue iv_self = stream_executor.findBlob(in_stensor_id[0]).second;
+    assert(iv_self.isTensor());
+    at::Tensor self_tensor = iv_self.toTensor();
+
+    torch::jit::IValue iv_other = stream_executor.findBlob(in_stensor_id[1]).second;
+    assert(iv_other.isTensor());
+    at::Tensor other_tensor = iv_other.toTensor();
+
+    int non_blocking_val = to2_layer->getNonBlocking();
+    if (nn_compiler::ir::isDefaultValue(non_blocking_val)) {
+        auto non_blocking_iv = stream_executor.findBlob(in_stensor_id[2]).second;
+        if (non_blocking_iv.isNone()) {
+            non_blocking_val = 0;
+        } else {
+            non_blocking_val = non_blocking_iv.toInt();
+        }
+    }
+    bool non_blocking = static_cast<bool>(non_blocking_val);
+
+    int copy_val = to2_layer->getCopy();
+    if (nn_compiler::ir::isDefaultValue(copy_val)) {
+        auto copy_iv = stream_executor.findBlob(in_stensor_id[3]).second;
+        if (copy_iv.isNone()) {
+            copy_val = 0;
+        } else {
+            copy_val = copy_iv.toInt();
+        }
+    }
+    bool copy = static_cast<bool>(copy_val);
+
+    auto optional_memory_format = to2_layer->getOptionalMemoryFormat();
+    if (nn_compiler::ir::isDefaultValue(optional_memory_format)) {
+        auto optional_memory_format_iv = stream_executor.findBlob(in_stensor_id[4]).second;
+        assert(optional_memory_format_iv.isInt());
+        optional_memory_format = optional_memory_format_iv.toInt();
+    }
+
+    if (optional_memory_format == -1) {  // optional_memory_format = NONE
+        auto output = atenTo(self_tensor, other_tensor, non_blocking, copy);
+        // update output
+        stream_executor.updateBlob(out_stensor_id[0], DataType::TENSOR, tensorToIValue(output));
+    } else {
+        auto memory_format = getMemoryFormat(optional_memory_format);
+        auto output = atenTo(self_tensor, other_tensor, non_blocking, copy, memory_format);
+        // update output
+        stream_executor.updateBlob(out_stensor_id[0], DataType::TENSOR, tensorToIValue(output));
+    }
+}
+
+void executorAtenTopk(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
+{
+    DLOG(INFO) << "execute Aten Topk node";
+
+    auto topk_layer = std::dynamic_pointer_cast<nn_compiler::ir::AtenTopkLayer>(layer);
+
+    auto in_stensor_id = layer->getInSTensorID();
+    auto out_stensor_id = layer->getOutSTensorID();
+
+    torch::jit::IValue iv_tensor = stream_executor.findBlob(in_stensor_id[0]).second;
+    assert(iv_tensor.isTensor());
+    auto self_tensor = iv_tensor.toTensor();
+
+    auto k = topk_layer->getK();
+    if (nncir::isDefaultValue(k)) {
+        auto data_iv = stream_executor.findBlob(in_stensor_id[1]).second;
+        assert(data_iv.isInt());
+        k = data_iv.toInt();
+    }
+
+    auto dim = topk_layer->getDim();
+    if (nn_compiler::ir::isDefaultValue(dim)) {
+        auto data_iv = stream_executor.findBlob(in_stensor_id[2]).second;
+        assert(data_iv.isInt());
+        dim = data_iv.toInt();
+    }
+
+    auto largest = topk_layer->getLargest();
+    if (nn_compiler::ir::isDefaultValue(largest)) {
+        auto data_iv = stream_executor.findBlob(in_stensor_id[3]).second;
+        assert(data_iv.isInt());
+        largest = static_cast<int>(data_iv.toInt());
+    }
+
+    auto sorted = topk_layer->getSorted();
+    if (nn_compiler::ir::isDefaultValue(sorted)) {
+        auto data_iv = stream_executor.findBlob(in_stensor_id[4]).second;
+        assert(data_iv.isInt());
+        sorted = static_cast<int>(data_iv.toInt());
+    }
+
+    auto output = atenTopk(self_tensor, k, dim, static_cast<bool>(largest), static_cast<bool>(sorted));
+    auto pos = std::unique(out_stensor_id.begin(), out_stensor_id.end());
+    out_stensor_id.erase(pos, out_stensor_id.end());
+    stream_executor.updateBlob(out_stensor_id[0], DataType::TENSOR, tensorToIValue(std::get<0>(output)));
+    stream_executor.updateBlob(out_stensor_id[1], DataType::TENSOR, tensorToIValue(std::get<1>(output)));
+}
+
+void executorAtenTranspose(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
+{
+    DLOG(INFO) << "execute Aten Transpose node";
+
+    auto transpose_layer = std::dynamic_pointer_cast<nn_compiler::ir::AtenTransposeLayer>(layer);
+
+    auto in_stensor_id = layer->getInSTensorID();
+    auto out_stensor_id = layer->getOutSTensorID();
+
+    torch::jit::IValue iv_self = stream_executor.findBlob(in_stensor_id[0]).second;
+    assert(iv_self.isTensor());
+    at::Tensor self_tensor = iv_self.toTensor();
+    // edge_id++;
+
+    auto dim0 = transpose_layer->getDim0();
+    if (nn_compiler::ir::isDefaultValue(dim0)) {
+        auto dim0_iv = stream_executor.findBlob(in_stensor_id[1]).second;
+        assert(dim0_iv.isInt());
+        dim0 = dim0_iv.toInt();
+    }
+    auto dim1 = transpose_layer->getDim1();
+    if (nn_compiler::ir::isDefaultValue(dim1)) {
+        auto dim1_iv = stream_executor.findBlob(in_stensor_id[2]).second;
+        assert(dim1_iv.isInt());
+        dim1 = dim1_iv.toInt();
+    }
+
+    auto output = atenTranspose(self_tensor, dim0, dim1);
+    stream_executor.updateBlob(out_stensor_id[0], DataType::TENSOR, tensorToIValue(output));
+}
+
+void executorAtenUnsqueeze(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
+{
+    DLOG(INFO) << "execute Aten Unsqueeze node";
+
+    auto unsqueeze_layer = std::dynamic_pointer_cast<nn_compiler::ir::AtenUnsqueezeLayer>(layer);
+
+    auto in_stensor_id = layer->getInSTensorID();
+    auto out_stensor_id = layer->getOutSTensorID();
+
+    torch::jit::IValue iv_tensor = stream_executor.findBlob(in_stensor_id[0]).second;
+    assert(iv_tensor.isTensor());
+    at::Tensor tensor = iv_tensor.toTensor();
+
+    auto dim = unsqueeze_layer->getDim();
+    if (nn_compiler::ir::isDefaultValue(dim)) {
+        auto dim_iv = stream_executor.findBlob(in_stensor_id[1]).second;
+        assert(dim_iv.isInt());
+        dim = dim_iv.toInt();
+    }
+    auto is_inplace = unsqueeze_layer->getIsInplace();
+    at::Tensor output = atenUnsqueeze(tensor, dim);
+    // If Unsqueeze op is in-place op, it need change origin data
+    if (is_inplace) {
+        auto releation_blob_id = stream_executor.releation_blob_ids_map_.find(in_stensor_id[0]);
+        assert(releation_blob_id != stream_executor.releation_blob_ids_map_.end());
+        auto list_blob_id = releation_blob_id->second.first;
+        auto in_list_pos = releation_blob_id->second.second;
+
+        auto list_blob_iv = stream_executor.findBlob(list_blob_id).second;
+        std::vector<torch::IValue> inputs;
+        auto datas = list_blob_iv.toListRef();
+        for (uint32_t idx = 0; idx < datas.size(); idx++) {
+            if (idx == in_list_pos) {
+                inputs.push_back(tensorToIValue(output));
+            } else {
+                inputs.push_back(datas[idx]);
+            }
+        }
+        at::ListTypePtr type = inferTypeFromDataType(inferDataType(output));
+        primListConstruct(inputs, inputs.size(), type);
+        stream_executor.updateBlob(list_blob_id, DataType::LIST, inputs.at(0));
+    } else {
+        stream_executor.updateBlob(out_stensor_id[0], DataType::TENSOR, tensorToIValue(output));
+    }
+}
+
+void executorAtenView(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
+{
+    DLOG(INFO) << "execute Aten View node";
+
+    auto in_stensor_id = layer->getInSTensorID();
+    auto out_stensor_id = layer->getOutSTensorID();
+
+    torch::jit::IValue iv_tensor = stream_executor.findBlob(in_stensor_id[0]).second;
+    assert(iv_tensor.isTensor());
+    at::Tensor tensor = iv_tensor.toTensor();
+
+    torch::jit::IValue iv_size = stream_executor.findBlob(in_stensor_id[1]).second;
+    assert(iv_size.isList());
+    auto size_list = iv_size.toListRef();
+    auto size_array = parseIValueVector<int64_t>(size_list);
+
+    at::Tensor output = atenView(tensor, at::ArrayRef<int64_t>(size_array));
+    stream_executor.updateBlob(out_stensor_id[0], DataType::TENSOR, tensorToIValue(output));
+}
+
+void executorAtenWarn(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
+{
+    DLOG(INFO) << "execute AtenWarn node";
+
+    auto in_stensor_id = layer->getInSTensorID();
+    auto out_stensor_id = layer->getOutSTensorID();
+
+    torch::jit::IValue iv = stream_executor.findBlob(in_stensor_id[0]).second;
+
+    atenWarn(iv.toString()->string());
+}
+
+void executorAtenZeros(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
+{
+    DLOG(INFO) << "execute Aten Zeros node";
+
+    auto in_stensor_id = layer->getInSTensorID();
+    auto out_stensor_id = layer->getOutSTensorID();
+
+    torch::jit::IValue iv_self = stream_executor.findBlob(in_stensor_id[0]).second;
+    assert(iv_self.isList());
+
+    auto self_list = iv_self.toListRef();
+    // input list -> at::IntArrayRef size, so datatype of elements in list must be int.
+    auto array_ref = parseIValueVector<int64_t>(self_list);
+
+    at::TensorOptions options;
+    auto iv_dtype = stream_executor.findBlob(in_stensor_id[1]).second;
+    auto iv_layout = stream_executor.findBlob(in_stensor_id[2]).second;
+    auto iv_device = stream_executor.findBlob(in_stensor_id[3]).second;
+    auto iv_pin_memory = stream_executor.findBlob(in_stensor_id[4]).second;
+
+    if (!iv_dtype.isNone()) {
+        options = options.dtype(iv_dtype.toScalarType());
+    }
+    if (!iv_layout.isNone()) {
+        options = options.layout(iv_layout.toLayout());
+    }
+    if (iv_device.isDevice()) {
+        options = options.device(iv_device.toDevice());
+    } else if (iv_device.isString()) {
+        options = options.device(iv_device.toStringRef());
+    }
+    if (!iv_pin_memory.isNone()) {
+        options = options.pinned_memory(iv_pin_memory.toBool());
+    }
+
+    auto output = atenZeros(at::ArrayRef<int64_t>(array_ref), options);
+    stream_executor.updateBlob(out_stensor_id[0], DataType::TENSOR, tensorToIValue(output));
+}
+
+
 }  // namespace runtime
 }  // namespace nn_compiler
