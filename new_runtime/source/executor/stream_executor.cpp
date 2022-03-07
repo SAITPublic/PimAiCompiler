@@ -96,6 +96,8 @@ RetVal StreamExecutor::preProcess(std::unique_ptr<nn_compiler::ir::NNModel>& mod
     if (input_blob_ids_.size() == 0 || output_blob_ids_.size() == 0) {
         Log::RT::E() << "The Graph must have >= 1 inputs and outputs!";
     }
+
+    return RetVal::SUCCESS;
 }
 
 RetVal StreamExecutor::inferenceModel(std::unique_ptr<nn_compiler::ir::NNModel>& model,

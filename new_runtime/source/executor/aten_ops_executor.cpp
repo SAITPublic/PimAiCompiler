@@ -296,16 +296,17 @@ void executorAtenArange1(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, Strea
     auto in_stensor_id = layer->getInSTensorID();
     auto out_stensor_id = layer->getOutSTensorID();
 
+    int in_id = 0;
     auto end = arange1_layer->getEnd();
     if (nn_compiler::ir::isDefaultValue(end)) {
-        auto iv_end = stream_executor.findBlob(in_stensor_id[0]).second;
+        auto iv_end = stream_executor.findBlob(in_stensor_id[in_id++]).second;
         end = iv_end.toInt();
     }
 
     at::TensorOptions options;
     auto dtype = arange1_layer->getDtype();
     if (nn_compiler::ir::isDefaultValue(dtype)) {
-        auto iv_dtype = stream_executor.findBlob(in_stensor_id[1]).second;
+        auto iv_dtype = stream_executor.findBlob(in_stensor_id[in_id++]).second;
         if (!iv_dtype.isNone()) {
             options = options.dtype(iv_dtype.toScalarType());
         }
@@ -315,7 +316,7 @@ void executorAtenArange1(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, Strea
 
     auto layout = arange1_layer->getLayout();
     if (nn_compiler::ir::isDefaultValue(layout)) {
-        auto iv_layout = stream_executor.findBlob(in_stensor_id[2]).second;
+        auto iv_layout = stream_executor.findBlob(in_stensor_id[in_id++]).second;
         if (!iv_layout.isNone()) {
             options = options.layout(iv_layout.toLayout());
         }
@@ -325,7 +326,7 @@ void executorAtenArange1(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, Strea
 
     auto device = arange1_layer->getDevice();
     if (nn_compiler::ir::isDefaultValue(device)) {
-        auto iv_device = stream_executor.findBlob(in_stensor_id[3]).second;
+        auto iv_device = stream_executor.findBlob(in_stensor_id[in_id++]).second;
         if (!iv_device.isNone()) {
             options = options.device(iv_device.toDevice());
         }
@@ -335,7 +336,7 @@ void executorAtenArange1(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, Strea
 
     auto pin_memory = arange1_layer->getPinMemory();
     if (nn_compiler::ir::isDefaultValue(pin_memory)) {
-        auto iv_pin_memory = stream_executor.findBlob(in_stensor_id[4]).second;
+        auto iv_pin_memory = stream_executor.findBlob(in_stensor_id[in_id++]).second;
         if (!iv_pin_memory.isNone()) {
             options = options.pinned_memory(iv_pin_memory.toBool());
         }
@@ -356,22 +357,23 @@ void executorAtenArange2(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, Strea
     auto in_stensor_id = layer->getInSTensorID();
     auto out_stensor_id = layer->getOutSTensorID();
 
+    int in_id = 0;
     auto start = arange2_layer->getStart();
     if (nn_compiler::ir::isDefaultValue(start)) {
-        auto iv_start = stream_executor.findBlob(in_stensor_id[0]).second;
+        auto iv_start = stream_executor.findBlob(in_stensor_id[in_id++]).second;
         start = iv_start.toInt();
     }
 
     auto end = arange2_layer->getEnd();
     if (nn_compiler::ir::isDefaultValue(end)) {
-        auto iv_end = stream_executor.findBlob(in_stensor_id[1]).second;
+        auto iv_end = stream_executor.findBlob(in_stensor_id[in_id++]).second;
         end = iv_end.toInt();
     }
 
     at::TensorOptions options;
     auto dtype = arange2_layer->getDtype();
     if (nn_compiler::ir::isDefaultValue(dtype)) {
-        auto iv_dtype = stream_executor.findBlob(in_stensor_id[2]).second;
+        auto iv_dtype = stream_executor.findBlob(in_stensor_id[in_id++]).second;
         if (!iv_dtype.isNone()) {
             options = options.dtype(iv_dtype.toScalarType());
         }
@@ -381,7 +383,7 @@ void executorAtenArange2(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, Strea
 
     auto layout = arange2_layer->getLayout();
     if (nn_compiler::ir::isDefaultValue(layout)) {
-        auto iv_layout = stream_executor.findBlob(in_stensor_id[3]).second;
+        auto iv_layout = stream_executor.findBlob(in_stensor_id[in_id++]).second;
         if (!iv_layout.isNone()) {
             options = options.layout(iv_layout.toLayout());
         }
@@ -391,7 +393,7 @@ void executorAtenArange2(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, Strea
 
     auto device = arange2_layer->getDevice();
     if (nn_compiler::ir::isDefaultValue(device)) {
-        auto iv_device = stream_executor.findBlob(in_stensor_id[4]).second;
+        auto iv_device = stream_executor.findBlob(in_stensor_id[in_id++]).second;
         if (!iv_device.isNone()) {
             options = options.device(iv_device.toDevice());
         }
@@ -401,7 +403,7 @@ void executorAtenArange2(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, Strea
 
     auto pin_memory = arange2_layer->getPinMemory();
     if (nn_compiler::ir::isDefaultValue(pin_memory)) {
-        auto iv_pin_memory = stream_executor.findBlob(in_stensor_id[5]).second;
+        auto iv_pin_memory = stream_executor.findBlob(in_stensor_id[in_id++]).second;
         if (!iv_pin_memory.isNone()) {
             options = options.pinned_memory(iv_pin_memory.toBool());
         }
@@ -422,28 +424,29 @@ void executorAtenArange3(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, Strea
     auto in_stensor_id = layer->getInSTensorID();
     auto out_stensor_id = layer->getOutSTensorID();
 
+    int in_id = 0;
     auto start = arange3_layer->getStart();
     if (nn_compiler::ir::isDefaultValue(start)) {
-        auto iv_start = stream_executor.findBlob(in_stensor_id[0]).second;
+        auto iv_start = stream_executor.findBlob(in_stensor_id[in_id++]).second;
         start = iv_start.toInt();
     }
 
     auto end = arange3_layer->getEnd();
     if (nn_compiler::ir::isDefaultValue(end)) {
-        auto iv_end = stream_executor.findBlob(in_stensor_id[1]).second;
+        auto iv_end = stream_executor.findBlob(in_stensor_id[in_id++]).second;
         end = iv_end.toInt();
     }
 
     auto step = arange3_layer->getStep();
     if (nn_compiler::ir::isDefaultValue(step)) {
-        auto iv_step = stream_executor.findBlob(in_stensor_id[2]).second;
+        auto iv_step = stream_executor.findBlob(in_stensor_id[in_id++]).second;
         step = iv_step.toInt();
     }
 
     at::TensorOptions options;
     auto dtype = arange3_layer->getDtype();
     if (nn_compiler::ir::isDefaultValue(dtype)) {
-        auto iv_dtype = stream_executor.findBlob(in_stensor_id[3]).second;
+        auto iv_dtype = stream_executor.findBlob(in_stensor_id[in_id++]).second;
         if (!iv_dtype.isNone()) {
             options = options.dtype(iv_dtype.toScalarType());
         }
@@ -453,7 +456,7 @@ void executorAtenArange3(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, Strea
 
     auto layout = arange3_layer->getLayout();
     if (nn_compiler::ir::isDefaultValue(layout)) {
-        auto iv_layout = stream_executor.findBlob(in_stensor_id[4]).second;
+        auto iv_layout = stream_executor.findBlob(in_stensor_id[in_id++]).second;
         if (!iv_layout.isNone()) {
             options = options.layout(iv_layout.toLayout());
         }
@@ -463,7 +466,7 @@ void executorAtenArange3(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, Strea
 
     auto device = arange3_layer->getDevice();
     if (nn_compiler::ir::isDefaultValue(device)) {
-        auto iv_device = stream_executor.findBlob(in_stensor_id[5]).second;
+        auto iv_device = stream_executor.findBlob(in_stensor_id[in_id++]).second;
         if (!iv_device.isNone()) {
             options = options.device(iv_device.toDevice());
         }
@@ -473,7 +476,7 @@ void executorAtenArange3(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, Strea
 
     auto pin_memory = arange3_layer->getPinMemory();
     if (nn_compiler::ir::isDefaultValue(pin_memory)) {
-        auto iv_pin_memory = stream_executor.findBlob(in_stensor_id[6]).second;
+        auto iv_pin_memory = stream_executor.findBlob(in_stensor_id[in_id++]).second;
         if (!iv_pin_memory.isNone()) {
             options = options.pinned_memory(iv_pin_memory.toBool());
         }
@@ -494,20 +497,21 @@ void executorAtenAsTensor(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, Stre
     auto in_stensor_id = layer->getInSTensorID();
     auto out_stensor_id = layer->getOutSTensorID();
 
-    torch::jit::IValue iv_tensor = stream_executor.findBlob(in_stensor_id[0]).second;
+    int in_id = 0;
+    torch::jit::IValue iv_tensor = stream_executor.findBlob(in_stensor_id[in_id++]).second;
     assert(iv_tensor.isTensor());
     auto in_tensor = iv_tensor.toTensor();
 
     auto int_dtype = as_tensor_layer->getDtype();
     if (nn_compiler::ir::isDefaultValue(int_dtype)) {
-        auto iv = stream_executor.findBlob(in_stensor_id[1]).second;
+        auto iv = stream_executor.findBlob(in_stensor_id[in_id++]).second;
         int_dtype = iv.toInt();
     }
     auto dtype = at::ScalarType(int_dtype);
 
     auto str_device = as_tensor_layer->getDevice();
     if (nn_compiler::ir::isDefaultValue(str_device)) {
-        auto map_value = stream_executor.findBlob(in_stensor_id[2]);
+        auto map_value = stream_executor.findBlob(in_stensor_id[in_id++]);
         auto iv = map_value.second;
         if (map_value.first != DataType::NONE) {
             str_device = iv.toDevice().str();
@@ -654,19 +658,20 @@ void executorAtenChunk(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamE
     auto in_stensor_id = layer->getInSTensorID();
     auto out_stensor_id = layer->getOutSTensorID();
 
-    torch::jit::IValue iv_tensor = stream_executor.findBlob(in_stensor_id[0]).second;
+    int in_id = 0;
+    torch::jit::IValue iv_tensor = stream_executor.findBlob(in_stensor_id[in_id++]).second;
     assert(iv_tensor.isTensor());
     auto in_tensor = iv_tensor.toTensor();
 
     auto chunks = chunk_layer->getChunks();
     if (nn_compiler::ir::isDefaultValue(chunks)) {
-        auto iv = stream_executor.findBlob(in_stensor_id[1]).second;
+        auto iv = stream_executor.findBlob(in_stensor_id[in_id++]).second;
         chunks = iv.toInt();
     }
 
     auto dim = chunk_layer->getDim();
     if (nn_compiler::ir::isDefaultValue(chunks)) {
-        auto iv = stream_executor.findBlob(in_stensor_id[2]).second;
+        auto iv = stream_executor.findBlob(in_stensor_id[in_id++]).second;
         dim = iv.toInt();
     }
 
@@ -683,18 +688,19 @@ void executorAtenClamp(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamE
     auto in_stensor_id = layer->getInSTensorID();
     auto out_stensor_id = layer->getOutSTensorID();
 
-    torch::jit::IValue iv_self = stream_executor.findBlob(in_stensor_id[0]).second;
+    int in_id = 0;
+    torch::jit::IValue iv_self = stream_executor.findBlob(in_stensor_id[in_id++]).second;
     assert(iv_self.isTensor());
     at::Tensor self_tensor = iv_self.toTensor();
 
     auto min = clamp_layer->getMin();
     auto max = clamp_layer->getMax();
     if (nn_compiler::ir::isDefaultValue(min)) {
-        auto iv = stream_executor.findBlob(in_stensor_id[1]).second;
+        auto iv = stream_executor.findBlob(in_stensor_id[in_id++]).second;
         min = static_cast<int>(iv.toInt());
     }
     if (nn_compiler::ir::isDefaultValue(max)) {
-        auto iv = stream_executor.findBlob(in_stensor_id[2]).second;
+        auto iv = stream_executor.findBlob(in_stensor_id[in_id++]).second;
         max = static_cast<int>(iv.toInt());
     }
 
@@ -755,12 +761,7 @@ void executorAtenConv2d(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, Stream
     assert(iv_self.isTensor());
     at::Tensor self_tensor = iv_self.toTensor();
 
-    // auto weight_blob_id = (layer->getWeightBlobId())[0];
-    // auto bias_blob_id = (layer->getBiasBlobId())[0];
     std::vector<at::Tensor> weights;
-    // auto weight_iv = stream_executor.findBlob(weight_blob_id).second;
-    // auto bias_iv = stream_executor.findBlob(bias_blob_id).second;
-    // assert(weight_iv.isTensor() && bias_iv.isTensor());
     auto weight_tensor = con2d_layer->getWeights()[0];
     auto bias_tensor = con2d_layer->getBiases()[0];
 
@@ -774,9 +775,6 @@ void executorAtenConv2d(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, Stream
     std::vector<int64_t> stride_vec = {static_cast<int64_t>(stride[0]), static_cast<int64_t>(stride[1])};
     std::vector<int64_t> padding_vec = {static_cast<int64_t>(padding[0]), static_cast<int64_t>(padding[1])};
     std::vector<int64_t> dilation_vec = {static_cast<int64_t>(dilation[0]), static_cast<int64_t>(dilation[1])};
-
-    // Log::RT::D() << "weight: " << weight_tensor;
-    // Log::RT::D() << "bias: " << bias_tensor;
 
     auto output = atenConv2d(self_tensor, weight_tensor, bias_tensor, at::ArrayRef<int64_t>(stride_vec),
                                    at::ArrayRef<int64_t>(padding_vec), at::ArrayRef<int64_t>(dilation_vec), groups);
@@ -792,11 +790,6 @@ void executorAtenCopy(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamEx
 
     auto in_stensor_id = layer->getInSTensorID();
     auto out_stensor_id = layer->getOutSTensorID();
-
-    // auto& input_self = cast<nncir::DataEdge>(copy_node.getInEdge(0));
-    // auto& input_src = cast<nncir::DataEdge>(copy_node.getInEdge(1));
-    // int input_self_blob_id = input_self.getBlobId();
-    // int input_src_blob_id = input_src.getBlobId();
 
     torch::jit::IValue iv_self = stream_executor.findBlob(in_stensor_id[0]).second;
     torch::jit::IValue iv_src = stream_executor.findBlob(in_stensor_id[1]).second;
@@ -855,21 +848,22 @@ void executorAtenDeriveIndex(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, S
     auto in_stensor_id = layer->getInSTensorID();
     auto out_stensor_id = layer->getOutSTensorID();
 
+    int in_id = 0;
     // Index is an input, get Index
-    torch::jit::IValue iv = stream_executor.findBlob(in_stensor_id[0]).second;
+    torch::jit::IValue iv = stream_executor.findBlob(in_stensor_id[in_id++]).second;
     auto index = iv.toInt();
 
     // Check and get start
     auto start = derive_index_layer->getStart();
     if (nn_compiler::ir::isDefaultValue(start)) {
-        auto start_iv = stream_executor.findBlob(in_stensor_id[1]).second;
+        auto start_iv = stream_executor.findBlob(in_stensor_id[in_id++]).second;
         start = start_iv.toInt();
     }
 
     // Check and get step
     auto step = derive_index_layer->getStep();
     if (nn_compiler::ir::isDefaultValue(step)) {
-        auto step_iv = stream_executor.findBlob(in_stensor_id[2]).second;
+        auto step_iv = stream_executor.findBlob(in_stensor_id[in_id++]).second;
         step = step_iv.toInt();
     }
 
@@ -938,19 +932,20 @@ void executorAtenDropout(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, Strea
 
     assert(in_stensor_id.size() == 1);
 
-    torch::jit::IValue iv_tensor = stream_executor.findBlob(in_stensor_id[0]).second;
+    int in_id = 0;
+    torch::jit::IValue iv_tensor = stream_executor.findBlob(in_stensor_id[in_id++]).second;
     assert(iv_tensor.isTensor());
     at::Tensor tensor = iv_tensor.toTensor();
 
     double proportion = (double)dropout_layer->getProportion();
     if (nn_compiler::ir::isDefaultValue(proportion)) {
-        auto proportion_iv = stream_executor.findBlob(in_stensor_id[1]).second;
+        auto proportion_iv = stream_executor.findBlob(in_stensor_id[in_id++]).second;
         assert(proportion_iv.isDouble());
         proportion = proportion_iv.toDouble();
     }
     int train_val = dropout_layer->getTrain();
     if (nn_compiler::ir::isDefaultValue(train_val)) {
-        auto train_iv = stream_executor.findBlob(in_stensor_id[2]).second;
+        auto train_iv = stream_executor.findBlob(in_stensor_id[in_id++]).second;
         assert(train_iv.isBool());
         train_val = train_iv.toBool();
     }
@@ -970,21 +965,22 @@ void executorAtenEmbedding(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, Str
     auto out_stensor_id = layer->getOutSTensorID();
 
     if (embedding_layer->getWeights().empty()) {
-        torch::jit::IValue iv_weights = stream_executor.findBlob(in_stensor_id[0]).second;
-        torch::jit::IValue iv_indices = stream_executor.findBlob(in_stensor_id[1]).second;
+        int in_id = 0;
+        torch::jit::IValue iv_weights = stream_executor.findBlob(in_stensor_id[in_id++]).second;
+        torch::jit::IValue iv_indices = stream_executor.findBlob(in_stensor_id[in_id++]).second;
         assert(iv_weights.isTensor());
         assert(iv_indices.isTensor());
 
         int64_t padding_idx = embedding_layer->getPaddingIdx();
         if (nn_compiler::ir::isDefaultValue(padding_idx)) {
-            auto padding_idx_iv = stream_executor.findBlob(in_stensor_id[2]).second;
+            auto padding_idx_iv = stream_executor.findBlob(in_stensor_id[in_id++]).second;
             assert(padding_idx_iv.isInt());
             padding_idx = padding_idx_iv.toInt();
         }
 
         int scale_grad_by_freq_val = embedding_layer->getScaleGrad();
         if (nn_compiler::ir::isDefaultValue(scale_grad_by_freq_val)) {
-            auto scale_grad_by_freq_iv = stream_executor.findBlob(in_stensor_id[3]).second;
+            auto scale_grad_by_freq_iv = stream_executor.findBlob(in_stensor_id[in_id++]).second;
             assert(scale_grad_by_freq_iv.isInt());
             scale_grad_by_freq_val = scale_grad_by_freq_iv.toInt();
         }
@@ -992,7 +988,7 @@ void executorAtenEmbedding(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, Str
 
         int sparse_val = embedding_layer->getSparse();
         if (nn_compiler::ir::isDefaultValue(sparse_val)) {
-            auto sparse_iv = stream_executor.findBlob(in_stensor_id[4]).second;
+            auto sparse_iv = stream_executor.findBlob(in_stensor_id[in_id++]).second;
             assert(sparse_iv.isInt());
             sparse_val = sparse_iv.toInt();
         }
@@ -1003,16 +999,16 @@ void executorAtenEmbedding(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, Str
 
         stream_executor.updateBlob(out_stensor_id[0], DataType::TENSOR, tensorToIValue(output));
     } else {
-        // auto& weights = embedding_layer->getWeights();
-        // assert(weights.size() > 0);
+        auto weights = embedding_layer->getWeights();
+        assert(weights.size() > 0);
 
-        // torch::jit::IValue iv_indices = stream_executor.findBlob(in_stensor_id[5]).second;
-        // assert(iv_indices.isTensor());
-        // auto indices_tensor = iv_indices.toTensor();
-        // assert(indices_tensor.item().type() == torch::kInt64);
+        torch::jit::IValue iv_indices = stream_executor.findBlob(in_stensor_id[0]).second;
+        assert(iv_indices.isTensor());
+        auto indices_tensor = iv_indices.toTensor();
+        assert(indices_tensor.item().type() == torch::kInt64);
 
-        // auto output = weights[indices_tensor.item().toInt()];
-        // stream_executor.updateBlob(out_stensor_id[0], DataType::TENSOR, tensorToIValue(output));
+        auto output = weights[indices_tensor.item().toInt()];
+        stream_executor.updateBlob(out_stensor_id[0], DataType::TENSOR, tensorToIValue(output));
     }
 }
 
@@ -1171,18 +1167,18 @@ void executorAtenFormat(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, Stream
 
     auto in_stensor_id = layer->getInSTensorID();
     auto out_stensor_id = layer->getOutSTensorID();
-
+    int in_id = 0;
     auto assembly_format = format_layer->getAssemblyFormat();
 
     if (assembly_format == "") {
-        auto assembly_format_iv = stream_executor.findBlob(in_stensor_id[0]).second;
+        auto assembly_format_iv = stream_executor.findBlob(in_stensor_id[in_id++]).second;
         assert(assembly_format_iv.isString());
         assembly_format = assembly_format_iv.toStringRef();
     }
 
     // Find the input blob
-    auto i_value1 = stream_executor.findBlob(in_stensor_id[1]).second;
-    auto i_value2 = stream_executor.findBlob(in_stensor_id[2]).second;
+    auto i_value1 = stream_executor.findBlob(in_stensor_id[in_id++]).second;
+    auto i_value2 = stream_executor.findBlob(in_stensor_id[in_id++]).second;
 
     auto dtype = stream_executor.findBlob(in_stensor_id[1]).first;
     if (dtype == DataType::TUPLE) {
@@ -1233,24 +1229,25 @@ void executorAtenGather(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, Stream
     auto in_stensor_id = layer->getInSTensorID();
     auto out_stensor_id = layer->getOutSTensorID();
 
-    torch::jit::IValue iv_self = stream_executor.findBlob(in_stensor_id[0]).second;
+    int in_id = 0;
+    torch::jit::IValue iv_self = stream_executor.findBlob(in_stensor_id[in_id++]).second;
     assert(iv_self.isTensor());
     auto self_tensor = iv_self.toTensor();
 
     auto dim = gather_layer->getDim();
     if (nn_compiler::ir::isDefaultValue(dim)) {
-        auto dim_iv = stream_executor.findBlob(in_stensor_id[1]).second;
+        auto dim_iv = stream_executor.findBlob(in_stensor_id[in_id++]).second;
         assert(dim_iv.isInt());
         dim = dim_iv.toInt();
     }
 
-    torch::jit::IValue iv_index = stream_executor.findBlob(in_stensor_id[2]).second;
+    torch::jit::IValue iv_index = stream_executor.findBlob(in_stensor_id[in_id++]).second;
     assert(iv_index.isTensor());
     auto index_tensor = iv_index.toTensor();
 
     auto sparse_grad = gather_layer->getSparseGrad();
     if (nn_compiler::ir::isDefaultValue(sparse_grad)) {
-        auto sparse_grad_iv = stream_executor.findBlob(in_stensor_id[3]).second;
+        auto sparse_grad_iv = stream_executor.findBlob(in_stensor_id[in_id++]).second;
         assert(sparse_grad_iv.isInt());
         sparse_grad = static_cast<int>(sparse_grad_iv.toInt());
     }
@@ -1380,11 +1377,12 @@ void executorAtenIndexPut(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, Stre
     auto in_stensor_id = layer->getInSTensorID();
     auto out_stensor_id = layer->getOutSTensorID();
 
-    torch::jit::IValue iv_self = stream_executor.findBlob(in_stensor_id[0]).second;
+    int in_id = 0;
+    torch::jit::IValue iv_self = stream_executor.findBlob(in_stensor_id[in_id++]).second;
     assert(iv_self.isTensor());
     auto self_tensor = iv_self.toTensor();
 
-    auto indices_iv = stream_executor.findBlob(in_stensor_id[1]).second;
+    auto indices_iv = stream_executor.findBlob(in_stensor_id[in_id++]).second;
     assert(indices_iv.isTensorList());
     auto indices_list_ivalue = indices_iv.toList();
     c10::List<c10::optional<at::Tensor>> indices_optional_list;
@@ -1392,14 +1390,14 @@ void executorAtenIndexPut(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, Stre
         indices_optional_list.push_back(iv.toOptional<at::Tensor>());
     }
 
-    torch::jit::IValue iv_other = stream_executor.findBlob(in_stensor_id[2]).second;
+    torch::jit::IValue iv_other = stream_executor.findBlob(in_stensor_id[in_id++]).second;
     assert(iv_other.isTensor());
     auto value_tensor = iv_other.toTensor();
 
     auto accumulate = index_put_layer->getAccumulate();
     if (nn_compiler::ir::isDefaultValue(accumulate)) {
  
-        auto accumulate_iv = stream_executor.findBlob(in_stensor_id[3]).second;
+        auto accumulate_iv = stream_executor.findBlob(in_stensor_id[in_id++]).second;
         assert(accumulate_iv.isInt());
         accumulate = accumulate_iv.toInt();
     }
@@ -1419,18 +1417,19 @@ void executorAtenIndexSelect(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, S
     auto in_stensor_id = layer->getInSTensorID();
     auto out_stensor_id = layer->getOutSTensorID();
 
-    torch::jit::IValue iv_self = stream_executor.findBlob(in_stensor_id[0]).second;
+    int in_id = 0;
+    torch::jit::IValue iv_self = stream_executor.findBlob(in_stensor_id[in_id++]).second;
     assert(iv_self.isTensor());
     auto self_tensor = iv_self.toTensor();
 
     auto dim = index_select_layer->getDim();
     if (nn_compiler::ir::isDefaultValue(dim)) {
-        auto dim_iv = stream_executor.findBlob(in_stensor_id[1]).second;
+        auto dim_iv = stream_executor.findBlob(in_stensor_id[in_id++]).second;
         assert(dim_iv.isInt());
         dim = dim_iv.toInt();
     }
 
-    torch::jit::IValue iv_other = stream_executor.findBlob(in_stensor_id[2]).second;
+    torch::jit::IValue iv_other = stream_executor.findBlob(in_stensor_id[in_id++]).second;
     assert(iv_other.isTensor());
     auto index_tensor = iv_other.toTensor();
 
@@ -1633,13 +1632,14 @@ void executorAtenLogSoftmax(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, St
     auto in_stensor_id = layer->getInSTensorID();
     auto out_stensor_id = layer->getOutSTensorID();
 
-    torch::jit::IValue iv_tensor = stream_executor.findBlob(in_stensor_id[0]).second;
+    int in_id = 0;
+    torch::jit::IValue iv_tensor = stream_executor.findBlob(in_stensor_id[in_id++]).second;
     assert(iv_tensor.isTensor());
     auto tensor = iv_tensor.toTensor();
 
     auto dim = log_softmax_layer->getDim();
     if (nn_compiler::ir::isDefaultValue(dim)) {
-        auto data_iv = stream_executor.findBlob(in_stensor_id[1]).second;
+        auto data_iv = stream_executor.findBlob(in_stensor_id[in_id++]).second;
         assert(data_iv.isInt());
         dim = data_iv.toInt();
     }
@@ -1647,7 +1647,7 @@ void executorAtenLogSoftmax(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, St
     auto ori_dtype = log_softmax_layer->getDType();
     bool dtype_is_none = false;
     if (nn_compiler::ir::isDefaultValue(ori_dtype)) {
-        auto ori_dtype_iv = stream_executor.findBlob(in_stensor_id[2]).second;
+        auto ori_dtype_iv = stream_executor.findBlob(in_stensor_id[in_id++]).second;
         if (ori_dtype_iv.isInt())
             ori_dtype = ori_dtype_iv.toInt();
         else if (ori_dtype_iv.isNone()) {
@@ -1675,21 +1675,14 @@ void executorAtenLSTM1(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamE
     auto in_stensor_id = layer->getInSTensorID();
     auto out_stensor_id = layer->getOutSTensorID();
 
-    // auto lstm1_node = cast<nncir::AtenLSTM1Node>(op_node);
-    // int edge_idx = 0;
-
-    // // const at::Tensor &input
-    // auto& input_edge = cast<nncir::DataEdge>(lstm1_node.getInEdge(edge_idx));
-    // int input_blob_id = input_edge.getBlobId();
-    auto input_iv = stream_executor.findBlob(in_stensor_id[0]).second;
+    int in_id = 0;
+    // const at::Tensor &input
+    auto input_iv = stream_executor.findBlob(in_stensor_id[in_id++]).second;
     assert(input_iv.isTensor());
     auto input = input_iv.toTensor();
-    // edge_idx++;
 
     // at::TensorList hx
-    // auto& hx_edge = cast<nncir::DataEdge>(lstm1_node.getInEdge(edge_idx));
-    // int hx_blob_id = hx_edge.getBlobId();
-    auto hx_iv = stream_executor.findBlob(in_stensor_id[1]).second;
+    auto hx_iv = stream_executor.findBlob(in_stensor_id[in_id++]).second;
     assert(hx_iv.isTensorList());
     auto hx_list_tensor = hx_iv.toTensorList();
     std::vector<at::Tensor> hx_list_tensor_vector;
@@ -1697,82 +1690,61 @@ void executorAtenLSTM1(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamE
         hx_list_tensor_vector.push_back(tensor);
     }
     at::TensorList hx(hx_list_tensor_vector);
-    // edge_idx++;
 
     // Check and skip, will handle params after getting all arguments
-    if (in_stensor_id.size() > 2) {
-        // auto& params_edge = cast<nncir::DataEdge>(lstm1_node.getInEdge(edge_idx));
-        // int params_blob_id = params_edge.getBlobId();
-        auto params_iv = stream_executor.findBlob(in_stensor_id[2]).second;
+    if (in_stensor_id.size() > in_id) {
+        auto params_iv = stream_executor.findBlob(in_stensor_id[in_id]).second;
         if (params_iv.isTensorList()) {
-            // edge_idx++;
+            in_id++;
         }
     }
 
     // bool has_biases
     int has_biases = lstm1_layer->getHasBiases();
     if (nn_compiler::ir::isDefaultValue(has_biases)) {
-        // auto& has_biases_edge = cast<nncir::DataEdge>(lstm1_node.getInEdge(edge_idx));
-        // int has_biases_blob_id = has_biases_edge.getBlobId();
-        auto has_biases_iv = stream_executor.findBlob(in_stensor_id[3]).second;
+        auto has_biases_iv = stream_executor.findBlob(in_stensor_id[in_id++]).second;
         assert(has_biases_iv.isInt());
         has_biases = has_biases_iv.toInt();
-        // edge_idx++;
     }
 
     // int64_t num_layers
     int64_t num_layers = lstm1_layer->getNumLayers();
     if (nn_compiler::ir::isDefaultValue(num_layers)) {
-        // auto& num_layers_edge = cast<nncir::DataEdge>(lstm1_node.getInEdge(edge_idx));
-        // int num_layers_blob_id = num_layers_edge.getBlobId();
-        auto num_layers_iv = stream_executor.findBlob(in_stensor_id[4]).second;
+        auto num_layers_iv = stream_executor.findBlob(in_stensor_id[in_id++]).second;
         assert(num_layers_iv.isInt());
         num_layers = num_layers_iv.toInt();
-        // edge_idx++;
     }
 
     // double dropout
     double dropout = lstm1_layer->getDropout();
     if (nn_compiler::ir::isDefaultValue(dropout)) {
-        // auto& dropout_edge = cast<nncir::DataEdge>(lstm1_node.getInEdge(edge_idx));
-        // int dropout_blob_id = dropout_edge.getBlobId();
-        auto dropout_iv = stream_executor.findBlob(in_stensor_id[5]).second;
+        auto dropout_iv = stream_executor.findBlob(in_stensor_id[in_id++]).second;
         assert(dropout_iv.isDouble());
         dropout = dropout_iv.toDouble();
-        // edge_idx++;
     }
 
     // bool train
     int train = lstm1_layer->getTrain();
     if (nn_compiler::ir::isDefaultValue(train)) {
-        // auto& train_edge = cast<nncir::DataEdge>(lstm1_node.getInEdge(edge_idx));
-        // int train_blob_id = train_edge.getBlobId();
-        auto train_iv = stream_executor.findBlob(in_stensor_id[6]).second;
+        auto train_iv = stream_executor.findBlob(in_stensor_id[in_id++]).second;
         assert(train_iv.isInt());
         train = train_iv.toInt();
-        // edge_idx++;
     }
 
     // bool bidirectional
     int bidirectional = lstm1_layer->getBidirectional();
     if (nn_compiler::ir::isDefaultValue(bidirectional)) {
-        // auto& bidirectional_edge = cast<nncir::DataEdge>(lstm1_node.getInEdge(edge_idx));
-        // int bidirectional_blob_id = bidirectional_edge.getBlobId();
-        auto bidirectional_iv = stream_executor.findBlob(in_stensor_id[7]).second;
+        auto bidirectional_iv = stream_executor.findBlob(in_stensor_id[in_id++]).second;
         assert(bidirectional_iv.isInt());
         bidirectional = bidirectional_iv.toInt();
-        // edge_idx++;
     }
 
     // bool batch_first
     int batch_first = lstm1_layer->getBatchFirst();
     if (nn_compiler::ir::isDefaultValue(batch_first)) {
-        // auto& batch_first_edge = cast<nncir::DataEdge>(lstm1_node.getInEdge(edge_idx));
-        // int batch_first_blob_id = batch_first_edge.getBlobId();
-        auto batch_first_iv = stream_executor.findBlob(in_stensor_id[8]).second;
+        auto batch_first_iv = stream_executor.findBlob(in_stensor_id[in_id++]).second;
         assert(batch_first_iv.isInt());
         batch_first = batch_first_iv.toInt();
-        // edge_idx++;
     }
 
     // at::TensorList params
@@ -1801,20 +1773,17 @@ void executorAtenLSTM1(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamE
         if (has_biases) {
             // b_ih? (optional)
             auto b_ih_iv = bias_blob[i * 2];
-            // hash_id += bias_blob_ids[i * 2];
             if (1) {
                 param_vector.push_back(b_ih_iv);
             }
             // b_hh? (optional)
             auto b_hh_iv = bias_blob[i * 2 + 1];
-            // hash_id += bias_blob_ids[i * 2 + 1];
             if (1) {
                 param_vector.push_back(b_hh_iv);
             }
         }
     }
     at::TensorList params(param_vector);
-    // auto out_blob_ids = getOutBlobIds(op_node);
     auto pos = std::unique(out_stensor_id.begin(), out_stensor_id.end());
     out_stensor_id.erase(pos, out_stensor_id.end());
     assert(out_stensor_id.size() == 3);
@@ -2093,30 +2062,20 @@ void executorAtenLSTM2(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamE
     auto in_stensor_id = layer->getInSTensorID();
     auto out_stensor_id = layer->getOutSTensorID();
 
-    // auto lstm2_node = cast<nncir::AtenLSTM2Node>(op_node);
-    // int edge_idx = 0;
-
+    int in_id = 0;
     // const at::Tensor &input
-    // auto& input_edge = cast<nncir::DataEdge>(lstm2_node.getInEdge(edge_idx));
-    // int input_blob_id = input_edge.getBlobId();
-    auto input_iv = stream_executor.findBlob(in_stensor_id[0]).second;
+    auto input_iv = stream_executor.findBlob(in_stensor_id[in_id++]).second;
     assert(input_iv.isTensor());
     auto input = input_iv.toTensor();
-    // edge_idx++;
 
     // const at::Tensor &batch_sizes,
     at::Tensor batch_sizes;
-    // auto& batch_sizes_edge = cast<nncir::DataEdge>(lstm2_node.getInEdge(edge_idx));
-    // int batch_sizes_blob_id = batch_sizes_edge.getBlobId();
-    auto batch_sizes_iv = stream_executor.findBlob(in_stensor_id[1]).second;
+    auto batch_sizes_iv = stream_executor.findBlob(in_stensor_id[in_id++]).second;
     assert(batch_sizes_iv.isTensor());
     batch_sizes = batch_sizes_iv.toTensor();
-    // edge_idx++;
 
     // at::TensorList hx
-    // auto& hx_edge = cast<nncir::DataEdge>(lstm2_node.getInEdge(edge_idx));
-    // int hx_blob_id = hx_edge.getBlobId();
-    auto hx_iv = stream_executor.findBlob(in_stensor_id[2]).second;
+    auto hx_iv = stream_executor.findBlob(in_stensor_id[in_id++]).second;
     assert(hx_iv.isTensorList());
     auto hx_list_tensor = hx_iv.toTensorList();
     std::vector<at::Tensor> hx_list_tensor_vector;
@@ -2124,72 +2083,54 @@ void executorAtenLSTM2(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamE
         hx_list_tensor_vector.push_back(tensor);
     }
     at::TensorList hx(hx_list_tensor_vector);
-    // edge_idx++;
 
     // at::TensorList params
     // Check and skip, will handle params after getting all arguments
     if (in_stensor_id.size() > 2) {
-        // auto& params_edge = cast<nncir::DataEdge>(lstm2_node.getInEdge(edge_idx));
-        // int params_blob_id = params_edge.getBlobId();
-        auto params_iv = stream_executor.findBlob(in_stensor_id[3]).second;
+        auto params_iv = stream_executor.findBlob(in_stensor_id[in_id]).second;
         if (params_iv.isTensorList()) {
-            // edge_idx++;
+            in_id++;
         }
     }
 
     // bool has_biases
     int has_biases = lstm2_layer->getHasBiases();
     if (nn_compiler::ir::isDefaultValue(has_biases)) {
-        // auto& has_biases_edge = cast<nncir::DataEdge>(lstm2_node.getInEdge(edge_idx));
-        // int has_biases_blob_id = has_biases_edge.getBlobId();
-        auto has_biases_iv = stream_executor.findBlob(in_stensor_id[4]).second;
+        auto has_biases_iv = stream_executor.findBlob(in_stensor_id[in_id++]).second;
         assert(has_biases_iv.isInt());
         has_biases = has_biases_iv.toInt();
-        // edge_idx++;
     }
 
     // int64_t num_layers
     int64_t num_layers = lstm2_layer->getNumLayers();
     if (nn_compiler::ir::isDefaultValue(num_layers)) {
-        // auto& num_layers_edge = cast<nncir::DataEdge>(lstm2_node.getInEdge(edge_idx));
-        // int num_layers_blob_id = num_layers_edge.getBlobId();
-        auto num_layers_iv = stream_executor.findBlob(in_stensor_id[5]).second;
+        auto num_layers_iv = stream_executor.findBlob(in_stensor_id[in_id++]).second;
         assert(num_layers_iv.isInt());
         num_layers = num_layers_iv.toInt();
-        // edge_idx++;
     }
 
     // double dropout
     double dropout = lstm2_layer->getDropout();
     if (nn_compiler::ir::isDefaultValue(dropout)) {
-        // auto& dropout_edge = cast<nncir::DataEdge>(lstm2_node.getInEdge(edge_idx));
-        // int dropout_blob_id = dropout_edge.getBlobId();
-        auto dropout_iv = stream_executor.findBlob(in_stensor_id[6]).second;
+        auto dropout_iv = stream_executor.findBlob(in_stensor_id[in_id++]).second;
         assert(dropout_iv.isDouble());
         dropout = dropout_iv.toDouble();
-        // edge_idx++;
     }
 
     // bool train
     int train = lstm2_layer->getTrain();
     if (nn_compiler::ir::isDefaultValue(train)) {
-        // auto& train_edge = cast<nncir::DataEdge>(lstm2_node.getInEdge(edge_idx));
-        // int train_blob_id = train_edge.getBlobId();
-        auto train_iv = stream_executor.findBlob(in_stensor_id[7]).second;
+        auto train_iv = stream_executor.findBlob(in_stensor_id[in_id++]).second;
         assert(train_iv.isInt());
         train = train_iv.toInt();
-        // edge_idx++;
     }
 
     // bool bidirectional
     int bidirectional = lstm2_layer->getBidirectional();
     if (nn_compiler::ir::isDefaultValue(bidirectional)) {
-        // auto& bidirectional_edge = cast<nncir::DataEdge>(lstm2_node.getInEdge(edge_idx));
-        // int bidirectional_blob_id = bidirectional_edge.getBlobId();
-        auto bidirectional_iv = stream_executor.findBlob(in_stensor_id[8]).second;
+        auto bidirectional_iv = stream_executor.findBlob(in_stensor_id[in_id++]).second;
         assert(bidirectional_iv.isInt());
         bidirectional = bidirectional_iv.toInt();
-        // edge_idx++;
     }
 
     // at::TensorList params
@@ -2219,13 +2160,11 @@ void executorAtenLSTM2(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamE
         if (has_biases) {
             // b_ih? (optional)
             auto b_ih_iv = bias_blob[i * 2];
-            // hash_id += bias_blob_ids[i * 2];
             if (1) {
                 param_vector.push_back(b_ih_iv);
             }
             // b_hh? (optional)
             auto b_hh_iv = bias_blob[i * 2 + 1];
-            // hash_id += bias_blob_ids[i * 2 + 1];
             if (1) {
                 param_vector.push_back(b_hh_iv);
             }
@@ -2233,7 +2172,6 @@ void executorAtenLSTM2(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamE
     }
     at::TensorList params(param_vector);
 
-    // auto out_blob_ids = getOutBlobIds(op_node);
     auto pos = std::unique(out_stensor_id.begin(), out_stensor_id.end());
     out_stensor_id.erase(pos, out_stensor_id.end());
     assert(out_stensor_id.size() == 3);
@@ -2527,8 +2465,6 @@ void executorAtenMaskedSelect(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, 
     auto in_stensor_id = layer->getInSTensorID();
     auto out_stensor_id = layer->getOutSTensorID();
 
-    // auto node = cast<nncir::AtenMaskedSelectNode>(op_node);
-
     // Find the input blob
     auto iv_self = stream_executor.findBlob(in_stensor_id[0]).second;
     auto iv_mask = stream_executor.findBlob(in_stensor_id[1]).second;
@@ -2547,15 +2483,6 @@ void executorAtenMatmul(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, Stream
 
     auto in_stensor_id = layer->getInSTensorID();
     auto out_stensor_id = layer->getOutSTensorID();
-
-    // auto node = cast<nncir::AtenMatmulNode>(op_node);
-
-    // auto& input_self = cast<nncir::DataEdge>(node.getInEdge(0));
-    // auto& input_other = cast<nncir::DataEdge>(node.getInEdge(1));
-
-    // Get input blob
-    // int input_self_blob_id = input_self.getBlobId();
-    // int input_other_blob_id = input_other.getBlobId();
 
     // Find the input blob
     torch::jit::IValue iv_self = stream_executor.findBlob(in_stensor_id[0]).second;
@@ -2714,7 +2641,8 @@ void executorAtenMax(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExe
     auto in_stensor_id = layer->getInSTensorID();
     auto out_stensor_id = layer->getOutSTensorID();
 
-    torch::jit::IValue iv_self = stream_executor.findBlob(in_stensor_id[0]).second;
+    int in_id = 0;
+    torch::jit::IValue iv_self = stream_executor.findBlob(in_stensor_id[in_id++]).second;
     assert(iv_self.isTensor());
     at::Tensor self_tensor = iv_self.toTensor();
 
@@ -2740,8 +2668,6 @@ void executorAtenMax(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExe
     }
 
     // Get second input
-    // auto& input_other = cast<nncir::DataEdge>(max_node.getInEdge(1));
-    // int input_other_blob_id = input_other.getBlobId();
     torch::jit::IValue iv_other = stream_executor.findBlob(in_stensor_id[1]).second;
 
     auto dtype = stream_executor.findBlob(in_stensor_id[1]).first;
@@ -2754,28 +2680,20 @@ void executorAtenMax(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExe
         stream_executor.updateBlob(out_stensor_id[0], DataType::TENSOR, tensorToIValue(output));
     } else if (isScalarType(dtype)) {
         // aten::max(Tensor, dim, keepdim)
-        // edge_id++;
         auto dim = max_layer->getDim();
         if (nn_compiler::ir::isDefaultValue(dim)) {
-            // auto& dim_edge = cast<nncir::DataEdge>(max_node.getInEdge(edge_id++));
-            // int dim_blob_id = dim_edge.getBlobId();
-            auto dim_iv = stream_executor.findBlob(in_stensor_id[1]).second;
+            auto dim_iv = stream_executor.findBlob(in_stensor_id[in_id++]).second;
             assert(dim_iv.isInt());
             dim = dim_iv.toInt();
         }
         int keep_dim = max_layer->getKeepDim();
         if (nn_compiler::ir::isDefaultValue(keep_dim)) {
-            // auto& keep_dim_edge = cast<nncir::DataEdge>(max_node.getInEdge(edge_id++));
-            // int keep_dim_blob_id = keep_dim_edge.getBlobId();
-            auto keep_dim_iv = stream_executor.findBlob(in_stensor_id[2]).second;
+            auto keep_dim_iv = stream_executor.findBlob(in_stensor_id[in_id++]).second;
             assert(keep_dim_iv.isBool());
             keep_dim = keep_dim_iv.toBool();
         }
 
         auto output = atenMax(self_tensor, dim, static_cast<bool>(keep_dim));
-        // update output
-        // auto& out_edge = cast<nncir::DataEdge>(max_node.getFirstOutEdge());
-        // auto out_blob_ids = getOutBlobIds(op_node);
         auto pos = std::unique(out_stensor_id.begin(), out_stensor_id.end());
         out_stensor_id.erase(pos, out_stensor_id.end());
         stream_executor.updateBlob(out_stensor_id[0], DataType::TENSOR, tensorToIValue(std::get<0>(output)));
@@ -2795,22 +2713,15 @@ void executorAtenMaxPool2d(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, Str
     auto in_stensor_id = layer->getInSTensorID();
     auto out_stensor_id = layer->getOutSTensorID();
 
-    // auto node = cast<nncir::AtenMaxPool2dNode>(op_node);
-    // int edge_id = 0;
-
-    // auto& input_self = cast<nncir::DataEdge>(node.getInEdge(edge_id++));
-    // int input_self_blob_id = input_self.getBlobId();
-    torch::jit::IValue iv_self = stream_executor.findBlob(in_stensor_id[0]).second;
+    int in_id = 0;
+    torch::jit::IValue iv_self = stream_executor.findBlob(in_stensor_id[in_id++]).second;
     assert(iv_self.isTensor());
     auto self_tensor = iv_self.toTensor();
-    // edge_id++;
 
     auto kernel_size =  getDataShapeFromVector(max_pool_2d_layer->getKernelSize());
     std::vector<int64_t> kernel_size_vec;
     if (kernel_size[0] == INT64_MIN && kernel_size[1] == INT64_MIN) {
-        // auto& data_edge = cast<nncir::DataEdge>(node.getInEdge(edge_id++));
-        // int data_blob_id = data_edge.getBlobId();
-        auto data_iv = stream_executor.findBlob(in_stensor_id[1]).second;
+        auto data_iv = stream_executor.findBlob(in_stensor_id[in_id++]).second;
         assert(data_iv.isList());
         auto data_list = data_iv.toListRef();
         kernel_size_vec = parseIValueVector<int64_t>(data_list);
@@ -2822,9 +2733,7 @@ void executorAtenMaxPool2d(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, Str
     auto stride = getDataShapeFromVector(max_pool_2d_layer->getStride());
     std::vector<int64_t> stride_vec;
     if (stride[0] == INT64_MIN && stride[1] == INT64_MIN) {
-        // auto& data_edge = cast<nncir::DataEdge>(node.getInEdge(edge_id++));
-        // int data_blob_id = data_edge.getBlobId();
-        auto data_iv = stream_executor.findBlob(in_stensor_id[2]).second;
+        auto data_iv = stream_executor.findBlob(in_stensor_id[in_id++]).second;
         assert(data_iv.isList());
         auto data_list = data_iv.toListRef();
         stride_vec = parseIValueVector<int64_t>(data_list);
@@ -2837,9 +2746,7 @@ void executorAtenMaxPool2d(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, Str
     auto padding = getDataShapeFromVector(max_pool_2d_layer->getPad());
     std::vector<int64_t> padding_vec;
     if (padding[0] == INT64_MIN && padding[1] == INT64_MIN) {
-        // auto& data_edge = cast<nncir::DataEdge>(node.getInEdge(edge_id++));
-        // int data_blob_id = data_edge.getBlobId();
-        auto data_iv = stream_executor.findBlob(in_stensor_id[3]).second;
+        auto data_iv = stream_executor.findBlob(in_stensor_id[in_id++]).second;
         assert(data_iv.isList());
         auto data_list = data_iv.toListRef();
         padding_vec = parseIValueVector<int64_t>(data_list);
@@ -2851,9 +2758,7 @@ void executorAtenMaxPool2d(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, Str
     auto dilation = getDataShapeFromVector(max_pool_2d_layer->getDilation());
     std::vector<int64_t> dilation_vec;
     if (dilation[0] == INT64_MIN && dilation[1] == INT64_MIN) {
-        // auto& data_edge = cast<nncir::DataEdge>(node.getInEdge(edge_id++));
-        // int data_blob_id = data_edge.getBlobId();
-        auto data_iv = stream_executor.findBlob(in_stensor_id[4]).second;
+        auto data_iv = stream_executor.findBlob(in_stensor_id[in_id++]).second;
         assert(data_iv.isList());
         auto data_list = data_iv.toListRef();
         dilation_vec = parseIValueVector<int64_t>(data_list);
@@ -2864,9 +2769,7 @@ void executorAtenMaxPool2d(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, Str
 
     auto ceil_mode = max_pool_2d_layer->getCeilMode();
     if (nn_compiler::ir::isDefaultValue(ceil_mode)) {
-        // auto& data_edge = cast<nncir::DataEdge>(node.getInEdge(edge_id++));
-        // int data_blob_id = data_edge.getBlobId();
-        auto data_iv = stream_executor.findBlob(in_stensor_id[5]).second;
+        auto data_iv = stream_executor.findBlob(in_stensor_id[in_id++]).second;
         assert(data_iv.isInt());
         ceil_mode = data_iv.toInt();
     }
@@ -2874,8 +2777,6 @@ void executorAtenMaxPool2d(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, Str
     auto output = atenMaxPool2d(self_tensor, at::ArrayRef<int64_t>(kernel_size_vec),
                                       at::ArrayRef<int64_t>(stride_vec), at::ArrayRef<int64_t>(padding_vec),
                                       at::ArrayRef<int64_t>(dilation_vec), static_cast<bool>(ceil_mode));
-    // update output
-    // auto& out_edge = cast<nncir::DataEdge>(node.getFirstOutEdge());
     stream_executor.updateBlob(out_stensor_id[0], DataType::TENSOR, tensorToIValue(output));
 }
 
@@ -2893,7 +2794,8 @@ void executorAtenMin(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExe
 
     // auto& input_self = cast<nncir::DataEdge>(node.getInEdge(edge_id++));
     // int input_self_blob_id = input_self.getBlobId();
-    torch::jit::IValue iv_self = stream_executor.findBlob(in_stensor_id[0]).second;
+    int in_id = 0;
+    torch::jit::IValue iv_self = stream_executor.findBlob(in_stensor_id[in_id++]).second;
     assert(iv_self.isTensor());
     at::Tensor self_tensor = iv_self.toTensor();
 
@@ -2907,7 +2809,7 @@ void executorAtenMin(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExe
     if (in_stensor_id.size() == 2 && nn_compiler::ir::isDefaultValue(dim)) {
         // auto& input_other = cast<nncir::DataEdge>(node.getInEdge(edge_id++));
         // int input_other_blob_id = input_other.getBlobId();
-        torch::jit::IValue iv_other = stream_executor.findBlob(in_stensor_id[1]).second;
+        torch::jit::IValue iv_other = stream_executor.findBlob(in_stensor_id[in_id++]).second;
         assert(iv_other.isTensor());
         at::Tensor other_tensor = iv_other.toTensor();
         auto output = atenMin(self_tensor, other_tensor);
@@ -2918,7 +2820,7 @@ void executorAtenMin(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExe
     if (nn_compiler::ir::isDefaultValue(dim)) {
         // auto& dim_edge = cast<nncir::DataEdge>(node.getInEdge(edge_id++));
         // int dim_blob_id = dim_edge.getBlobId();
-        auto dim_iv = stream_executor.findBlob(in_stensor_id[2]).second;
+        auto dim_iv = stream_executor.findBlob(in_stensor_id[in_id++]).second;
         assert(dim_iv.isInt());
         dim = dim_iv.toInt();
     }
@@ -2927,7 +2829,7 @@ void executorAtenMin(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExe
     if (nn_compiler::ir::isDefaultValue(keepdim)) {
         // auto& data_edge = cast<nncir::DataEdge>(node.getInEdge(edge_id++));
         // int data_blob_id = data_edge.getBlobId();
-        auto data_iv = stream_executor.findBlob(in_stensor_id[3]).second;
+        auto data_iv = stream_executor.findBlob(in_stensor_id[in_id++]).second;
         assert(data_iv.isInt());
         keepdim = static_cast<int>(data_iv.toInt());
     }
@@ -3119,7 +3021,8 @@ void executorAtenOnes(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamEx
 
     // auto& input_tensor = cast<nncir::DataEdge>(node.getInEdge(edge_id++));
     // int input_tensor_blob_id = input_tensor.getBlobId();
-    auto iv_self = stream_executor.findBlob(in_stensor_id[0]).second;
+    int in_id = 0;
+    auto iv_self = stream_executor.findBlob(in_stensor_id[in_id++]).second;
     assert(iv_self.isList());
     auto self_list = iv_self.toListRef();
     auto array_ref = parseIValueVector<int64_t>(self_list);
@@ -3129,7 +3032,7 @@ void executorAtenOnes(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamEx
     if (nn_compiler::ir::isDefaultValue(dtype)) {
         // auto& edge_dtype = cast<nncir::DataEdge>(node.getInEdge(edge_id++));
         // auto dtype_id = edge_dtype.getBlobId();
-        auto iv_dtype = stream_executor.findBlob(in_stensor_id[1]).second;
+        auto iv_dtype = stream_executor.findBlob(in_stensor_id[in_id++]).second;
         if (!iv_dtype.isNone()) {
             options = options.dtype(iv_dtype.toScalarType());
         }
@@ -3141,7 +3044,7 @@ void executorAtenOnes(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamEx
     if (nn_compiler::ir::isDefaultValue(layout)) {
         // auto& edge_layout = cast<nncir::DataEdge>(node.getInEdge(edge_id++));
         // auto layout_id = edge_layout.getBlobId();
-        auto iv_layout = stream_executor.findBlob(in_stensor_id[2]).second;
+        auto iv_layout = stream_executor.findBlob(in_stensor_id[in_id++]).second;
         if (!iv_layout.isNone()) {
             options = options.layout(iv_layout.toLayout());
         }
@@ -3153,7 +3056,7 @@ void executorAtenOnes(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamEx
     if (nn_compiler::ir::isDefaultValue(device)) {
         // auto& edge_device = cast<nncir::DataEdge>(node.getInEdge(edge_id++));
         // auto device_id = edge_device.getBlobId();
-        auto iv_device = stream_executor.findBlob(in_stensor_id[3]).second;
+        auto iv_device = stream_executor.findBlob(in_stensor_id[in_id++]).second;
         if (!iv_device.isNone()) {
             options = options.device(iv_device.toDevice());
         }
@@ -3165,7 +3068,7 @@ void executorAtenOnes(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamEx
     if (nn_compiler::ir::isDefaultValue(pin_memory)) {
         // auto& edge_pin_memory = cast<nncir::DataEdge>(node.getInEdge(edge_id++));
         // auto pin_memory_id = edge_pin_memory.getBlobId();
-        auto iv_pin_memory = stream_executor.findBlob(in_stensor_id[4]).second;
+        auto iv_pin_memory = stream_executor.findBlob(in_stensor_id[in_id++]).second;
         if (!iv_pin_memory.isNone()) {
             options = options.pinned_memory(iv_pin_memory.toBool());
         }
@@ -3219,9 +3122,10 @@ void executorAtenPadPackedSequence(std::shared_ptr<nn_compiler::ir::NNLayer>& la
     auto in_stensor_id = layer->getInSTensorID();
     auto out_stensor_id = layer->getOutSTensorID();
 
+    int in_id = 0;
     // Find the input blob
-    torch::jit::IValue iv_self = stream_executor.findBlob(in_stensor_id[0]).second;
-    torch::jit::IValue iv_other = stream_executor.findBlob(in_stensor_id[1]).second;
+    torch::jit::IValue iv_self = stream_executor.findBlob(in_stensor_id[in_id++]).second;
+    torch::jit::IValue iv_other = stream_executor.findBlob(in_stensor_id[in_id++]).second;
     assert(iv_self.isTensor() && iv_other.isTensor());
     auto self_tensor = iv_self.toTensor();
     auto other_tensor = iv_other.toTensor();
@@ -3230,7 +3134,7 @@ void executorAtenPadPackedSequence(std::shared_ptr<nn_compiler::ir::NNLayer>& la
     if (nn_compiler::ir::isDefaultValue(batch_first)) {
         // auto& data_edge = cast<nncir::DataEdge>(node.getInEdge(edge_id++));
         // int data_blob_id = data_edge.getBlobId();
-        auto data_iv = stream_executor.findBlob(in_stensor_id[2]).second;
+        auto data_iv = stream_executor.findBlob(in_stensor_id[in_id++]).second;
         assert(data_iv.isInt());
         batch_first = static_cast<int>(data_iv.toInt());
     }
@@ -3239,7 +3143,7 @@ void executorAtenPadPackedSequence(std::shared_ptr<nn_compiler::ir::NNLayer>& la
     if (nn_compiler::ir::isDefaultValue(padding_value)) {
         // auto& data_edge = cast<nncir::DataEdge>(node.getInEdge(edge_id++));
         // int data_blob_id = data_edge.getBlobId();
-        auto data_iv = stream_executor.findBlob(in_stensor_id[3]).second;
+        auto data_iv = stream_executor.findBlob(in_stensor_id[in_id++]).second;
         assert(data_iv.isDouble());
         padding_value = static_cast<float>(data_iv.toDouble());
     }
@@ -3248,7 +3152,7 @@ void executorAtenPadPackedSequence(std::shared_ptr<nn_compiler::ir::NNLayer>& la
     if (nn_compiler::ir::isDefaultValue(total_length)) {
         // auto& data_edge = cast<nncir::DataEdge>(node.getInEdge(edge_id++));
         // int data_blob_id = data_edge.getBlobId();
-        auto data_iv = stream_executor.findBlob(in_stensor_id[4]).second;
+        auto data_iv = stream_executor.findBlob(in_stensor_id[in_id++]).second;
         assert(data_iv.isInt());
         total_length = data_iv.toInt();
     }
@@ -3323,7 +3227,8 @@ void executorAtenSelect(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, Stream
     auto in_stensor_id = layer->getInSTensorID();
     auto out_stensor_id = layer->getOutSTensorID();
 
-    torch::jit::IValue iv_self = stream_executor.findBlob(in_stensor_id[0]).second;
+    int in_id = 0;
+    torch::jit::IValue iv_self = stream_executor.findBlob(in_stensor_id[in_id++]).second;
     assert(iv_self.isTensor());
     at::Tensor self_tensor = iv_self.toTensor();
     // edge_id++;
@@ -3332,7 +3237,7 @@ void executorAtenSelect(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, Stream
     if (nn_compiler::ir::isDefaultValue(dim)) {
         // auto& dim_edge = cast<nncir::DataEdge>(select_node.getInEdge(edge_id++));
         // int dim_blob_id = dim_edge.getBlobId();
-        auto dim_iv = stream_executor.findBlob(in_stensor_id[1]).second;
+        auto dim_iv = stream_executor.findBlob(in_stensor_id[in_id++]).second;
         assert(dim_iv.isInt());
         dim = dim_iv.toInt();
     }
@@ -3340,7 +3245,7 @@ void executorAtenSelect(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, Stream
     if (nn_compiler::ir::isDefaultValue(index)) {
         // auto& index_edge = cast<nncir::DataEdge>(select_node.getInEdge(edge_id++));
         // int index_blob_id = index_edge.getBlobId();
-        auto index_iv = stream_executor.findBlob(in_stensor_id[2]).second;
+        auto index_iv = stream_executor.findBlob(in_stensor_id[in_id++]).second;
         assert(index_iv.isInt());
         index = index_iv.toInt();
     }
@@ -3359,18 +3264,19 @@ void executorAtenSetItem(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, Strea
     auto in_stensor_id = layer->getInSTensorID();
     auto out_stensor_id = layer->getOutSTensorID();
 
-    torch::jit::IValue iv_self = stream_executor.findBlob(in_stensor_id[0]).second;
+    int in_id = 0;
+    torch::jit::IValue iv_self = stream_executor.findBlob(in_stensor_id[in_id++]).second;
     assert(iv_self.isList());
     auto self_list = iv_self.toList();
 
     auto indice = set_item_layer->getIndices();
     if (nn_compiler::ir::isDefaultValue(indice)) {
-        auto data_iv = stream_executor.findBlob(in_stensor_id[1]).second;
+        auto data_iv = stream_executor.findBlob(in_stensor_id[in_id++]).second;
         assert(data_iv.isInt());
         indice = data_iv.toInt();
     }
 
-    torch::jit::IValue iv_item = stream_executor.findBlob(in_stensor_id[2]).second;
+    torch::jit::IValue iv_item = stream_executor.findBlob(in_stensor_id[in_id++]).second;
 
     auto output = atenSetItem(self_list, indice, iv_item);
     // update output
@@ -3416,7 +3322,8 @@ void executorAtenSlice(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamE
     auto in_stensor_id = layer->getInSTensorID();
     auto out_stensor_id = layer->getOutSTensorID();
 
-    torch::jit::IValue iv_tensor = stream_executor.findBlob(in_stensor_id[0]).second;
+    int in_id = 0;
+    torch::jit::IValue iv_tensor = stream_executor.findBlob(in_stensor_id[in_id++]).second;
     assert(iv_tensor.isTensor());
     // edge_id++;
 
@@ -3424,25 +3331,25 @@ void executorAtenSlice(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamE
 
     auto dim = slice_layer->getDim();
     if (nn_compiler::ir::isDefaultValue(dim)) {
-        auto dim_iv = stream_executor.findBlob(in_stensor_id[1]).second;
+        auto dim_iv = stream_executor.findBlob(in_stensor_id[in_id++]).second;
         assert(dim_iv.isInt());
         dim = dim_iv.toInt();
     }
     auto start = slice_layer->getStart();
     if (nn_compiler::ir::isDefaultValue(start)) {
-        auto start_iv = stream_executor.findBlob(in_stensor_id[2]).second;
+        auto start_iv = stream_executor.findBlob(in_stensor_id[in_id++]).second;
         assert(start_iv.isInt());
         start = start_iv.toInt();
     }
     auto end = slice_layer->getEnd();
     if (nn_compiler::ir::isDefaultValue(end)) {
-        auto end_iv = stream_executor.findBlob(in_stensor_id[3]).second;
+        auto end_iv = stream_executor.findBlob(in_stensor_id[in_id++]).second;
         assert(end_iv.isInt());
         end = end_iv.toInt();
     }
     auto step = slice_layer->getStep();
     if (nn_compiler::ir::isDefaultValue(step)) {
-        auto step_iv = stream_executor.findBlob(in_stensor_id[4]).second;
+        auto step_iv = stream_executor.findBlob(in_stensor_id[in_id++]).second;
         assert(step_iv.isInt());
         step = step_iv.toInt();
     }
@@ -3460,13 +3367,14 @@ void executorAtenSoftmax(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, Strea
     auto in_stensor_id = layer->getInSTensorID();
     auto out_stensor_id = layer->getOutSTensorID();
 
-    torch::jit::IValue iv_tensor = stream_executor.findBlob(in_stensor_id[0]).second;
+    int in_id = 0;
+    torch::jit::IValue iv_tensor = stream_executor.findBlob(in_stensor_id[in_id++]).second;
     assert(iv_tensor.isTensor());
     auto self_tensor = iv_tensor.toTensor();
 
     auto dim = softmax_layer->getDim();
     if (nn_compiler::ir::isDefaultValue(dim)) {
-        auto data_iv = stream_executor.findBlob(in_stensor_id[1]).second;
+        auto data_iv = stream_executor.findBlob(in_stensor_id[in_id++]).second;
         assert(data_iv.isInt());
         dim = data_iv.toInt();
     }
@@ -3474,7 +3382,7 @@ void executorAtenSoftmax(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, Strea
     auto dtype = softmax_layer->getDtype();
     at::Tensor output;
     if (nn_compiler::ir::isDefaultValue(dtype)) {
-        auto data_iv = stream_executor.findBlob(in_stensor_id[2]).second;
+        auto data_iv = stream_executor.findBlob(in_stensor_id[in_id++]).second;
         if (!data_iv.isNone()) {
             dtype = data_iv.toInt();
             output = atenSoftmax(self_tensor, dim, at::ScalarType(dtype));
@@ -3496,13 +3404,14 @@ void executorAtenSqueeze(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, Strea
     auto in_stensor_id = layer->getInSTensorID();
     auto out_stensor_id = layer->getOutSTensorID();
 
-    torch::jit::IValue iv_tensor = stream_executor.findBlob(in_stensor_id[0]).second;
+    int in_id = 0;
+    torch::jit::IValue iv_tensor = stream_executor.findBlob(in_stensor_id[in_id++]).second;
     assert(iv_tensor.isTensor());
     auto self_tensor = iv_tensor.toTensor();
 
     auto dim = squeeze_layer->getDim();
     if (nn_compiler::ir::isDefaultValue(dim)) {
-        auto data_iv = stream_executor.findBlob(in_stensor_id[1]).second;
+        auto data_iv = stream_executor.findBlob(in_stensor_id[in_id++]).second;
         assert(data_iv.isInt());
         dim = data_iv.toInt();
     }
@@ -3559,13 +3468,14 @@ void executorAtenSum(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExe
     auto in_stensor_id = layer->getInSTensorID();
     auto out_stensor_id = layer->getOutSTensorID();
 
-    torch::jit::IValue iv_tensor = stream_executor.findBlob(in_stensor_id[0]).second;
+    int in_id = 0;
+    torch::jit::IValue iv_tensor = stream_executor.findBlob(in_stensor_id[in_id++]).second;
     assert(iv_tensor.isTensor());
     auto self_tensor = iv_tensor.toTensor();
 
     auto dims = sum_layer->getDim();
     if (dims.size() == 0) {
-        auto data_iv = stream_executor.findBlob(in_stensor_id[1]).second;
+        auto data_iv = stream_executor.findBlob(in_stensor_id[in_id++]).second;
         assert(data_iv.isList());
         auto dims_list = data_iv.toListRef();
         dims = parseIValueVector<int64_t>(dims_list);
@@ -3573,14 +3483,14 @@ void executorAtenSum(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExe
 
     auto keepdim = sum_layer->getKeepdim();
     if (nn_compiler::ir::isDefaultValue(keepdim)) {
-        auto data_iv = stream_executor.findBlob(in_stensor_id[2]).second;
+        auto data_iv = stream_executor.findBlob(in_stensor_id[in_id++]).second;
         assert(data_iv.isInt());
         keepdim = static_cast<int>(data_iv.toInt());
     }
 
     auto dtype = sum_layer->getDtype();
     if (nn_compiler::ir::isDefaultValue(dtype)) {
-        auto data_iv = stream_executor.findBlob(in_stensor_id[3]).second;
+        auto data_iv = stream_executor.findBlob(in_stensor_id[in_id++]).second;
         if (!data_iv.isNone()) {
             dtype = data_iv.toInt();
         }
@@ -3681,13 +3591,14 @@ void executorAtenTo1(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExe
     auto in_stensor_id = layer->getInSTensorID();
     auto out_stensor_id = layer->getOutSTensorID();
 
-    torch::jit::IValue iv_self = stream_executor.findBlob(in_stensor_id[0]).second;
+    int in_id = 0;
+    torch::jit::IValue iv_self = stream_executor.findBlob(in_stensor_id[in_id++]).second;
     assert(iv_self.isTensor());
     at::Tensor self_tensor = iv_self.toTensor();
 
     auto ori_dtype = to1_layer->getDType();
     if (nn_compiler::ir::isDefaultValue(ori_dtype)) {
-        auto ori_dtype_iv = stream_executor.findBlob(in_stensor_id[1]).second;
+        auto ori_dtype_iv = stream_executor.findBlob(in_stensor_id[in_id++]).second;
         assert(ori_dtype_iv.isInt());
         ori_dtype = ori_dtype_iv.toInt();
     }
@@ -3695,7 +3606,7 @@ void executorAtenTo1(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExe
 
     int non_blocking_val = to1_layer->getNonBlocking();
     if (nn_compiler::ir::isDefaultValue(non_blocking_val)) {
-        auto non_blocking_iv = stream_executor.findBlob(in_stensor_id[2]).second;
+        auto non_blocking_iv = stream_executor.findBlob(in_stensor_id[in_id++]).second;
         if (non_blocking_iv.isNone()) {
             non_blocking_val = 0;
         } else {
@@ -3706,7 +3617,7 @@ void executorAtenTo1(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExe
 
     int copy_val = to1_layer->getCopy();
     if (nn_compiler::ir::isDefaultValue(copy_val)) {
-        auto copy_iv = stream_executor.findBlob(in_stensor_id[3]).second;
+        auto copy_iv = stream_executor.findBlob(in_stensor_id[in_id++]).second;
         if (copy_iv.isNone()) {
             copy_val = 0;
         } else {
@@ -3717,7 +3628,7 @@ void executorAtenTo1(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExe
 
     auto optional_memory_format = to1_layer->getOptionalMemoryFormat();
     if (nn_compiler::ir::isDefaultValue(optional_memory_format)) {
-        auto optional_memory_format_iv = stream_executor.findBlob(in_stensor_id[4]).second;
+        auto optional_memory_format_iv = stream_executor.findBlob(in_stensor_id[in_id++]).second;
         assert(optional_memory_format_iv.isInt());
         optional_memory_format = optional_memory_format_iv.toInt();
     }
@@ -3743,17 +3654,18 @@ void executorAtenTo2(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExe
     auto in_stensor_id = layer->getInSTensorID();
     auto out_stensor_id = layer->getOutSTensorID();
 
-    torch::jit::IValue iv_self = stream_executor.findBlob(in_stensor_id[0]).second;
+    int in_id = 0;
+    torch::jit::IValue iv_self = stream_executor.findBlob(in_stensor_id[in_id++]).second;
     assert(iv_self.isTensor());
     at::Tensor self_tensor = iv_self.toTensor();
 
-    torch::jit::IValue iv_other = stream_executor.findBlob(in_stensor_id[1]).second;
+    torch::jit::IValue iv_other = stream_executor.findBlob(in_stensor_id[in_id++]).second;
     assert(iv_other.isTensor());
     at::Tensor other_tensor = iv_other.toTensor();
 
     int non_blocking_val = to2_layer->getNonBlocking();
     if (nn_compiler::ir::isDefaultValue(non_blocking_val)) {
-        auto non_blocking_iv = stream_executor.findBlob(in_stensor_id[2]).second;
+        auto non_blocking_iv = stream_executor.findBlob(in_stensor_id[in_id++]).second;
         if (non_blocking_iv.isNone()) {
             non_blocking_val = 0;
         } else {
@@ -3764,7 +3676,7 @@ void executorAtenTo2(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExe
 
     int copy_val = to2_layer->getCopy();
     if (nn_compiler::ir::isDefaultValue(copy_val)) {
-        auto copy_iv = stream_executor.findBlob(in_stensor_id[3]).second;
+        auto copy_iv = stream_executor.findBlob(in_stensor_id[in_id++]).second;
         if (copy_iv.isNone()) {
             copy_val = 0;
         } else {
@@ -3775,7 +3687,7 @@ void executorAtenTo2(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExe
 
     auto optional_memory_format = to2_layer->getOptionalMemoryFormat();
     if (nn_compiler::ir::isDefaultValue(optional_memory_format)) {
-        auto optional_memory_format_iv = stream_executor.findBlob(in_stensor_id[4]).second;
+        auto optional_memory_format_iv = stream_executor.findBlob(in_stensor_id[in_id++]).second;
         assert(optional_memory_format_iv.isInt());
         optional_memory_format = optional_memory_format_iv.toInt();
     }
@@ -3801,34 +3713,35 @@ void executorAtenTopk(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamEx
     auto in_stensor_id = layer->getInSTensorID();
     auto out_stensor_id = layer->getOutSTensorID();
 
-    torch::jit::IValue iv_tensor = stream_executor.findBlob(in_stensor_id[0]).second;
+    int in_id = 0;
+    torch::jit::IValue iv_tensor = stream_executor.findBlob(in_stensor_id[in_id++]).second;
     assert(iv_tensor.isTensor());
     auto self_tensor = iv_tensor.toTensor();
 
     auto k = topk_layer->getK();
     if (nn_compiler::ir::isDefaultValue(k)) {
-        auto data_iv = stream_executor.findBlob(in_stensor_id[1]).second;
+        auto data_iv = stream_executor.findBlob(in_stensor_id[in_id++]).second;
         assert(data_iv.isInt());
         k = data_iv.toInt();
     }
 
     auto dim = topk_layer->getDim();
     if (nn_compiler::ir::isDefaultValue(dim)) {
-        auto data_iv = stream_executor.findBlob(in_stensor_id[2]).second;
+        auto data_iv = stream_executor.findBlob(in_stensor_id[in_id++]).second;
         assert(data_iv.isInt());
         dim = data_iv.toInt();
     }
 
     auto largest = topk_layer->getLargest();
     if (nn_compiler::ir::isDefaultValue(largest)) {
-        auto data_iv = stream_executor.findBlob(in_stensor_id[3]).second;
+        auto data_iv = stream_executor.findBlob(in_stensor_id[in_id++]).second;
         assert(data_iv.isInt());
         largest = static_cast<int>(data_iv.toInt());
     }
 
     auto sorted = topk_layer->getSorted();
     if (nn_compiler::ir::isDefaultValue(sorted)) {
-        auto data_iv = stream_executor.findBlob(in_stensor_id[4]).second;
+        auto data_iv = stream_executor.findBlob(in_stensor_id[in_id++]).second;
         assert(data_iv.isInt());
         sorted = static_cast<int>(data_iv.toInt());
     }
@@ -3849,20 +3762,21 @@ void executorAtenTranspose(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, Str
     auto in_stensor_id = layer->getInSTensorID();
     auto out_stensor_id = layer->getOutSTensorID();
 
-    torch::jit::IValue iv_self = stream_executor.findBlob(in_stensor_id[0]).second;
+    int in_id = 0;
+    torch::jit::IValue iv_self = stream_executor.findBlob(in_stensor_id[in_id++]).second;
     assert(iv_self.isTensor());
     at::Tensor self_tensor = iv_self.toTensor();
     // edge_id++;
 
     auto dim0 = transpose_layer->getDim0();
     if (nn_compiler::ir::isDefaultValue(dim0)) {
-        auto dim0_iv = stream_executor.findBlob(in_stensor_id[1]).second;
+        auto dim0_iv = stream_executor.findBlob(in_stensor_id[in_id++]).second;
         assert(dim0_iv.isInt());
         dim0 = dim0_iv.toInt();
     }
     auto dim1 = transpose_layer->getDim1();
     if (nn_compiler::ir::isDefaultValue(dim1)) {
-        auto dim1_iv = stream_executor.findBlob(in_stensor_id[2]).second;
+        auto dim1_iv = stream_executor.findBlob(in_stensor_id[in_id++]).second;
         assert(dim1_iv.isInt());
         dim1 = dim1_iv.toInt();
     }
