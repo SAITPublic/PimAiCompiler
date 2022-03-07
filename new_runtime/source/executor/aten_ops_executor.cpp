@@ -2079,5 +2079,457 @@ void executorAtenLSTM1(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamE
     }
 }
 
+void executorAtenLSTM2(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
+{
+    DLOG(INFO) << "execute Aten LSTM2 node";
+
+    auto lstm2_layer = std::dynamic_pointer_cast<nn_compiler::ir::AtenLSTM2Layer>(layer);
+
+    auto in_stensor_id = layer->getInSTensorID();
+    auto out_stensor_id = layer->getOutSTensorID();
+
+    // auto lstm2_node = cast<nncir::AtenLSTM2Node>(op_node);
+    // int edge_idx = 0;
+
+    // const at::Tensor &input
+    // auto& input_edge = cast<nncir::DataEdge>(lstm2_node.getInEdge(edge_idx));
+    // int input_blob_id = input_edge.getBlobId();
+    auto input_iv = stream_executor.findBlob(in_stensor_id[0]).second;
+    assert(input_iv.isTensor());
+    auto input = input_iv.toTensor();
+    // edge_idx++;
+
+    // const at::Tensor &batch_sizes,
+    at::Tensor batch_sizes;
+    // auto& batch_sizes_edge = cast<nncir::DataEdge>(lstm2_node.getInEdge(edge_idx));
+    // int batch_sizes_blob_id = batch_sizes_edge.getBlobId();
+    auto batch_sizes_iv = stream_executor.findBlob(in_stensor_id[1]).second;
+    assert(batch_sizes_iv.isTensor());
+    batch_sizes = batch_sizes_iv.toTensor();
+    // edge_idx++;
+
+    // at::TensorList hx
+    // auto& hx_edge = cast<nncir::DataEdge>(lstm2_node.getInEdge(edge_idx));
+    // int hx_blob_id = hx_edge.getBlobId();
+    auto hx_iv = stream_executor.findBlob(in_stensor_id[2]).second;
+    assert(hx_iv.isTensorList());
+    auto hx_list_tensor = hx_iv.toTensorList();
+    std::vector<at::Tensor> hx_list_tensor_vector;
+    for (auto tensor : hx_list_tensor) {
+        hx_list_tensor_vector.push_back(tensor);
+    }
+    at::TensorList hx(hx_list_tensor_vector);
+    // edge_idx++;
+
+    // at::TensorList params
+    // Check and skip, will handle params after getting all arguments
+    if (in_stensor_id.size() > edge_idx) {
+        // auto& params_edge = cast<nncir::DataEdge>(lstm2_node.getInEdge(edge_idx));
+        // int params_blob_id = params_edge.getBlobId();
+        auto params_iv = stream_executor.findBlob(in_stensor_id[3]).second;
+        if (params_iv.isTensorList()) {
+            // edge_idx++;
+        }
+    }
+
+    // bool has_biases
+    int has_biases = lstm2_layer->getHasBiases();
+    if (nn_compiler::ir::isDefaultValue(has_biases)) {
+        // auto& has_biases_edge = cast<nncir::DataEdge>(lstm2_node.getInEdge(edge_idx));
+        // int has_biases_blob_id = has_biases_edge.getBlobId();
+        auto has_biases_iv = stream_executor.findBlob(in_stensor_id[4]).second;
+        assert(has_biases_iv.isInt());
+        has_biases = has_biases_iv.toInt();
+        // edge_idx++;
+    }
+
+    // int64_t num_layers
+    int64_t num_layers = lstm2_layer->getNumLayers();
+    if (nn_compiler::ir::isDefaultValue(num_layers)) {
+        // auto& num_layers_edge = cast<nncir::DataEdge>(lstm2_node.getInEdge(edge_idx));
+        // int num_layers_blob_id = num_layers_edge.getBlobId();
+        auto num_layers_iv = stream_executor.findBlob(in_stensor_id[5]).second;
+        assert(num_layers_iv.isInt());
+        num_layers = num_layers_iv.toInt();
+        // edge_idx++;
+    }
+
+    // double dropout
+    double dropout = lstm2_layer->getDropout();
+    if (nn_compiler::ir::isDefaultValue(dropout)) {
+        // auto& dropout_edge = cast<nncir::DataEdge>(lstm2_node.getInEdge(edge_idx));
+        // int dropout_blob_id = dropout_edge.getBlobId();
+        auto dropout_iv = stream_executor.findBlob(in_stensor_id[6]).second;
+        assert(dropout_iv.isDouble());
+        dropout = dropout_iv.toDouble();
+        // edge_idx++;
+    }
+
+    // bool train
+    int train = lstm2_layer->getTrain();
+    if (nn_compiler::ir::isDefaultValue(train)) {
+        // auto& train_edge = cast<nncir::DataEdge>(lstm2_node.getInEdge(edge_idx));
+        // int train_blob_id = train_edge.getBlobId();
+        auto train_iv = stream_executor.findBlob(in_stensor_id[7]).second;
+        assert(train_iv.isInt());
+        train = train_iv.toInt();
+        // edge_idx++;
+    }
+
+    // bool bidirectional
+    int bidirectional = lstm2_layer->getBidirectional();
+    if (nncir::isDefaultValue(bidirectional)) {
+        // auto& bidirectional_edge = cast<nncir::DataEdge>(lstm2_node.getInEdge(edge_idx));
+        // int bidirectional_blob_id = bidirectional_edge.getBlobId();
+        auto bidirectional_iv = stream_executor.findBlob(in_stensor_id[8]).second;
+        assert(bidirectional_iv.isInt());
+        bidirectional = bidirectional_iv.toInt();
+        // edge_idx++;
+    }
+
+    // at::TensorList params
+    // param layerout                --> (fw_w_ih, fw_w_hh, fw_b_ih?, fw_b_hh?) * layers
+    // param layerout (bidirctional) --> (fw_w_ih, fw_w_hh, fw_b_ih?, fw_b_hh?, bw_w_ih, bw_w_hh, bw_b_ih?, bw_b_hh?) *
+    // layers
+
+    auto weight_blob = lstm2_layer->getWeights();
+    auto bias_blob = lstm2_layer->getBias();
+    std::vector<at::Tensor> param_vector;
+    assert((bidirectional == 0 || bidirectional == 1));
+
+    int hash_id = 0;
+    for (int i = 0; i < num_layers * (bidirectional + 1); i++) {
+        // w_ih
+        auto w_ih_iv = weight_blob[i * 2];
+        hash_id += in_stensor_id[0];
+        if (w_ih_iv.isTensor()) {
+            param_vector.push_back(w_ih_iv);
+        }
+        // w_hh
+        auto w_hh_iv = weight_blob[i * 2 + 1];
+        hash_id += in_stensor_id[1];
+        if (w_hh_iv.isTensor()) {
+            param_vector.push_back(w_hh_iv);
+        }
+        if (has_biases) {
+            // b_ih? (optional)
+            auto b_ih_iv = bias_blob[i * 2];
+            // hash_id += bias_blob_ids[i * 2];
+            if (b_ih_iv.isTensor()) {
+                param_vector.push_back(b_ih_iv);
+            }
+            // b_hh? (optional)
+            auto b_hh_iv = bias_blob[i * 2 + 1];
+            // hash_id += bias_blob_ids[i * 2 + 1];
+            if (b_hh_iv.isTensor()) {
+                param_vector.push_back(b_hh_iv);
+            }
+        }
+    }
+    at::TensorList params(param_vector);
+
+    // auto out_blob_ids = getOutBlobIds(op_node);
+    auto pos = std::unique(out_stensor_id.begin(), out_stensor_id.end());
+    out_stensor_id.erase(pos, out_stensor_id.end());
+    assert(out_stensor_id.size() == 3);
+    {
+        if (!input.is_contiguous()) input = input.contiguous();
+        void *in_dev, *hx_dev, *out_dev, *wei_dev, *cx_dev, *workspace_dev, *hy_dev, *cy_dev;
+        stream_executor.input_tensors.clear();
+        stream_executor.output_tensors.clear();
+
+        int batch_size = 1;
+        int in_dim = input.dim();
+        int input_size = input.size(in_dim - 1);
+        int seq_len = input.size(in_dim - 2);
+        int bidirectional_int = static_cast<bool>(bidirectional) ? 2 : 1;
+
+        int hx_dim = hx_list_tensor_vector[0].dim();
+        int hidden_size = hx_list_tensor_vector[0].size(hx_dim - 1);
+
+        std::vector<int> in_len({batch_size, input_size});
+        std::vector<int> hid_len({bidirectional_int *  (int)(num_layers),  hidden_size});
+        std::vector<int> out_len({bidirectional_int * hidden_size});
+
+        int dims = 2;
+        for (int i = 0; i < seq_len; i++) {
+            std::array<int, 2> in_lens = {in_len[0],  in_len.back() };
+            miopenCreateTensorDescriptor(&stream_executor.input_tensor);
+            miopenSetTensorDescriptor(stream_executor.input_tensor, miopenHalf, dims, in_lens.data(), nullptr);
+            stream_executor.input_tensors.push_back(stream_executor.input_tensor);
+
+            std::array<int, 2> out_lens = {{in_len[0], out_len[0]}};
+            miopenCreateTensorDescriptor(&stream_executor.output_tensor);
+            miopenSetTensorDescriptor(stream_executor.output_tensor, miopenHalf, dims, out_lens.data(), nullptr);
+            stream_executor.output_tensors.push_back(stream_executor.output_tensor);
+        }
+        std::array<int, 3> hid_lens = {{hid_len[0], in_len[0], hid_len[1]}};
+        miopenSetTensorDescriptor(stream_executor.hidden_tensor, miopenHalf, 3, hid_lens.data(), nullptr);
+
+        miopenRNNMode_t mode = miopenRNNMode_t::miopenLSTM;;
+        miopenRNNBiasMode_t biasMode = static_cast<bool>(has_biases) ? miopenRNNwithBias : miopenRNNNoBias;
+        miopenRNNDirectionMode_t directionMode = bidirectional_int == 2 ? miopenRNNbidirection : miopenRNNunidirection;
+        miopenRNNInputMode_t inMode = miopenRNNlinear;
+        miopenRNNAlgo_t algo = miopenRNNdefault;
+
+        miopenSetRNNDescriptor(stream_executor.rnnDesc, hidden_size, num_layers, inMode, directionMode, mode, biasMode, algo, miopenHalf);
+        miopenGetRNNParamsDescriptor(stream_executor.handle, stream_executor.rnnDesc, stream_executor.input_tensor, stream_executor.weight_tensor, miopenHalf);
+        size_t workspace_size;
+        miopenGetRNNWorkspaceSize(stream_executor.handle, stream_executor.rnnDesc, seq_len, stream_executor.input_tensors.data(), &workspace_size);
+        auto workspace = at::empty(workspace_size, input.options().dtype(at::kByte));
+
+        int datasize = 2; //miopenHalf
+        in_dev = input.data_ptr();
+
+        hash_id += 10000; // avert id conflict
+        auto it = stream_executor.global_blobs_.find(hash_id);
+        if (it == stream_executor.global_blobs_.end()) {
+            size_t weight_size = 0;
+            miopenGetRNNParamsSize(stream_executor.handle, stream_executor.rnnDesc, stream_executor.input_tensor, &weight_size, miopenHalf);
+            auto weight_buf = at::empty(weight_size / datasize, input.options());
+            int expected_weight_size = hidden_size * 4 * (input_size + hidden_size + 2) * bidirectional_int + hidden_size * 4 * (hidden_size + hidden_size + 2) * (num_layers - 1) * bidirectional_int;
+            assert((weight_size / datasize) == expected_weight_size);
+            size_t offset = 0;
+            size_t param_size = 0;
+
+            offset = 0;
+            param_size = 0;
+
+            int param_num = static_cast<bool>(has_biases) ? 4 * num_layers * bidirectional_int: 2 * num_layers * bidirectional_int;
+            int num = 0;
+            int num_offset = static_cast<bool>(has_biases) ? 4 * bidirectional_int : 2 * bidirectional_int;
+            for (; num < param_num; num += num_offset) {
+                param_size = 1;
+                auto in_wei_vec = param_vector[num].sizes().vec();
+                for (int i = 0; i < in_wei_vec.size(); ++i) {
+                    param_size *= in_wei_vec[i];
+                }
+
+                at::Tensor param = at::from_blob((_Float16*)(weight_buf.data_ptr()) + offset, {static_cast<long>(param_size)}, weight_buf.options());
+                auto sliced_tensor = param_vector[num].chunk(4, 0);
+                auto permuted_wei = at::cat({sliced_tensor[0], sliced_tensor[1], sliced_tensor[3], sliced_tensor[2]});
+                param.copy_(permuted_wei.view_as(param));
+                offset += param_size;
+
+                if (bidirectional_int == 2) {
+                    param_size = 1;
+                    in_wei_vec = param_vector[num + (num_offset / bidirectional_int)].sizes().vec();
+                    for (int i = 0; i < in_wei_vec.size(); ++i) {
+                        param_size *= in_wei_vec[i];
+                    }
+                    param = at::from_blob((_Float16*)(weight_buf.data_ptr()) + offset, {static_cast<long>(param_size)}, weight_buf.options());
+                    sliced_tensor = param_vector[num + (num_offset / bidirectional_int)].chunk(4, 0);
+                    permuted_wei = at::cat({sliced_tensor[0], sliced_tensor[1], sliced_tensor[3], sliced_tensor[2]});
+                    param.copy_(permuted_wei.view_as(param));
+                    offset += param_size;
+                }
+
+                param_size = 1;
+                in_wei_vec = param_vector[num + 1].sizes().vec();
+                for (int i = 0; i < in_wei_vec.size(); ++i) {
+                    param_size *= in_wei_vec[i];
+                }
+                param = at::from_blob((_Float16*)(weight_buf.data_ptr()) + offset, {static_cast<long>(param_size)}, weight_buf.options());
+                sliced_tensor = param_vector[num + 1].chunk(4, 0);
+                permuted_wei = at::cat({sliced_tensor[0], sliced_tensor[1], sliced_tensor[3], sliced_tensor[2]});
+                param.copy_(permuted_wei.view_as(param));
+                offset += param_size;
+
+                if (bidirectional_int == 2) {
+                    param_size = 1;
+                    in_wei_vec = param_vector[num + (num_offset / bidirectional_int) + 1].sizes().vec();
+                    for (int i = 0; i < in_wei_vec.size(); ++i) {
+                        param_size *= in_wei_vec[i];
+                    }
+                    param = at::from_blob((_Float16*)(weight_buf.data_ptr()) + offset, {static_cast<long>(param_size)}, weight_buf.options());
+                    sliced_tensor = param_vector[num + (num_offset / bidirectional_int) + 1].chunk(4, 0);
+                    permuted_wei = at::cat({sliced_tensor[0], sliced_tensor[1], sliced_tensor[3], sliced_tensor[2]});
+                    param.copy_(permuted_wei.view_as(param));
+                    offset += param_size;
+                }
+            }
+            if (static_cast<bool>(has_biases)) {
+                num = 2;
+                for (; num < param_num; num += num_offset) {
+                    param_size = 1;
+                    auto in_wei_vec = param_vector[num].sizes().vec();
+                    for (int i = 0; i < in_wei_vec.size(); ++i) {
+                        param_size *= in_wei_vec[i];
+                    }
+                    at::Tensor param = at::from_blob((_Float16*)(weight_buf.data_ptr()) + offset, {static_cast<long>(param_size)}, weight_buf.options());
+                    auto sliced_tensor = param_vector[num].chunk(4, 0);
+                    auto permuted_wei = at::cat({sliced_tensor[0], sliced_tensor[1], sliced_tensor[3], sliced_tensor[2]});
+                    param.copy_(permuted_wei.view_as(param));
+                    offset += param_size;
+
+                    if (bidirectional_int == 2) {
+                        param_size = 1;
+                        in_wei_vec = param_vector[num + (num_offset / bidirectional_int)].sizes().vec();
+                        for (int i = 0; i < in_wei_vec.size(); ++i) {
+                            param_size *= in_wei_vec[i];
+                        }
+                        param = at::from_blob((_Float16*)(weight_buf.data_ptr()) + offset, {static_cast<long>(param_size)}, weight_buf.options());
+                        sliced_tensor = param_vector[num + (num_offset / bidirectional_int)].chunk(4, 0);
+                        permuted_wei = at::cat({sliced_tensor[0], sliced_tensor[1], sliced_tensor[3], sliced_tensor[2]});
+                        param.copy_(permuted_wei.view_as(param));
+                        offset += param_size;
+                    }
+
+                    param_size = 1;
+                    in_wei_vec = param_vector[num + 1].sizes().vec();
+                    for (int i = 0; i < in_wei_vec.size(); ++i) {
+                        param_size *= in_wei_vec[i];
+                    }
+                    param = at::from_blob((_Float16*)(weight_buf.data_ptr()) + offset, {static_cast<long>(param_size)}, weight_buf.options());
+                    sliced_tensor = param_vector[num + 1].chunk(4, 0);
+                    permuted_wei = at::cat({sliced_tensor[0], sliced_tensor[1], sliced_tensor[3], sliced_tensor[2]});
+                    param.copy_(permuted_wei.view_as(param));
+                    offset += param_size;
+
+                    if (bidirectional_int == 2) {
+                        param_size = 1;
+                        in_wei_vec = param_vector[num + (num_offset / bidirectional_int) + 1].sizes().vec();
+                        for (int i = 0; i < in_wei_vec.size(); ++i) {
+                            param_size *= in_wei_vec[i];
+                        }
+                        param = at::from_blob((_Float16*)(weight_buf.data_ptr()) + offset, {static_cast<long>(param_size)}, weight_buf.options());
+                        sliced_tensor = param_vector[num + (num_offset / bidirectional_int) + 1].chunk(4, 0);
+                        permuted_wei = at::cat({sliced_tensor[0], sliced_tensor[1], sliced_tensor[3], sliced_tensor[2]});
+                        param.copy_(permuted_wei.view_as(param));
+                        offset += param_size;
+                    }
+                }
+            }
+            wei_dev = weight_buf.data_ptr();
+            stream_executor.updateBlob(hash_id, DataType::TENSOR, tensorToIValue(weight_buf));
+        } else {
+            wei_dev = it->second.second.toTensor().data_ptr();
+        }
+        in_dev = input.data_ptr();
+        hx_dev = hx_list_tensor_vector[0].data_ptr();
+        cx_dev = hx_list_tensor_vector[1].data_ptr();
+        workspace_dev = workspace.data_ptr();
+        auto it0 = stream_executor.global_blobs_.find(out_blob_ids[0]);
+
+        if (0 && stream_executor.modelType == "GNMT" && it0 != stream_executor.global_blobs_.end() && seq_len == 1) {
+            out_dev = it0->second.second.toTensor().data_ptr();
+            hy_dev = stream_executor.global_blobs_.find(out_blob_ids[1])->second.second.toTensor().data_ptr();
+            cy_dev = stream_executor.global_blobs_.find(out_blob_ids[2])->second.second.toTensor().data_ptr();
+            miopenRNNForwardInference(stream_executor.handle, stream_executor.rnnDesc, seq_len, stream_executor.input_tensors.data(), in_dev,
+                                  stream_executor.hidden_tensor, hx_dev, stream_executor.hidden_tensor, cx_dev, stream_executor.weight_tensor, wei_dev,
+                                  stream_executor.output_tensors.data(), out_dev, stream_executor.hidden_tensor, hy_dev, stream_executor.hidden_tensor, cy_dev,
+                                  workspace_dev, workspace_size);
+
+        } else {
+            auto output = at::empty({seq_len, out_len[0]}, input.options());
+            out_dev = output.data_ptr();
+            at::Tensor hy, cy;
+            {
+                size_t hc_y_size = hid_lens[0] * hid_lens[1] * hid_lens[2];
+                auto options = at::TensorOptions().dtype(at::kHalf).device(at::kCUDA);
+                hy = at::empty({hid_lens[0], hid_lens[1], hid_lens[2]}, options);
+                cy = at::empty({hid_lens[0], hid_lens[1], hid_lens[2]}, options);
+
+                hy_dev = hy.data_ptr();
+                cy_dev = cy.data_ptr();
+            }
+            miopenRNNForwardInference(stream_executor.handle, stream_executor.rnnDesc, seq_len, stream_executor.input_tensors.data(), in_dev,
+                                    stream_executor.hidden_tensor, hx_dev, stream_executor.hidden_tensor, cx_dev, stream_executor.weight_tensor, wei_dev,
+                                    stream_executor.output_tensors.data(), out_dev, stream_executor.hidden_tensor, hy_dev, stream_executor.hidden_tensor, cy_dev,
+                                    workspace_dev, workspace_size);
+
+            stream_executor.updateBlob(out_stensor_id[0], DataType::TENSOR, tensorToIValue(output));
+            stream_executor.updateBlob(out_stensor_id[1], DataType::TENSOR, tensorToIValue(hy));
+            stream_executor.updateBlob(out_stensor_id[2], DataType::TENSOR, tensorToIValue(cy));
+        }
+    }
+}
+
+void executorAtenLt(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
+{
+    DLOG(INFO) << "execute Aten Lt node";
+
+    auto in_stensor_id = layer->getInSTensorID();
+    auto out_stensor_id = layer->getOutSTensorID();
+
+    assert(out_stensor_id.size() == 1);
+
+    if (iv_self.isTensor() && iv_other.isTensor()) {
+        // tensor = Lt(tensor, tensor)
+        auto output = atenLt(iv_self.toTensor(), iv_other.toTensor());
+        stream_executor.updateBlob(out_stensor_id[0], DataType::TENSOR, tensorToIValue(output));
+    } else if (iv_self.isTensor() && iv_other.isScalar()) {
+        // tensor = Lt(tensor, scalar)
+        auto output = atenLt(iv_self.toTensor(), iv_other.toScalar());
+        stream_executor.updateBlob(out_stensor_id[0], DataType::TENSOR, tensorToIValue(output));
+    } else if (iv_self.isScalar() && iv_other.isInt()) {
+        // int/bool Lt(scalar, int)
+        int64_t output = iv_self.toScalar().toInt() < iv_other.toInt();
+        stream_executor.updateBlob(out_stensor_id[0], DataType::BOOL, scalarToIValue<int64_t>(output));
+    } else if (iv_self.isInt() && iv_other.isInt()) {
+        // int/bool = Lt(int, int)
+        int64_t output = iv_self.toInt() < iv_other.toInt();
+        stream_executor.updateBlob(out_stensor_id[0], DataType::BOOL, scalarToIValue<int64_t>(output));
+    }
+}
+
+void executorAtenMaskedFill(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
+{
+    DLOG(INFO) << "execute Aten MaskedFill node";
+
+    auto in_stensor_id = layer->getInSTensorID();
+    auto out_stensor_id = layer->getOutSTensorID();
+
+    // Find the input blob
+    auto iv_self = stream_executor.findBlob(in_stensor_id[0]).second;
+    auto iv_other = stream_executor.findBlob(in_stensor_id[1]).second;
+    auto iv_value = stream_executor.findBlob(in_stensor_id[2]).second;
+    assert(iv_self.isTensor() && iv_other.isTensor());
+    auto self_tensor = iv_self.toTensor();
+    auto other_tensor = iv_other.toTensor();
+
+    at::Tensor output;
+    if (iv_value.isTensor()) {
+        auto value_tensor = iv_value.toTensor();
+        output = atenMaskedFill(self_tensor, other_tensor, value_tensor);
+    } else if (iv_value.isScalar()) {
+        at::Scalar value_scalar = iv_value.toScalar();
+        output = atenMaskedFill(self_tensor, other_tensor, value_scalar);
+    } else {
+        DLOG(FATAL) << "Unsupported input type for aten::masked_fill";
+    }
+
+    // update output
+    stream_executor.updateBlob(out_stensor_id[0], DataType::TENSOR, tensorToIValue(output));
+    bool is_inplace = node.getIsInplace();
+    if (is_inplace) {
+        auto releation_blob_id = stream_executor.releation_blob_ids_map_.find(in_stensor_id[0]);
+        assert(releation_blob_id != stream_executor.releation_blob_ids_map_.end());
+        auto ori_id = releation_blob_id->second.first;
+        stream_executor.updateBlob(ori_id, DataType::TENSOR, tensorToIValue(output));
+    }
+}
+
+void executorAtenMaskedSelect(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
+{
+    DLOG(INFO) << "execute Aten MaskedSelect node";
+
+    auto in_stensor_id = layer->getInSTensorID();
+    auto out_stensor_id = layer->getOutSTensorID();
+
+    auto node = cast<nncir::AtenMaskedSelectNode>(op_node);
+
+    // Find the input blob
+    auto iv_self = stream_executor.findBlob(in_stensor_id[0]).second;
+    auto iv_mask = stream_executor.findBlob(in_stensor_id[1]).second;
+    assert(iv_self.isTensor() && iv_mask.isTensor());
+    auto self_tensor = iv_self.toTensor();
+    auto mask_tensor = iv_mask.toTensor();
+
+    auto output = atenMaskedSelect(self_tensor, mask_tensor);
+    // update output
+    stream_executor.updateBlob(out_stensor_id[0], DataType::TENSOR, tensorToIValue(output));
+}
+
 }  // namespace runtime
 }  // namespace nn_compiler
