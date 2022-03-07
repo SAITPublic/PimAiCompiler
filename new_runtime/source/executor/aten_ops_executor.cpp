@@ -70,7 +70,7 @@ void executorAtenAdd(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExe
         // update output
         stream_executor.updateBlob(out_stensor_id[0], DataType::TENSOR, tensorToIValue(output));
     } else {
-        DLOG(FATAL) << "Unsupported input type for aten::add";
+        Log::RT::E() << "Unsupported input type for aten::add";
     }
 }  // executorAtenAdd
 
@@ -244,7 +244,7 @@ void executorAtenAnd(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExe
         value_a = iv_a.toInt();
         value_b = iv_b.toInt();
     } else {
-        DLOG(FATAL) << "Wrong input type for AtenAdd.";
+        Log::RT::E() << "Wrong input type for AtenAdd.";
     }
 
     auto output = atenAnd(value_a, value_b);
@@ -571,7 +571,7 @@ void executorAtenBool(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamEx
         auto double_value = ivalue.toDouble();
         output = atenBool(double_value);
     } else {
-        DLOG(FATAL) << "Unsupported type for aten::Bool.";
+        Log::RT::E() << "Unsupported type for aten::Bool.";
     }
     stream_executor.updateBlob(out_stensor_id[0], DataType::BOOL, boolToIValue(output));
 }
@@ -923,7 +923,7 @@ void executorAtenDiv(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExe
         // update output
         stream_executor.updateBlob(out_stensor_id[0], DataType::TENSOR, tensorToIValue(output));
     } else {
-        DLOG(FATAL) << "Unsupported input type for aten::div";
+        Log::RT::E() << "Unsupported input type for aten::div";
     }
 }
 
@@ -1039,7 +1039,7 @@ void executorAtenEq(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExec
             at::Scalar other = iv_other.toScalar();
             output = atenEq(self_tensor, other);
         } else {
-            DLOG(FATAL) << "Aten eq op's data type do not support!";
+            Log::RT::E() << "Aten eq op's data type do not support!";
         }
         // update output
         stream_executor.updateBlob(out_stensor_id[0], DataType::TENSOR, tensorToIValue(output));
@@ -1051,7 +1051,7 @@ void executorAtenEq(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExec
         // update output
         stream_executor.updateBlob(out_stensor_id[0], DataType::BOOL, scalarToIValue(output));
     } else {
-        DLOG(FATAL) << "Unsupported input type for aten::eq";
+        Log::RT::E() << "Unsupported input type for aten::eq";
     }
 }
 
@@ -1131,7 +1131,7 @@ void executorAtenFill(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamEx
         stream_executor.updateBlob(out_stensor_id[0], DataType::TENSOR, tensorToIValue(output));
         stream_executor.updateBlob(in_stensor_id[0], DataType::TENSOR, tensorToIValue(output));  // in-place op
     } else {
-        DLOG(FATAL) << "Unsupported input type for aten::fill_";
+        Log::RT::E() << "Unsupported input type for aten::fill_";
     }
 }
 
@@ -1159,7 +1159,7 @@ void executorAtenFloorDivide(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, S
         // update output
         stream_executor.updateBlob(out_stensor_id[1], DataType::TENSOR, tensorToIValue(output));
     } else {
-        DLOG(FATAL) << "Unsupported input type for aten::floor_divide";
+        Log::RT::E() << "Unsupported input type for aten::floor_divide";
     }
 }
 
@@ -1220,7 +1220,7 @@ void executorAtenFormat(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, Stream
         // update output
         stream_executor.updateBlob(out_stensor_id[0], DataType::STRING, strToIValue(output));
     } else {
-        DLOG(FATAL) << "Unsupported input type for aten::format";
+        Log::RT::E() << "Unsupported input type for aten::format";
     }
 }
 
@@ -1284,7 +1284,7 @@ void executorAtenGe(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExec
         // update output
         stream_executor.updateBlob(out_stensor_id[0], DataType::TENSOR, tensorToIValue(output));
     } else {
-        DLOG(FATAL) << "Unsupported input type for aten::ge";
+        Log::RT::E() << "Unsupported input type for aten::ge";
     }
 }
 
@@ -1455,7 +1455,7 @@ void executorAtenInt(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExe
         auto self_tensor = iv_self.toTensor();
         output = atenInt(self_tensor);
     } else {
-        DLOG(FATAL) << "AtenInt data type do not support!";
+        Log::RT::E() << "AtenInt data type do not support!";
     }
 
     // update output
@@ -1551,7 +1551,7 @@ void executorAtenLen(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExe
     } else if (iv.isTensor()) {
         output = atenLen(iv.toTensor());
     } else {
-        DLOG(FATAL) << "Aten len op's data type do not support!";
+        Log::RT::E() << "Aten len op's data type do not support!";
     }
 
     // update output
@@ -2506,7 +2506,7 @@ void executorAtenMaskedFill(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, St
         at::Scalar value_scalar = iv_value.toScalar();
         output = atenMaskedFill(self_tensor, other_tensor, value_scalar);
     } else {
-        DLOG(FATAL) << "Unsupported input type for aten::masked_fill";
+        Log::RT::E() << "Unsupported input type for aten::masked_fill";
     }
 
     // update output
@@ -2782,7 +2782,7 @@ void executorAtenMax(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExe
         stream_executor.updateBlob(out_stensor_id[1], DataType::TENSOR, tensorToIValue(std::get<1>(output)));
 
     } else {
-        DLOG(FATAL) << "Unsupported input type for aten::max";
+        Log::RT::E() << "Unsupported input type for aten::max";
     }
 }
 
@@ -2975,10 +2975,10 @@ void executorAtenMul(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExe
             auto output = atenMul(self_tensor, other_scalar);
             stream_executor.updateBlob(out_stensor_id[0], DataType::TENSOR, tensorToIValue(output));
         } else {
-            DLOG(FATAL) << "Unsupported input type for aten::mul";
+            Log::RT::E() << "Unsupported input type for aten::mul";
         }
     } else {
-        DLOG(FATAL) << "Unsupported input type for aten::mul";
+        Log::RT::E() << "Unsupported input type for aten::mul";
     }
 }
 
@@ -3023,7 +3023,7 @@ void executorAtenNe(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExec
         // update output
         stream_executor.updateBlob(out_stensor_id[0], DataType::BOOL, boolToIValue(output));
     } else {
-        DLOG(FATAL) << "Unsupported input type for aten::ne";
+        Log::RT::E() << "Unsupported input type for aten::ne";
     }
 }
 
@@ -3056,7 +3056,7 @@ void executorAtenNeg(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExe
         stream_executor.updateBlob(out_stensor_id[0], DataType::TENSOR, tensorToIValue(output));
 
     } else {
-        DLOG(FATAL) << "AtenNeg: unsupported dtype!";
+        Log::RT::E() << "AtenNeg: unsupported dtype!";
     }
 }
 
@@ -3101,7 +3101,7 @@ void executorAtenNot(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExe
         auto output = atenNot(input);
         stream_executor.updateBlob(out_stensor_id[0], DataType::BOOL, boolToIValue(output));
     } else {
-        DLOG(FATAL) << "Aten not op's data type do not support!";
+        Log::RT::E() << "Aten not op's data type do not support!";
     }
 }
 
@@ -3291,7 +3291,7 @@ void executorAtenPow(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExe
         // update output
         stream_executor.updateBlob(out_stensor_id[0], DataType::TENSOR, tensorToIValue(output));
     } else {
-        DLOG(FATAL) << "Unsupported input type for aten::pow";
+        Log::RT::E() << "Unsupported input type for aten::pow";
     }
 }
 
@@ -3546,7 +3546,7 @@ void executorAtenSub(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExe
         // update output
         stream_executor.updateBlob(out_stensor_id[0], DataType::TENSOR, tensorToIValue(output));
     } else {
-        DLOG(FATAL) << "Unsupported input type for aten::sub";
+        Log::RT::E() << "Unsupported input type for aten::sub";
     }
 }
 
@@ -3637,7 +3637,7 @@ void executorAtenTensor(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, Stream
         } else if (iv_pin_memory.isBool()) {
             options = options.pinned_memory(iv_pin_memory.toBool());
         } else {
-            DLOG(FATAL) << "Unsupported data type to parse iv_pin_memory.";
+            Log::RT::E() << "Unsupported data type to parse iv_pin_memory.";
         }
     }
     // FIXME(SRCX): To get list item type, is there a better way?
@@ -3652,7 +3652,7 @@ void executorAtenTensor(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, Stream
     } else if (iv_self.isScalar()) {
         value_item = iv_self;
     } else {
-        DLOG(FATAL) << "Unsupported data type to IValue.";
+        Log::RT::E() << "Unsupported data type to IValue.";
     }
 
     at::Tensor output;
@@ -3667,7 +3667,7 @@ void executorAtenTensor(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, Stream
         parseIValueList<double>(stream_executor.findBlob(in_stensor_id[0]).second, value_vec, dim, 1);
         output = atenTensor(at::ArrayRef<double>(value_vec), options).reshape(at::ArrayRef<int64_t>(dim));
     } else {
-        DLOG(FATAL) << "Unsupported data type to parse IValue list.";
+        Log::RT::E() << "Unsupported data type to parse IValue list.";
     }
     stream_executor.updateBlob(out_stensor_id[0], DataType::TENSOR, tensorToIValue(output));
 }
@@ -4087,7 +4087,7 @@ void executorAtenBatchNorm2d(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, S
     }
 
     if (training == 1) {
-        DLOG(FATAL) << "Currently, NNRuntime only support inference !";
+        Log::RT::E() << "Currently, NNRuntime only support inference !";
     }
 
     // Call kernel
