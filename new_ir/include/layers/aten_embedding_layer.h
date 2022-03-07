@@ -1,5 +1,6 @@
 #pragma once
 
+#include <torch/script.h>
 #include "new_ir/include/layers/nn_layer.h"
 
 namespace nn_compiler {
@@ -28,9 +29,9 @@ class AtenEmbeddingLayer : public NNLayer {
         return std::shared_ptr<AtenEmbeddingLayer>(new AtenEmbeddingLayer(*this));
     }
 
-    void setWeights(std::vector<float> weights) { _weights = weights; }
+    void setWeights(std::vector<at::Tensor> weights) { _weights = weights; }
 
-    std::vector<float> getWeights() { return _weights; }
+    std::vector<at::Tensor> getWeights() { return _weights; }
 
     void setWeightsShape(std::vector<int> weights_shape) { _weights_shape = weights_shape; }
 
@@ -56,7 +57,7 @@ class AtenEmbeddingLayer : public NNLayer {
     }
 
  private:
-    std::vector<float> _weights;
+    std::vector<at::Tensor> _weights;
     std::vector<int> _weights_shape;
     int64_t  _padding_idx       = INT64_MIN;
     int     _scale_grad_by_freq = INT32_MAX;
