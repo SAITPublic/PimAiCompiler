@@ -1,15 +1,16 @@
 #pragma once
 
-#include "compiler/include/middlend/context/compilation_context.hpp"
-#include "compiler/include/middlend/passes/pass_support.hpp"
-#include "compiler/include/middlend/utils/op_basic_util.hpp"
+#include "compiler/include/frontend/optimizer/pass.h"
 
+#include "new_ir/include/nn_model.h"
 #include "new_ir/include/nn_network.h"
+
 #include "new_ir/include/types.h"
+
 namespace nn_compiler
 {
 
-namespace frontend
+namespace middlend
 {
 
 class ControlLayerExecution : public Pass
@@ -28,5 +29,5 @@ class ControlLayerExecution : public Pass
 
 };  // class ControlLayerExecution
 
-}  // namespace frontend
+}  // namespace middlend
 }  // namespace nn_compiler

@@ -1,7 +1,5 @@
 #include <string>
 
-#include "compiler/include/frontend/optimizer/construct_list.h"
-
 #include "new_ir/include/layers/aten_lstm1_layer.h"
 #include "new_ir/include/layers/aten_lstm2_layer.h"
 #include "new_ir/include/layers/prim_constant_layer.h"
@@ -17,7 +15,7 @@
 #include "new_ir/include/layers/prim_if_layer.h"
 #include "new_ir/include/layers/prim_loop_layer.h"
 
-#include "compiler/include/frontend/optimizer/control_layer_execution.h"
+#include "compiler/include/middlend/control_layer_execution.h"
 
 #include "common/include/common.hpp"
 #include "compiler/include/common/log.hpp"
@@ -27,7 +25,7 @@
 namespace nn_compiler
 {
 
-namespace frontend
+namespace middlend
 {
 
 ControlLayerExecution::ControlLayerExecution() {}
@@ -88,5 +86,5 @@ void ControlLayerExecution::run(std::unique_ptr<nn_compiler::ir::NNModel>& model
     }
 }
 
-}  // namespace frontend
+}  // namespace middlend
 }  // namespace nn_compiler

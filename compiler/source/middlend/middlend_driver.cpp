@@ -3,6 +3,8 @@
 
 #include "compiler/include/middlend/middlend_driver.hpp"
 
+#include "compiler/include/middlend/pass_manager.h"
+
 #include <cstdio>
 #include <cstdlib> 
 

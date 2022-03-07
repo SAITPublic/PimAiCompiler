@@ -13,16 +13,11 @@
 #include "compiler/include/frontend/optimizer/swap_addmm_inputs.h"
 #include "compiler/include/frontend/optimizer/swap_matmul_inputs.h"
 
-#include "compiler/include/frontend/optimizer/lstm_labeling.h"
 #include "compiler/include/frontend/optimizer/remove_constant_layers.h"
 #include "compiler/include/frontend/optimizer/remove_dropout_layers.h"
 #include "compiler/include/frontend/optimizer/remove_set_attr_layers.h"
 #include "compiler/include/frontend/optimizer/set_attribute.h"
 #include "compiler/include/frontend/optimizer/take_in_body_net.h"
-#include "compiler/include/frontend/optimizer/control_layer_execution.h"
-#include "compiler/include/frontend/optimizer/update_layer_id.h"
-
-#include "compiler/include/frontend/optimizer/cat_labeling.h"
 
 namespace nn_compiler
 {
@@ -51,12 +46,6 @@ void PassManager::runPasses(std::unique_ptr<nn_compiler::ir::NNModel>& model)
 
     auto set_weights_for_embedding = std::make_shared<SetWeightsForEmbedding>();
 
-    /*TODO: add middlend passes*/
-    auto update_layer_id = std::make_shared<UpdateLayerId>();
-    auto control_layer_execution = std::make_shared<ControlLayerExecution>();
-    auto lstm_labeling = std::make_shared<LstmLabeling>();
-    auto cat_labeling = std::make_shared<CatLabeling>();
-
     base_pass->add(take_in_body_net);
     take_in_body_net->add(construct_list);
     construct_list->add(remake_dtensor_of_prim_variable);
@@ -69,17 +58,11 @@ void PassManager::runPasses(std::unique_ptr<nn_compiler::ir::NNModel>& model)
     remove_if_with_addmm->add(remove_cat_for_addmm);
     remove_cat_for_addmm->add(swap_addmm_inputs);
     swap_addmm_inputs->add(swap_matmul_inputs);
-    swap_matmul_inputs->add(fuse_act);    
+    swap_matmul_inputs->add(fuse_act);
 
     if (model_name_ == "RNNT") {
         fuse_act->add(set_weights_for_embedding);
-        set_weights_for_embedding->add(update_layer_id);
-    } else {
-        fuse_act->add(update_layer_id);
     }
-    update_layer_id->add(control_layer_execution);
-    control_layer_execution->add(lstm_labeling);
-    lstm_labeling->add(cat_labeling);
 
     while (base_pass->getSuccessor() != nullptr) {
         base_pass = base_pass->getSuccessor();

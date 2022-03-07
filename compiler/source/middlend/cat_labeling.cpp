@@ -1,7 +1,7 @@
 #include "common/include/common.hpp"
 #include "compiler/include/common/log.hpp"
 
-#include "compiler/include/frontend/optimizer/cat_labeling.h"
+#include "compiler/include/middlend/cat_labeling.h"
 #include "new_ir/include/layers/aten_cat_layer.h"
 #include "new_ir/include/layers/aten_lstm1_layer.h"
 
@@ -17,7 +17,7 @@
 
 namespace nn_compiler
 {
-namespace frontend
+namespace middlend
 {
 CatLabeling::CatLabeling() {}
 
@@ -83,5 +83,5 @@ void CatLabeling::run(std::unique_ptr<nn_compiler::ir::NNModel>& model)
     }
 }
 
-}  // namespace frontend
+}  // namespace middlend
 }  // namespace nn_compiler

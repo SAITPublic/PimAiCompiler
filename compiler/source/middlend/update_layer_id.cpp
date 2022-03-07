@@ -1,7 +1,5 @@
 #include <string>
 
-#include "compiler/include/frontend/optimizer/construct_list.h"
-
 #include "new_ir/include/layers/aten_lstm1_layer.h"
 #include "new_ir/include/layers/aten_lstm2_layer.h"
 #include "new_ir/include/layers/prim_constant_layer.h"
@@ -15,12 +13,12 @@
 #include "compiler/include/common/log.hpp"
 #include "new_ir/include/layers/prim_end_if_layer.h"
 
-#include "compiler/include/frontend/optimizer/update_layer_id.h"
+#include "compiler/include/middlend/update_layer_id.h"
 
 namespace nn_compiler
 {
 
-namespace frontend
+namespace middlend
 {
 
 UpdateLayerId::UpdateLayerId() {}
@@ -53,5 +51,5 @@ void UpdateLayerId::run(std::unique_ptr<nn_compiler::ir::NNModel>& model)
     }
 }
 
-}  // namespace frontend
+}  // namespace middlend
 }  // namespace nn_compiler

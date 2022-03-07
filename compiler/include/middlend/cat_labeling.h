@@ -9,7 +9,7 @@
 
 namespace nn_compiler
 {
-namespace frontend
+namespace middlend
 {
 class CatLabeling : public Pass
 {
@@ -26,5 +26,5 @@ class CatLabeling : public Pass
     std::vector<std::shared_ptr<nn_compiler::ir::NNLayer>> cat_labeling_layers_;
 };  // class CatLabeling
 
-}  // namespace frontend
+}  // namespace middlend
 }  // namespace nn_compiler

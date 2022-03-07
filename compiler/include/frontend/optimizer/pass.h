@@ -3,7 +3,6 @@
 #include "new_ir/include/nn_model.h"
 
 namespace nn_compiler {
-namespace frontend {
 
 class Pass {
  public:
@@ -36,5 +35,4 @@ class Pass {
     std::shared_ptr<Pass> successor_ = nullptr;
 };
 
-} // namespace frontend
 } // namespace nn_compiler

@@ -1,11 +1,15 @@
 #pragma once
 
+#include "compiler/include/frontend/optimizer/pass.h"
+
+#include "new_ir/include/nn_model.h"
 #include "new_ir/include/nn_network.h"
+#include "new_ir/include/types.h"
 
 namespace nn_compiler
 {
 
-namespace frontend
+namespace middlend
 {
 
 /** @Brief Details: 
@@ -27,5 +31,5 @@ class UpdateLayerId : public Pass
 
 };  // class UpdateLayerId
 
-}  // namespace frontend
+}  // namespace middlend
 }  // namespace nn_compiler

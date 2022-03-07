@@ -1,7 +1,7 @@
 #include "common/include/common.hpp"
 #include "compiler/include/common/log.hpp"
 
-#include "compiler/include/frontend/optimizer/lstm_labeling.h"
+#include "compiler/include/middlend/lstm_labeling.h"
 #include "new_ir/include/layers/aten_lstm1_layer.h"
 
 #include "new_ir/include/layers/nn_layer.h"
@@ -16,7 +16,7 @@
 namespace nn_compiler
 {
 
-namespace frontend
+namespace middlend
 {
 
 LstmLabeling::LstmLabeling() {}
@@ -70,5 +70,5 @@ void LstmLabeling::run(std::unique_ptr<nn_compiler::ir::NNModel>& model)
     }
 }
 
-}  // namespace frontend
+}  // namespace middlend
 }  // namespace nn_compiler

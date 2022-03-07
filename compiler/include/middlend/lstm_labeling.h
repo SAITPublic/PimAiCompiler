@@ -10,7 +10,7 @@
 namespace nn_compiler
 {
 
-namespace frontend
+namespace middlend
 {
 
 class LstmLabeling : public Pass
@@ -28,5 +28,5 @@ class LstmLabeling : public Pass
     std::vector<std::shared_ptr<nn_compiler::ir::NNLayer>> aten_lstm1_layers_;
 };  // class LstmLabeling
 
-}  // namespace frontend
+}  // namespace middlend
 }  // namespace nn_compiler
