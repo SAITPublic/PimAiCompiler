@@ -270,8 +270,58 @@ std::vector<torch::Tensor> StreamExecutor::iValueParser(torch::jit::IValue& iv)
     std::vector<torch::Tensor> out_tensor;
     std::vector<int64_t> out_list;
 
-    // TODO(SRCX): implementation
-
+    if (iv.isTuple()) {
+        auto tuple_ = iv.toTuple();
+        auto ivs = primTupleUnpack(tuple_);
+        for (auto iv_ : ivs) {
+            if (iv_.isTensor()) {
+                out_tensor.push_back(iv_.toTensor());
+            } else if (iv_.isList()) {
+                auto temp_out = iValueParser(iv_);
+                for (auto& out : temp_out) {
+                    out_tensor.push_back(out);
+                }
+            } else if (iv_.isInt()) {
+                auto temp_out = iValueParser(iv_);
+                for (auto& out : temp_out) {
+                    out_tensor.push_back(out);
+                }
+            } else {
+                Log::RT::E() << "Dtype of output is unsupported !";
+            }
+        }
+    } else if (iv.isList()) {
+        auto list_ = iv.toListRef();
+        out_list.clear();
+        for (auto iv_ : list_) {
+            if (iv_.isTensor()) {
+                out_tensor.push_back(iv_.toTensor());
+            } else if (iv_.isInt()) {
+                out_list.push_back(iv_.toInt());
+            } else if (iv_.isList()) {
+                auto temp_out = iValueParser(iv_);
+                for (auto& out : temp_out) {
+                    out_tensor.push_back(out);
+                }
+            } else {
+                Log::RT::E() << "Dtype of output is unsupported !";
+            }
+        }
+        if (out_list.size() != 0) {
+            torch::Tensor out =
+                torch::from_blob(out_list.data(), {1, static_cast<int64_t>(out_list.size())}, torch::kLong).clone();
+            out_tensor.push_back(std::move(out));
+        }
+    } else if (iv.isInt()) {
+        out_list.push_back(iv.toInt());
+        torch::Tensor out =
+            torch::from_blob(out_list.data(), {static_cast<int64_t>(out_list.size())}, torch::kLong).clone();
+        out_tensor.push_back(std::move(out));
+    } else if (iv.isTensor()) {
+        out_tensor.push_back(iv.toTensor());
+    } else {
+        Log::RT::E() << "Dtype of output is unsupported !";
+    }
     return out_tensor;
 }
 

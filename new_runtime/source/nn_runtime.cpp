@@ -51,7 +51,7 @@ std::vector<torch::Tensor> NNRuntime::inferenceModel(std::unique_ptr<nn_compiler
 
     // for simple test, fill zeros to outputs
     // output_tensors.push_back(torch::zeros({10, 10}, torch::kF16));
-    Log::RT::D() << "numOutps:" << output_tensors.size();
+    Log::RT::D() << "Num of Outputs: " << output_tensors.size();
 
     return output_tensors;
 }

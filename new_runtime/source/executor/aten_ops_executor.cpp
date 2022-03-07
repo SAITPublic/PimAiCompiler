@@ -9,10 +9,10 @@
 #include "new_ir/include/layers/all_layers.h"
 #include "new_runtime/include/executor/aten_ops_executor.h"
 #include "new_runtime/include/executor/aten_ops.h"
+#include "new_runtime/include/executor/custom_ops.hpp"
 #include "new_runtime/include/executor/prim_ops_executor.h"
 #include "new_runtime/include/executor/stream_executor.h"
 #include "new_runtime/include/executor/utils.h"
-#include "runtime/include/executor/custom_ops.hpp"
 #include "pim_runtime_api.h"
 #include "tv_tools.h"
 
