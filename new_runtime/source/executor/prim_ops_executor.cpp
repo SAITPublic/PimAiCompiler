@@ -62,10 +62,43 @@ void executePrimConstant(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, Strea
         std::vector<int64_t> stride = getDataShapeFromVector(stride_);
 
         // TODO(SRCX): add gnmt optimization
+        if (stream_executor.model_type_ == "GNMT" && constant_layer->getOutSTensorID()[0] == 3) {
+            std::vector<int64_t> reorder_shape(input_shape);
 
-        auto tensor = createPtTensor((void*)ptr, input_shape, scalar_type, stride).cuda();
-        iv = tensorToIValue(tensor);
-        dtype = DataType::TENSOR;
+            int align_m = 32;
+            int align_k = 16;
+
+            int m_align = (input_shape[0] + align_m - 1) / align_m * align_m;
+            int k_align = (input_shape[1] + align_k - 1) / align_k * align_k;
+            reorder_shape[0] = m_align;
+            reorder_shape[1] = k_align;
+
+            _Float16* ptr_origin = (_Float16*)ptr;
+            auto options = at::TensorOptions().dtype(at::kHalf).device(at::kCPU);
+            auto reorder = at::zeros(reorder_shape, options);
+            _Float16* y = (_Float16*)reorder.data_ptr();
+
+            for (int i = 0; i < k_align / align_k; ++i) {
+                for (int j = 0; j < m_align; ++j) {
+                    for (int n = 0; n < align_k; ++n) {
+                        int dst = n + j * align_k + i * align_k * m_align;
+                        int src = j * input_shape[1] + (i * align_k + n);
+                        if (j >= input_shape[0] || (i * align_k + n) >= input_shape[1]) {
+                            y[dst] = 0;
+                        } else {
+                            y[dst] = ptr_origin[src];
+                        }
+                    }
+                }
+            }
+            auto tensor = createPtTensor((void*)y, input_shape, scalar_type, stride).cuda();
+            iv = tensorToIValue(tensor);
+            dtype = DataType::TENSOR;
+        } else {
+            auto tensor = createPtTensor((void*)ptr, input_shape, scalar_type, stride).cuda();
+            iv = tensorToIValue(tensor);
+            dtype = DataType::TENSOR;
+        }
     } else if (ntype.find("None") != std::string::npos) {
         dtype = DataType::NONE;
     } else if (ntype.find("(") != std::string::npos && ntype.find(")") != std::string::npos) {  // tuple type
