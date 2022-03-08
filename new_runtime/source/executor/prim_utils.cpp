@@ -73,17 +73,6 @@ std::vector<int64_t> getDataShapeFromSTensor(nn_compiler::ir::STensor& value)
     return value_;
 }
 
-std::vector<int64_t> getDataShapeFromVector(std::vector<int64_t>& value)
-{
-    std::vector<int64_t> value_;
-    for (auto item : value) {
-        if (item != 0) {
-            value_.push_back(item);
-        }
-    }
-    return value_;
-}
-
 torch::Tensor loadTensor(const std::string& bin_file, const std::vector<int64_t>& shape, DataType dtype)
 {
     if (!fs::is_regular_file(fs::path(bin_file))) {

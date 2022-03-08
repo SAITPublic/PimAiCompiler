@@ -710,14 +710,12 @@ void executorAtenClear(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamE
 {
     Log::RT::D() << "execute Aten Clear node";
     auto in_stensor_id = layer->getInSTensorID();
-    auto out_stensor_id = layer->getOutSTensorID();
 
     torch::jit::IValue iv_self = stream_executor.findBlob(in_stensor_id[0]).second;
     assert(iv_self.isList());
     at::List self_list = iv_self.toList();
     atenClear(self_list);
     // update list
-    assert(in_stensor_id[0] == out_stensor_id[0]);
     stream_executor.updateBlob(in_stensor_id[0], DataType::LIST, torch::jit::IValue(self_list));
 }
 
@@ -926,8 +924,6 @@ void executorAtenDropout(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, Strea
     
     auto in_stensor_id = layer->getInSTensorID();
     auto out_stensor_id = layer->getOutSTensorID();
-
-    assert(in_stensor_id.size() == 1);
 
     int in_id = 0;
     torch::jit::IValue iv_tensor = stream_executor.findBlob(in_stensor_id[in_id++]).second;
@@ -1150,7 +1146,7 @@ void executorAtenFloorDivide(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, S
         at::Scalar other_scalar = iv_other.toScalar();
         auto output = atenFloorDivide(self_tensor, other_scalar);
         // update output
-        stream_executor.updateBlob(out_stensor_id[1], DataType::TENSOR, tensorToIValue(output));
+        stream_executor.updateBlob(out_stensor_id[0], DataType::TENSOR, tensorToIValue(output));
     } else {
         Log::RT::E() << "Unsupported input type for aten::floor_divide";
     }
@@ -2657,12 +2653,10 @@ void executorAtenMax(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExe
         return;
     }
 
-    // Get second input
-    torch::jit::IValue iv_other = stream_executor.findBlob(in_stensor_id[1]).second;
-
-    auto dtype = stream_executor.findBlob(in_stensor_id[1]).first;
+    auto dtype = stream_executor.findBlob(in_stensor_id[in_id]).first;
     if (dtype == DataType::TENSOR) {
         // aten::max(Tensor, Tensor)
+        torch::jit::IValue iv_other = stream_executor.findBlob(in_stensor_id[in_id++]).second;
         assert(iv_other.isTensor());
         at::Tensor other_tensor = iv_other.toTensor();
         auto output = atenMax(self_tensor, other_tensor);
@@ -2708,9 +2702,14 @@ void executorAtenMaxPool2d(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, Str
     assert(iv_self.isTensor());
     auto self_tensor = iv_self.toTensor();
 
+    // In PyTorch, kernel_size is a tuple(int, int)
     auto kernel_size =  getDataShapeFromVector(max_pool_2d_layer->getKernelSize());
     std::vector<int64_t> kernel_size_vec;
-    if (kernel_size[0] == INT64_MIN && kernel_size[1] == INT64_MIN) {
+    if (kernel_size.size() == 0) {
+        // empty stride vector means kernel size = 0
+        kernel_size_vec.push_back(0);
+        kernel_size_vec.push_back(0);
+    } else if (kernel_size[0] == INT64_MIN && kernel_size[1] == INT64_MIN) {
         auto data_iv = stream_executor.findBlob(in_stensor_id[in_id++]).second;
         assert(data_iv.isList());
         auto data_list = data_iv.toListRef();
@@ -2720,9 +2719,14 @@ void executorAtenMaxPool2d(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, Str
         kernel_size_vec.push_back(kernel_size[1]);
     }
 
+    // In PyTorch, stride is a tuple(int, int)
     auto stride = getDataShapeFromVector(max_pool_2d_layer->getStride());
     std::vector<int64_t> stride_vec;
-    if (stride[0] == INT64_MIN && stride[1] == INT64_MIN) {
+    if (stride.size() == 0) {
+        // empty stride vector means stride 0
+        stride_vec.push_back(0);
+        stride_vec.push_back(0);
+    } else if (stride[0] == INT64_MIN && stride[1] == INT64_MIN) {
         auto data_iv = stream_executor.findBlob(in_stensor_id[in_id++]).second;
         assert(data_iv.isList());
         auto data_list = data_iv.toListRef();
@@ -2732,10 +2736,14 @@ void executorAtenMaxPool2d(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, Str
         stride_vec.push_back(stride[1]);
     }
 
-    // In PyTorch, Pad is a tuple(int, int)
+    // In PyTorch, pad is a tuple(int, int)
     auto padding = getDataShapeFromVector(max_pool_2d_layer->getPad());
     std::vector<int64_t> padding_vec;
-    if (padding[0] == INT64_MIN && padding[1] == INT64_MIN) {
+    if (padding.size() == 0) {
+        // empty padding vector means padding 0
+        padding_vec.push_back(0);
+        padding_vec.push_back(0);
+    } else if (padding[0] == INT64_MIN && padding[1] == INT64_MIN) {
         auto data_iv = stream_executor.findBlob(in_stensor_id[in_id++]).second;
         assert(data_iv.isList());
         auto data_list = data_iv.toListRef();
@@ -2745,9 +2753,14 @@ void executorAtenMaxPool2d(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, Str
         padding_vec.push_back(padding[1]);
     }
 
+    // In PyTorch, dilation is a tuple(int, int)
     auto dilation = getDataShapeFromVector(max_pool_2d_layer->getDilation());
     std::vector<int64_t> dilation_vec;
-    if (dilation[0] == INT64_MIN && dilation[1] == INT64_MIN) {
+    if (dilation.size() == 0) {
+        // empty dilation vector means dilation 0
+        dilation_vec.push_back(0);
+        dilation_vec.push_back(0);
+    } else if (dilation[0] == INT64_MIN && dilation[1] == INT64_MIN) {
         auto data_iv = stream_executor.findBlob(in_stensor_id[in_id++]).second;
         assert(data_iv.isList());
         auto data_list = data_iv.toListRef();
@@ -3736,7 +3749,6 @@ void executorAtenTranspose(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, Str
     torch::jit::IValue iv_self = stream_executor.findBlob(in_stensor_id[in_id++]).second;
     assert(iv_self.isTensor());
     at::Tensor self_tensor = iv_self.toTensor();
-    // edge_id++;
 
     auto dim0 = transpose_layer->getDim0();
     if (nn_compiler::ir::isDefaultValue(dim0)) {
@@ -3979,17 +3991,6 @@ void executorAtenBatchNorm2d(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, S
                                   eps, static_cast<bool>(cudnn_enabled));
     // save outputs
     stream_executor.updateBlob(out_stensor_id[0], DataType::TENSOR, tensorToIValue(output));
-}
-
-std::vector<int64_t> getDataShapeFromVector(const std::vector<int64_t>& value)
-{
-    std::vector<int64_t> value_;
-    for (auto item : value) {
-        if (item != 0) {
-            value_.push_back(item);
-        }
-    }
-    return value_;
 }
 
 }  // namespace runtime

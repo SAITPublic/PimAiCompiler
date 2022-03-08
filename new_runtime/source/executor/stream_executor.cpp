@@ -51,11 +51,9 @@ RetVal StreamExecutor::preProcess(std::unique_ptr<nn_compiler::ir::NNModel>& mod
     auto graph = model->getGraphs()[0];
     for (auto layer : graph->getLayers()) {
         if (model_type_ == "GNMT" && layer->getType() == nn_compiler::ir::LayerType::ATENCAT) {
-            // TODO(SRCX): Implement this part with new IR.
-            /***
-            auto cat_node = cast_if<nncir::AtenCatNode>(op_node);
+            auto cat_layer = std::dynamic_pointer_cast<nn_compiler::ir::AtenCatLayer>(layer);
             auto options = at::TensorOptions().dtype(at::kHalf).device(at::kCUDA);
-            auto mem_blob_id = cat_node->getMemBlobId();
+            auto mem_blob_id = cat_layer->getMemLayerId();
             if (mem_blob_id != -1) {
                 // memory cat_s
                 auto cat_mem_s0 = at::zeros({1, 1, 2048}, options);
@@ -63,11 +61,10 @@ RetVal StreamExecutor::preProcess(std::unique_ptr<nn_compiler::ir::NNModel>& mod
             } else {
                 // memory cat_f
                 int cat_f = 22222;
-                cat_node->setMemBlobId(cat_f);
+                cat_layer->setMemLayerId(cat_f);
                 auto cat_mem = at::empty({8, 1, 1024}, options);
                 this->global_blobs_.insert({cat_f, {DataType::TENSOR, tensorToIValue(cat_mem)}});
             }
-            ***/
         }
 
         if (layer->getType() == nn_compiler::ir::LayerType::PRIMINPUT) {

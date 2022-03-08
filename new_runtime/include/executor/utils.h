@@ -137,5 +137,7 @@ at::ListTypePtr inferTypeFromDataType(DataType type);
 
 std::vector<int64_t> getUniqueOutStensorIds(std::shared_ptr<nn_compiler::ir::NNLayer>& layer);
 
+std::vector<int64_t> getDataShapeFromVector(const std::vector<int64_t>& value);
+
 }  // namespace runtime
 }  // namespace nn_compiler

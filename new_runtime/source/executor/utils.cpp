@@ -260,5 +260,16 @@ std::vector<int64_t> getUniqueOutStensorIds(std::shared_ptr<nn_compiler::ir::NNL
     return ret;
 }
 
+std::vector<int64_t> getDataShapeFromVector(const std::vector<int64_t>& value)
+{
+    std::vector<int64_t> value_;
+    for (auto item : value) {
+        if (item != 0) {
+            value_.push_back(item);
+        }
+    }
+    return value_;
+}
+
 }  // namespace runtime
 }  // namespace nn_compiler
