@@ -55,6 +55,7 @@ RetVal StreamExecutor::preProcess(std::unique_ptr<nn_compiler::ir::NNModel>& mod
             auto options = at::TensorOptions().dtype(at::kHalf).device(at::kCUDA);
             auto mem_blob_id = cat_layer->getMemLayerId();
             if (mem_blob_id != -1) {
+                std::cout << " cat id is " << mem_blob_id << std::endl;
                 // memory cat_s
                 auto cat_mem_s0 = at::zeros({1, 1, 2048}, options);
                 this->global_blobs_.insert({mem_blob_id, {DataType::TENSOR, tensorToIValue(cat_mem_s0)}});

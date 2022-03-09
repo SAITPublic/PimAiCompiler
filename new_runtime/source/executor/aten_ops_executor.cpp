@@ -60,9 +60,60 @@ void executorAtenAdd(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExe
     if (dtype == DataType::TENSOR) {
         assert(iv_other.isTensor());
         at::Tensor other_tensor = iv_other.toTensor();
-        auto output = atenAdd(self_tensor, other_tensor, alpha);
+        // auto output = atenAdd(self_tensor, other_tensor, alpha);
+        {
+            if (!self_tensor.is_contiguous()) self_tensor = self_tensor.contiguous();
+            if (!other_tensor.is_contiguous()) other_tensor = other_tensor.contiguous();
+            int dim0 = self_tensor.dim();
+            int dim1 = other_tensor.dim();
+
+            auto options = at::TensorOptions().dtype(at::kHalf).device(at::kCUDA);
+            auto output_tmp = at::zeros(self_tensor.sizes().vec(), options);
+
+            _Float16* A = (_Float16*)self_tensor.data_ptr();
+            _Float16* B = (_Float16*)other_tensor.data_ptr();
+            _Float16* C = A;
+
+            at::Tensor tmp;
+            auto input1_layer = stream_executor.getGraph()->getLayerByPosition((layer->getPreLayerIDs())[0]);
+            auto input2_layer = stream_executor.getGraph()->getLayerByPosition((layer->getPreLayerIDs())[1]);
+            bool add_opt_flag = input1_layer->getType() == nn_compiler::ir::LayerType::ATENLSTM1 &&
+                input2_layer->getType() == nn_compiler::ir::LayerType::ATENLSTM1 &&
+                std::dynamic_pointer_cast<nn_compiler::ir::AtenLSTM1Layer>(input1_layer)->getCustomOptNumber() == 2 &&
+                std::dynamic_pointer_cast<nn_compiler::ir::AtenLSTM1Layer>(input2_layer)->getCustomOptNumber() == 1;
+            if (stream_executor.model_type_ == "GNMT" && add_opt_flag) {
+                    auto out1_layer = stream_executor.getGraph()->getLayerByPosition((layer->getNextLayerIDs())[0]);
+                    auto out1_out1_layer = stream_executor.getGraph()->getLayerByPosition((out1_layer->getNextLayerIDs())[0]);
+                int cat_mem_id =
+                    std::dynamic_pointer_cast<nn_compiler::ir::AtenCatLayer>(out1_out1_layer)->getMemLayerId();
+                auto it = stream_executor.global_blobs_.find(cat_mem_id);
+                auto options = at::TensorOptions().dtype(at::kHalf).device(at::kCUDA);
+                tmp = torch::from_blob((_Float16*)(it->second.second.toTensor().data_ptr()), {1, 1, 1024}, options);
+                C = (_Float16*)tmp.data_ptr();
+            }
+
+            int m = 1;
+            int n = 1;
+            int a_m_s = 1;
+            int a_n_s = 1;
+            int b_m_s = 1;
+            int b_n_s = 1;
+
+            m = self_tensor.size(dim0 - 2);
+            n = self_tensor.size(dim0 - 1);
+
+            bool sym = (dim0 == dim1);
+            custom_add(nullptr, A, B, C, m, n, alpha, sym, a_m_s, a_n_s, b_m_s, b_n_s);
+
+            // update output
+            if (add_opt_flag) {
+                stream_executor.updateBlob(out_stensor_id[0], DataType::TENSOR, tensorToIValue(tmp));
+            } else {
+                stream_executor.updateBlob(out_stensor_id[0], DataType::TENSOR, tensorToIValue(self_tensor));
+            }
+        }
         // update output
-        stream_executor.updateBlob(out_stensor_id[0], DataType::TENSOR, tensorToIValue(output));
+        // stream_executor.updateBlob(out_stensor_id[0], DataType::TENSOR, tensorToIValue(output));
     } else if (isScalarType(dtype)) {
         assert(iv_other.isScalar());
         at::Scalar other_scalar = iv_other.toScalar();
@@ -551,10 +602,77 @@ void executorAtenBmm(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExe
     torch::jit::IValue iv_other = stream_executor.findBlob(in_stensor_id[1]).second;
     assert(iv_self.isTensor() && iv_other.isTensor());
 
+    at::Tensor tmp0, tmp1, tmp2;
+    if (stream_executor.model_type_ == "GNMT") {
+        auto out2_layer = stream_executor.getGraph()->getLayerByPosition((layer->getNextLayerIDs())[1]);
+        auto out2_out1_layer = stream_executor.getGraph()->getLayerByPosition((out2_layer->getNextLayerIDs())[0]);
+        auto out2_out2_layer = stream_executor.getGraph()->getLayerByPosition((out2_layer->getNextLayerIDs())[1]);
+        auto out2_out3_layer = stream_executor.getGraph()->getLayerByPosition((out2_layer->getNextLayerIDs())[2]);
+        auto out2_out1_out1_layer = stream_executor.getGraph()->getLayerByPosition((out2_out1_layer->getNextLayerIDs())[0]);
+        auto out2_out2_out1_layer = stream_executor.getGraph()->getLayerByPosition((out2_out2_layer->getNextLayerIDs())[0]);
+        auto out2_out3_out1_layer = stream_executor.getGraph()->getLayerByPosition((out2_out3_layer->getNextLayerIDs())[0]);
+        // auto end_if_node = op_node.getOutEdge(1).getOutNode();
+        int64_t cat_mem_id =
+            std::dynamic_pointer_cast<nn_compiler::ir::AtenCatLayer>(out2_out1_out1_layer)->getMemLayerId();
+        auto it = stream_executor.global_blobs_.find(cat_mem_id);
+        auto options = at::TensorOptions().dtype(at::kHalf).device(at::kCUDA);
+        tmp0 = torch::from_blob((_Float16*)(it->second.second.toTensor().data_ptr()) + 1024, {1, 1, 1024}, options);
+        std::cout << " runtime cat id is " << cat_mem_id << std::endl;
+
+        cat_mem_id =
+            std::dynamic_pointer_cast<nn_compiler::ir::AtenCatLayer>(out2_out2_out1_layer)->getMemLayerId();
+        it = stream_executor.global_blobs_.find(cat_mem_id);
+        tmp1 = torch::from_blob((_Float16*)(it->second.second.toTensor().data_ptr()) + 1024, {1, 1, 1024}, options);
+        std::cout << " runtime cat id is " << cat_mem_id << std::endl;
+
+        cat_mem_id =
+            std::dynamic_pointer_cast<nn_compiler::ir::AtenCatLayer>(out2_out3_out1_layer)->getMemLayerId();
+        it = stream_executor.global_blobs_.find(cat_mem_id);
+        tmp2 = torch::from_blob((_Float16*)(it->second.second.toTensor().data_ptr()) + 1024, {1, 1, 1024}, options);
+
+        std::cout << " runtime cat id is " << cat_mem_id << std::endl;
+    }
+
     auto self_tensor = iv_self.toTensor();
     auto other_tensor = iv_other.toTensor();
-    auto output = atenBmm(self_tensor, other_tensor);
-    stream_executor.updateBlob(out_stensor_id[0], DataType::TENSOR, torch::jit::IValue(output));
+
+    if (!self_tensor.is_contiguous()) self_tensor = self_tensor.contiguous();
+    if (!other_tensor.is_contiguous()) other_tensor = other_tensor.contiguous();
+
+    int dim0 = self_tensor.dim();
+    int dim1 = other_tensor.dim();
+    int m = self_tensor.size(dim0 - 2);
+    int k = self_tensor.size(dim0 - 1);
+    int n = other_tensor.size(dim1 - 1);
+    int k_ = other_tensor.size(dim1 - 2);
+    assert(k_ == k);
+
+    auto options = at::TensorOptions().dtype(at::kHalf).device(at::kCUDA);
+    auto output_shape = self_tensor.sizes().vec();
+    output_shape[dim0 - 1] = n;
+    output_shape[dim0 - 2] = m;
+
+    _Float16* x = (_Float16*)self_tensor.data_ptr();
+    _Float16* A = (_Float16*)other_tensor.data_ptr();
+    auto output = at::zeros(output_shape, options);
+    _Float16* y = (_Float16*)output.data_ptr();
+
+    if (stream_executor.model_type_ == "GNMT") {
+        y = (_Float16*)tmp0.data_ptr();
+    }
+
+    rocblas_bmm_template_xAy(nullptr, x, A, y, m, n, k);
+    if (stream_executor.model_type_ == "GNMT") {
+        atenCopy_(tmp1, tmp0, c10::attr::non_blocking);
+        atenCopy_(tmp2, tmp0, c10::attr::non_blocking);
+    }
+
+    // update output
+    if (stream_executor.model_type_ == "GNMT") {
+        stream_executor.updateBlob(out_stensor_id[0], DataType::TENSOR, tensorToIValue(tmp0));
+    } else {
+        stream_executor.updateBlob(out_stensor_id[0], DataType::TENSOR, tensorToIValue(output));
+    }
 }
 
 void executorAtenBool(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
@@ -591,24 +709,24 @@ void executorAtenCat(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExe
 
     std::vector<at::Tensor> tensor_vec;
 
+    auto input1_layer = stream_executor.getGraph()->getLayerByPosition((layer->getPreLayerIDs())[0]);
+    auto in_input1_stensor_id = input1_layer->getInSTensorID();
     // TODO(SRCX): implement this part of optimization.
-    // if (stream_executor.modelType == "GNMT" && op_node.getFirstInEdge().getInNode()->getNumInputs() == 0) {
-    //     int cat_mem_id = cat_node.getMemBlobId();
-    //     auto it = stream_executor.global_blobs_.find(cat_mem_id);
-    //     auto& out_edge = cast<nncir::DataEdge>(cat_node.getFirstOutEdge());
-    //     auto output = it->second.second.toTensor().clone();
-    //     stream_executor.updateBlob(out_edge.getBlobId(), DataType::TENSOR, tensorToIValue(output));
-    //     return;
-    // }
+    if (stream_executor.model_type_ == "GNMT" && in_input1_stensor_id.size() == 0) {
+        int cat_mem_id = cat_layer->getMemLayerId();
+        auto it = stream_executor.global_blobs_.find(cat_mem_id);
+        auto output = it->second.second.toTensor().clone();
+        stream_executor.updateBlob(out_stensor_id[0], DataType::TENSOR, tensorToIValue(output));
+        return;
+    }
 
-    // int cat_mem_id = cat_node.getMemBlobId();
-    // auto it = stream_executor.global_blobs_.find(cat_mem_id);
-    // if (stream_executor.modelType == "GNMT" && it != stream_executor.global_blobs_.end()) {
-    //     auto& out_edge = cast<nncir::DataEdge>(cat_node.getFirstOutEdge());
-    //     auto output = it->second.second;
-    //     stream_executor.updateBlob(out_edge.getBlobId(), DataType::TENSOR, output);
-    //     return;
-    // }
+    int cat_mem_id = cat_layer->getMemLayerId();
+    auto it = stream_executor.global_blobs_.find(cat_mem_id);
+    if (stream_executor.model_type_ == "GNMT" && it != stream_executor.global_blobs_.end()) {
+        auto output = it->second.second;
+        stream_executor.updateBlob(out_stensor_id[0], DataType::TENSOR, output);
+        return;
+    }
 
     auto ivalue = stream_executor.findBlob(in_stensor_id[0]).second;
     assert(ivalue.isTensorList());
@@ -1533,12 +1651,14 @@ void executorAtenLen(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExe
     if (iv.isList()) {
         output = atenLen(iv.toList());
         // TODO(SRCX): implement this part of optimization.
-        // if (stream_executor.modelType == "GNMT" &&
-        //     op_node.getFirstInEdge().getInNode()->getNodeType() == nncir::NodeType::PRIMVARIABLE &&
-        //     iv.toList().size() == 4) {
-        //     int next_node_id = cast<nncir::PrimLoopNode>(op_node.getFirstOutEdge().getOutNode()).getGotoNode() - 1;
-        //     stream_executor.setCursor(next_node_id);
-        // }
+        auto input1_layer = stream_executor.getGraph()->getLayerByPosition((layer->getPreLayerIDs())[0]);
+        auto out1_layer = stream_executor.getGraph()->getLayerByPosition((layer->getNextLayerIDs())[0]);
+        if (stream_executor.model_type_ == "GNMT" &&
+            input1_layer->getType() == nn_compiler::ir::LayerType::PRIMVARIABLE &&
+            iv.toList().size() == 4) {
+            int next_node_id = std::dynamic_pointer_cast<nn_compiler::ir::PrimLoopLayer>(out1_layer)->getGotoLayer() - 1;
+            stream_executor.setCursor(next_node_id);
+        }
     } else if (iv.isTensor()) {
         output = atenLen(iv.toTensor());
     } else {
@@ -1956,7 +2076,7 @@ void executorAtenLSTM1(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamE
 
         auto it0 = stream_executor.global_blobs_.find(out_stensor_id[0]);
 
-        if (0 && stream_executor.model_type_ == "GNMT" && it0 != stream_executor.global_blobs_.end() && seq_len == 1) {
+        if (stream_executor.model_type_ == "GNMT" && it0 != stream_executor.global_blobs_.end() && seq_len == 1) {
             out_dev = it0->second.second.toTensor().data_ptr();
             hy_dev = stream_executor.global_blobs_.find(out_stensor_id[1])->second.second.toTensor().data_ptr();
             cy_dev = stream_executor.global_blobs_.find(out_stensor_id[2])->second.second.toTensor().data_ptr();
@@ -1979,52 +2099,53 @@ void executorAtenLSTM1(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamE
                 cy_dev = cy.data_ptr();
 
                 // TODO(SRCX): implement this part of optimization.
-                // if (stream_executor.modelType == "GNMT" && lstm1_node.getMatchCustomOpt()) {
-                //     int cat_f = 22222;
-                //     auto cat = stream_executor.global_blobs_.find(cat_f);
-                //     auto cat_mem = cat->second.second.toTensor();
+                if (stream_executor.model_type_ == "GNMT" && lstm1_layer->getMatchCustomOpt()) {
+                    int cat_f = 22222;
+                    auto cat = stream_executor.global_blobs_.find(cat_f);
+                    auto cat_mem = cat->second.second.toTensor();
 
-                //     if (lstm1_node.getCustomOptNumber() == 0) {
-                //         hy = torch::from_blob((_Float16*)(cat_mem.data_ptr()), {1, 1, 1024}, options);
-                //         cy = torch::from_blob((_Float16*)(cat_mem.data_ptr()) + 1024, {1, 1, 1024}, options);
-                //         hy_dev = hy.data_ptr();
-                //         cy_dev = cy.data_ptr();
-                //     }else if (lstm1_node.getCustomOptNumber() == 1) {
-                //         hy = torch::from_blob((_Float16*)(cat_mem.data_ptr()) + 2048, {1, 1, 1024}, options);
-                //         cy = torch::from_blob((_Float16*)(cat_mem.data_ptr()) + 3072, {1, 1, 1024}, options);
-                //         hy_dev = hy.data_ptr();
-                //         cy_dev = cy.data_ptr();
-                //     }else if (lstm1_node.getCustomOptNumber() == 2) {
-                //         hy = torch::from_blob((_Float16*)(cat_mem.data_ptr()) + 4096, {1, 1, 1024}, options);
-                //         cy = torch::from_blob((_Float16*)(cat_mem.data_ptr()) + 5120, {1, 1, 1024}, options);
-                //         hy_dev = hy.data_ptr();
-                //         cy_dev = cy.data_ptr();
-                //     }else if (lstm1_node.getCustomOptNumber() == 3) {
-                //         hy = torch::from_blob((_Float16*)(cat_mem.data_ptr()) + 6144, {1, 1, 1024}, options);
-                //         cy = torch::from_blob((_Float16*)(cat_mem.data_ptr()) + 7168, {1, 1, 1024}, options);
-                //         hy_dev = hy.data_ptr();
-                //         cy_dev = cy.data_ptr();
-                //     }
+                    if (lstm1_layer->getCustomOptNumber() == 0) {
+                        hy = torch::from_blob((_Float16*)(cat_mem.data_ptr()), {1, 1, 1024}, options);
+                        cy = torch::from_blob((_Float16*)(cat_mem.data_ptr()) + 1024, {1, 1, 1024}, options);
+                        hy_dev = hy.data_ptr();
+                        cy_dev = cy.data_ptr();
+                    }else if (lstm1_layer->getCustomOptNumber() == 1) {
+                        hy = torch::from_blob((_Float16*)(cat_mem.data_ptr()) + 2048, {1, 1, 1024}, options);
+                        cy = torch::from_blob((_Float16*)(cat_mem.data_ptr()) + 3072, {1, 1, 1024}, options);
+                        hy_dev = hy.data_ptr();
+                        cy_dev = cy.data_ptr();
+                    }else if (lstm1_layer->getCustomOptNumber() == 2) {
+                        hy = torch::from_blob((_Float16*)(cat_mem.data_ptr()) + 4096, {1, 1, 1024}, options);
+                        cy = torch::from_blob((_Float16*)(cat_mem.data_ptr()) + 5120, {1, 1, 1024}, options);
+                        hy_dev = hy.data_ptr();
+                        cy_dev = cy.data_ptr();
+                    }else if (lstm1_layer->getCustomOptNumber() == 3) {
+                        hy = torch::from_blob((_Float16*)(cat_mem.data_ptr()) + 6144, {1, 1, 1024}, options);
+                        cy = torch::from_blob((_Float16*)(cat_mem.data_ptr()) + 7168, {1, 1, 1024}, options);
+                        hy_dev = hy.data_ptr();
+                        cy_dev = cy.data_ptr();
+                    }
 
-                //     if (stream_executor.modelType == "GNMT" && lstm1_node.getCustomOptNumber() == 0) {
-                //         int64_t cat_mem_id =
-                //             cast<nncir::AtenCatNode>(op_node.getOutEdge(3).getOutNode()->getFirstOutEdge().getOutNode())
-                //                 .getMemBlobId();
-                //         auto it = stream_executor.global_blobs_.find(cat_mem_id);
-                //         auto options = at::TensorOptions().dtype(at::kHalf).device(at::kCUDA);
-                //         auto cat_mem = it->second.second.toTensor();
-                //         output = torch::from_blob((_Float16*)(cat_mem.data_ptr()), {1, 1, 1024}, options);
-                //     }
-                //     if (stream_executor.modelType == "GNMT" && lstm1_node.getCustomOptNumber() == 1) {
-                //         int64_t cat_mem_id = cast<nncir::AtenCatNode>(
-                //                                  op_node.getFirstOutEdge().getOutNode()->getFirstOutEdge().getOutNode())
-                //                                  .getMemBlobId();
-                //         auto it = stream_executor.global_blobs_.find(cat_mem_id);
-                //         auto options = at::TensorOptions().dtype(at::kHalf).device(at::kCUDA);
-                //         auto cat_mem = it->second.second.toTensor();
-                //         output = torch::from_blob((_Float16*)(cat_mem.data_ptr()), {1, 1, 1024}, options);
-                //     }
-                // }
+                    if (stream_executor.model_type_ == "GNMT" && lstm1_layer->getCustomOptNumber() == 0) {
+                        auto out4_layer = stream_executor.getGraph()->getLayerByPosition((layer->getNextLayerIDs())[3]);
+                        auto out4_out1_layer = stream_executor.getGraph()->getLayerByPosition((out4_layer->getNextLayerIDs())[0]);
+                        int64_t cat_mem_id =
+                            std::dynamic_pointer_cast<nn_compiler::ir::AtenCatLayer>(out4_out1_layer)->getMemLayerId();
+                        auto it = stream_executor.global_blobs_.find(cat_mem_id);
+                        auto options = at::TensorOptions().dtype(at::kHalf).device(at::kCUDA);
+                        auto cat_mem = it->second.second.toTensor();
+                        output = torch::from_blob((_Float16*)(cat_mem.data_ptr()), {1, 1, 1024}, options);
+                    }
+                    if (stream_executor.model_type_ == "GNMT" && lstm1_layer->getCustomOptNumber() == 1) {
+                        auto out1_layer = stream_executor.getGraph()->getLayerByPosition((layer->getNextLayerIDs())[0]);
+                        auto out1_out1_layer = stream_executor.getGraph()->getLayerByPosition((out1_layer->getNextLayerIDs())[0]);
+                        int64_t cat_mem_id = std::dynamic_pointer_cast<nn_compiler::ir::AtenCatLayer>(out1_out1_layer)->getMemLayerId();
+                        auto it = stream_executor.global_blobs_.find(cat_mem_id);
+                        auto options = at::TensorOptions().dtype(at::kHalf).device(at::kCUDA);
+                        auto cat_mem = it->second.second.toTensor();
+                        output = torch::from_blob((_Float16*)(cat_mem.data_ptr()), {1, 1, 1024}, options);
+                    }
+                }
             }
             miopenRNNForwardInference(stream_executor.handle_, stream_executor.rnn_desc_, seq_len, stream_executor.input_tensors_.data(), in_dev,
                                     stream_executor.hidden_tensor_, hx_dev, stream_executor.hidden_tensor_, cx_dev, stream_executor.weight_tensor_, wei_dev,
@@ -2340,7 +2461,7 @@ void executorAtenLSTM2(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamE
         workspace_dev = workspace.data_ptr();
         auto it0 = stream_executor.global_blobs_.find(out_stensor_id[0]);
 
-        if (0 && stream_executor.model_type_ == "GNMT" && it0 != stream_executor.global_blobs_.end() && seq_len == 1) {
+        if (stream_executor.model_type_ == "GNMT" && it0 != stream_executor.global_blobs_.end() && seq_len == 1) {
             out_dev = it0->second.second.toTensor().data_ptr();
             hy_dev = stream_executor.global_blobs_.find(out_stensor_id[1])->second.second.toTensor().data_ptr();
             cy_dev = stream_executor.global_blobs_.find(out_stensor_id[2])->second.second.toTensor().data_ptr();
