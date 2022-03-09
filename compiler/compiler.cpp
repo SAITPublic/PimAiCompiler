@@ -11,32 +11,27 @@
 #include "common/include/command_line_parser.hpp"
 #include "nn_compiler.hpp"
 
-static cl_opt::Option<std::string>
-input_file_path(std::vector<std::string>{"-i", "--input"}, "<file>", "Input file path", cl_opt::Required::YES);
+static cl_opt::Option<std::string> input_file_path(std::vector<std::string>{"-i", "--input"}, "<file>",
+                                                   "Input file path", cl_opt::Required::YES);
 
-static cl_opt::Option<std::string>
-model_name(std::vector<std::string>{"-m", "--model"}, "<name>", "Model name[RNNT, GNMT, HWR]", cl_opt::Required::YES);
+static cl_opt::Option<std::string> model_name(std::vector<std::string>{"-m", "--model"}, "<name>",
+                                              "Model name[RNNT, GNMT, HWR]", cl_opt::Required::YES);
 
-static cl_opt::Option<int> compile_level("-l",
-                                         "<compile level>",
-                                         "compile level. Possible values: 0 (frontend->middlend->backend),\n\
-                                          1 (middlend->backend), 2 (backend) (default: 0)",
-                                         cl_opt::Required::YES,
-                                         cl_opt::Hidden::NO);
-
-int main(int argc, char* argv[]) {
+int main(int argc, char* argv[])
+{
     // parse arguments
     cl_opt::CommandLineParser::getInstance().parseCommandLine(argc, argv);
 
     // get a compiler instance (singleton)
     nn_compiler::compiler::NNCompiler compiler;
 
+    std::unique_ptr<nn_compiler::ir::NNModel> model = std::make_unique<nn_compiler::ir::NNModel>();
+
     // initialize
-    compiler.initialize(static_cast<int>(compile_level), static_cast<std::string>(input_file_path),
-                        static_cast<std::string>(model_name));
+    compiler.initialize(static_cast<std::string>(input_file_path), static_cast<std::string>(model_name));
 
     // compile
-    compiler.compile();
+    compiler.compile(model);
 
     // finalize
     compiler.finalize();

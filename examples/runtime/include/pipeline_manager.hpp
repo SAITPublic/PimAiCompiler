@@ -6,7 +6,7 @@ namespace examples
 {
 class PipelineManager
 {
- public:
+   public:
     enum class ModelType { NO_MODEL = 0, RNNT, GNMT, HWR };
 
     PipelineManager() = default;
@@ -24,8 +24,7 @@ class PipelineManager
      *            const bool& profiling
      * @returns   return code
      */
-    RetVal initialize(const std::string& input_file, const int& compile_level, const std::string& model_type,
-                      const bool& profiling);
+    RetVal initialize(const std::string& input_file, const std::string& model_type, const bool& profiling);
 
     /**
      * @brief   Call and run pipeline
@@ -41,12 +40,10 @@ class PipelineManager
      */
     RetVal finalize();
 
- private:
+   private:
     std::string input_file_path_ = "";
 
     ModelType model_type_ = ModelType::NO_MODEL;
-
-    int compile_level_ = 1;
 
     bool is_profiling_ = false;
 

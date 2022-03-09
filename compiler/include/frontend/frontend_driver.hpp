@@ -6,7 +6,6 @@
 
 #include "compiler/include/common/log.hpp"
 #include "importer/model_builder.h"
-#include "ir/include/nn_ir.hpp"
 #include "new_ir/include/nn_model.h"
 
 namespace nn_compiler
@@ -50,9 +49,6 @@ class FrontendDriver
     std::string in_file_path_ = "";
 
     std::string model_name_ = "";
-
-    // TODO(SRCX): remove NNIR graphs when refactor successfully
-    std::vector<std::shared_ptr<nn_compiler::nn_ir::NNIR>> graphs_;
 
     /**
      * @brief   Import model

@@ -20,8 +20,7 @@ namespace fs = std::experimental::filesystem;
 
 namespace examples
 {
-RetVal PipelineManager::initialize(const std::string& input_file, const int& compile_level,
-                                   const std::string& model_type, const bool& profiling)
+RetVal PipelineManager::initialize(const std::string& input_file, const std::string& model_type, const bool& profiling)
 {
     if (model_type == "RNNT") {
         model_type_ = ModelType::RNNT;
@@ -33,7 +32,6 @@ RetVal PipelineManager::initialize(const std::string& input_file, const int& com
         Log::EG::E() << "Unsupported model type.";
     }
     input_file_path_ = input_file;
-    compile_level_ = compile_level;
     is_profiling_ = profiling;
 
     return RetVal::SUCCESS;
@@ -76,7 +74,7 @@ void PipelineManager::load_and_run_rnnt()
     std::unique_ptr<nn_compiler::ir::NNModel> model = std::make_unique<nn_compiler::ir::NNModel>();
 
     NNCompiler compiler;
-    compiler.initialize(0, input_file_path_, "RNNT");
+    compiler.initialize(input_file_path_, "RNNT");
     compiler.compile(model);
 
     NNRuntime runtime(model, "RNNT");
@@ -115,7 +113,7 @@ void PipelineManager::load_and_run_gnmt()
     std::unique_ptr<nn_compiler::ir::NNModel> model = std::make_unique<nn_compiler::ir::NNModel>();
 
     NNCompiler compiler;
-    compiler.initialize(0, input_file_path_, "GNMT");
+    compiler.initialize(input_file_path_, "GNMT");
     compiler.compile(model);
 
     NNRuntime runtime(model, "GNMT");
@@ -152,7 +150,7 @@ void PipelineManager::load_and_run_hwr()
     std::unique_ptr<nn_compiler::ir::NNModel> model = std::make_unique<nn_compiler::ir::NNModel>();
 
     NNCompiler compiler;
-    compiler.initialize(0, input_file_path_, "HWR");
+    compiler.initialize(input_file_path_, "HWR");
     compiler.compile(model);
 
     NNRuntime runtime(model, "HWR");
@@ -179,4 +177,4 @@ void PipelineManager::load_and_run_hwr()
     }
 }
 
-} // namespace examples
+}  // namespace examples
