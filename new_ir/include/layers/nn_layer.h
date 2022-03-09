@@ -104,13 +104,17 @@ class NNLayer {
 
     const std::string& getName() const { return name_; }
 
-    void setType(LayerType type) {
-        type_ = type;
-    }
+    void setType(LayerType type) { type_ = type; }
 
-    const LayerType& getType() const {
-        return type_;
-    }
+    const LayerType& getType() const { return type_; }
+
+    void setPreLayerIDs(std::vector<uint32_t> pre_layer_ids) { pre_layer_ids_ = pre_layer_ids; }
+
+    const std::vector<uint32_t>& getPreLayerIDs() const { return pre_layer_ids_; }
+
+    void setNextLayerIDs(std::vector<uint32_t> next_layer_ids) { next_layer_ids_ = next_layer_ids; }
+
+    const std::vector<uint32_t>& getNextLayerIDs() const { return next_layer_ids_; }
 
     void setActivation(std::shared_ptr<NNLayer> activation_attr) { activation_attr_ = activation_attr; }
 
@@ -138,6 +142,9 @@ class NNLayer {
     std::string name_;
 
     LayerType type_;
+
+    std::vector<uint32_t> pre_layer_ids_;
+    std::vector<uint32_t> next_layer_ids_;
 
     std::shared_ptr<NNLayer> activation_attr_ = nullptr;
 };

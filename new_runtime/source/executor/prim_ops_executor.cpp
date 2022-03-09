@@ -226,7 +226,7 @@ void executePrimEndIf(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamEx
 
         auto in_stensor_ids = layer->getInSTensorID();
         if (in_stensor_ids.size() > 0) {
-            auto if_layer = stream_executor.getGraph()->getLayer(if_id);
+            auto if_layer = stream_executor.getGraph()->getLayerByPosition(if_id);
             auto if_layer_in_stensor_ids = if_layer->getInSTensorID();
 
             // Find the input blob, named condition, it is a int64/bool value
@@ -647,7 +647,7 @@ std::unordered_map<std::string, int64_t> getMatchedLoopInfo(int64_t loop_block_i
     int64_t loop_id = loop_block_id - 2;
     assert(loop_id >= 0);
     auto graph = stream_executor.getGraph();
-    auto layer = graph->getLayer(loop_id);
+    auto layer = graph->getLayerByPosition(loop_id);
     auto loop_layer = std::dynamic_pointer_cast<nn_compiler::ir::PrimLoopLayer>(layer);
 
     // max_cnt & cond
@@ -666,7 +666,7 @@ std::unordered_map<std::string, int64_t> getMatchedLoopInfo(int64_t loop_block_i
     }
 
     int64_t loop_index_id = loop_block_id - 1;
-    auto loop_index_layer_ = graph->getLayer(loop_index_id);
+    auto loop_index_layer_ = graph->getLayerByPosition(loop_index_id);
     int blob_id = loop_index_layer_->getOutSTensorID()[0];
     auto blob = stream_executor.findBlob(blob_id);
     assert(blob.first == DataType::INT64);
@@ -704,7 +704,7 @@ void executePrimBlock(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamEx
     if (loop_index >= max_trip_cnt || cond == 0) {
         // Get EndLoop's input
         // transfer EndLoop's input --> output
-        auto end_loop_layer = stream_executor.getGraph()->getLayer(end_loop_next_id - 1);
+        auto end_loop_layer = stream_executor.getGraph()->getLayerByPosition(end_loop_next_id - 1);
         auto end_loop_in_stensor_ids = end_loop_layer->getInSTensorID();
         auto end_loop_out_stensor_ids = end_loop_layer->getOutSTensorID();
 
@@ -727,13 +727,13 @@ void executePrimBlock(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamEx
         // Jump to End Loop'next
         int64_t temp_cond = stream_executor.loop_condition_stack_.top();
         stream_executor.loop_condition_stack_.pop();
-        auto loop_op_layer = stream_executor.getGraph()->getLayer(loop_layer_id);
+        auto loop_op_layer = stream_executor.getGraph()->getLayerByPosition(loop_layer_id);
         auto loop_layer = std::dynamic_pointer_cast<nn_compiler::ir::PrimLoopLayer>(loop_op_layer);
         loop_layer->setCond(temp_cond);
         stream_executor.setCursor(end_loop_next_id);
     } else {
         auto graph = stream_executor.getGraph();
-        auto loop_layer = std::dynamic_pointer_cast<nn_compiler::ir::PrimLoopLayer>(graph->getLayer(loop_layer_id));
+        auto loop_layer = std::dynamic_pointer_cast<nn_compiler::ir::PrimLoopLayer>(graph->getLayerByPosition(loop_layer_id));
         if (!loopHasExtraInputs(loop_layer)) {
             // the in_stensor_ids[0] is invalid, only is maintain linkage
             // only need to pass LoopIndex into Block's inner
@@ -788,7 +788,7 @@ void executePrimLoop(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExe
     // loop_layer.id + 2 ---> PrimBlockLayer
 
     // Get LoopIndex
-    auto loop_index_layer_ = stream_executor.getGraph()->getLayer(loop_layer_id + 1);
+    auto loop_index_layer_ = stream_executor.getGraph()->getLayerByPosition(loop_layer_id + 1);
     int64_t loop_index_blob_id = loop_index_layer_->getOutSTensorID()[0];
     //
     executePrimLoopIndex(loop_index_layer_, stream_executor);  // BUG: this will reset loop_index
@@ -798,7 +798,7 @@ void executePrimLoop(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExe
 
     // Get LoopBlockNode.id
     int loop_block_id = loop_layer_id + 2;
-    auto loop_block_layer_ = stream_executor.getGraph()->getLayer(loop_block_id);
+    auto loop_block_layer_ = stream_executor.getGraph()->getLayerByPosition(loop_block_id);
 
     // the Loop's input maybe empty
     // loopHasExtraInputs(loop_node)
@@ -824,7 +824,7 @@ void executePrimEndLoop(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, Stream
 
     // get the matched StartLoopNode
     int64_t loop_start_layer_id = end_loop_layer->getGotoLayer();
-    auto loop_index_layer_ = stream_executor.getGraph()->getLayer(loop_start_layer_id + 1);
+    auto loop_index_layer_ = stream_executor.getGraph()->getLayerByPosition(loop_start_layer_id + 1);
 
     // Get newset LoopIndex
     int loop_index_blob_id = loop_index_layer_->getOutSTensorID()[0];
@@ -845,11 +845,11 @@ void executePrimEndLoop(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, Stream
 
     // update EndLoop's input Blobs --> PrimBlock's input
     auto end_loop_input_blob_ids = layer->getInSTensorID();
-    auto prim_block_layer_ = stream_executor.getGraph()->getLayer(loop_start_layer_id + 2);
+    auto prim_block_layer_ = stream_executor.getGraph()->getLayerByPosition(loop_start_layer_id + 2);
     auto prim_block_input_blob_ids = prim_block_layer_->getInSTensorID();
 
     // the 0 element is condition
-    auto prim_loop_layer_ = stream_executor.getGraph()->getLayer(loop_start_layer_id);
+    auto prim_loop_layer_ = stream_executor.getGraph()->getLayerByPosition(loop_start_layer_id);
     auto prim_loop_layer = std::dynamic_pointer_cast<nn_compiler::ir::PrimLoopLayer>(prim_loop_layer_);
     auto cond_iv = stream_executor.findBlob(end_loop_input_blob_ids.at(0)).second;
     if (cond_iv.isInt()) {

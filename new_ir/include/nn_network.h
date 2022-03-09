@@ -55,11 +55,18 @@ class NNNetwork {
         return ret;
     }
 
-    std::shared_ptr<NNLayer> getLayer(uint32_t id) {
+    std::shared_ptr<NNLayer> getLayerByID(uint32_t id) {
         for (auto layer : layers_) {
             if (layer->getID() == id) {
                 return layer;
             }
+        }
+        return nullptr;
+    }
+
+    std::shared_ptr<NNLayer> getLayerByPosition(uint32_t pos) {
+        if (pos < layers_.size()) {
+            return layers_[pos];
         }
         return nullptr;
     }

@@ -67,7 +67,7 @@ class StreamExecutor
     }
 
    public:
-    std::shared_ptr<nn_compiler::ir::NNNetwork> ir_graph_;
+    std::shared_ptr<nn_compiler::ir::NNNetwork> graph_;
 
     // Global input & output vars
     blob_store_type global_blobs_;
