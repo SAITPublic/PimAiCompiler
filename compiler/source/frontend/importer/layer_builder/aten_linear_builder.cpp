@@ -27,15 +27,17 @@ std::shared_ptr<ir::NNLayer> AtenLinearBuilder::buildLayer(const torch::jit::Nod
     auto weight_node = node_ref->inputs()[1]->node();
     assert(weight_node->kind() == c10::prim::Constant);
     assert(weight_node->hasAttribute(c10::attr::value));
-    auto weight_tensor = weight_node->t(c10::attr::value);
+    auto weight_tensor_cpu = weight_node->t(c10::attr::value);
+    auto weight_tensor = std::move(weight_tensor_cpu.cuda());
     std::vector<at::Tensor> weight_vec;
     weight_vec.push_back(weight_tensor);
     // get bias
     auto bias_node = node_ref->inputs()[2]->node();
     std::vector<at::Tensor> bias_vec;
     if (bias_node->kind() == c10::prim::Constant && bias_node->hasAttribute(c10::attr::value)) {
-        auto bais_tensor = bias_node->t(c10::attr::value);
-        bias_vec.push_back(bais_tensor);
+        auto bias_tensor_cpu = bias_node->t(c10::attr::value);
+        auto bias_tensor = std::move(bias_tensor_cpu.cuda());
+        bias_vec.push_back(bias_tensor);
     }
 
     aten_linear_layer_->setWeights(weight_vec);

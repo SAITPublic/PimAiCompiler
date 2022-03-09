@@ -23,14 +23,16 @@ std::shared_ptr<ir::NNLayer> AtenBatchNorm2dBuilder::buildLayer(const torch::jit
     auto weight_node = node_ref->inputs()[1]->node();
     assert(weight_node->kind() == c10::prim::Constant);
     assert(weight_node->hasAttribute(c10::attr::value));
-    auto weight_tensor = weight_node->t(c10::attr::value);
+    auto weight_tensor_cpu = weight_node->t(c10::attr::value);
+    auto weight_tensor = std::move(weight_tensor_cpu.cuda());
     std::vector<at::Tensor> weight_vec;
     weight_vec.push_back(weight_tensor);
     // get bias
     auto bias_node = node_ref->inputs()[2]->node();
     assert(bias_node->kind() == c10::prim::Constant);
     assert(bias_node->hasAttribute(c10::attr::value));
-    auto bias_tensor = bias_node->t(c10::attr::value);
+    auto bias_tensor_cpu = bias_node->t(c10::attr::value);
+    auto bias_tensor = std::move(bias_tensor_cpu.cuda());
     std::vector<at::Tensor> bias_vec;
     bias_vec.push_back(bias_tensor);
 
