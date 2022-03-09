@@ -44,8 +44,8 @@ class MiddlendDriver {
 
  private:
    /**
-     * @brief   Apply Graph optimizations
-     * @details This function runs graph optimization passes onto model graph
+     * @brief   Apply optimizations
+     * @details This function runs optimization passes onto model graph
      * @returns return code
      */
     RetVal optimizer(std::unique_ptr<nn_compiler::ir::NNModel>& model);

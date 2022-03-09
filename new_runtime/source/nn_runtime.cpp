@@ -25,15 +25,15 @@ NNRuntime::NNRuntime(std::unique_ptr<nn_compiler::ir::NNModel>& model, std::stri
     PimInitialize(RT_TYPE_HIP, PIM_FP16);
 }
 
-std::vector<torch::Tensor> NNRuntime::inferenceModel(std::unique_ptr<nn_compiler::ir::NNModel>& model,
-                                                     const std::vector<torch::Tensor>& input_tensors, bool profiling)
+void NNRuntime::inferenceModel(std::unique_ptr<nn_compiler::ir::NNModel>& model,
+                               const std::vector<torch::Tensor>& input_tensors,
+                               std::vector<torch::Tensor>& output_tensors, bool profiling)
 {
     Log::RT::D() << "numInputs:" << input_tensors.size();
     for (auto& item : input_tensors) {
         Log::RT::D() << "shape:" << item.sizes() << " dtype:" << item.dtype() << " device:" << item.device();
     }
 
-    std::vector<torch::Tensor> output_tensors;
     auto status = RetVal::FAILURE;
     if (profiling) {
         // profiling result of the first running time is not accurate.
@@ -52,8 +52,6 @@ std::vector<torch::Tensor> NNRuntime::inferenceModel(std::unique_ptr<nn_compiler
     // for simple test, fill zeros to outputs
     // output_tensors.push_back(torch::zeros({10, 10}, torch::kF16));
     Log::RT::D() << "Num of Outputs: " << output_tensors.size();
-
-    return output_tensors;
 }
 
 int NNRuntime::rocblas_init(void)

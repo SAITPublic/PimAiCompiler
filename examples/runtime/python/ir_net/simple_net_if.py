@@ -106,7 +106,7 @@ def sample3():
     print('x1:{}'.format(x1))
     print('x2:{}'.format(x2))
     print('out:{}'.format(out))
-    # frozen_net.save('sample_if_if_else_else_3.pt')
+    frozen_net.save('sample_if_if_else_else_3.torchscript')
 
 
 if __name__ == '__main__':

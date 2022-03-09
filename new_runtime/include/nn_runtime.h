@@ -4,8 +4,8 @@
 #include <tuple>
 #include <vector>
 
-#include "common/log.hpp"
 #include "builder/model_builder.h"
+#include "common/log.hpp"
 #include "executor/stream_executor.h"
 #include "new_ir/include/nn_model.h"
 
@@ -13,20 +13,19 @@ namespace nn_compiler
 {
 namespace runtime
 {
-
 class NNRuntime
 {
    public:
     NNRuntime() {}
 
-    NNRuntime(std::unique_ptr<nn_compiler::ir::NNModel> &model, std::string model_type = "");
+    NNRuntime(std::unique_ptr<nn_compiler::ir::NNModel>& model, std::string model_type = "");
 
-    std::vector<torch::Tensor> inferenceModel(std::unique_ptr<nn_compiler::ir::NNModel>& model,
-                                              const std::vector<torch::Tensor>& input_tensors,
-                                              bool profiling = false);
+    void inferenceModel(std::unique_ptr<nn_compiler::ir::NNModel>& model,
+                        const std::vector<torch::Tensor>& input_tensors, std::vector<torch::Tensor>& output_tensors,
+                        bool profiling = false);
 
     int rocblas_init(void);
-    
+
     int test(void);
 
     ~NNRuntime();

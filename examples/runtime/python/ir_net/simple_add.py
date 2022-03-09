@@ -24,7 +24,7 @@ def sample1():
     my_script_module = torch.jit.script(model)
     frozen_model = torch.jit.freeze(my_script_module)
     print(frozen_model.graph)
-    torch.jit.save(frozen_model, "simple_jit_add.pt")
+    torch.jit.save(frozen_model, "simple_jit_add.torchscript")
 
     print("x1:{}".format(x1))
     print("x2:{}".format(x2))

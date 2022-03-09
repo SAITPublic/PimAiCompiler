@@ -80,6 +80,7 @@ void PipelineManager::load_and_run_rnnt()
     NNRuntime runtime(model, "RNNT");
 
     std::vector<torch::Tensor> input_tensors;
+    std::vector<torch::Tensor> output_tensors;
     // load inputs from files
     auto tensor_feature = loadTensor(feature_file, {341, 1, 240}, DataType::FLOAT16).cuda();
     auto tensor_feature_len = loadTensor(feature_len_file, {1}, DataType::INT64);
@@ -91,7 +92,7 @@ void PipelineManager::load_and_run_rnnt()
                      << "size: " << item.sizes() << " dtype:" << item.dtype() << " device:" << item.device();
     }
     // Inference
-    runtime.inferenceModel(model, input_tensors, is_profiling_);
+    runtime.inferenceModel(model, input_tensors, output_tensors, is_profiling_);
 }
 
 void PipelineManager::load_and_run_gnmt()
@@ -119,6 +120,7 @@ void PipelineManager::load_and_run_gnmt()
     NNRuntime runtime(model, "GNMT");
 
     std::vector<torch::Tensor> input_tensors;
+    std::vector<torch::Tensor> output_tensors;
     // load inputs from files
     auto tensor_src = loadTensor(src_file, {1, 12}, DataType::INT64).cuda();
     auto tensor_src_length = loadTensor(src_length_file, {1}, DataType::INT64).cuda();
@@ -133,7 +135,7 @@ void PipelineManager::load_and_run_gnmt()
                      << "size: " << item.sizes() << " dtype:" << item.dtype() << " device:" << item.device();
     }
     // Inference
-    runtime.inferenceModel(model, input_tensors, is_profiling_);
+    runtime.inferenceModel(model, input_tensors, output_tensors, is_profiling_);
 }
 
 void PipelineManager::load_and_run_hwr()
@@ -156,6 +158,7 @@ void PipelineManager::load_and_run_hwr()
     NNRuntime runtime(model, "HWR");
 
     std::vector<torch::Tensor> input_tensors;
+    std::vector<torch::Tensor> output_tensors;
     // load inputs from files
     auto tensor_ = loadTensor(input_file, {1, 1, 1024, 128}, DataType::FLOAT16).cuda();
     input_tensors.push_back(tensor_);
@@ -165,7 +168,7 @@ void PipelineManager::load_and_run_hwr()
                      << "size: " << item.sizes() << " dtype:" << item.dtype() << " device:" << item.device();
     }
     // Inference
-    auto output_tensors = runtime.inferenceModel(model, input_tensors, is_profiling_);
+    runtime.inferenceModel(model, input_tensors, output_tensors, is_profiling_);
     // check outputs
     TVComparator& tv_comp = TVComparator::getInstance();
     tv_comp.loadTV("./examples/runtime/resource/hwr/inputs/output_hwr_y_hat_128_1_98.bin", {128, 1, 98},

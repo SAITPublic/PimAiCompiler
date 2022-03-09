@@ -4,10 +4,10 @@ import shutil
 import sys
 
 current_dir = os.path.dirname(os.path.abspath(__file__))
-nnrt_path = os.path.abspath(os.path.join(current_dir, '../../../../build/runtime/python'))
+nncompiler_path = os.path.abspath(os.path.join(current_dir, '../../../../build/runtime/python'))
 # Load Nnr module
-sys.path.append(nnrt_path)
-import Nnrt
+sys.path.append(nncompiler_path)
+import NNCompiler
 
 
 def script_freeze(torch_model):
@@ -21,9 +21,9 @@ def inference_pytorch(torch_model, inputs):
     outs = torch_model(*inputs)
     return outs
 
-def inference_nnruntime(graph_ir_file, inputs):
-    rt = Nnrt.NNRuntime(graph_ir_file)
-    outs = rt.inferenceModel(inputs)
+def inference_nncompiler(input_file, inputs):
+    nncompiler = NNCompiler.PipelineManager(input_file)
+    outs = nncompiler.inferenceModel(inputs)
     return outs
 
 def compare_tensors(lst1, lst2):
