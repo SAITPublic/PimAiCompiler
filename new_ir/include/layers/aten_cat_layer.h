@@ -36,7 +36,7 @@ class AtenCatLayer : public NNLayer
 
    private:
     int _dim = INT32_MAX;
-    int64_t mem_layer_id_;
+    int64_t mem_layer_id_ = -1;
 };
 
 }  // namespace ir

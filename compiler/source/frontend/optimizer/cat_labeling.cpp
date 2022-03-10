@@ -30,15 +30,14 @@ void getOffspring(std::vector<int64_t>& res, std::shared_ptr<nn_compiler::ir::NN
         return;
     }
     int next_level = level - 1;
-    auto out_layers_id = layer->getOutSTensorID();
+    auto out_layers_id = layer->getNextLayerIDs();
     for (auto out_id : out_layers_id) {
-        for (auto check_layer : graph->getLayers()) {
-            if (check_layer->getName() == layer->getName() && check_layer->getType() == targetLayerType &&
-                std::find(res.begin(), res.end(), check_layer->getID()) == res.end()) {
-                res.emplace_back(check_layer->getID());
-            }
-            getOffspring(res, graph, check_layer, targetLayerType, next_level);
+        auto out_layer = graph->getLayerByID(out_id);
+        if (out_layer->getType() == targetLayerType &&
+            std::find(res.begin(), res.end(), out_layer->getID()) == res.end()) {
+            res.emplace_back(out_layer->getID());
         }
+        getOffspring(res, graph, out_layer, targetLayerType, next_level);
     }
 }
 
@@ -74,7 +73,7 @@ void CatLabeling::run(std::unique_ptr<nn_compiler::ir::NNModel>& model)
                 auto cat_in_layer_id = cat_layer->getInSTensorID()[0];
                 for (auto cat_in_layer : graph->getLayers()) {
                     if (cat_in_layer->getID() == cat_in_layer_id) {
-                        cat_layer->setMemLayerId(cat_in_layer->getID());
+                        cat_layer->setMemLayerId(cat_in_layer->getID() * 10);
                         break;
                     }
                 }
