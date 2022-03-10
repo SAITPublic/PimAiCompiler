@@ -120,6 +120,25 @@ void executePrimConstant(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, Strea
         primTupleConstruct(inputs, inputs.size());
         iv = inputs.at(0);
         dtype = DataType::TUPLE;
+    } else if (ntype.find("[") != std::string::npos && ntype.find("]") != std::string::npos) {  // list type
+        std::vector<torch::IValue> inputs;
+        if (ntype.find("int") != std::string::npos) {
+            auto data = constant_layer_attr->getData<int64_t>();
+            for (auto item : *data) {
+                inputs.push_back(intToIValue(item));
+            }
+            // Call OpKernel
+            primListConstruct(inputs, inputs.size(), inferTypeFromDataType(DataType::INT64));
+        } else if (ntype.find("float") != std::string::npos) {
+            auto data = constant_layer_attr->getData<double>();
+            for (auto item : *data) {
+                inputs.push_back(doubleToIValue(item));
+            }
+            // Call OpKernel
+            primListConstruct(inputs, inputs.size(), inferTypeFromDataType(DataType::FLOAT64));
+        }
+        iv = inputs.at(0);
+        dtype = DataType::LIST;
     } else {
         Log::RT::E() << "PrimConstant Error, ntype: " << ntype << "unsupport!";
     }

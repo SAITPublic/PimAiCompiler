@@ -177,7 +177,7 @@ std::shared_ptr<DTensor> getDTensorData(const torch::jit::Node* node_constant)
                     ;
                 element_type = nn_compiler::ir::DataType::INT64;
             } else {
-                Log::NIR::I() << "unspported datatype for tuple.";
+                Log::NIR::E() << "unspported datatype for tuple.";
             }
             return std::make_pair(element_num, element_type);
         };
@@ -190,7 +190,30 @@ std::shared_ptr<DTensor> getDTensorData(const torch::jit::Node* node_constant)
         data->setTensorShape(STensor(0, 0, 0, parsed_ntype.first));
         data->setDataType(parsed_ntype.second);
         Log::NIR::I() << "set tuple:" << value_vec;
-
+    } else if (ntype.find("[") != std::string::npos && ntype.find("]") != std::string::npos) {  // list type
+        auto attr_symbol = c10::attr::value;
+        auto value_list = node_constant->ival(attr_symbol).toList();
+        auto value_vec = value_list.vec();
+        if (ntype.find("int") != std::string::npos) {
+            std::vector<int64_t> value;
+            for (auto item : value_vec) {
+                value.push_back(item.toInt());
+            }
+            data->setData(value.data(), value.size() * 8);
+            data->setTensorShape(STensor(0, 0, 0, value.size()));
+            data->setDataType(nn_compiler::ir::DataType::INT64);
+        } else if (ntype.find("float") != std::string::npos) {
+            std::vector<double> value;
+            for (auto item : value_vec) {
+                value.push_back(item.toDouble());
+            }
+            data->setData(value.data(), value.size() * 8);
+            data->setTensorShape(STensor(0, 0, 0, value.size()));
+            data->setDataType(nn_compiler::ir::DataType::FLOAT64);
+        } else {
+            Log::NIR::E() << "unspported datatype for list.";
+        }
+        Log::NIR::I() << "set list:" << value_vec;
     } else {
         Log::NIR::E() << "not supported type:" << ntype;
         return nullptr;
