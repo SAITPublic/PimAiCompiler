@@ -296,8 +296,8 @@ int64_t atenSize(const at::Tensor &tensor, int64_t dim);
 
 int64_t atenSize(const at::Tensor &self, at::Dimname dim);
 
-at::Tensor atenSlice(const at::Tensor &self, int64_t dim = 0, int64_t start = 0, int64_t end = 9223372036854775807,
-                     int64_t step = 1);
+at::Tensor atenSlice(const at::Tensor &self, int64_t dim = 0, c10::optional<int64_t> start = c10::nullopt,
+                     c10::optional<int64_t> end = c10::nullopt, int64_t step = 1);
 
 at::Tensor atenSoftmax(const at::Tensor &self, int64_t dim, c10::optional<at::ScalarType> dtype = c10::nullopt);
 

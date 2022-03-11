@@ -407,7 +407,8 @@ int64_t atenSize(const at::Tensor &tensor, int64_t dim) { return at::size(tensor
 
 int64_t atenSize(const at::Tensor &self, at::Dimname dim) { return at::size(self, dim); }
 
-at::Tensor atenSlice(const at::Tensor &self, int64_t dim, int64_t start, int64_t end, int64_t step)
+at::Tensor atenSlice(const at::Tensor &self, int64_t dim, c10::optional<int64_t> start,
+                     c10::optional<int64_t> end, int64_t step)
 {
     return at::slice(self, dim, start, end, step);
 }

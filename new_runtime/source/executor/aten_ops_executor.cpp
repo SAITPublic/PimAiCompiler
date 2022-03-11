@@ -3440,17 +3440,21 @@ void executorAtenSlice(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamE
         assert(dim_iv.isInt());
         dim = dim_iv.toInt();
     }
+    c10::optional<int64_t> optional_start;
     auto start = slice_layer->getStart();
     if (nn_compiler::ir::isDefaultValue(start)) {
         auto start_iv = stream_executor.findBlob(in_stensor_id[in_id++]).second;
-        assert(start_iv.isInt());
-        start = start_iv.toInt();
+        optional_start = start_iv.toOptional<int64_t>();
+    } else {
+        optional_start = (torch::jit::IValue(start)).toOptional<int64_t>();
     }
+    c10::optional<int64_t> optional_end;
     auto end = slice_layer->getEnd();
     if (nn_compiler::ir::isDefaultValue(end)) {
         auto end_iv = stream_executor.findBlob(in_stensor_id[in_id++]).second;
-        assert(end_iv.isInt());
-        end = end_iv.toInt();
+        optional_end = end_iv.toOptional<int64_t>();
+    } else {
+        optional_end = (torch::jit::IValue(end)).toOptional<int64_t>();
     }
     auto step = slice_layer->getStep();
     if (nn_compiler::ir::isDefaultValue(step)) {
@@ -3459,7 +3463,7 @@ void executorAtenSlice(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamE
         step = step_iv.toInt();
     }
 
-    auto output = atenSlice(iv_tensor.toTensor(), dim, start, end, step);
+    auto output = atenSlice(iv_tensor.toTensor(), dim, optional_start, optional_end, step);
     stream_executor.updateBlob(out_stensor_id[0], DataType::TENSOR, tensorToIValue(output));
 }
 
