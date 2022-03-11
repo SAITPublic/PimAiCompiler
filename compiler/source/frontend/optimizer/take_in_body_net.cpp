@@ -128,7 +128,7 @@ void TakeInBodyNet::take_in_if_body(std::unique_ptr<nn_compiler::ir::NNModel>& m
 
 void TakeInBodyNet::take_in_loop_body(std::unique_ptr<nn_compiler::ir::NNModel>& model)
 {
-    Log::IR::I() << "Take in loop body net start.";
+    Log::FE::I() << "Take in loop body net start.";
     auto graphs = model->getGraphs();
     // need find loop layer belongs to which net. when loop layer in if body net, after take_in_if_body()
     // executed, if body net removed, it need update the map(prim_loop_layers_)

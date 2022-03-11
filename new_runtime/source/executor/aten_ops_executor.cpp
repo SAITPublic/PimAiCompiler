@@ -617,20 +617,16 @@ void executorAtenBmm(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExe
         auto it = stream_executor.global_blobs_.find(cat_mem_id);
         auto options = at::TensorOptions().dtype(at::kHalf).device(at::kCUDA);
         tmp0 = torch::from_blob((_Float16*)(it->second.second.toTensor().data_ptr()) + 1024, {1, 1, 1024}, options);
-        std::cout << " runtime cat id is " << cat_mem_id << std::endl;
 
         cat_mem_id =
             std::dynamic_pointer_cast<nn_compiler::ir::AtenCatLayer>(out2_out2_out1_layer)->getMemLayerId();
         it = stream_executor.global_blobs_.find(cat_mem_id);
         tmp1 = torch::from_blob((_Float16*)(it->second.second.toTensor().data_ptr()) + 1024, {1, 1, 1024}, options);
-        std::cout << " runtime cat id is " << cat_mem_id << std::endl;
 
         cat_mem_id =
             std::dynamic_pointer_cast<nn_compiler::ir::AtenCatLayer>(out2_out3_out1_layer)->getMemLayerId();
         it = stream_executor.global_blobs_.find(cat_mem_id);
         tmp2 = torch::from_blob((_Float16*)(it->second.second.toTensor().data_ptr()) + 1024, {1, 1, 1024}, options);
-
-        std::cout << " runtime cat id is " << cat_mem_id << std::endl;
     }
 
     auto self_tensor = iv_self.toTensor();
