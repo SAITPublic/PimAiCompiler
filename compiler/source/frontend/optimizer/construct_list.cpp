@@ -3,12 +3,12 @@
 #include "compiler/include/common/log.hpp"
 #include "compiler/include/frontend/optimizer/construct_list.h"
 
-#include "new_ir/include/layers/aten_lstm1_layer.h"
-#include "new_ir/include/layers/aten_lstm2_layer.h"
-#include "new_ir/include/layers/prim_constant_layer.h"
-#include "new_ir/include/layers/prim_variable_layer.h"
-#include "new_ir/include/tensors/data_tensor.h"
-#include "new_ir/include/utils/graph_util.h"
+#include "ir/include/layers/aten_lstm1_layer.h"
+#include "ir/include/layers/aten_lstm2_layer.h"
+#include "ir/include/layers/prim_constant_layer.h"
+#include "ir/include/layers/prim_variable_layer.h"
+#include "ir/include/tensors/data_tensor.h"
+#include "ir/include/utils/graph_util.h"
 
 namespace nn_compiler
 {

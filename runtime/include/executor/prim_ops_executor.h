@@ -2,9 +2,9 @@
 
 #include <torch/script.h>
 
-#include "new_ir/include/common/utils.hpp"
-#include "new_ir/include/layers/all_layers.h"
-#include "new_ir/include/layers/nn_layer.h"
+#include "ir/include/common/utils.hpp"
+#include "ir/include/layers/all_layers.h"
+#include "ir/include/layers/nn_layer.h"
 #include "runtime/include/executor/prim_ops.h"
 #include "runtime/include/executor/prim_utils.h"
 #include "runtime/include/executor/stream_executor.h"

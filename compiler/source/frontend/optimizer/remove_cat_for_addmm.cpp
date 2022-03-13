@@ -2,12 +2,12 @@
 
 #include "compiler/include/common/log.hpp"
 #include "compiler/include/frontend/optimizer/remove_cat_for_addmm.h"
-#include "new_ir/include/layers/pim_general_layers.h"
-#include "new_ir/include/layers/aten_addmm_layer.h"
-#include "new_ir/include/layers/aten_cat_layer.h"
-#include "new_ir/include/layers/prim_constant_layer.h"
-#include "new_ir/include/utils/graph_search.h"
-#include "new_ir/include/utils/graph_util.h"
+#include "ir/include/layers/pim_general_layers.h"
+#include "ir/include/layers/aten_addmm_layer.h"
+#include "ir/include/layers/aten_cat_layer.h"
+#include "ir/include/layers/prim_constant_layer.h"
+#include "ir/include/utils/graph_search.h"
+#include "ir/include/utils/graph_util.h"
 
 namespace nn_compiler {
 

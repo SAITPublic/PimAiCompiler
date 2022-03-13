@@ -46,7 +46,6 @@ include_directories(${FLATBUFFERS_INCLUDE_DIR})
 
 add_subdirectory(common)
 add_subdirectory(ir)
-add_subdirectory(new_ir)
 
 add_subdirectory(runtime)
 add_subdirectory(compiler)

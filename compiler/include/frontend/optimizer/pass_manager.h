@@ -1,7 +1,7 @@
 #pragma once
 
 #include "compiler/include/common/pass.hpp"
-#include "new_ir/include/nn_model.h"
+#include "ir/include/nn_model.h"
 
 namespace nn_compiler {
 namespace frontend {

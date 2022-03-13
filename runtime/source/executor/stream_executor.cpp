@@ -2,7 +2,7 @@
 #include <torch/script.h>
 
 #include "c10/hip/HIPFunctions.h"
-#include "new_ir/include/types.h"
+#include "ir/include/types.h"
 #include "runtime/include/executor/aten_ops_executor.h"
 #include "runtime/include/executor/prim_ops_executor.h"
 #include "runtime/include/executor/profiler.h"

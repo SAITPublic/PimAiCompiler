@@ -2,8 +2,8 @@
 
 #include "compiler/include/common/log.hpp"
 #include "compiler/include/frontend/optimizer/remove_get_attr_layers.h"
-#include "new_ir/include/layers/prim_get_attr_layer.h"
-#include "new_ir/include/utils/graph_util.h"
+#include "ir/include/layers/prim_get_attr_layer.h"
+#include "ir/include/utils/graph_util.h"
 
 namespace nn_compiler {
 

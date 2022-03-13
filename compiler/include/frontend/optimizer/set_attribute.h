@@ -2,7 +2,7 @@
 
 #include "compiler/include/common/pass.hpp"
 #include "compiler/include/frontend/optimizer/utils/attribute_helper.h"
-#include "new_ir/include/nn_network.h"
+#include "ir/include/nn_network.h"
 
 namespace nn_compiler
 {

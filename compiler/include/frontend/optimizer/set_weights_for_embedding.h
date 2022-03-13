@@ -4,8 +4,8 @@
 #include "compiler/include/frontend/optimizer/utils/constant_parser.h"
 
 #include "half.hpp"
-#include "new_ir/include/layers//aten_embedding_layer.h"
-#include "new_ir/include/layers//prim_constant_layer.h"
+#include "ir/include/layers//aten_embedding_layer.h"
+#include "ir/include/layers//prim_constant_layer.h"
 
 namespace nn_compiler {
 

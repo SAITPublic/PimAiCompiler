@@ -2,8 +2,8 @@
 
 #include "half.hpp"
 
-#include "new_ir/include/nn_network.h"
-#include "new_ir/include/utils/graph_util.h"
+#include "ir/include/nn_network.h"
+#include "ir/include/utils/graph_util.h"
 
 namespace nn_compiler {
 

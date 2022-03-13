@@ -1,10 +1,10 @@
 #pragma once
 
 #include "importer/layer_builder/layer_builder.h"
-#include "new_ir/include/common/log.hpp"
-#include "new_ir/include/layers/nn_layer.h"
-#include "new_ir/include/nn_model.h"
-#include "new_ir/include/nn_network.h"
+#include "ir/include/common/log.hpp"
+#include "ir/include/layers/nn_layer.h"
+#include "ir/include/nn_model.h"
+#include "ir/include/nn_network.h"
 
 namespace nn_compiler
 {

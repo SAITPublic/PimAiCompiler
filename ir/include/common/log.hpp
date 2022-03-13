@@ -8,13 +8,6 @@
  * to third parties without the express written permission of Samsung Electronics.
  */
 
-/**
- * @file.    log.hpp
- * @brief.
- * @details. This header defines interfaces for log
- * @version. 0.1.
- */
-
 #pragma once
 
 #include "common/include/common.hpp"

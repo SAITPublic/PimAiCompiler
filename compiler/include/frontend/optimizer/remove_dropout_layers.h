@@ -1,7 +1,7 @@
 #pragma once
 
 #include "compiler/include/common/pass.hpp"
-#include "new_ir/include/layers/aten_dropout_layer.h"
+#include "ir/include/layers/aten_dropout_layer.h"
 
 namespace nn_compiler
 {

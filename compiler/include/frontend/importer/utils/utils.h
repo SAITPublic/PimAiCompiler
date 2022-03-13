@@ -7,7 +7,7 @@
 
 #include <torch/csrc/jit/ir/ir.h>
 #include <torch/script.h>
-#include "new_ir/include/common/log.hpp"
+#include "ir/include/common/log.hpp"
 
 namespace nn_compiler
 {

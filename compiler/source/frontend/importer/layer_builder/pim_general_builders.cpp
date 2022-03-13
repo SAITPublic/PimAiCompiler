@@ -1,7 +1,7 @@
 #include "importer/layer_builder/layer_builder.h"
-#include "new_ir/include/common/log.hpp"
-#include "new_ir/include/tensors/data_tensor.h"
-#include "new_ir/include/types.h"
+#include "ir/include/common/log.hpp"
+#include "ir/include/tensors/data_tensor.h"
+#include "ir/include/types.h"
 
 #define DECLARE_TORCH_OP_BUILDER(op_name, type_name, layer_name)                                 \
   namespace nn_compiler {                                                                        \
@@ -9,7 +9,7 @@
   using nn_compiler::ir::DTensor;                                                                \
   using nn_compiler::ir::STensor;                                                                \
   std::shared_ptr<ir::NNLayer> op_name##Builder::buildLayer(const torch::jit::Node *node_ref) {  \
-    Log::NIR::I() << "build " << convertLayerTypeToString(type_name);                            \
+    Log::IR::I() << "build " << convertLayerTypeToString(type_name);                            \
     nn_compiler::ir::LayerType type = type_name;                                                 \
     std::string name = "";                                                                       \
     layer_name = std::make_shared<ir::op_name##Layer>(name, type);                               \

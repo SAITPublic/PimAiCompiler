@@ -2,11 +2,11 @@
 #include <vector>
 
 #include "c10/hip/HIPFunctions.h"
-#include "new_ir/include/nn_model.h"
-#include "new_ir/include/nn_network.h"
-#include "new_ir/include/types.h"
-#include "new_ir/include/common/utils.hpp"
-#include "new_ir/include/layers/all_layers.h"
+#include "ir/include/nn_model.h"
+#include "ir/include/nn_network.h"
+#include "ir/include/types.h"
+#include "ir/include/common/utils.hpp"
+#include "ir/include/layers/all_layers.h"
 #include "runtime/include/executor/aten_ops_executor.h"
 #include "runtime/include/executor/aten_ops.h"
 #include "runtime/include/executor/custom_ops.hpp"

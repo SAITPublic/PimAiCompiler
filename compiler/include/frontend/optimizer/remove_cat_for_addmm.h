@@ -4,7 +4,7 @@
 
 #include "half.hpp"
 
-#include "new_ir/include/layers/prim_constant_layer.h"
+#include "ir/include/layers/prim_constant_layer.h"
 
 typedef half_float::half float16;
 

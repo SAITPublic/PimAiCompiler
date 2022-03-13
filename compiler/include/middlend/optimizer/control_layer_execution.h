@@ -2,9 +2,9 @@
 
 #include "compiler/include/common/pass.hpp"
 
-#include "new_ir/include/nn_model.h"
-#include "new_ir/include/nn_network.h"
-#include "new_ir/include/types.h"
+#include "ir/include/nn_model.h"
+#include "ir/include/nn_network.h"
+#include "ir/include/types.h"
 
 namespace nn_compiler
 {

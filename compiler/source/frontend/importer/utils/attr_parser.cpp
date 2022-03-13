@@ -84,19 +84,19 @@ void ptTensor2DTensor(at::Tensor torch_tensor, std::shared_ptr<DTensor> d_tensor
 void showString(std::shared_ptr<DTensor> dt)
 {
     std::vector<uint8_t> vv = *(dt->getData<uint8_t>());
-    Log::NIR::I() << "str: " << vv.data();
+    Log::IR::I() << "str: " << vv.data();
 }
 void showInt64(std::shared_ptr<DTensor> dt)
 {
     std::vector<int64_t> vv = *(dt->getData<int64_t>());
     long int res = *vv.data();
-    Log::NIR::I() << "int64: " << res;
+    Log::IR::I() << "int64: " << res;
 }
 void showFloat64(std::shared_ptr<DTensor> dt)
 {
     std::vector<double> vv = *(dt->getData<double>());
     double res = *vv.data();
-    Log::NIR::I() << "float64: " << res;
+    Log::IR::I() << "float64: " << res;
 }
 
 std::shared_ptr<DTensor> getDTensorData(const torch::jit::Node* node_constant)
@@ -112,7 +112,7 @@ std::shared_ptr<DTensor> getDTensorData(const torch::jit::Node* node_constant)
         data->setData(value.c_str(), len + 1);
         data->setTensorShape(STensor(0, 0, 0, len));
         data->setDataType(nn_compiler::ir::DataType::UINT8);
-        Log::NIR::I() << "set str: " << value;
+        Log::IR::I() << "set str: " << value;
 
     } else if (ntype == "Device") {
         auto attr_symbol = node_constant->attributeNames().at(0);
@@ -121,7 +121,7 @@ std::shared_ptr<DTensor> getDTensorData(const torch::jit::Node* node_constant)
         data->setData(value.c_str(), len + 1);
         data->setTensorShape(STensor(0, 0, 0, len));
         data->setDataType(nn_compiler::ir::DataType::UINT8);
-        Log::NIR::I() << "set Device: " << value;
+        Log::IR::I() << "set Device: " << value;
 
     } else if (ntype == "int") {
         auto attr_symbol = node_constant->attributeNames().at(0);
@@ -129,7 +129,7 @@ std::shared_ptr<DTensor> getDTensorData(const torch::jit::Node* node_constant)
         data->setData(&value, 8);
         data->setTensorShape(STensor(0, 0, 0, 1));
         data->setDataType(nn_compiler::ir::DataType::INT64);
-        Log::NIR::I() << "set int64: " << value;
+        Log::IR::I() << "set int64: " << value;
 
     } else if (ntype == "bool") {
         auto attr_symbol = node_constant->attributeNames().at(0);
@@ -137,14 +137,14 @@ std::shared_ptr<DTensor> getDTensorData(const torch::jit::Node* node_constant)
         data->setData(&value, 8);
         data->setTensorShape(STensor(0, 0, 0, 1));
         data->setDataType(nn_compiler::ir::DataType::INT64);
-        Log::NIR::I() << "set bool as int64: " << value;
+        Log::IR::I() << "set bool as int64: " << value;
 
     } else if (ntype == "Tensor") {
         auto attr_symbol = node_constant->attributeNames().at(0);
         auto torch_tensor = node_constant->t(attr_symbol);
         c10::ScalarType dtype = torch_tensor.scalar_type();
         ptTensor2DTensor(torch_tensor, data);
-        Log::NIR::I() << "set Tensor with size: " << torch_tensor.sizes() << " dtype: " << dtype;
+        Log::IR::I() << "set Tensor with size: " << torch_tensor.sizes() << " dtype: " << dtype;
 
     } else if (ntype == "float") {
         auto attr_symbol = node_constant->attributeNames().at(0);
@@ -152,11 +152,11 @@ std::shared_ptr<DTensor> getDTensorData(const torch::jit::Node* node_constant)
         data->setData(&value, 1 * sizeof(value));
         data->setTensorShape(STensor(0, 0, 0, 1));
         data->setDataType(nn_compiler::ir::DataType::FLOAT64);
-        Log::NIR::I() << "set float64: " << value;
+        Log::IR::I() << "set float64: " << value;
 
     } else if (ntype.find("None") != std::string::npos) {
         data->setDataType(nn_compiler::ir::DataType::UINT8);
-        Log::NIR::I() << "set None: " << ntype;
+        Log::IR::I() << "set None: " << ntype;
 
     } else if (ntype.find("(") != std::string::npos && ntype.find(")") != std::string::npos) {  // tuple type
         // presupposition: same datatype in a single tuple
@@ -177,7 +177,7 @@ std::shared_ptr<DTensor> getDTensorData(const torch::jit::Node* node_constant)
                     ;
                 element_type = nn_compiler::ir::DataType::INT64;
             } else {
-                Log::NIR::E() << "unspported datatype for tuple.";
+                Log::IR::E() << "unspported datatype for tuple.";
             }
             return std::make_pair(element_num, element_type);
         };
@@ -189,7 +189,7 @@ std::shared_ptr<DTensor> getDTensorData(const torch::jit::Node* node_constant)
         data->setData(value, parsed_ntype.first * 8);
         data->setTensorShape(STensor(0, 0, 0, parsed_ntype.first));
         data->setDataType(parsed_ntype.second);
-        Log::NIR::I() << "set tuple:" << value_vec;
+        Log::IR::I() << "set tuple:" << value_vec;
     } else if (ntype.find("[") != std::string::npos && ntype.find("]") != std::string::npos) {  // list type
         auto attr_symbol = c10::attr::value;
         auto value_list = node_constant->ival(attr_symbol).toList();
@@ -211,11 +211,11 @@ std::shared_ptr<DTensor> getDTensorData(const torch::jit::Node* node_constant)
             data->setTensorShape(STensor(0, 0, 0, value.size()));
             data->setDataType(nn_compiler::ir::DataType::FLOAT64);
         } else {
-            Log::NIR::E() << "unspported datatype for list.";
+            Log::IR::E() << "unspported datatype for list.";
         }
-        Log::NIR::I() << "set list:" << value_vec;
+        Log::IR::I() << "set list:" << value_vec;
     } else {
-        Log::NIR::E() << "not supported type:" << ntype;
+        Log::IR::E() << "not supported type:" << ntype;
         return nullptr;
     }
     return data;

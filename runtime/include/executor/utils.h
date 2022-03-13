@@ -2,8 +2,8 @@
 
 #include <torch/script.h>
 
-#include "new_ir/include/layers/nn_layer.h"
-#include "new_ir/include/types.h"
+#include "ir/include/layers/nn_layer.h"
+#include "ir/include/types.h"
 
 namespace nn_compiler
 {

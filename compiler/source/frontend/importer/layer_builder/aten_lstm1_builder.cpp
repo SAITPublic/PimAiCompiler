@@ -1,6 +1,6 @@
 #include "importer/layer_builder/layer_builder.h"
-#include "new_ir/include/common/log.hpp"
-#include "new_ir/include/tensors/data_tensor.h"
+#include "ir/include/common/log.hpp"
+#include "ir/include/tensors/data_tensor.h"
 
 using nn_compiler::ir::DTensor;
 using nn_compiler::ir::STensor;
@@ -11,7 +11,7 @@ namespace frontend
 {
 std::shared_ptr<ir::NNLayer> AtenLSTM1Builder::buildLayer(const torch::jit::Node* node_ref)
 {
-    Log::NIR::I() << "build aten::lstm1";
+    Log::IR::I() << "build aten::lstm1";
 
     nn_compiler::ir::LayerType type = nn_compiler::ir::LayerType::ATENLSTM1;
     std::string name = "";

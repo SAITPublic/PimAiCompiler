@@ -7,10 +7,10 @@
 #include <string>
 #include <vector>
 
-#include "new_ir/include/layers/all_layers.h"
-#include "new_ir/include/nn_model.h"
-#include "new_ir/include/nn_network.h"
-#include "new_ir/include/types.h"
+#include "ir/include/layers/all_layers.h"
+#include "ir/include/nn_model.h"
+#include "ir/include/nn_network.h"
+#include "ir/include/types.h"
 #include "runtime/include/builder/model_builder.h"
 #include "runtime/include/executor/utils.h"
 

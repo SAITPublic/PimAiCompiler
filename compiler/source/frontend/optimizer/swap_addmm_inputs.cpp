@@ -5,10 +5,10 @@
 #include "compiler/include/common/log.hpp"
 #include "compiler/include/frontend/optimizer/swap_addmm_inputs.h"
 
-#include "new_ir/include/layers/aten_addmm_layer.h"
-#include "new_ir/include/layers/aten_transpose_layer.h"
-#include "new_ir/include/layers/prim_constant_layer.h"
-#include "new_ir/include/utils/graph_util.h"
+#include "ir/include/layers/aten_addmm_layer.h"
+#include "ir/include/layers/aten_transpose_layer.h"
+#include "ir/include/layers/prim_constant_layer.h"
+#include "ir/include/utils/graph_util.h"
 
 namespace nn_compiler {
 

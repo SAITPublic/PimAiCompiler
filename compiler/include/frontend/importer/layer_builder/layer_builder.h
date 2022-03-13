@@ -4,9 +4,9 @@
 #include <vector>
 
 #include "importer/utils/attr_parser.h"
-#include "new_ir/include/layers/all_layers.h"
-#include "new_ir/include/nn_network.h"
-#include "new_ir/include/tensors/data_tensor.h"
+#include "ir/include/layers/all_layers.h"
+#include "ir/include/nn_network.h"
+#include "ir/include/tensors/data_tensor.h"
 
 namespace nn_compiler
 {

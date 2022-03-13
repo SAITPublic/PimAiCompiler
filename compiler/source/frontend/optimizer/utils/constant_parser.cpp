@@ -1,6 +1,6 @@
 #include "compiler/include/frontend/optimizer/utils/constant_parser.h"
 
-#include "new_ir/include/layers/prim_constant_layer.h"
+#include "ir/include/layers/prim_constant_layer.h"
 
 namespace nn_compiler {
 

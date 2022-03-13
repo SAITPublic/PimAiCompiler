@@ -5,8 +5,8 @@
 #include <stack>
 #include <vector>
 
-#include "new_ir/include/tensors/data_tensor.h"
-#include "new_ir/include/types.h"
+#include "ir/include/tensors/data_tensor.h"
+#include "ir/include/types.h"
 #include "runtime/include/executor/utils.h"
 
 namespace nn_compiler

@@ -1,5 +1,5 @@
 #include "runtime/include/executor/prim_ops_executor.h"
-#include "new_ir/include/layers/all_layers.h"
+#include "ir/include/layers/all_layers.h"
 
 namespace nn_compiler
 {

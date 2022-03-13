@@ -14,7 +14,7 @@ target_include_directories(pipeline_manager_py PUBLIC
     ${PROJECT_SOURCE_DIR}
     ${PROJECT_SOURCE_DIR}/common
     ${PROJECT_SOURCE_DIR}/compiler/include
-    ${PROJECT_SOURCE_DIR}/new_ir/include      
+    ${PROJECT_SOURCE_DIR}/ir/include      
     ${PROJECT_SOURCE_DIR}/runtime/include)
 
 target_link_libraries(pipeline_manager_py PUBLIC nncompiler common nn_runtime  torch_cpu torch)
