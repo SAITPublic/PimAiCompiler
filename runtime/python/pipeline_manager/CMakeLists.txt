@@ -8,7 +8,6 @@ include_directories(
 file(GLOB pipeline_manager_py_source *.cpp)
 
 add_library(pipeline_manager_py SHARED ${pipeline_manager_py_source})
-add_dependencies(pipeline_manager_py flatc_cpp_generator)
 
 target_include_directories(pipeline_manager_py PUBLIC
     ${PROJECT_SOURCE_DIR}
