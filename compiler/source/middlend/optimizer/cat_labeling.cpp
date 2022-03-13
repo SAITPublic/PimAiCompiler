@@ -1,19 +1,15 @@
-#include "common/include/common.hpp"
-#include "compiler/include/common/log.hpp"
-
-#include "compiler/include/middlend/cat_labeling.h"
-#include "new_ir/include/layers/aten_cat_layer.h"
-#include "new_ir/include/layers/aten_lstm1_layer.h"
-
-#include "new_ir/include/layers/nn_layer.h"
-#include "new_ir/include/nn_model.h"
-#include "new_ir/include/nn_network.h"
-
-#include "new_ir/include/types.h"
-
 #include <algorithm>
 #include <set>
 #include <vector>
+
+#include "common/include/common.hpp"
+#include "compiler/include/common/log.hpp"
+#include "compiler/include/middlend/optimizer/cat_labeling.h"
+#include "new_ir/include/layers/aten_cat_layer.h"
+#include "new_ir/include/layers/aten_lstm1_layer.h"
+#include "new_ir/include/nn_model.h"
+#include "new_ir/include/nn_network.h"
+#include "new_ir/include/types.h"
 
 namespace nn_compiler
 {

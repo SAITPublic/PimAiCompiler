@@ -1,12 +1,9 @@
-#include "compiler/include/common/log.hpp"
-#include "ir/include/ir_importer.hpp"
-
-#include "compiler/include/middlend/middlend_driver.hpp"
-
-#include "compiler/include/middlend/pass_manager.h"
-
 #include <cstdio>
 #include <cstdlib> 
+
+#include "compiler/include/common/log.hpp"
+#include "compiler/include/middlend/middlend_driver.hpp"
+#include "compiler/include/middlend/optimizer/pass_manager.h"
 
 namespace nn_compiler {
 namespace middlend {

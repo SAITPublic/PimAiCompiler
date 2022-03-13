@@ -1,7 +1,0 @@
-#ifndef PASS_DATA
-#define PASS_DATA(DATA_TYPE)
-#endif
-PASS_DATA(DeviceLabelInfo)
-PASS_DATA(MemoryLabelInfo)
-
-#undef PASS_DATA

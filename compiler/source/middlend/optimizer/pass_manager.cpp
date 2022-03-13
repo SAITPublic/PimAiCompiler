@@ -1,16 +1,17 @@
-#include "compiler/include/middlend/pass_manager.h"
 #include "compiler/include/common/log.hpp"
-
-#include "compiler/include/middlend/lstm_labeling.h"
-#include "compiler/include/middlend/update_layer_id.h"
-#include "compiler/include/middlend/control_layer_execution.h"
-#include "compiler/include/middlend/cat_labeling.h"
+#include "compiler/include/middlend/optimizer/cat_labeling.h"
+#include "compiler/include/middlend/optimizer/control_layer_execution.h"
+#include "compiler/include/middlend/optimizer/lstm_labeling.h"
+#include "compiler/include/middlend/optimizer/pass_manager.h"
+#include "compiler/include/middlend/optimizer/update_layer_id.h"
 
 namespace nn_compiler
 {
 namespace middlend
 {
+
 PassManager::PassManager() { }
+
 void PassManager::runPasses(std::unique_ptr<nn_compiler::ir::NNModel>& model)
 {
     Log::FE::I() << "PassManager::runPasses is called.";

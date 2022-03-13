@@ -1,26 +1,19 @@
 #include <string>
 
+#include "common/include/common.hpp"
+#include "compiler/include/common/log.hpp"
+#include "compiler/include/middlend/optimizer/control_layer_execution.h"
 #include "new_ir/include/layers/aten_lstm1_layer.h"
 #include "new_ir/include/layers/aten_lstm2_layer.h"
 #include "new_ir/include/layers/prim_constant_layer.h"
-#include "new_ir/include/layers/prim_variable_layer.h"
-#include "new_ir/include/tensors/data_tensor.h"
-#include "new_ir/include/utils/graph_util.h"
-
-#include "new_ir/include/layers/nn_layer.h"
-#include "new_ir/include/utils/graph_search.h"
-
 #include "new_ir/include/layers/prim_end_if_layer.h"
 #include "new_ir/include/layers/prim_end_loop_layer.h"
 #include "new_ir/include/layers/prim_if_layer.h"
 #include "new_ir/include/layers/prim_loop_layer.h"
-
-#include "compiler/include/middlend/control_layer_execution.h"
-
-#include "common/include/common.hpp"
-#include "compiler/include/common/log.hpp"
-
+#include "new_ir/include/layers/prim_variable_layer.h"
+#include "new_ir/include/tensors/data_tensor.h"
 #include "new_ir/include/types.h"
+#include "new_ir/include/utils/graph_util.h"
 
 namespace nn_compiler
 {

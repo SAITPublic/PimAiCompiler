@@ -5,10 +5,6 @@
 #include "compiler/include/common/log.hpp"
 #include "new_ir/include/nn_model.h"
 
-
-#include "compiler/include/common/log.hpp"
-#include "new_ir/include/nn_model.h"
-
 namespace nn_compiler {
 namespace middlend {
 

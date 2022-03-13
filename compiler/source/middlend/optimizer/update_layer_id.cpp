@@ -1,19 +1,14 @@
 #include <string>
 
+#include "compiler/include/common/log.hpp"
+#include "compiler/include/middlend/optimizer/update_layer_id.h"
 #include "new_ir/include/layers/aten_lstm1_layer.h"
 #include "new_ir/include/layers/aten_lstm2_layer.h"
 #include "new_ir/include/layers/prim_constant_layer.h"
+#include "new_ir/include/layers/prim_end_if_layer.h"
 #include "new_ir/include/layers/prim_variable_layer.h"
 #include "new_ir/include/tensors/data_tensor.h"
 #include "new_ir/include/utils/graph_util.h"
-
-#include "new_ir/include/layers/nn_layer.h"
-#include "new_ir/include/utils/graph_search.h"
-
-#include "compiler/include/common/log.hpp"
-#include "new_ir/include/layers/prim_end_if_layer.h"
-
-#include "compiler/include/middlend/update_layer_id.h"
 
 namespace nn_compiler
 {

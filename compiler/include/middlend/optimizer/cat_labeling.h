@@ -4,30 +4,26 @@
 
 #include "new_ir/include/nn_model.h"
 #include "new_ir/include/nn_network.h"
-
 #include "new_ir/include/types.h"
 
 namespace nn_compiler
 {
-
 namespace middlend
 {
-
-class ControlLayerExecution : public Pass
+class CatLabeling : public Pass
 {
    public:
-    ControlLayerExecution();
+    CatLabeling();
 
     bool fitCondition(std::unique_ptr<nn_compiler::ir::NNModel>& model);
 
     void run(std::unique_ptr<nn_compiler::ir::NNModel>& model);
 
-    ~ControlLayerExecution() = default;
+    ~CatLabeling() = default;
 
    private:
-    std::vector<std::shared_ptr<nn_compiler::ir::NNLayer>> control_layers_;
-
-};  // class ControlLayerExecution
+    std::vector<std::shared_ptr<nn_compiler::ir::NNLayer>> cat_labeling_layers_;
+};  // class CatLabeling
 
 }  // namespace middlend
 }  // namespace nn_compiler

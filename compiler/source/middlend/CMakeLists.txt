@@ -6,7 +6,7 @@ file(GLOB_RECURSE middlend_src *.cpp ${PROJECT_SOURCE_DIR}/third_party/json/*.cp
 add_library(middlend SHARED ${middlend_src})
 
 target_link_libraries(middlend common)
-target_link_libraries(middlend ir)
+target_link_libraries(middlend new_ir)
 target_link_libraries(middlend -lstdc++fs)
 
 install (TARGETS middlend LIBRARY DESTINATION ${ROCM_PATH}/lib/)

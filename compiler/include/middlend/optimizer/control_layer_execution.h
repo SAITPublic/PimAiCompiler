@@ -4,7 +4,6 @@
 
 #include "new_ir/include/nn_model.h"
 #include "new_ir/include/nn_network.h"
-
 #include "new_ir/include/types.h"
 
 namespace nn_compiler
@@ -13,20 +12,21 @@ namespace nn_compiler
 namespace middlend
 {
 
-class LstmLabeling : public Pass
+class ControlLayerExecution : public Pass
 {
    public:
-    LstmLabeling();
+    ControlLayerExecution();
 
     bool fitCondition(std::unique_ptr<nn_compiler::ir::NNModel>& model);
 
     void run(std::unique_ptr<nn_compiler::ir::NNModel>& model);
 
-    ~LstmLabeling() = default;
+    ~ControlLayerExecution() = default;
 
    private:
-    std::vector<std::shared_ptr<nn_compiler::ir::NNLayer>> aten_lstm1_layers_;
-};  // class LstmLabeling
+    std::vector<std::shared_ptr<nn_compiler::ir::NNLayer>> control_layers_;
+
+};  // class ControlLayerExecution
 
 }  // namespace middlend
 }  // namespace nn_compiler
