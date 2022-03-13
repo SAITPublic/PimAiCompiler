@@ -1,7 +1,11 @@
-#include "c10/hip/HIPFunctions.h"
-#include "executor/aten_ops.h"
 #include <iostream>
-namespace nnrt
+
+#include "c10/hip/HIPFunctions.h"
+#include "runtime/include/executor/aten_ops.h"
+
+namespace nn_compiler
+{
+namespace runtime
 {
 at::Tensor atenAdd(const at::Tensor &self, const at::Scalar &other, const at::Scalar &alpha) { return at::add(self, other, alpha); }
 
@@ -47,6 +51,15 @@ at::Tensor atenArange3(at::Scalar start, at::Scalar end, at::Scalar step, const 
 at::Tensor atenAsTensor(at::Tensor &self, at::ScalarType dtype, at::Device device) {
     return self.to(device, dtype);
 }
+
+at::Tensor atenBatchNorm2d(const at::Tensor &input, const c10::optional<at::Tensor> &weight,
+                           const c10::optional<at::Tensor> &bias, const c10::optional<at::Tensor> &running_mean,
+                           const c10::optional<at::Tensor> &running_var, bool training, double momentum, double eps,
+                           bool cudnn_enabled)
+{
+    return at::batch_norm(input, weight, bias, running_mean, running_var, training, momentum, eps, cudnn_enabled);
+}
+
 
 at::Tensor atenBitwiseNot(const at::Tensor &self) { return at::bitwise_not(self); }
 
@@ -379,6 +392,11 @@ at::Tensor atenPow(const at::Tensor &self, at::Scalar exponent) { return at::pow
 
 at::Tensor atenRelu(const at::Tensor &self) { return at::relu(self); }
 
+at::Tensor atenReshape(const at::Tensor & self, at::IntArrayRef shape) 
+{
+    return at::reshape(self, shape);
+}
+
 at::Tensor atenSelect(const at::Tensor &self, at::Dimname dim, int64_t index) { return at::select(self, dim, index); }
 
 at::Tensor atenSelect(const at::Tensor &self, int64_t dim, int64_t index) { return at::select(self, dim, index); }
@@ -389,7 +407,8 @@ int64_t atenSize(const at::Tensor &tensor, int64_t dim) { return at::size(tensor
 
 int64_t atenSize(const at::Tensor &self, at::Dimname dim) { return at::size(self, dim); }
 
-at::Tensor atenSlice(const at::Tensor &self, int64_t dim, int64_t start, int64_t end, int64_t step)
+at::Tensor atenSlice(const at::Tensor &self, int64_t dim, c10::optional<int64_t> start,
+                     c10::optional<int64_t> end, int64_t step)
 {
     return at::slice(self, dim, start, end, step);
 }
@@ -483,18 +502,5 @@ at::Tensor atenZeroslike(const at::Tensor &self, at::TensorOptions options,
 {
     return at::zeros_like(self, options, memory_format);
 }
-
-at::Tensor atenBatchNorm2d(const at::Tensor &input, const c10::optional<at::Tensor> &weight,
-                           const c10::optional<at::Tensor> &bias, const c10::optional<at::Tensor> &running_mean,
-                           const c10::optional<at::Tensor> &running_var, bool training, double momentum, double eps,
-                           bool cudnn_enabled)
-{
-    return at::batch_norm(input, weight, bias, running_mean, running_var, training, momentum, eps, cudnn_enabled);
-}
-
-at::Tensor atenReshape(const at::Tensor & self, at::IntArrayRef shape) 
-{
-    return at::reshape(self, shape);
-}
-
-}  // namespace nnrt
+}  // namespace runtime
+}  // namespace nn_compiler

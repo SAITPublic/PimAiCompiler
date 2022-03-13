@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include <algorithm>
 #include <iostream>
+
 #include "hip/hip_runtime.h"
 #include "hip/hip_fp16.h"
 

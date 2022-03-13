@@ -1,12 +1,17 @@
 #pragma once
 
+#ifndef NNCOMPILER_PRIM_OP_H
+#define NNCOMPILER_PRIM_OP_H
+
 #include <torch/script.h>
 #include <unordered_map>
 #include <vector>
-#include "nnrt_types.h"
-#include "glog/logging.h"
 
-namespace nnrt
+#include "runtime/include/executor/prim_utils.h"
+
+namespace nn_compiler
+{
+namespace runtime
 {
 torch::Tensor primData(const torch::Tensor& input_tensor);
 
@@ -15,11 +20,7 @@ c10::Device primDevice(const torch::Tensor& input_tensor);
 int64_t primDtype(const torch::Tensor& input_tensor);
 
 template <typename T>
-T& primEndIf(T& inputs)
-{
-    // auto ret = std::move<T>(inputs);
-    return inputs;
-}
+T& primEndIf(T& inputs) { return inputs; }
 
 std::vector<torch::Tensor> primEndLoop(const std::vector<torch::Tensor>& inputs);
 
@@ -46,7 +47,7 @@ T primScalarConstant(T* data_ptr)
         std::is_same<T, double>::value) {
         return *data_ptr;
     } else {
-        DLOG(ERROR) << "Unsupported scalar type!";
+        DLOG(FATAL) << "Unsupported scalar type!";
     }
 }
 
@@ -60,14 +61,13 @@ torch::IValue primTupleIndex(const std::vector<torch::IValue>& inputs, int64_t i
 std::vector<torch::IValue> primTupleUnpack(c10::intrusive_ptr<c10::ivalue::Tuple> tuple);
 
 template <typename T>
-T& primUncheckedCast(T& inputs)
-{
-    // noop
-    return inputs;
-}
+T& primUncheckedCast(T& inputs) { return inputs; }
 
 torch::IValue primUninitialized();
 
 at::IValue primVariable(std::string ntype, std::vector<torch::IValue> inputs);
 
-}  // namespace nnrt
+}  // namespace runtime
+}  // namespace nn_compiler
+
+#endif  // NNCOMPILER_PRIM_OP_H

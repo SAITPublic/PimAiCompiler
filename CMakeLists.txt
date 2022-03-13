@@ -48,9 +48,7 @@ add_subdirectory(common)
 add_subdirectory(ir)
 add_subdirectory(new_ir)
 
-# (for debug) use new_runtime
-# add_subdirectory(runtime)
-add_subdirectory(new_runtime)
+add_subdirectory(runtime)
 add_subdirectory(compiler)
 #add_subdirectory(python_libs)
 add_subdirectory(examples)

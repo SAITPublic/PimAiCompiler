@@ -2,43 +2,33 @@
 
 #include <torch/script.h>
 
-#include "common/include/cast.hpp"
-#include "ir/include/all_nodes.hpp"
-#include "ir/include/data_blob.hpp"
-#include "ir/include/ir_types.hpp"
-#include "ir/include/nn_ir.hpp"
-#include "nnrt_types.h"
+#include "new_ir/include/nn_model.h"
+#include "new_ir/include/types.h"
 
-namespace nncir = nn_compiler::nn_ir;
-
-namespace nnrt
+namespace nn_compiler
 {
+namespace runtime
+{
+
+using namespace nn_compiler::ir;
 class ModelBuilder
 {
    public:
-    typedef std::unordered_map<int64_t, std::pair<nnrt::DataType, torch::jit::IValue>> blob_store_type;
+    typedef std::unordered_map<int64_t, std::pair<DataType, torch::jit::IValue>> data_store_type;
 
-    ModelBuilder(std::string model_path)
-    {
-        this->model_path_ = model_path;
-        this->runnable_ir_ = nullptr;
-    }
+    RetVal preProcess(std::unique_ptr<nn_compiler::ir::NNModel>& model);
 
-    // compiler intput model_path; output NNIR(LLO)
-    RetVal compileModel(int compile_level, const std::string model_type);
+    RetVal preloadModel(std::unique_ptr<nn_compiler::ir::NNModel>& model);
 
-    RetVal preloadModel();
+    RetVal loadWeightAndBias(nn_compiler::ir::DTensor &data);
 
-    void loadWeightAndBias(nncir::Blob* blob);
-
-    std::pair<std::shared_ptr<nncir::NNIR>, blob_store_type> getModel();
+    data_store_type getPreLoadedData() { return preloaded_data_container_; }
 
    private:
-    std::shared_ptr<nncir::NNIR> runnable_ir_;
+    data_store_type preloaded_data_container_;
 
-    blob_store_type preloaded_blobs_container_;
-
-    std::string model_path_;
+    int preload_start_id_ = 0;
 };
 
-}  // namespace nnrt
+}  // namespace runtime
+}  // namespace nn_compiler

@@ -1,5 +1,5 @@
 #include "compiler/include/nn_compiler.hpp"
-#include "new_runtime/include/nn_runtime.h"
+#include "runtime/include/nn_runtime.h"
 
 #include "pipeline_manager.h"
 

@@ -1,9 +1,12 @@
+#pragma once
+
 #ifndef NNCOMPILER_ATEN_OP_H
 #define NNCOMPILER_ATEN_OP_H
 #include "ATen/ATen.h"
-#include "glog/logging.h"
 
-namespace nnrt
+namespace nn_compiler
+{
+namespace runtime
 {
 at::Tensor atenAdd(const at::Tensor &self, const at::Scalar &other, const at::Scalar &alpha = 1);
 
@@ -112,7 +115,7 @@ static std::string atenFormat(const std::string &fmt)
 {
     int index = fmt.find("{}");
     if (index != std::string::npos) {
-        DLOG(ERROR) << "Too few arguments for format string:" << fmt;
+        DLOG(FATAL) << "Too few arguments for format string:" << fmt;
     }
     return fmt;
 }
@@ -292,8 +295,8 @@ int64_t atenSize(const at::Tensor &tensor, int64_t dim);
 
 int64_t atenSize(const at::Tensor &self, at::Dimname dim);
 
-at::Tensor atenSlice(const at::Tensor &self, int64_t dim = 0, int64_t start = 0, int64_t end = 9223372036854775807,
-                     int64_t step = 1);
+at::Tensor atenSlice(const at::Tensor &self, int64_t dim = 0, c10::optional<int64_t> start = c10::nullopt,
+                     c10::optional<int64_t> end = c10::nullopt, int64_t step = 1);
 
 at::Tensor atenSoftmax(const at::Tensor &self, int64_t dim, c10::optional<at::ScalarType> dtype = c10::nullopt);
 
@@ -346,5 +349,7 @@ at::Tensor atenZeros(at::IntArrayRef size, at::TensorOptions options = {});
 
 at::Tensor atenZeroslike(const at::Tensor &self, at::TensorOptions options = {},
                          c10::optional<at::MemoryFormat> memory_format = c10::nullopt);
-}  // namespace nnrt
+}  // namespace runtime
+}  // namespace nn_compiler
+
 #endif  // NNCOMPILER_ATEN_OP_H

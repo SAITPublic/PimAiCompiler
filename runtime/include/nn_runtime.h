@@ -3,34 +3,39 @@
 #include <memory>
 #include <tuple>
 #include <vector>
+
 #include "builder/model_builder.h"
 #include "executor/stream_executor.h"
-#include "executor/aten_ops.h"
-#include "nnrt_types.h"
+#include "new_ir/include/nn_model.h"
 
-namespace nnrt
+namespace nn_compiler
+{
+namespace runtime
 {
 class NNRuntime
 {
    public:
     NNRuntime() {}
 
-    NNRuntime(const std::string torch_model_path, int compile_level = 1, std::string model_type = "");
+    NNRuntime(std::unique_ptr<nn_compiler::ir::NNModel>& model, std::string model_type = "");
 
-    std::vector<torch::Tensor> inferenceModel(const std::vector<torch::Tensor>& input_tensors,
-                                              bool profiling = false);
+    void inferenceModel(std::unique_ptr<nn_compiler::ir::NNModel>& model,
+                        const std::vector<torch::Tensor>& input_tensors, std::vector<torch::Tensor>& output_tensors,
+                        bool profiling = false);
 
     int rocblas_init(void);
-    
+
     int test(void);
 
     ~NNRuntime();
 
    private:
-    // Runnable NNIR in ModelBuilder
-    std::shared_ptr<ModelBuilder> mbuilder_;
+    std::shared_ptr<ModelBuilder> mbuilder_ = nullptr;
 
-    std::shared_ptr<StreamExecutor> executor_;
+    std::shared_ptr<StreamExecutor> executor_ = nullptr;
+
+    std::string model_type_ = "";
 };
 
-}  // namespace nnrt
+}  // namespace runtime
+}  // namespace nn_compiler

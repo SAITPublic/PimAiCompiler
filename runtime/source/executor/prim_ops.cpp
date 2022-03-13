@@ -1,14 +1,13 @@
-#include "executor/prim_ops.h"
 #include <torch/script.h>
 #include <string>
 #include <unordered_map>
 #include <vector>
-#include "executor/prim_ops.h"
-#include "executor/prim_utils.h"
-#include "executor/stream_executor.h"
-#include "glog/logging.h"
 
-namespace nnrt
+#include "runtime/include/executor/prim_ops.h"
+
+namespace nn_compiler
+{
+namespace runtime
 {
 torch::Tensor primData(const torch::Tensor& input_tensor)
 {
@@ -49,8 +48,8 @@ void primListConstruct(std::vector<torch::IValue>& stack, size_t num_inputs, at:
     for (size_t i = stack.size() - num_inputs; i < stack.size(); ++i) {
         vals.emplace_back(std::move(stack[i]));
     }
-    nnrt::drop(stack, num_inputs);
-    nnrt::push(stack, std::move(vals));
+    drop(stack, num_inputs);
+    push(stack, std::move(vals));
 }
 
 void primListConstruct(std::vector<torch::IValue>& stack)
@@ -61,8 +60,8 @@ void primListConstruct(std::vector<torch::IValue>& stack)
         for (uint32_t idx = 0; idx < stack.size(); idx++) {
             items.emplace_back(stack.at(idx).toTuple());
         }
-        nnrt::drop(stack, stack.size());
-        nnrt::push(stack, std::move(items));
+        drop(stack, stack.size());
+        push(stack, std::move(items));
     } else {
         DLOG(FATAL) << "primListConstruct element type do not support!";
     }
@@ -70,7 +69,7 @@ void primListConstruct(std::vector<torch::IValue>& stack)
 
 void primListUnpack(std::vector<torch::IValue>& stack, size_t num_outputs)
 {
-    auto list = nnrt::pop(stack).toList();
+    auto list = pop(stack).toList();
     assert(list.size() == num_outputs);
     // insert the unpakced data
     stack.insert(stack.end(), list.begin(), list.end());
@@ -78,7 +77,7 @@ void primListUnpack(std::vector<torch::IValue>& stack, size_t num_outputs)
 
 void primRaiseException(std::string msg)
 {
-    nnrt::NNRuntimeException exception(msg);
+    NNRuntimeException exception(msg);
     DLOG(INFO) << exception.what();
     throw exception;
 }
@@ -90,8 +89,8 @@ void primTupleConstruct(std::vector<torch::IValue>& stack, size_t num_inputs)
 {
     std::vector<torch::jit::IValue> elems{std::make_move_iterator(stack.end() - num_inputs),
                                           std::make_move_iterator(stack.end())};
-    nnrt::drop(stack, num_inputs);
-    nnrt::push(stack, c10::ivalue::Tuple::create(std::move(elems)));
+    drop(stack, num_inputs);
+    push(stack, c10::ivalue::Tuple::create(std::move(elems)));
 }
 
 torch::IValue primTupleIndex(const std::vector<torch::IValue>& inputs, int64_t index)
@@ -178,7 +177,7 @@ at::IValue primVariable(std::string ntype, std::vector<torch::IValue> inputs)
                     iv.push_back(temp_iv.at(0));
                     temp_iv.clear();
                 } else {
-                    DLOG(ERROR) << "Variable ntype: " << ntype_stack.top() << "is wrong!";
+                    DLOG(FATAL) << "Variable ntype: " << ntype_stack.top() << "is wrong!";
                 }
             } else {
                 //list[tuple, tuple] tuple[tuple, tuple]
@@ -201,7 +200,7 @@ at::IValue primVariable(std::string ntype, std::vector<torch::IValue> inputs)
                     ntype_stack.pop();
                     primTupleConstruct(temp_iv, temp_iv.size());
                 } else {
-                    DLOG(ERROR) << "Variable ntype: " << ntype_stack.top() << "is wrong!";
+                    DLOG(FATAL) << "Variable ntype: " << ntype_stack.top() << "is wrong!";
                 }
 
                 // update output to iv
@@ -213,4 +212,5 @@ at::IValue primVariable(std::string ntype, std::vector<torch::IValue> inputs)
     return iv.at(0);
 }
 
-}  // namespace nnrt
+}  // namespace runtime
+}  // namespace nn_compiler

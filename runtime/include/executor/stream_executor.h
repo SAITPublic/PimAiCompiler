@@ -1,58 +1,64 @@
 #pragma once
 
+#include <miopen/miopen.h>
 #include <torch/script.h>
 #include <functional>
 #include <stack>
 #include <string>
 #include <vector>
-#include <miopen/miopen.h>
-#include "builder/model_builder.h"
-#include "ir/include/data_edge.hpp"
-#include "ir/include/edge.hpp"
-#include "ir/include/nn_ir.hpp"
-#include "nnrt_types.h"
-#include "runtime/include/profiler.h"
-#include "utils.h"
 
-// #include "prim_ops_executor.h"
+#include "new_ir/include/layers/all_layers.h"
+#include "new_ir/include/nn_model.h"
+#include "new_ir/include/nn_network.h"
+#include "new_ir/include/types.h"
+#include "runtime/include/builder/model_builder.h"
+#include "runtime/include/executor/utils.h"
 
-namespace nncir = nn_compiler::nn_ir;
-
-namespace nnrt
+namespace nn_compiler
 {
+namespace runtime
+{
+using namespace nn_compiler::ir;
 class StreamExecutor;
-using OpExecutorFn = std::function<void(const nncir::Node&, StreamExecutor& stream_executor)>;
+using OpExecutorFn =
+    std::function<void(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)>;
 
 class StreamExecutor
 {
    public:
-    typedef std::unordered_map<int64_t, std::pair<nnrt::DataType, torch::jit::IValue>> blob_store_type;
+    typedef std::unordered_map<int64_t, std::pair<DataType, torch::jit::IValue>> blob_store_type;
 
-    StreamExecutor(std::pair<std::shared_ptr<nncir::NNIR>, blob_store_type> model, std::string model_type);
+    StreamExecutor(std::pair<std::shared_ptr<nn_compiler::ir::NNNetwork>, blob_store_type> model,
+                   std::string model_type);
 
     ~StreamExecutor();
 
-    RetVal inferenceModel(const std::vector<torch::Tensor>& input_tensors,
-                          std::vector<torch::Tensor>& output_tensors);
+    RetVal preProcess(std::unique_ptr<nn_compiler::ir::NNModel>& model);
 
-    RetVal inferenceModelwithProfiling(const std::vector<torch::Tensor>& input_tensors,
+    RetVal inferenceModel(std::unique_ptr<nn_compiler::ir::NNModel>& model,
+                          const std::vector<torch::Tensor>& input_tensors, std::vector<torch::Tensor>& output_tensors);
+
+    RetVal inferenceModelwithProfiling(std::unique_ptr<nn_compiler::ir::NNModel>& model,
+                                       const std::vector<torch::Tensor>& input_tensors,
                                        std::vector<torch::Tensor>& output_tensors);
 
     void updateBlob(int64_t blob_id, DataType dtype, const torch::jit::IValue& iv);
 
     std::pair<DataType, torch::jit::IValue>& findBlob(int64_t blob_id);
 
-    OpExecutorFn findOpExecutor(nncir::NodeType op_type);
+    bool checkValidBlobID(int64_t blob_id);
+
+    OpExecutorFn findOpExecutor(nn_compiler::ir::LayerType& op_type);
 
     void registerOp();
 
     void setInputTensors(const std::vector<torch::Tensor>& input_tensors);
 
     void getOutputTensors(std::vector<torch::Tensor>& output_tensors);
-    
-    std::vector<torch::Tensor> iValueParser(torch::jit::IValue &iv);
 
-    const std::shared_ptr<nncir::NNIR> getGraph();
+    const std::shared_ptr<nn_compiler::ir::NNNetwork> getGraph();
+
+    std::vector<torch::Tensor> iValueParser(torch::jit::IValue& iv);
 
     void setCursor(int64_t cursor)
     {
@@ -60,33 +66,14 @@ class StreamExecutor
         cursor_ = cursor;
     }
 
-    void showAllBlobs()
-    {
-        for (auto& item : this->global_blobs_) {
-            DLOG(INFO) << "blob_id: " << item.first << " dtype: " << getDataTypeStr(item.second.first);
-        }
-    }
-
-    RetVal showBlob(int64_t blob_id)
-    {
-        auto it = this->global_blobs_.find(blob_id);
-        if (it == this->global_blobs_.end()) {
-            DLOG(INFO) << "Blob not found!";
-            return RetVal::FAILURE;
-        } else {
-            DLOG(INFO) << "blob_id: " << blob_id << " type:" << getDataTypeStr(it->second.first)
-                       << " value: " << it->second;
-            return RetVal::SUCCESS;
-        }
-    }
-
    public:
-    std::shared_ptr<nncir::NNIR> ir_graph_;
+    std::shared_ptr<nn_compiler::ir::NNNetwork> graph_;
 
     // Global input & output vars
     blob_store_type global_blobs_;
     // Op Register
-    std::unordered_map<nncir::NodeType, OpExecutorFn> global_op_register_;
+    std::unordered_map<nn_compiler::ir::LayerType, OpExecutorFn> global_op_register_;
+
     std::vector<int64_t> input_blob_ids_;
     std::vector<int64_t> output_blob_ids_;
 
@@ -95,14 +82,15 @@ class StreamExecutor
     std::stack<int64_t> loop_condition_stack_;
     std::unordered_map<int, std::pair<int, int>> releation_blob_ids_map_;
 
-    // miopen
-    miopenTensorDescriptor_t input_tensor, hidden_tensor, weight_tensor, output_tensor;
-    std::vector<miopenTensorDescriptor_t> input_tensors;
-    std::vector<miopenTensorDescriptor_t> output_tensors;
-    miopenHandle_t handle;
-    miopenRNNDescriptor_t rnnDesc;
+    std::string model_type_ = "";
 
-    std::string modelType;
+    // miopen
+    miopenTensorDescriptor_t input_tensor_, hidden_tensor_, weight_tensor_, output_tensor_;
+    std::vector<miopenTensorDescriptor_t> input_tensors_;
+    std::vector<miopenTensorDescriptor_t> output_tensors_;
+    miopenHandle_t handle_;
+    miopenRNNDescriptor_t rnn_desc_;
 };
 
-}  // namespace nnrt
+}  // namespace runtime
+}  // namespace nn_compiler

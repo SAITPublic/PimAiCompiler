@@ -12,6 +12,7 @@ set(CMAKE_USE_WIN32_THREADS_INIT 0)
 set(CMAKE_USE_PTHREADS_INIT 1)
 set(THREADS_PREFER_PTHREAD_FLAG ON)
 
+
 # Add rocm dir
 set(CMAKE_PREFIX_PATH ${CMAKE_PREFIX_PATH}
 ${LIBTORCH_DIR}
@@ -34,9 +35,11 @@ find_package(rocfft)
 find_package(hipsparse)
 find_package(hiprand)
 
+add_subdirectory(pipeline_manager)
 
 add_subdirectory(${PROJECT_SOURCE_DIR}/third_party/pybind11 pybind11_binary_dir)
-add_library(Nnrt MODULE nn_runtime_py.cpp)
+add_library(NNCompiler MODULE nn_runtime_py.cpp)
+
 
 set(TORCH_INSTALL_PREFIX "${LIBTORCH_DIR}")
 find_library(TORCH_PYTHON_LIBRARY torch_python PATHS "${TORCH_INSTALL_PREFIX}/lib")
@@ -45,12 +48,12 @@ find_library(TORCH_PYTHON_LIBRARY torch_python PATHS "${TORCH_INSTALL_PREFIX}/li
 # message(STATUS ${TORCH_LIBRARIES})
 # message(STATUS ${TORCH_PYTHON_LIBRARY})
 
-target_include_directories(Nnrt PRIVATE ${TORCH_INCLUDE_DIRS})
-target_link_libraries(Nnrt PRIVATE nn_runtime pybind11::module pybind11::lto ${TORCH_LIBRARIES} ${TORCH_PYTHON_LIBRARY})
-set_property(TARGET Nnrt PROPERTY CXX_STANDARD 17)
+target_include_directories(NNCompiler PRIVATE ${TORCH_INCLUDE_DIRS})
+target_link_libraries(NNCompiler PRIVATE pipeline_manager_py pybind11::module pybind11::lto ${TORCH_LIBRARIES} ${TORCH_PYTHON_LIBRARY})
+set_property(TARGET NNCompiler PROPERTY CXX_STANDARD 17)
 
 
-pybind11_extension(Nnrt)
-pybind11_strip(Nnrt)
+pybind11_extension(NNCompiler)
+pybind11_strip(NNCompiler)
 
-install ( TARGETS Nnrt LIBRARY DESTINATION ${ROCM_PATH}/lib/)
+install ( TARGETS NNCompiler LIBRARY DESTINATION ${ROCM_PATH}/lib/)

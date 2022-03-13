@@ -4,7 +4,7 @@ add_library(runtime_builder SHARED ${runtime_builder_src})
 
 target_include_directories(runtime_builder PUBLIC
     ${PROJECT_SOURCE_DIR}      
-    ${PROJECT_SOURCE_DIR}/new_runtime/include)
+    ${PROJECT_SOURCE_DIR}/runtime/include)
 
 target_link_libraries(runtime_builder common new_ir hsakmt torch c10)
 

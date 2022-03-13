@@ -1,17 +1,14 @@
-#include "executor/utils.h"
 #include <torch/script.h>
 #include <ostream>
 #include <string>
 #include <vector>
-#include "ir/include/data_edge.hpp"
-#include "ir/include/edge.hpp"
-#include "ir/include/nn_ir.hpp"
-#include "nnrt_types.h"
 
-namespace nnrt
+#include "runtime/include/executor/utils.h"
+
+namespace nn_compiler
 {
-namespace nncir = nn_compiler::nn_ir;
-
+namespace runtime
+{
 torch::jit::IValue deviceToIValue(const c10::Device& device) { return torch::jit::IValue(device); }
 
 torch::jit::IValue tensorToIValue(const torch::Tensor& tensor) { return torch::jit::IValue(tensor); }
@@ -20,37 +17,37 @@ torch::jit::IValue tensorListToIValue(const torch::TensorList& tensor_list) { re
 
 torch::jit::IValue strToIValue(std::string str) { return torch::jit::IValue(str); }
 
-nnrt::DataType convertATScalarTypeToDType(at::ScalarType dtype)
+DataType convertATScalarTypeToDType(at::ScalarType dtype)
 {
     // according to: pytorch/c10/core/ScalarType.h
-    nnrt::DataType data_type = nnrt::DataType::NONE;
+    DataType data_type = DataType::NONE;
     switch (dtype) {
         case at::ScalarType::Byte:
-            data_type = nnrt::DataType::UINT8;
+            data_type = DataType::UINT8;
             break;
         case at::ScalarType::Char:
-            data_type = nnrt::DataType::INT8;
+            data_type = DataType::INT8;
             break;
         case at::ScalarType::Short:
-            data_type = nnrt::DataType::INT16;
+            data_type = DataType::INT16;
             break;
         case at::ScalarType::Int:
-            data_type = nnrt::DataType::INT32;
+            data_type = DataType::INT32;
             break;
         case at::ScalarType::Long:
-            data_type = nnrt::DataType::INT64;
+            data_type = DataType::INT64;
             break;
         case at::ScalarType::Half:
-            data_type = nnrt::DataType::FLOAT16;
+            data_type = DataType::FLOAT16;
             break;
         case at::ScalarType::Float:
-            data_type = nnrt::DataType::FLOAT32;
+            data_type = DataType::FLOAT32;
             break;
         case at::ScalarType::Double:
-            data_type = nnrt::DataType::FLOAT64;
+            data_type = DataType::FLOAT64;
             break;
         case at::ScalarType::Bool:
-            data_type = nnrt::DataType::BOOL;
+            data_type = DataType::BOOL;
             break;
         default:
             DLOG(FATAL) << "Complex type has not been supported.";
@@ -58,7 +55,8 @@ nnrt::DataType convertATScalarTypeToDType(at::ScalarType dtype)
     return data_type;
 }
 
-at::Device convertIntToATDevice(const int& value) {
+at::Device convertIntToATDevice(const int& value)
+{
     // according to: pytorch/c10/core/DeviceType.h
     at::Device device(at::DeviceType::CPU);
     switch (value) {
@@ -164,47 +162,6 @@ bool isScalarType(DataType dtype)
            dtype == DataType::BOOL;
 }
 
-std::vector<int64_t> getInBlobIds(const nncir::Node& node)
-{
-    std::vector<int64_t> ret;
-    for (int i = 0; i < node.getInEdgeIds().size(); i++) {
-        auto& data_edge = cast<nncir::DataEdge>(node.getInEdge(i));
-        ret.push_back(data_edge.getBlobId());
-    }
-    return ret;
-}
-
-/**
- * @brief Get the Out Blob Ids, the result <ids> may contain duplicates elements, for example {1, 1, 2, 3, 3}
- * 
- * @param node 
- * @return std::vector<int64_t> 
- */
-std::vector<int64_t> getOutBlobIds(const nncir::Node& node)
-{
-    std::vector<int64_t> ret;
-    for (int i = 0; i < node.getOutEdgeIds().size(); i++) {
-        auto& data_edge = cast<nncir::DataEdge>(node.getOutEdge(i));
-        ret.push_back(data_edge.getBlobId());
-    }
-    return ret;
-}
-
-std::vector<int64_t> getUniqueOutBlobIds(const nncir::Node& node)
-{
-    std::vector<int64_t> ret;
-    for (int i = 0; i < node.getOutEdgeIds().size(); i++) {
-        auto& data_edge = cast<nncir::DataEdge>(node.getOutEdge(i));
-        int blob_id = data_edge.getBlobId();
-        if(std::find(ret.begin(), ret.end(), blob_id) == ret.end()){
-            // not exist, insert
-            ret.push_back(data_edge.getBlobId());
-        }
-    }
-    return ret;
-}
-
-
 static std::unordered_map<DataType, std::string> dtype_to_str_map = {
     {DataType::UNDEFINED, "UNDEFINED"}, {DataType::INT8, "INT8"},
     {DataType::UINT8, "UINT8"},         {DataType::INT16, "INT16"},
@@ -289,21 +246,29 @@ at::ListTypePtr inferTypeFromDataType(DataType type)
     return list_type;
 }
 
-std::string showOpNodeInfo(const nncir::Node& node, bool show_in_blobs, bool show_out_blobs)
+std::vector<int64_t> getUniqueOutStensorIds(std::shared_ptr<nn_compiler::ir::NNLayer>& layer)
 {
-    auto node_info = node.getNodeInfo();
-    std::stringstream ss;
-
-    ss << std::endl
-       << "node_id: " << node_info.id << std::endl
-       << "node_name:" << node_info.name << std::endl
-       << "in_blob_ids: " << getInBlobIds(node) << std::endl
-       << "out_blob_ids: " << getOutBlobIds(node) << std::endl;
-
-    // remark: node_info.in_edge_ids & node_info.in_edge_ids maybe not correct
-    //    <<"in_edge_ids: "<<node_info.in_edge_ids <<std::endl
-    //    <<"out_edge_ids: "<<node_info.in_edge_ids <<std::endl
-    return ss.str();
+    std::vector<int64_t> ret;
+    auto out_stensor_id = layer->getOutSTensorID();
+    for (int i = 0; i < out_stensor_id.size(); i++) {
+        if (std::find(ret.begin(), ret.end(), out_stensor_id[i]) == ret.end()) {
+            // not exist, insert
+            ret.push_back(out_stensor_id[i]);
+        }
+    }
+    return ret;
 }
 
-}  // namespace nnrt
+std::vector<int64_t> getDataShapeFromVector(const std::vector<int64_t>& value)
+{
+    std::vector<int64_t> value_;
+    for (auto item : value) {
+        if (item != 0) {
+            value_.push_back(item);
+        }
+    }
+    return value_;
+}
+
+}  // namespace runtime
+}  // namespace nn_compiler

@@ -1,6 +1,5 @@
 #pragma once
 
-#include <glog/logging.h>
 #include <torch/script.h>
 #include <experimental/filesystem>
 #include <string>
@@ -10,7 +9,9 @@
 
 namespace fs = std::experimental::filesystem;
 
-namespace nnrt
+namespace nn_compiler
+{
+namespace runtime
 {
 #define SPLITE_LINE "================================================"
 
@@ -170,4 +171,5 @@ class TVComparator
 #define TV_COMPARE_TENSOR(input_tensor, ans_key_name, print_tensor)
 #endif  // TV_ENABLE
 
-}  // namespace nnrt
+}  // namespace runtime
+} // namespace nn_compiler

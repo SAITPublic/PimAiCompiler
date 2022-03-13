@@ -8,9 +8,9 @@
 
 #include "compiler/include/nn_compiler.hpp"
 #include "new_ir/include/nn_model.h"
-#include "new_runtime/include/executor/prim_utils.h"
-#include "new_runtime/include/nn_runtime.h"
-#include "new_runtime/include/tv_tools.h"
+#include "runtime/include/executor/prim_utils.h"
+#include "runtime/include/nn_runtime.h"
+#include "runtime/include/tv_tools.h"
 
 #include "pipeline_manager.hpp"
 

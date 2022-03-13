@@ -1,34 +1,40 @@
 #pragma once
 
 #include <torch/script.h>
-#include "executor/prim_ops.h"
-#include "executor/stream_executor.h"
-#include "glog/logging.h"
-#include "ir/include/all_nodes.hpp"
-#include "ir/include/nn_ir.hpp"
 
-namespace nnrt
+#include "new_ir/include/common/utils.hpp"
+#include "new_ir/include/layers/all_layers.h"
+#include "new_ir/include/layers/nn_layer.h"
+#include "runtime/include/executor/prim_ops.h"
+#include "runtime/include/executor/prim_utils.h"
+#include "runtime/include/executor/stream_executor.h"
+
+namespace nn_compiler
 {
-void executePrimBlock(const nncir::Node& op_node, StreamExecutor& stream_executor);
-void executePrimConstant(const nncir::Node& op_node, StreamExecutor& stream_executor);
-void executePrimData(const nncir::Node& op_node, StreamExecutor& stream_executor);
-void executePrimDevice(const nncir::Node& op_node, StreamExecutor& stream_executor);
-void executePrimDtype(const nncir::Node& op_node, StreamExecutor& stream_executor);
-void executePrimEndLoop(const nncir::Node& op_node, StreamExecutor& stream_executor);
-void executePrimEndIf(const nncir::Node& op_node, StreamExecutor& stream_executor);
-void executePrimGetAttr(const nncir::Node& op_node, StreamExecutor& stream_executor);
-void executePrimIf(const nncir::Node& op_node, StreamExecutor& stream_executor);
-void executePrimLoop(const nncir::Node& op_node, StreamExecutor& stream_executor);
-void executePrimLoopIndex(const nncir::Node& op_node, StreamExecutor& stream_executor);
-void executePrimListConstruct(const nncir::Node& op_node, StreamExecutor& stream_executor);
-void executePrimListUnpack(const nncir::Node& op_node, StreamExecutor& stream_executor);
-void executePrimRaiseException(const nncir::Node& op_node, StreamExecutor& stream_executor);
-void executePrimSetAttr(const nncir::Node& op_node, StreamExecutor& stream_executor);
-void executePrimTupleConstruct(const nncir::Node& op_node, StreamExecutor& stream_executor);
-void executePrimTupleIndex(const nncir::Node& op_node, StreamExecutor& stream_executor);
-void executePrimTupleUnpack(const nncir::Node& op_node, StreamExecutor& stream_executor);
-void executePrimType(const nncir::Node& op_node, StreamExecutor& stream_executor);
-void executePrimUncheckedCast(const nncir::Node& op_node, StreamExecutor& stream_executor);
-void executePrimUninitialized(const nncir::Node& op_node, StreamExecutor& stream_executor);
-void executePrimVariable(const nncir::Node& op_node, StreamExecutor& stream_executor);
-}  // namespace nnrt
+namespace runtime
+{
+void executePrimBlock(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor);
+void executePrimConstant(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor);
+void executePrimData(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor);
+void executePrimDevice(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor);
+void executePrimDtype(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor);
+void executePrimEndIf(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor);
+void executePrimGetAttr(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor);
+void executePrimIf(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor);
+void executePrimListConstruct(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor);
+void executePrimListUnpack(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor);
+void executePrimLoopIndex(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor);
+void executePrimRaiseException(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor);
+void executePrimSetAttr(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor);
+void executePrimTupleConstruct(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor);
+void executePrimTupleIndex(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor);
+void executePrimTupleUnpack(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor);
+void executePrimType(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor);
+void executePrimUncheckedCast(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor);
+void executePrimUninitialized(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor);
+void executePrimLoop(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor);
+void executePrimEndLoop(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor);
+void executePrimVariable(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor);
+
+}  // namespace runtime
+}  // namespace nn_compiler

@@ -1,15 +1,19 @@
 #pragma once
 
-#include "utils.h"
 #include <torch/script.h>
 #include <exception>
-#include <vector>
-#include "../nnrt_types.h"
-#include "ir/include/ir_types.hpp"
 #include <stack>
+#include <vector>
 
-namespace nnrt
+#include "new_ir/include/tensors/data_tensor.h"
+#include "new_ir/include/types.h"
+#include "runtime/include/executor/utils.h"
+
+namespace nn_compiler
 {
+namespace runtime
+{
+using namespace nn_compiler::ir;
 class NNRuntimeException : std::exception
 {
     using std::exception::what;
@@ -41,11 +45,13 @@ void push(std::vector<torch::jit::IValue>& stack, Types&&... args)
 torch::Tensor createPtTensor(void* data_ptr, const std::vector<int64_t>& shape, DataType dtype,
                              const std::vector<int64_t>& stride = {});
 
-std::vector<int64_t> getDataShapeFromShape4D(nn_compiler::nn_ir::Shape4D shape);
+std::vector<int64_t> getDataShapeFromSTensor(nn_compiler::ir::STensor& value);
 
 torch::Tensor loadTensor(const std::string& bin_file, const std::vector<int64_t>& shape, DataType dtype);
 
-std::pair<torch::jit::IValue, std::pair<int, DataType>> getVariableInfo(uint8_t* ptr,
-                                                                        const std::string tensor_data_type,
-                                                                        int total_size);
-}  // namespace nnrt
+std::pair<int, DataType> parseNtype(std::string& ntype);
+
+torch::jit::IValue convertVaraibleData2IValve(uint8_t* ptr, DataType d_type);
+
+}  // namespace runtime
+}  // namespace nn_compiler
