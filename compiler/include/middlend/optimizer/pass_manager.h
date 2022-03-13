@@ -1,6 +1,6 @@
 #pragma once
 
-#include "compiler/include/frontend/optimizer/pass.h"
+#include "compiler/include/common/pass.hpp"
 #include "new_ir/include/nn_model.h"
 
 namespace nn_compiler {
@@ -11,8 +11,6 @@ class PassManager {
     explicit PassManager();
 
     void runPasses(std::unique_ptr<nn_compiler::ir::NNModel>& model);
-
- private:
 };
 
 }  // namespace middlend

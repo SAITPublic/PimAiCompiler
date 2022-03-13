@@ -1,3 +1,8 @@
+#include "compiler/include/common/log.hpp"
+#include "compiler/include/frontend/optimizer/utils/attribute_helper.h"
+
+#include "half.hpp"
+
 #include "new_ir/include/layers/aten_add_layer.h"
 #include "new_ir/include/layers/aten_arange1_layer.h"
 #include "new_ir/include/layers/aten_arange2_layer.h"
@@ -47,11 +52,6 @@
 #include "new_ir/include/layers/prim_constant_layer.h"
 #include "new_ir/include/layers/prim_loop_layer.h"
 #include "new_ir/include/layers/prim_tuple_index_layer.h"
-
-#include "compiler/include/common/log.hpp"
-#include "compiler/include/frontend/optimizer/utils/attribute_helper.h"
-
-#include "half.hpp"
 
 namespace nn_compiler
 {

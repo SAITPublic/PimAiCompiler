@@ -6,8 +6,7 @@ namespace nn_compiler {
 
 class Pass {
  public:
-    Pass() {
-    }
+    Pass() {}
 
     void add(std::shared_ptr<Pass> pass) {
         if (successor_) {

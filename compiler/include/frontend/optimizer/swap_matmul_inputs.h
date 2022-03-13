@@ -1,6 +1,6 @@
 #pragma once
 
-#include "compiler/include/frontend/optimizer/pass.h"
+#include "compiler/include/common/pass.hpp"
 #include "compiler/include/frontend/optimizer/utils/constant_parser.h"
 
 #include "half.hpp"

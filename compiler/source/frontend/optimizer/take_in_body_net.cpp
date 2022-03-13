@@ -1,19 +1,16 @@
 #include <string>
 
+#include "compiler/include/common/log.hpp"
 #include "compiler/include/frontend/optimizer/take_in_body_net.h"
 
 #include "new_ir/include/layers/pim_general_layers.h"
+#include "new_ir/include/layers/prim_end_if_layer.h"
+#include "new_ir/include/layers/prim_end_loop_layer.h"
 #include "new_ir/include/layers/prim_if_layer.h"
-
 #include "new_ir/include/layers/prim_loop_index_layer.h"
 #include "new_ir/include/layers/prim_loop_layer.h"
 #include "new_ir/include/types.h"
 #include "new_ir/include/utils/graph_util.h"
-
-#include "compiler/include/common/log.hpp"
-
-#include "new_ir/include/layers/prim_end_if_layer.h"
-#include "new_ir/include/layers/prim_end_loop_layer.h"
 
 namespace nn_compiler
 {

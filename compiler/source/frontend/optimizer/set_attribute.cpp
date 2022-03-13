@@ -1,11 +1,10 @@
 #include <string>
 
+#include "compiler/include/common/log.hpp"
 #include "compiler/include/frontend/optimizer/set_attribute.h"
 #include "new_ir/include/layers/prim_constant_layer.h"
 #include "new_ir/include/layers/prim_variable_layer.h"
 #include "new_ir/include/utils/graph_util.h"
-
-#include "compiler/include/common/log.hpp"
 
 namespace nn_compiler
 {

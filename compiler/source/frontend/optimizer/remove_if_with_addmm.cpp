@@ -4,10 +4,9 @@
 #include "compiler/include/frontend/optimizer/remove_if_with_addmm.h"
 
 #include "new_ir/include/layers/aten_addmm_layer.h"
-#include "new_ir/include/utils/graph_search.h"
-#include "new_ir/include/utils/graph_util.h"
 #include "new_ir/include/layers/pim_general_layers.h"
 #include "new_ir/include/layers/prim_if_layer.h"
+#include "new_ir/include/utils/graph_util.h"
 
 namespace nn_compiler {
 

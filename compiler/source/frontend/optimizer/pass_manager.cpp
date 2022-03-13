@@ -1,22 +1,19 @@
-#include "compiler/include/frontend/optimizer/pass_manager.h"
 #include "compiler/include/common/log.hpp"
+#include "compiler/include/frontend/optimizer/pass_manager.h"
 
 #include "compiler/include/frontend/optimizer/construct_list.h"
 #include "compiler/include/frontend/optimizer/fuse_activation.h"
 #include "compiler/include/frontend/optimizer/remake_dtensor_of_prim_variable.h"
 #include "compiler/include/frontend/optimizer/remove_cat_for_addmm.h"
-#include "compiler/include/frontend/optimizer/remove_get_attr_layers.h"
-#include "compiler/include/frontend/optimizer/remove_if_with_addmm.h"
-
-#include "compiler/include/frontend/optimizer/set_weights_for_embedding.h"
-
-#include "compiler/include/frontend/optimizer/swap_addmm_inputs.h"
-#include "compiler/include/frontend/optimizer/swap_matmul_inputs.h"
-
 #include "compiler/include/frontend/optimizer/remove_constant_layers.h"
 #include "compiler/include/frontend/optimizer/remove_dropout_layers.h"
+#include "compiler/include/frontend/optimizer/remove_get_attr_layers.h"
+#include "compiler/include/frontend/optimizer/remove_if_with_addmm.h"
 #include "compiler/include/frontend/optimizer/remove_set_attr_layers.h"
 #include "compiler/include/frontend/optimizer/set_attribute.h"
+#include "compiler/include/frontend/optimizer/set_weights_for_embedding.h"
+#include "compiler/include/frontend/optimizer/swap_addmm_inputs.h"
+#include "compiler/include/frontend/optimizer/swap_matmul_inputs.h"
 #include "compiler/include/frontend/optimizer/take_in_body_net.h"
 
 namespace nn_compiler

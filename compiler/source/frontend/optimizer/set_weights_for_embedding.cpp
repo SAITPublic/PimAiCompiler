@@ -2,8 +2,6 @@
 
 #include "compiler/include/common/log.hpp"
 #include "compiler/include/frontend/optimizer/set_weights_for_embedding.h"
-
-#include "new_ir/include/utils/graph_search.h"
 #include "new_ir/include/utils/graph_util.h"
 
 namespace nn_compiler {

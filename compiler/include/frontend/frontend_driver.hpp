@@ -5,7 +5,8 @@
 #include <vector>
 
 #include "compiler/include/common/log.hpp"
-#include "importer/model_builder.h"
+#include "compiler/include/frontend/importer/model_builder.h"
+#include "compiler/include/frontend/optimizer/pass_manager.h"
 #include "new_ir/include/nn_model.h"
 
 namespace nn_compiler

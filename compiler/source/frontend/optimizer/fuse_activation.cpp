@@ -1,11 +1,7 @@
+#include "compiler/include/common/log.hpp"
 #include "compiler/include/frontend/optimizer/fuse_activation.h"
 #include "new_ir/include/layers/aten_addmm_layer.h"
-
-#include "new_ir/include/utils/graph_search.h"
-#include "new_ir/include/utils/graph_transform.h"
 #include "new_ir/include/utils/graph_util.h"
-
-#include "compiler/include/common/log.hpp"
 
 namespace nn_compiler {
 

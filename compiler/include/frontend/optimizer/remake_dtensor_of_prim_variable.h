@@ -1,10 +1,9 @@
 #pragma once
 
-#include "compiler/include/frontend/optimizer/pass.h"
-#include "new_ir/include/layers/prim_variable_layer.h"
-
+#include "compiler/include/common/pass.hpp"
 #include "compiler/include/frontend/optimizer/utils/attribute_helper.h"
 #include "ir/include/common/log.hpp"
+#include "new_ir/include/layers/prim_variable_layer.h"
 
 namespace nn_compiler
 {

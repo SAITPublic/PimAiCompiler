@@ -23,7 +23,9 @@ RetVal MiddlendDriver::run(std::unique_ptr<nn_compiler::ir::NNModel>& model) {
 RetVal MiddlendDriver::optimizer(std::unique_ptr<nn_compiler::ir::NNModel>& model)
 {
     Log::ME::I() << "NNCompiler MiddlendDriver::optimizer() is called";
-    // TODO(SRCX): implement this code.
+    
+    auto pass_manager = std::make_shared<PassManager>();
+    pass_manager->runPasses(model);
 
     return RetVal::SUCCESS;
 }

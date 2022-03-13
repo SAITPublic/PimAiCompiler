@@ -1,6 +1,6 @@
 #pragma once
 
-#include "compiler/include/frontend/optimizer/pass.h"
+#include "compiler/include/common/pass.hpp"
 #include "compiler/include/frontend/optimizer/utils/attribute_helper.h"
 #include "new_ir/include/nn_network.h"
 

@@ -1,8 +1,7 @@
 #pragma once
 
+#include "compiler/include/common/pass.hpp"
 #include "new_ir/include/layers/prim_get_attr_layer.h"
-
-#include "compiler/include/frontend/optimizer/pass.h"
 
 namespace nn_compiler
 {
