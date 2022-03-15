@@ -21,6 +21,10 @@ class PrimVariableLayer : public NNLayer {
     explicit PrimVariableLayer(const PrimVariableLayer& variable_layer) :
         NNLayer(variable_layer) {
         values_ = variable_layer.values_;
+        ntype_ = variable_layer.ntype_;
+        single_dtensor_ = variable_layer.single_dtensor_;
+        to_remove_ = variable_layer.to_remove_;
+        is_constant_ = variable_layer.is_constant_;
     }
 
     virtual ~PrimVariableLayer() {}

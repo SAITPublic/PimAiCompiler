@@ -20,7 +20,9 @@ class AtenLinearLayer : public NNLayer {
     explicit AtenLinearLayer(const AtenLinearLayer& aten_linear_layer) :
         NNLayer(aten_linear_layer) {
         this->weights_ = aten_linear_layer.weights_;
-        this->biases_  = aten_linear_layer.biases_;
+        this->biases_ = aten_linear_layer.biases_;
+        this->weight_ids_ = aten_linear_layer.weight_ids_;
+        this->bias_ids_ = aten_linear_layer.bias_ids_;
     }
 
     virtual ~AtenLinearLayer() {}

@@ -16,7 +16,9 @@ class AtenAddmmLayer : public NNLayer {
             : NNLayer(name, type) {
     }
 
-    explicit AtenAddmmLayer(const AtenAddmmLayer& aten_addmm_layer) : NNLayer(aten_addmm_layer) {}
+    explicit AtenAddmmLayer(const AtenAddmmLayer& aten_addmm_layer) : NNLayer(aten_addmm_layer) {
+        act_type_ = aten_addmm_layer.act_type_;
+    }
 
     virtual ~AtenAddmmLayer() {}
 

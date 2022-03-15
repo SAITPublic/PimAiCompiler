@@ -16,6 +16,7 @@ class AtenMaskedFillLayer : public NNLayer {
 
     explicit AtenMaskedFillLayer(const AtenMaskedFillLayer &aten_masked_fill_layer) :
         NNLayer(aten_masked_fill_layer) {
+            this->is_inplace_ = aten_masked_fill_layer.is_inplace_;
     }
 
     virtual ~AtenMaskedFillLayer() {}

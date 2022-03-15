@@ -19,6 +19,8 @@ class AtenBatchNorm2dLayer : public NNLayer {
         NNLayer(batch_norm2d_layer) {
         this->weights_ = batch_norm2d_layer.weights_;
         this->bias_ = batch_norm2d_layer.bias_;
+        this->weight_ids_ = batch_norm2d_layer.weight_ids_;
+        this->bias_ids_ = batch_norm2d_layer.bias_ids_;
         this->training_  = batch_norm2d_layer.training_;
         this->momentum_ = batch_norm2d_layer.momentum_;
         this->eps_ = batch_norm2d_layer.eps_;
@@ -28,7 +30,7 @@ class AtenBatchNorm2dLayer : public NNLayer {
     virtual ~AtenBatchNorm2dLayer() {}
 
     virtual std::shared_ptr<NNLayer> clone() {
-        return  std::shared_ptr<AtenBatchNorm2dLayer>(new AtenBatchNorm2dLayer(*this));
+        return std::shared_ptr<AtenBatchNorm2dLayer>(new AtenBatchNorm2dLayer(*this));
     }
 
     std::vector<at::Tensor> getWeights() { return this->weights_; }

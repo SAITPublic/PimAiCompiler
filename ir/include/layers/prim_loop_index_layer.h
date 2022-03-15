@@ -17,7 +17,9 @@ class PrimLoopIndexLayer : public NNLayer {
     }
 
     explicit PrimLoopIndexLayer(const PrimLoopIndexLayer& prim_loop_index_layer) :
-        NNLayer(prim_loop_index_layer) {}
+        NNLayer(prim_loop_index_layer) {
+        index_ = prim_loop_index_layer.index_;
+    }
 
     virtual ~PrimLoopIndexLayer() {}
 
@@ -25,16 +27,16 @@ class PrimLoopIndexLayer : public NNLayer {
         return std::shared_ptr<PrimLoopIndexLayer>(new PrimLoopIndexLayer(*this));
     }
 
-    void setIndex(int64_t index) { _index = index; }
+    void setIndex(int64_t index) { index_ = index; }
 
-    int64_t getIndex() { return _index; }
+    int64_t getIndex() { return index_; }
 
     void printAttr() {
         Log::IR::I() << "     PrimLoopIndexAttr    ";
     }
 
  private:
-    int64_t _index = INT64_MIN;
+    int64_t index_ = INT64_MIN;
 };
 
 }  // namespace ir

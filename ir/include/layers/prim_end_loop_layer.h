@@ -19,7 +19,9 @@ class PrimEndLoopLayer : public NNLayer
      */
     PrimEndLoopLayer(std::string name, LayerType type) : NNLayer(name, type) {}
 
-    explicit PrimEndLoopLayer(const PrimEndLoopLayer& prim_end_loop_layer) : NNLayer(prim_end_loop_layer) {}
+    explicit PrimEndLoopLayer(const PrimEndLoopLayer& prim_end_loop_layer) : NNLayer(prim_end_loop_layer) {
+        goto_layer_ = prim_end_loop_layer.goto_layer_;
+    }
 
     virtual ~PrimEndLoopLayer() {}
 

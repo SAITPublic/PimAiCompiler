@@ -21,6 +21,8 @@ class PrimConstantLayer : public NNLayer {
     explicit PrimConstantLayer(const PrimConstantLayer& constant_layer) :
         NNLayer(constant_layer) {
         value_ = constant_layer.value_;
+        ntype_ = constant_layer.ntype_;
+        to_remove_ = constant_layer.to_remove_;
     }
 
     virtual ~PrimConstantLayer() {}

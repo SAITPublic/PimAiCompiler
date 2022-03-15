@@ -16,7 +16,7 @@ class AtenExpandLayer : public NNLayer {
 
     explicit AtenExpandLayer(const AtenExpandLayer &aten_expand_layer) :
         NNLayer(aten_expand_layer) {
-        this->_implicit = aten_expand_layer._implicit;
+        this->implicit_ = aten_expand_layer.implicit_;
     }
 
     virtual ~AtenExpandLayer() {}
@@ -25,18 +25,18 @@ class AtenExpandLayer : public NNLayer {
         return std::shared_ptr<AtenExpandLayer>(new AtenExpandLayer(*this));
     }
 
-    void setImplicit(int implicit) { _implicit = implicit; }
+    void setImplicit(int implicit) { implicit_ = implicit; }
 
-    int getImplicit() { return _implicit; }
+    int getImplicit() { return implicit_; }
 
 
     void printAttr() {
         Log::IR::I() << "    AtenExpandAttr      ";
-        Log::IR::I() << "    implicit is         " << _implicit;
+        Log::IR::I() << "    implicit is         " << implicit_;
     }
 
  private:
-    int _implicit = INT32_MAX;
+    int implicit_ = INT32_MAX;
 };
 
 } // namespace ir

@@ -25,6 +25,7 @@ class PrimIfLayer : public NNLayer
     {
         this->_then_net = prim_if_layer._then_net;
         this->_else_net = prim_if_layer._else_net;
+        this->else_net_start_layer_ = prim_if_layer.else_net_start_layer_;
     }
 
     virtual ~PrimIfLayer() {}

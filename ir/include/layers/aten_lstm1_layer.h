@@ -35,6 +35,10 @@ class AtenLSTM1Layer : public NNLayer
 
     explicit AtenLSTM1Layer(const AtenLSTM1Layer &aten_lstm1_layer) : NNLayer(aten_lstm1_layer)
     {
+        this->weights_ = aten_lstm1_layer.weights_;
+        this->biases_ = aten_lstm1_layer.biases_;
+        this->weight_ids_ = aten_lstm1_layer.weight_ids_;
+        this->bias_ids_ = aten_lstm1_layer.bias_ids_;
         this->setAttr(aten_lstm1_layer.has_biases_, aten_lstm1_layer.num_layers_, aten_lstm1_layer.dropout_,
                       aten_lstm1_layer.train_, aten_lstm1_layer.bidirectional_, aten_lstm1_layer.batch_first_);
     }

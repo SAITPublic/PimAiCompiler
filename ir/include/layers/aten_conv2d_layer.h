@@ -22,12 +22,14 @@ class AtenConv2dLayer : public NNLayer {
 
     explicit AtenConv2dLayer(const AtenConv2dLayer& aten_conv2d_layer) :
         NNLayer(aten_conv2d_layer) {
-        this->weights_   = aten_conv2d_layer.weights_;
-        this->bias_      = aten_conv2d_layer.bias_;
-        this->stride_    = aten_conv2d_layer.stride_;
-        this->padding_   = aten_conv2d_layer.padding_;
+        this->weights_ = aten_conv2d_layer.weights_;
+        this->bias_ = aten_conv2d_layer.bias_;
+        this->weight_ids_ = aten_conv2d_layer.weight_ids_;
+        this->bias_ids_ = aten_conv2d_layer.bias_ids_;
+        this->stride_ = aten_conv2d_layer.stride_;
+        this->padding_ = aten_conv2d_layer.padding_;
         this->dialation_ = aten_conv2d_layer.dialation_;
-        this->_groups    = aten_conv2d_layer._groups;
+        this->groups_ = aten_conv2d_layer.groups_;
     }
 
     virtual ~AtenConv2dLayer() {}
@@ -64,9 +66,9 @@ class AtenConv2dLayer : public NNLayer {
 
     const std::vector<int64_t> getDialation() const { return dialation_; }
 
-    void setGroups(int64_t groups) { _groups = groups; }
+    void setGroups(int64_t groups) { groups_ = groups; }
 
-    int64_t getGroups() const { return _groups; }
+    int64_t getGroups() const { return groups_; }
 
     void printAttr() {
         Log::IR::I() << "    AtenConv2dAttr          ";
@@ -76,7 +78,7 @@ class AtenConv2dLayer : public NNLayer {
         Log::IR::I() << "    padding[1] is           "<< padding_[1];
         Log::IR::I() << "    dialation[0] is         "<< dialation_[0];
         Log::IR::I() << "    dialation[1] is         "<< dialation_[1];
-        Log::IR::I() << "    groups is               "<< _groups;
+        Log::IR::I() << "    groups is               "<< groups_;
     }
 
  private:
@@ -88,7 +90,7 @@ class AtenConv2dLayer : public NNLayer {
     std::vector<int64_t> padding_ = {0, 0};
     std::vector<int64_t> dialation_ = {1, 1};
 
-    int64_t _groups = INT64_MIN;
+    int64_t groups_ = INT64_MIN;
 };
 
 }  // namespace ir

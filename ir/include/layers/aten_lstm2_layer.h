@@ -31,6 +31,10 @@ class AtenLSTM2Layer : public NNLayer {
     AtenLSTM2Layer(std::string name, LayerType type) : NNLayer(name, type) {}
 
     explicit AtenLSTM2Layer(const AtenLSTM2Layer &aten_lstm2_layer) : NNLayer(aten_lstm2_layer) {
+        this->weights_ = aten_lstm2_layer.weights_;
+        this->biases_ = aten_lstm2_layer.biases_;
+        this->weight_ids_ = aten_lstm2_layer.weight_ids_;
+        this->bias_ids_ = aten_lstm2_layer.bias_ids_;
         this->setAttr(aten_lstm2_layer.has_biases_, aten_lstm2_layer.num_layers_,
                       aten_lstm2_layer.dropout_, aten_lstm2_layer.train_,
                       aten_lstm2_layer.bidirectional_);

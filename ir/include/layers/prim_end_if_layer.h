@@ -20,7 +20,11 @@ class PrimEndIfLayer : public NNLayer
      */
     PrimEndIfLayer(std::string name, LayerType type) : NNLayer(name, type) {}
 
-    explicit PrimEndIfLayer(const PrimEndIfLayer& prim_end_if_layer) : NNLayer(prim_end_if_layer) {}
+    explicit PrimEndIfLayer(const PrimEndIfLayer& prim_end_if_layer) : NNLayer(prim_end_if_layer) {
+        goto_layer_ = prim_end_if_layer.goto_layer_;
+        is_else_net_ = prim_end_if_layer.is_else_net_;
+        if_layer_id_ = prim_end_if_layer.if_layer_id_;
+    }
 
     virtual std::shared_ptr<NNLayer> clone() { return std::shared_ptr<PrimEndIfLayer>(new PrimEndIfLayer(*this)); }
 
