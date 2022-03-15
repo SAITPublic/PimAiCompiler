@@ -15,12 +15,12 @@ RetVal ModelBuilder::preProcess(std::unique_ptr<nn_compiler::ir::NNModel>& model
     for (auto layer : graph->getLayers()) {
         auto out_stensor_ids = layer->getOutSTensorID();
         for (auto item : out_stensor_ids) {
-            if (item > preload_start_id_) {
-                preload_start_id_ = item;
+            if (item > preload_id_) {
+                preload_id_ = item;
             }
         }
     }
-    preload_start_id_++;
+    preload_id_++;
 
     return RetVal::SUCCESS;
 }
@@ -35,44 +35,61 @@ RetVal ModelBuilder::preloadModel(std::unique_ptr<nn_compiler::ir::NNModel>& mod
             type == nn_compiler::ir::LayerType::ATENCONV2D || type == nn_compiler::ir::LayerType::ATENBATCHNORM2D ||
             type == nn_compiler::ir::LayerType::ATENLINEAR) {
             // For Ops' with weight/bias, preload weights/bias to data_container.
-            
-            //TODO(SRCX): determine whether model builder is necessary.
+            if (type == nn_compiler::ir::LayerType::ATENLSTM1) {
+                auto lstm1_layer = std::dynamic_pointer_cast<ir::AtenLSTM1Layer>(layer);
+                auto ids = this->loadWeightAndBias(lstm1_layer->getWeights(), lstm1_layer->getBiases());
+                lstm1_layer->setWeightIds(ids.first);
+                lstm1_layer->setBiasIds(ids.second);
+            } else if (type == nn_compiler::ir::LayerType::ATENLSTM2) {
+                auto lstm2_layer = std::dynamic_pointer_cast<ir::AtenLSTM2Layer>(layer);
+                auto ids = this->loadWeightAndBias(lstm2_layer->getWeights(), lstm2_layer->getBiases());
+                lstm2_layer->setWeightIds(ids.first);
+                lstm2_layer->setBiasIds(ids.second);
+            } else if (type == nn_compiler::ir::LayerType::ATENCONV2D) {
+                auto conv2d_layer = std::dynamic_pointer_cast<ir::AtenConv2dLayer>(layer);
+                auto ids = this->loadWeightAndBias(conv2d_layer->getWeights(), conv2d_layer->getBiases());
+                conv2d_layer->setWeightIds(ids.first);
+                conv2d_layer->setBiasIds(ids.second);
+            } else if (type == nn_compiler::ir::LayerType::ATENBATCHNORM2D) {
+                auto bn2d_layer = std::dynamic_pointer_cast<ir::AtenBatchNorm2dLayer>(layer);
+                auto ids = this->loadWeightAndBias(bn2d_layer->getWeights(), bn2d_layer->getBiases());
+                bn2d_layer->setWeightIds(ids.first);
+                bn2d_layer->setBiasIds(ids.second);
+            } else if (type == nn_compiler::ir::LayerType::ATENLINEAR) {
+                auto linear_layer = std::dynamic_pointer_cast<ir::AtenLinearLayer>(layer);
+                auto ids = this->loadWeightAndBias(linear_layer->getWeights(), linear_layer->getBiases());
+                linear_layer->setWeightIds(ids.first);
+                linear_layer->setBiasIds(ids.second);
+            }
         }
     }
 
     return RetVal::SUCCESS;
 }
 
-RetVal ModelBuilder::loadWeightAndBias(nn_compiler::ir::DTensor& data){
-    auto this_id = preload_start_id_++;
-    auto stensor = data.getTensorShape();
-    auto bit_width = data.getBitWidth();
+std::pair<std::vector<int64_t>, std::vector<int64_t> >
+ModelBuilder::loadWeightAndBias(std::vector<at::Tensor> weight_data, std::vector<at::Tensor> bias_data) {
+    std::vector<int64_t> weight_ids;
+    std::vector<int64_t> bias_ids;
 
-    at::ScalarType scalar_type;
-
-    std::vector<int64_t> shape_arr;
-    if (stensor.getBatch() > 0) shape_arr.push_back(stensor.getBatch());
-    if (stensor.getChannel() > 0) shape_arr.push_back(stensor.getChannel());
-    if (stensor.getHeight() > 0) shape_arr.push_back(stensor.getHeight());
-    if (stensor.getWidth() > 0) shape_arr.push_back(stensor.getWidth());
-
-    if (bit_width == 16) {
-        auto value_vec = data.getData<half_float::half>();
-        scalar_type = torch::kHalf;
-        auto tensor_data = at::from_blob(value_vec->data(), shape_arr, scalar_type).cuda();
-        torch::jit::IValue iv = torch::jit::IValue(tensor_data);
+    for (auto data : weight_data) {
+        auto this_id = preload_id_++;
+        auto cuda_data = std::move(data.cuda());
+        torch::jit::IValue iv = torch::jit::IValue(cuda_data);
         this->preloaded_data_container_.insert({this_id, {DataType::TENSOR, iv}});
-    } else if (bit_width == 32) {
-        auto value_vec = data.getData<float>();
-        scalar_type = torch::kFloat;
-        auto tensor_data = at::from_blob(value_vec->data(), shape_arr, scalar_type).cuda();
-        torch::jit::IValue iv = torch::jit::IValue(tensor_data);
+
+        weight_ids.push_back(this_id);
+    }
+    for (auto data : bias_data) {
+        auto this_id = preload_id_++;
+        auto cuda_data = std::move(data.cuda());
+        torch::jit::IValue iv = torch::jit::IValue(cuda_data);
         this->preloaded_data_container_.insert({this_id, {DataType::TENSOR, iv}});
-    } else {
-        DLOG(FATAL) << "Bit witdh Error!";
+
+        bias_ids.push_back(this_id);
     }
 
-    return RetVal::SUCCESS;
+    return std::make_pair(weight_ids, bias_ids);
 }
 
 }  // namespace runtime

@@ -35,8 +35,8 @@ class AtenLSTM1Layer : public NNLayer
 
     explicit AtenLSTM1Layer(const AtenLSTM1Layer &aten_lstm1_layer) : NNLayer(aten_lstm1_layer)
     {
-        this->setAttr(aten_lstm1_layer._has_biases, aten_lstm1_layer._num_layers, aten_lstm1_layer._dropout,
-                      aten_lstm1_layer._train, aten_lstm1_layer._bidirectional, aten_lstm1_layer._batch_first);
+        this->setAttr(aten_lstm1_layer.has_biases_, aten_lstm1_layer.num_layers_, aten_lstm1_layer.dropout_,
+                      aten_lstm1_layer.train_, aten_lstm1_layer.bidirectional_, aten_lstm1_layer.batch_first_);
     }
 
     virtual ~AtenLSTM1Layer() {}
@@ -52,76 +52,67 @@ class AtenLSTM1Layer : public NNLayer
     void printAttr()
     {
         Log::IR::I() << "     AtenLSTM1Attr   ";
-        Log::IR::I() << "     has_biases is    " << this->_has_biases;
-        Log::IR::I() << "     num_layers is    " << this->_num_layers;
-        Log::IR::I() << "     dropout is       " << this->_dropout;
-        Log::IR::I() << "     bidirectional is " << this->_bidirectional;
-        Log::IR::I() << "     train is         " << this->_train;
-        Log::IR::I() << "     batch_first is   " << this->_batch_first;
+        Log::IR::I() << "     has_biases is    " << this->has_biases_;
+        Log::IR::I() << "     num_layers is    " << this->num_layers_;
+        Log::IR::I() << "     dropout is       " << this->dropout_;
+        Log::IR::I() << "     bidirectional is " << this->bidirectional_;
+        Log::IR::I() << "     train is         " << this->train_;
+        Log::IR::I() << "     batch_first is   " << this->batch_first_;
     }
 
-   private:
-    int _has_biases = INT32_MAX;
-    int64_t _num_layers = INT64_MIN;
-    double _dropout = DBL_MAX;
-    int _train = INT32_MAX;
-    int _bidirectional = INT32_MAX;
-    int _batch_first = INT32_MAX;
-    // weights & bias, 8 or 12 tensors
-    std::vector<at::Tensor> _weights;     // only weight, dim > 1
-    std::vector<at::Tensor> _biases;        // bias, dim == 1
-
-    // LSTM type, helper info for building ir, it will not be saved to ir file
-    int _lstm_type = 0;
-    bool match_custom_opt_;
-    int custom_opt_number_;
-
-   public:
     void setAttr(int has_biases, int64_t num_layers, double dropout, int train, int bidirectional, int batch_first)
     {
-        this->_has_biases = has_biases;
-        this->_num_layers = num_layers;
-        this->_dropout = dropout;
-        this->_train = train;
-        this->_bidirectional = bidirectional;
-        this->_batch_first = batch_first;
+        this->has_biases_ = has_biases;
+        this->num_layers_ = num_layers;
+        this->dropout_ = dropout;
+        this->train_ = train;
+        this->bidirectional_ = bidirectional;
+        this->batch_first_ = batch_first;
     }
 
-    std::vector<at::Tensor> getWeights() { return this->_weights; }
+    std::vector<at::Tensor> getWeights() { return this->weights_; }
 
     void setWeights(const std::vector<at::Tensor> &weights) {
-        this->_weights = weights;
+        this->weights_ = weights;
     }
 
-    std::vector<at::Tensor> getBiases() { return this->_biases; }
+    std::vector<at::Tensor> getBiases() { return this->biases_; }
 
     void setBiases(const std::vector<at::Tensor> &biases) {
-        this->_biases = biases;
+        this->biases_ = biases;
     }
 
-    int getHasBiases() { return this->_has_biases; }
+    std::vector<int64_t> getWeightIds() { return weight_ids_; }
 
-    void setHasBiases(int has_biases) { this->_has_biases = has_biases; }
+    void setWeightIds(const std::vector<int64_t>& weight_ids) { weight_ids_ = weight_ids; }
 
-    int64_t getNumLayers() { return this->_num_layers; }
+    std::vector<int64_t> getBiasIds() { return bias_ids_; }
 
-    void setNumLayers(int64_t num_layers) { this->_num_layers = num_layers; }
+    void setBiasIds(const std::vector<int64_t>& bias_ids) { bias_ids_ = bias_ids; }
 
-    double getDropout() { return _dropout; }
+    int getHasBiases() { return this->has_biases_; }
 
-    void setDropout(double dropout) { this->_dropout = dropout; }
+    void setHasBiases(int has_biases) { this->has_biases_ = has_biases; }
 
-    int getTrain() { return this->_train; }
+    int64_t getNumLayers() { return this->num_layers_; }
 
-    void setTrain(int train) { this->_train = train; }
+    void setNumLayers(int64_t num_layers) { this->num_layers_ = num_layers; }
 
-    int getBidirectional() { return this->_bidirectional; }
+    double getDropout() { return dropout_; }
 
-    void setBidirectional(int bidirectional) { this->_bidirectional = bidirectional; }
+    void setDropout(double dropout) { this->dropout_ = dropout; }
 
-    int getBatchFirst() { return this->_batch_first; }
+    int getTrain() { return this->train_; }
 
-    void setBatchFirst(int batch_first) { this->_batch_first = batch_first; }
+    void setTrain(int train) { this->train_ = train; }
+
+    int getBidirectional() { return this->bidirectional_; }
+
+    void setBidirectional(int bidirectional) { this->bidirectional_ = bidirectional; }
+
+    int getBatchFirst() { return this->batch_first_; }
+
+    void setBatchFirst(int batch_first) { this->batch_first_ = batch_first; }
 
     struct AtenLSTM1LayerAttr {
         int has_biases;
@@ -135,14 +126,32 @@ class AtenLSTM1Layer : public NNLayer
     AtenLSTM1LayerAttr getAttr()
     {
         AtenLSTM1LayerAttr attrs;
-        attrs.has_biases = this->_has_biases;
-        attrs.num_layers = this->_num_layers;
-        attrs.dropout = this->_dropout;
-        attrs.train = this->_train;
-        attrs.bidirectional = this->_bidirectional;
-        attrs.batch_first = this->_batch_first;
+        attrs.has_biases = this->has_biases_;
+        attrs.num_layers = this->num_layers_;
+        attrs.dropout = this->dropout_;
+        attrs.train = this->train_;
+        attrs.bidirectional = this->bidirectional_;
+        attrs.batch_first = this->batch_first_;
         return attrs;
     }
+
+   private:
+    int has_biases_ = INT32_MAX;
+    int64_t num_layers_ = INT64_MIN;
+    double dropout_ = DBL_MAX;
+    int train_ = INT32_MAX;
+    int bidirectional_ = INT32_MAX;
+    int batch_first_ = INT32_MAX;
+
+    // weights & bias, 8 or 12 tensors
+    std::vector<at::Tensor> weights_;     // only weight, dim > 1
+    std::vector<at::Tensor> biases_;        // bias, dim == 1
+    std::vector<int64_t> weight_ids_;
+    std::vector<int64_t> bias_ids_;
+
+    int lstm_type_ = 0;
+    bool match_custom_opt_;
+    int custom_opt_number_;
 };
 }  // namespace ir
 }  // namespace nn_compiler

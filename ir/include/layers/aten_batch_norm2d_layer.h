@@ -33,15 +33,19 @@ class AtenBatchNorm2dLayer : public NNLayer {
 
     std::vector<at::Tensor> getWeights() { return this->weights_; }
 
-    void setWeights(const std::vector<at::Tensor> &weights) {
-        this->weights_ = weights;
-    }
+    void setWeights(const std::vector<at::Tensor> &weights) { weights_ = weights; }
 
     std::vector<at::Tensor> getBiases() { return this->bias_; }
 
-    void setBiases(const std::vector<at::Tensor> &bias) {
-        this->bias_ = bias;
-    }
+    void setBiases(const std::vector<at::Tensor> &bias) { bias_ = bias; }
+
+    std::vector<int64_t> getWeightIds() { return weight_ids_; }
+
+    void setWeightIds(const std::vector<int64_t>& weight_ids) { weight_ids_ = weight_ids; }
+
+    std::vector<int64_t> getBiasIds() { return bias_ids_; }
+
+    void setBiasIds(const std::vector<int64_t>& bias_ids) { bias_ids_ = bias_ids; }
 
     void setTraining(int training) { training_ = training; }
 
@@ -70,6 +74,8 @@ class AtenBatchNorm2dLayer : public NNLayer {
  private:
     std::vector<at::Tensor> weights_;
     std::vector<at::Tensor> bias_;
+    std::vector<int64_t> weight_ids_;
+    std::vector<int64_t> bias_ids_;
     int training_  = INT32_MAX;
     double momentum_ = DBL_MAX;
     double eps_ = DBL_MAX;

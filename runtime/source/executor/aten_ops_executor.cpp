@@ -861,7 +861,7 @@ void executorAtenConv2d(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, Stream
 {
     DLOG(INFO) << "execute Aten Conv2d node";
 
-    auto con2d_layer = std::dynamic_pointer_cast<nn_compiler::ir::AtenConv2dLayer>(layer);
+    auto conv2d_layer = std::dynamic_pointer_cast<nn_compiler::ir::AtenConv2dLayer>(layer);
 
     auto in_stensor_id = layer->getInSTensorID();
     auto out_stensor_id = layer->getOutSTensorID();
@@ -870,16 +870,20 @@ void executorAtenConv2d(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, Stream
     assert(iv_self.isTensor());
     at::Tensor self_tensor = iv_self.toTensor();
 
-    std::vector<at::Tensor> weights;
-    auto weight_tensor = con2d_layer->getWeights()[0];
-    auto bias_tensor = con2d_layer->getBiases()[0];
+    auto weight_ids = conv2d_layer->getWeightIds();
+    auto bias_ids = conv2d_layer->getBiasIds();
+    auto weight_iv = stream_executor.findBlob(weight_ids[0]).second;
+    auto bias_iv = stream_executor.findBlob(bias_ids[0]).second;
+    assert(weight_iv.isTensor() && bias_iv.isTensor());
+    at::Tensor weight_tensor = weight_iv.toTensor();
+    at::Tensor bias_tensor = bias_iv.toTensor();
 
     // attributes of conv2d don't need default-value check, because its default values
     // are set as same as default values in aten::conv2d.
-    auto stride = con2d_layer->getStride();
-    auto padding = con2d_layer->getPadding();
-    auto dilation = con2d_layer->getDialation();
-    auto groups = con2d_layer->getGroups();
+    auto stride = conv2d_layer->getStride();
+    auto padding = conv2d_layer->getPadding();
+    auto dilation = conv2d_layer->getDialation();
+    auto groups = conv2d_layer->getGroups();
 
     std::vector<int64_t> stride_vec = {static_cast<int64_t>(stride[0]), static_cast<int64_t>(stride[1])};
     std::vector<int64_t> padding_vec = {static_cast<int64_t>(padding[0]), static_cast<int64_t>(padding[1])};
@@ -1678,13 +1682,17 @@ void executorAtenLinear(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, Stream
     assert(iv_tensor.isTensor());
     auto tensor = iv_tensor.toTensor();
 
-    std::vector<at::Tensor> weights;
-    auto weight_tensor = linear_layer->getWeights()[0];
+    auto weight_ids = linear_layer->getWeightIds();
+    auto weight_iv = stream_executor.findBlob(weight_ids[0]).second;
+    assert(weight_iv.isTensor());
+    at::Tensor weight_tensor = weight_iv.toTensor();
 
     at::Tensor output;
     if (!linear_layer->getBiases().empty()) {
-        std::vector<at::Tensor> bias;
-        auto bias_tensor = linear_layer->getBiases()[0];
+        auto bias_ids = linear_layer->getBiasIds();
+        auto bias_iv = stream_executor.findBlob(bias_ids[0]).second;
+        assert(bias_iv.isTensor());
+        at::Tensor bias_tensor = bias_iv.toTensor();
         output = atenLinear(tensor, weight_tensor, bias_tensor);
     } else {
         output = atenLinear(tensor, weight_tensor);
@@ -1853,34 +1861,36 @@ void executorAtenLSTM1(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamE
     // param layerout (bidirctional) --> (fw_w_ih, fw_w_hh, fw_b_ih?, fw_b_hh?, bw_w_ih, bw_w_hh, bw_b_ih?, bw_b_hh?) *
     // layers
 
-    auto weight_blob = lstm1_layer->getWeights();
-    auto bias_blob = lstm1_layer->getBiases();
+    auto weight_ids = lstm1_layer->getWeightIds();
+    auto bias_ids = lstm1_layer->getBiasIds();
     std::vector<at::Tensor> param_vector;
     assert((bidirectional == 0 || bidirectional == 1));
     int hash_id = 0;
     for (int i = 0; i < num_layers * (bidirectional + 1); i++) {
         // w_ih
-        auto w_ih_iv = weight_blob[i * 2];
-        hash_id += in_stensor_id[0];
-        if (1) {
-            param_vector.push_back(w_ih_iv);
+        auto w_ih_iv = stream_executor.findBlob(weight_ids[i * 2]).second;
+        hash_id += weight_ids[i * 2];
+        if (w_ih_iv.isTensor()) {
+            param_vector.push_back(w_ih_iv.toTensor());
         }
         // w_hh
-        auto w_hh_iv = weight_blob[i * 2 + 1];
-        hash_id += in_stensor_id[1];
-        if (1) {
-            param_vector.push_back(w_hh_iv);
+        auto w_hh_iv = stream_executor.findBlob(weight_ids[i * 2 + 1]).second;
+        hash_id += weight_ids[i * 2 + 1];
+        if (w_hh_iv.isTensor()) {
+            param_vector.push_back(w_hh_iv.toTensor());
         }
         if (has_biases) {
             // b_ih? (optional)
-            auto b_ih_iv = bias_blob[i * 2];
-            if (1) {
-                param_vector.push_back(b_ih_iv);
+            auto b_ih_iv = stream_executor.findBlob(bias_ids[i * 2]).second;
+            hash_id += bias_ids[i * 2];
+            if (b_ih_iv.isTensor()) {
+                param_vector.push_back(b_ih_iv.toTensor());
             }
             // b_hh? (optional)
-            auto b_hh_iv = bias_blob[i * 2 + 1];
-            if (1) {
-                param_vector.push_back(b_hh_iv);
+            auto b_hh_iv = stream_executor.findBlob(bias_ids[i * 2 + 1]).second;
+            hash_id += bias_ids[i * 2 + 1];
+            if (b_hh_iv.isTensor()) {
+                param_vector.push_back(b_hh_iv.toTensor());
             }
         }
     }
@@ -2080,7 +2090,6 @@ void executorAtenLSTM1(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamE
                                   stream_executor.hidden_tensor_, hx_dev, stream_executor.hidden_tensor_, cx_dev, stream_executor.weight_tensor_, wei_dev,
                                   stream_executor.output_tensors_.data(), out_dev, stream_executor.hidden_tensor_, hy_dev, stream_executor.hidden_tensor_, cy_dev,
                                   workspace_dev, workspace_size);
-
         } else {
             auto output = at::empty({in_len[0], seq_len, out_len[0]}, input.options());
             out_dev = output.data_ptr();
@@ -2094,7 +2103,6 @@ void executorAtenLSTM1(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamE
                 hy_dev = hy.data_ptr();
                 cy_dev = cy.data_ptr();
 
-                // TODO(SRCX): implement this part of optimization.
                 if (stream_executor.model_type_ == "GNMT" && lstm1_layer->getMatchCustomOpt()) {
                     int cat_f = 22222;
                     auto cat = stream_executor.global_blobs_.find(cat_f);
@@ -2121,7 +2129,6 @@ void executorAtenLSTM1(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamE
                         hy_dev = hy.data_ptr();
                         cy_dev = cy.data_ptr();
                     }
-
                     if (stream_executor.model_type_ == "GNMT" && lstm1_layer->getCustomOptNumber() == 0) {
                         auto out4_layer = stream_executor.getGraph()->getLayerByPosition((layer->getNextLayerIDs())[3]);
                         auto out4_out1_layer = stream_executor.getGraph()->getLayerByPosition((out4_layer->getNextLayerIDs())[0]);
@@ -2241,35 +2248,37 @@ void executorAtenLSTM2(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamE
     // param layerout (bidirctional) --> (fw_w_ih, fw_w_hh, fw_b_ih?, fw_b_hh?, bw_w_ih, bw_w_hh, bw_b_ih?, bw_b_hh?) *
     // layers
 
-    auto weight_blob = lstm2_layer->getWeights();
-    auto bias_blob = lstm2_layer->getBiases();
+    auto weight_ids = lstm2_layer->getWeightIds();
+    auto bias_ids = lstm2_layer->getBiasIds();
     std::vector<at::Tensor> param_vector;
     assert((bidirectional == 0 || bidirectional == 1));
 
     int hash_id = 0;
     for (int i = 0; i < num_layers * (bidirectional + 1); i++) {
         // w_ih
-        auto w_ih_iv = weight_blob[i * 2];
-        hash_id += in_stensor_id[0];
-        if (1) {
-            param_vector.push_back(w_ih_iv);
+        auto w_ih_iv = stream_executor.findBlob(weight_ids[i * 2]).second;
+        hash_id += weight_ids[i * 2];
+        if (w_ih_iv.isTensor()) {
+            param_vector.push_back(w_ih_iv.toTensor());
         }
         // w_hh
-        auto w_hh_iv = weight_blob[i * 2 + 1];
-        hash_id += in_stensor_id[1];
-        if (1) {
-            param_vector.push_back(w_hh_iv);
+        auto w_hh_iv = stream_executor.findBlob(weight_ids[i * 2 + 1]).second;
+        hash_id += weight_ids[i * 2 + 1];
+        if (w_hh_iv.isTensor()) {
+            param_vector.push_back(w_hh_iv.toTensor());
         }
         if (has_biases) {
             // b_ih? (optional)
-            auto b_ih_iv = bias_blob[i * 2];
-            if (1) {
-                param_vector.push_back(b_ih_iv);
+            auto b_ih_iv = stream_executor.findBlob(bias_ids[i * 2]).second;
+            hash_id += bias_ids[i * 2];
+            if (b_ih_iv.isTensor()) {
+                param_vector.push_back(b_ih_iv.toTensor());
             }
             // b_hh? (optional)
-            auto b_hh_iv = bias_blob[i * 2 + 1];
-            if (1) {
-                param_vector.push_back(b_hh_iv);
+            auto b_hh_iv = stream_executor.findBlob(bias_ids[i * 2 + 1]).second;
+            hash_id += bias_ids[i * 2 + 1];
+            if (b_hh_iv.isTensor()) {
+                param_vector.push_back(b_hh_iv.toTensor());
             }
         }
     }
@@ -4069,11 +4078,15 @@ void executorAtenBatchNorm2d(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, S
     at::Tensor running_mean = get_tensor(in_stensor_id[1]);
     at::Tensor running_var = get_tensor(in_stensor_id[2]);
 
-    auto weight_ = batch_norm_2d_layer->getWeights();
-    auto bias_ = batch_norm_2d_layer->getBiases();
-    assert(weight_.size() == 1 && bias_.size() == 1);
-    at::Tensor weight = weight_[0];
-    at::Tensor bias = bias_[0];
+    auto weight_ids = batch_norm_2d_layer->getWeightIds();
+    auto bias_ids = batch_norm_2d_layer->getBiasIds();
+    assert(weight_ids.size() == 1 && bias_ids.size() == 1);
+    auto weight_iv = stream_executor.findBlob(weight_ids[0]).second;
+    assert(weight_iv.isTensor());
+    at::Tensor weight = weight_iv.toTensor();
+    auto bias_iv = stream_executor.findBlob(bias_ids[0]).second;
+    assert(bias_iv.isTensor());
+    at::Tensor bias = bias_iv.toTensor();
 
     // Get input attrs
     int training = batch_norm_2d_layer->getTraining();

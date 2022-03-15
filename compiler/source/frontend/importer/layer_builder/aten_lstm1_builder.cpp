@@ -36,8 +36,7 @@ std::shared_ptr<ir::NNLayer> AtenLSTM1Builder::buildLayer(const torch::jit::Node
         assert(constant_node->kind() == c10::prim::Constant);
         assert(constant_node->hasAttribute(c10::attr::value));
         // get the at::Tensor from prim::Constant
-        auto torch_tensor_cpu = constant_node->t(c10::attr::value);
-        auto torch_tensor = std::move(torch_tensor_cpu.cuda());
+        auto torch_tensor = constant_node->t(c10::attr::value);
         if (torch_tensor.dim() == 1) {
             bias_vec.push_back(torch_tensor);
         } else {

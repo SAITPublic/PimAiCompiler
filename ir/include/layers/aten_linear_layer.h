@@ -33,13 +33,17 @@ class AtenLinearLayer : public NNLayer {
 
     std::vector<at::Tensor> getBiases() { return this->biases_; }
 
-    void setWeights(const std::vector<at::Tensor> &weights) {
-        this->weights_ = weights;
-    }
+    void setWeights(const std::vector<at::Tensor> &weights) { weights_ = weights; }
 
-    void setBiases(const std::vector<at::Tensor> &biases) {
-        this->biases_ = biases;
-    }
+    void setBiases(const std::vector<at::Tensor> &biases) { biases_ = biases; }
+
+    std::vector<int64_t> getWeightIds() { return weight_ids_; }
+
+    void setWeightIds(const std::vector<int64_t>& weight_ids) { weight_ids_ = weight_ids; }
+
+    std::vector<int64_t> getBiasIds() { return bias_ids_; }
+
+    void setBiasIds(const std::vector<int64_t>& bias_ids) { bias_ids_ = bias_ids; }
 
     void printAttr() {
         Log::IR::I() << "    AtenLinearAttr      ";
@@ -48,6 +52,8 @@ class AtenLinearLayer : public NNLayer {
  private:
     std::vector<at::Tensor> weights_;
     std::vector<at::Tensor> biases_;
+    std::vector<int64_t> weight_ids_;
+    std::vector<int64_t> bias_ids_;
 };
 
 }  // namespace ir

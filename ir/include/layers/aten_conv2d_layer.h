@@ -22,11 +22,11 @@ class AtenConv2dLayer : public NNLayer {
 
     explicit AtenConv2dLayer(const AtenConv2dLayer& aten_conv2d_layer) :
         NNLayer(aten_conv2d_layer) {
-        this->_weights   = aten_conv2d_layer._weights;
-        this->_bias      = aten_conv2d_layer._bias;
-        this->_stride    = aten_conv2d_layer._stride;
-        this->_padding   = aten_conv2d_layer._padding;
-        this->_dialation = aten_conv2d_layer._dialation;
+        this->weights_   = aten_conv2d_layer.weights_;
+        this->bias_      = aten_conv2d_layer.bias_;
+        this->stride_    = aten_conv2d_layer.stride_;
+        this->padding_   = aten_conv2d_layer.padding_;
+        this->dialation_ = aten_conv2d_layer.dialation_;
         this->_groups    = aten_conv2d_layer._groups;
     }
 
@@ -36,29 +36,33 @@ class AtenConv2dLayer : public NNLayer {
         return  std::shared_ptr<AtenConv2dLayer>(new AtenConv2dLayer(*this));
     }
 
-    std::vector<at::Tensor> getWeights() { return this->_weights; }
+    std::vector<at::Tensor> getWeights() { return this->weights_; }
 
-    void setWeights(const std::vector<at::Tensor> &weights) {
-        this->_weights = weights;
-    }
+    void setWeights(const std::vector<at::Tensor> &weights) { weights_ = weights; }
 
-    std::vector<at::Tensor> getBiases() { return this->_bias; }
+    std::vector<at::Tensor> getBiases() { return this->bias_; }
 
-    void setBiases(const std::vector<at::Tensor> &bias) {
-        this->_bias = bias;
-    }
+    void setBiases(const std::vector<at::Tensor> &bias) { bias_ = bias; }
 
-    void setStride(const std::vector<int64_t> &stride) { _stride = stride; }
+    std::vector<int64_t> getWeightIds() { return weight_ids_; }
 
-    const std::vector<int64_t> getStride() const { return _stride; }
+    void setWeightIds(const std::vector<int64_t>& weight_ids) { weight_ids_ = weight_ids; }
 
-    void setPadding(const std::vector<int64_t> &padding) { _padding = padding; }
+    std::vector<int64_t> getBiasIds() { return bias_ids_; }
 
-    const std::vector<int64_t> getPadding() const { return _padding; }
+    void setBiasIds(const std::vector<int64_t>& bias_ids) { bias_ids_ = bias_ids; }
 
-    void setDialation(const std::vector<int64_t> &dialation) { _dialation = dialation; }
+    void setStride(const std::vector<int64_t> &stride) { stride_ = stride; }
 
-    const std::vector<int64_t> getDialation() const { return _dialation; }
+    const std::vector<int64_t> getStride() const { return stride_; }
+
+    void setPadding(const std::vector<int64_t> &padding) { padding_ = padding; }
+
+    const std::vector<int64_t> getPadding() const { return padding_; }
+
+    void setDialation(const std::vector<int64_t> &dialation) { dialation_ = dialation; }
+
+    const std::vector<int64_t> getDialation() const { return dialation_; }
 
     void setGroups(int64_t groups) { _groups = groups; }
 
@@ -66,21 +70,23 @@ class AtenConv2dLayer : public NNLayer {
 
     void printAttr() {
         Log::IR::I() << "    AtenConv2dAttr          ";
-        Log::IR::I() << "    stride[0] is            "<< _stride[0];
-        Log::IR::I() << "    stride[1] is            "<< _stride[1];
-        Log::IR::I() << "    padding[0] is           "<< _padding[0];
-        Log::IR::I() << "    padding[1] is           "<< _padding[1];
-        Log::IR::I() << "    dialation[0] is         "<< _dialation[0];
-        Log::IR::I() << "    dialation[1] is         "<< _dialation[1];
+        Log::IR::I() << "    stride[0] is            "<< stride_[0];
+        Log::IR::I() << "    stride[1] is            "<< stride_[1];
+        Log::IR::I() << "    padding[0] is           "<< padding_[0];
+        Log::IR::I() << "    padding[1] is           "<< padding_[1];
+        Log::IR::I() << "    dialation[0] is         "<< dialation_[0];
+        Log::IR::I() << "    dialation[1] is         "<< dialation_[1];
         Log::IR::I() << "    groups is               "<< _groups;
     }
 
  private:
-    std::vector<at::Tensor> _weights;
-    std::vector<at::Tensor> _bias;
-    std::vector<int64_t> _stride = {1, 1};
-    std::vector<int64_t> _padding = {0, 0};
-    std::vector<int64_t> _dialation = {1, 1};
+    std::vector<at::Tensor> weights_;
+    std::vector<at::Tensor> bias_;
+    std::vector<int64_t> weight_ids_;
+    std::vector<int64_t> bias_ids_;
+    std::vector<int64_t> stride_ = {1, 1};
+    std::vector<int64_t> padding_ = {0, 0};
+    std::vector<int64_t> dialation_ = {1, 1};
 
     int64_t _groups = INT64_MIN;
 };

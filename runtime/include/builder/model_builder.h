@@ -20,14 +20,15 @@ class ModelBuilder
 
     RetVal preloadModel(std::unique_ptr<nn_compiler::ir::NNModel>& model);
 
-    RetVal loadWeightAndBias(nn_compiler::ir::DTensor &data);
+    std::pair<std::vector<int64_t>, std::vector<int64_t> >
+    loadWeightAndBias(std::vector<at::Tensor> weight_data, std::vector<at::Tensor> bias_data);
 
     data_store_type getPreLoadedData() { return preloaded_data_container_; }
 
    private:
     data_store_type preloaded_data_container_;
 
-    int preload_start_id_ = 0;
+    int64_t preload_id_ = 0;
 };
 
 }  // namespace runtime
