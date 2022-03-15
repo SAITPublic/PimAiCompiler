@@ -49,8 +49,6 @@ void NNRuntime::inferenceModel(std::unique_ptr<nn_compiler::ir::NNModel>& model,
         DLOG(FATAL) << " inference model fail!";
     }
 
-    // for simple test, fill zeros to outputs
-    // output_tensors.push_back(torch::zeros({10, 10}, torch::kF16));
     DLOG(INFO) << "Num of Outputs: " << output_tensors.size();
 }
 

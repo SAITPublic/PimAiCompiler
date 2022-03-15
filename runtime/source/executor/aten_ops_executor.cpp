@@ -23,7 +23,7 @@ void executorAtenAdd(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExe
 {
     DLOG(INFO) << "execute Aten Add node";
 
-    auto add_layer = std::dynamic_pointer_cast<nn_compiler::ir::AtenAddLayer>(layer);
+    auto add_layer = std::static_pointer_cast<nn_compiler::ir::AtenAddLayer>(layer);
 
     int in_id = 0;
     auto in_stensor_id = layer->getInSTensorID();
@@ -79,13 +79,13 @@ void executorAtenAdd(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExe
             auto input2_layer = stream_executor.getGraph()->getLayerByPosition((layer->getPreLayerIDs())[1]);
             bool add_opt_flag = input1_layer->getType() == nn_compiler::ir::LayerType::ATENLSTM1 &&
                 input2_layer->getType() == nn_compiler::ir::LayerType::ATENLSTM1 &&
-                std::dynamic_pointer_cast<nn_compiler::ir::AtenLSTM1Layer>(input1_layer)->getCustomOptNumber() == 2 &&
-                std::dynamic_pointer_cast<nn_compiler::ir::AtenLSTM1Layer>(input2_layer)->getCustomOptNumber() == 1;
+                std::static_pointer_cast<nn_compiler::ir::AtenLSTM1Layer>(input1_layer)->getCustomOptNumber() == 2 &&
+                std::static_pointer_cast<nn_compiler::ir::AtenLSTM1Layer>(input2_layer)->getCustomOptNumber() == 1;
             if (stream_executor.model_type_ == "GNMT" && add_opt_flag) {
                     auto out1_layer = stream_executor.getGraph()->getLayerByPosition((layer->getNextLayerIDs())[0]);
                     auto out1_out1_layer = stream_executor.getGraph()->getLayerByPosition((out1_layer->getNextLayerIDs())[0]);
                 int cat_mem_id =
-                    std::dynamic_pointer_cast<nn_compiler::ir::AtenCatLayer>(out1_out1_layer)->getMemLayerId();
+                    std::static_pointer_cast<nn_compiler::ir::AtenCatLayer>(out1_out1_layer)->getMemLayerId();
                 auto it = stream_executor.global_blobs_.find(cat_mem_id);
                 auto options = at::TensorOptions().dtype(at::kHalf).device(at::kCUDA);
                 tmp = torch::from_blob((_Float16*)(it->second.second.toTensor().data_ptr()), {1, 1, 1024}, options);
@@ -129,7 +129,7 @@ void executorAtenAddmm(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamE
 {
     DLOG(INFO) << "execute Aten Addmm node";
 
-    auto addmm_layer = std::dynamic_pointer_cast<nn_compiler::ir::AtenAddmmLayer>(layer);
+    auto addmm_layer = std::static_pointer_cast<nn_compiler::ir::AtenAddmmLayer>(layer);
     auto act_type = addmm_layer->get_act_type();
 
     // TODO choose the corresponding kernel when activation type is aten::none, aten::relu, aten::max
@@ -342,7 +342,7 @@ void executorAtenArange1(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, Strea
 {
     DLOG(INFO) << "execute Aten Arange1 node";
 
-    auto arange1_layer = std::dynamic_pointer_cast<nn_compiler::ir::AtenArange1Layer>(layer);
+    auto arange1_layer = std::static_pointer_cast<nn_compiler::ir::AtenArange1Layer>(layer);
 
     auto in_stensor_id = layer->getInSTensorID();
     auto out_stensor_id = layer->getOutSTensorID();
@@ -403,7 +403,7 @@ void executorAtenArange2(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, Strea
 {
     DLOG(INFO) << "execute Aten Arange2 node";
 
-    auto arange2_layer = std::dynamic_pointer_cast<nn_compiler::ir::AtenArange2Layer>(layer);
+    auto arange2_layer = std::static_pointer_cast<nn_compiler::ir::AtenArange2Layer>(layer);
 
     auto in_stensor_id = layer->getInSTensorID();
     auto out_stensor_id = layer->getOutSTensorID();
@@ -470,7 +470,7 @@ void executorAtenArange3(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, Strea
 {
     DLOG(INFO) << "execute Aten Arange3 node";
 
-    auto arange3_layer = std::dynamic_pointer_cast<nn_compiler::ir::AtenArange3Layer>(layer);
+    auto arange3_layer = std::static_pointer_cast<nn_compiler::ir::AtenArange3Layer>(layer);
 
     auto in_stensor_id = layer->getInSTensorID();
     auto out_stensor_id = layer->getOutSTensorID();
@@ -543,7 +543,7 @@ void executorAtenAsTensor(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, Stre
 {
     DLOG(INFO) << "execute Aten AsTensor node";
 
-    auto as_tensor_layer = std::dynamic_pointer_cast<nn_compiler::ir::AtenAsTensorLayer>(layer);
+    auto as_tensor_layer = std::static_pointer_cast<nn_compiler::ir::AtenAsTensorLayer>(layer);
 
     auto in_stensor_id = layer->getInSTensorID();
     auto out_stensor_id = layer->getOutSTensorID();
@@ -613,18 +613,18 @@ void executorAtenBmm(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExe
         auto out2_out3_out1_layer = stream_executor.getGraph()->getLayerByPosition((out2_out3_layer->getNextLayerIDs())[0]);
         // auto end_if_node = op_node.getOutEdge(1).getOutNode();
         int64_t cat_mem_id =
-            std::dynamic_pointer_cast<nn_compiler::ir::AtenCatLayer>(out2_out1_out1_layer)->getMemLayerId();
+            std::static_pointer_cast<nn_compiler::ir::AtenCatLayer>(out2_out1_out1_layer)->getMemLayerId();
         auto it = stream_executor.global_blobs_.find(cat_mem_id);
         auto options = at::TensorOptions().dtype(at::kHalf).device(at::kCUDA);
         tmp0 = torch::from_blob((_Float16*)(it->second.second.toTensor().data_ptr()) + 1024, {1, 1, 1024}, options);
 
         cat_mem_id =
-            std::dynamic_pointer_cast<nn_compiler::ir::AtenCatLayer>(out2_out2_out1_layer)->getMemLayerId();
+            std::static_pointer_cast<nn_compiler::ir::AtenCatLayer>(out2_out2_out1_layer)->getMemLayerId();
         it = stream_executor.global_blobs_.find(cat_mem_id);
         tmp1 = torch::from_blob((_Float16*)(it->second.second.toTensor().data_ptr()) + 1024, {1, 1, 1024}, options);
 
         cat_mem_id =
-            std::dynamic_pointer_cast<nn_compiler::ir::AtenCatLayer>(out2_out3_out1_layer)->getMemLayerId();
+            std::static_pointer_cast<nn_compiler::ir::AtenCatLayer>(out2_out3_out1_layer)->getMemLayerId();
         it = stream_executor.global_blobs_.find(cat_mem_id);
         tmp2 = torch::from_blob((_Float16*)(it->second.second.toTensor().data_ptr()) + 1024, {1, 1, 1024}, options);
     }
@@ -701,7 +701,7 @@ void executorAtenCat(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExe
     auto in_stensor_id = layer->getInSTensorID();
     auto out_stensor_id = layer->getOutSTensorID();
     
-    auto cat_layer = std::dynamic_pointer_cast<nn_compiler::ir::AtenCatLayer>(layer);
+    auto cat_layer = std::static_pointer_cast<nn_compiler::ir::AtenCatLayer>(layer);
 
     std::vector<at::Tensor> tensor_vec;
 
@@ -764,7 +764,7 @@ void executorAtenChunk(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamE
 {
     DLOG(INFO) << "execute Aten Chunk node";
 
-    auto chunk_layer = std::dynamic_pointer_cast<nn_compiler::ir::AtenChunkLayer>(layer);
+    auto chunk_layer = std::static_pointer_cast<nn_compiler::ir::AtenChunkLayer>(layer);
 
     auto in_stensor_id = layer->getInSTensorID();
     auto out_stensor_id = layer->getOutSTensorID();
@@ -794,7 +794,7 @@ void executorAtenClamp(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamE
 {
     DLOG(INFO) << "execute Aten Clamp node";
 
-    auto clamp_layer = std::dynamic_pointer_cast<nn_compiler::ir::AtenClampLayer>(layer);
+    auto clamp_layer = std::static_pointer_cast<nn_compiler::ir::AtenClampLayer>(layer);
 
     auto in_stensor_id = layer->getInSTensorID();
     auto out_stensor_id = layer->getOutSTensorID();
@@ -837,7 +837,7 @@ void executorAtenContiguous(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, St
 {
     DLOG(INFO) << "execute Aten Contiguous node";
 
-    auto contiguous_layer = std::dynamic_pointer_cast<nn_compiler::ir::AtenContiguousLayer>(layer);
+    auto contiguous_layer = std::static_pointer_cast<nn_compiler::ir::AtenContiguousLayer>(layer);
 
     auto in_stensor_id = layer->getInSTensorID();
     auto out_stensor_id = layer->getOutSTensorID();
@@ -861,7 +861,7 @@ void executorAtenConv2d(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, Stream
 {
     DLOG(INFO) << "execute Aten Conv2d node";
 
-    auto conv2d_layer = std::dynamic_pointer_cast<nn_compiler::ir::AtenConv2dLayer>(layer);
+    auto conv2d_layer = std::static_pointer_cast<nn_compiler::ir::AtenConv2dLayer>(layer);
 
     auto in_stensor_id = layer->getInSTensorID();
     auto out_stensor_id = layer->getOutSTensorID();
@@ -899,7 +899,7 @@ void executorAtenCopy(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamEx
 {
     DLOG(INFO) << "execute Aten Copy node";
 
-    auto copy_layer = std::dynamic_pointer_cast<nn_compiler::ir::AtenCopyLayer>(layer);
+    auto copy_layer = std::static_pointer_cast<nn_compiler::ir::AtenCopyLayer>(layer);
 
     auto in_stensor_id = layer->getInSTensorID();
     auto out_stensor_id = layer->getOutSTensorID();
@@ -956,7 +956,7 @@ void executorAtenDeriveIndex(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, S
 {
     DLOG(INFO) << "execute Aten derive_index node";
 
-    auto derive_index_layer = std::dynamic_pointer_cast<nn_compiler::ir::AtenDeriveIndexLayer>(layer);
+    auto derive_index_layer = std::static_pointer_cast<nn_compiler::ir::AtenDeriveIndexLayer>(layer);
 
     auto in_stensor_id = layer->getInSTensorID();
     auto out_stensor_id = layer->getOutSTensorID();
@@ -1038,7 +1038,7 @@ void executorAtenDropout(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, Strea
 {
     DLOG(INFO) << "execute Aten Dropout node";
 
-    auto dropout_layer = std::dynamic_pointer_cast<nn_compiler::ir::AtenDropoutLayer>(layer);
+    auto dropout_layer = std::static_pointer_cast<nn_compiler::ir::AtenDropoutLayer>(layer);
     
     auto in_stensor_id = layer->getInSTensorID();
     auto out_stensor_id = layer->getOutSTensorID();
@@ -1070,7 +1070,7 @@ void executorAtenEmbedding(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, Str
 {
     DLOG(INFO) << "execute Aten Embedding node";
 
-    auto embedding_layer = std::dynamic_pointer_cast<nn_compiler::ir::AtenEmbeddingLayer>(layer);
+    auto embedding_layer = std::static_pointer_cast<nn_compiler::ir::AtenEmbeddingLayer>(layer);
 
     auto in_stensor_id = layer->getInSTensorID();
     auto out_stensor_id = layer->getOutSTensorID();
@@ -1185,7 +1185,7 @@ void executorAtenExpand(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, Stream
 {
     DLOG(INFO) << "execute Aten Expand node";
 
-    auto expand_layer = std::dynamic_pointer_cast<nn_compiler::ir::AtenExpandLayer>(layer);
+    auto expand_layer = std::static_pointer_cast<nn_compiler::ir::AtenExpandLayer>(layer);
 
     auto in_stensor_id = layer->getInSTensorID();
     auto out_stensor_id = layer->getOutSTensorID();
@@ -1274,7 +1274,7 @@ void executorAtenFormat(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, Stream
 {
     DLOG(INFO) << "execute Aten Format node";
 
-    auto format_layer = std::dynamic_pointer_cast<nn_compiler::ir::AtenFormatLayer>(layer);
+    auto format_layer = std::static_pointer_cast<nn_compiler::ir::AtenFormatLayer>(layer);
 
     auto in_stensor_id = layer->getInSTensorID();
     auto out_stensor_id = layer->getOutSTensorID();
@@ -1335,7 +1335,7 @@ void executorAtenGather(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, Stream
 {
     DLOG(INFO) << "execute Aten Gather node";
 
-    auto gather_layer = std::dynamic_pointer_cast<nn_compiler::ir::AtenGatherLayer>(layer);
+    auto gather_layer = std::static_pointer_cast<nn_compiler::ir::AtenGatherLayer>(layer);
 
     auto in_stensor_id = layer->getInSTensorID();
     auto out_stensor_id = layer->getOutSTensorID();
@@ -1400,7 +1400,7 @@ void executorAtenGetItem(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, Strea
 {
     DLOG(INFO) << "execute Aten GetItem node";
 
-    auto get_item_layer = std::dynamic_pointer_cast<nn_compiler::ir::AtenGetItemLayer>(layer);
+    auto get_item_layer = std::static_pointer_cast<nn_compiler::ir::AtenGetItemLayer>(layer);
 
     auto in_stensor_id = layer->getInSTensorID();
     auto out_stensor_id = layer->getOutSTensorID();
@@ -1483,7 +1483,7 @@ void executorAtenIndexPut(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, Stre
 {
     DLOG(INFO) << "execute Aten IndexPut node";
 
-    auto index_put_layer = std::dynamic_pointer_cast<nn_compiler::ir::AtenIndexPutLayer>(layer);
+    auto index_put_layer = std::static_pointer_cast<nn_compiler::ir::AtenIndexPutLayer>(layer);
     
     auto in_stensor_id = layer->getInSTensorID();
     auto out_stensor_id = layer->getOutSTensorID();
@@ -1523,7 +1523,7 @@ void executorAtenIndexSelect(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, S
 {
     DLOG(INFO) << "execute Aten IndexSelect node";
 
-    auto index_select_layer = std::dynamic_pointer_cast<nn_compiler::ir::AtenIndexSelectLayer>(layer);
+    auto index_select_layer = std::static_pointer_cast<nn_compiler::ir::AtenIndexSelectLayer>(layer);
 
     auto in_stensor_id = layer->getInSTensorID();
     auto out_stensor_id = layer->getOutSTensorID();
@@ -1613,7 +1613,7 @@ void executorAtenLeakyRelu(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, Str
 {
     DLOG(INFO) << "execute Aten LeakyRelu node";
 
-    auto leaky_relu_layer = std::dynamic_pointer_cast<nn_compiler::ir::AtenLeakyReluLayer>(layer);
+    auto leaky_relu_layer = std::static_pointer_cast<nn_compiler::ir::AtenLeakyReluLayer>(layer);
 
     auto in_stensor_id = layer->getInSTensorID();
     auto out_stensor_id = layer->getOutSTensorID();
@@ -1656,7 +1656,7 @@ void executorAtenLen(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExe
         if (stream_executor.model_type_ == "GNMT" &&
             input1_layer->getType() == nn_compiler::ir::LayerType::PRIMVARIABLE &&
             iv.toList().size() == 4) {
-            int next_node_id = std::dynamic_pointer_cast<nn_compiler::ir::PrimLoopLayer>(out1_layer)->getGotoLayer() - 1;
+            int next_node_id = std::static_pointer_cast<nn_compiler::ir::PrimLoopLayer>(out1_layer)->getGotoLayer() - 1;
             stream_executor.setCursor(next_node_id);
         }
     } else if (iv.isTensor()) {
@@ -1673,7 +1673,7 @@ void executorAtenLinear(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, Stream
 {
     DLOG(INFO) << "execute Aten Linear node";
 
-    auto linear_layer = std::dynamic_pointer_cast<nn_compiler::ir::AtenLinearLayer>(layer);
+    auto linear_layer = std::static_pointer_cast<nn_compiler::ir::AtenLinearLayer>(layer);
 
     auto in_stensor_id = layer->getInSTensorID();
     auto out_stensor_id = layer->getOutSTensorID();
@@ -1736,7 +1736,7 @@ void executorAtenLogSoftmax(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, St
 {
     DLOG(INFO) << "execute Aten LogSoftmax node";
 
-    auto log_softmax_layer = std::dynamic_pointer_cast<nn_compiler::ir::AtenLogSoftmaxLayer>(layer);
+    auto log_softmax_layer = std::static_pointer_cast<nn_compiler::ir::AtenLogSoftmaxLayer>(layer);
 
     auto in_stensor_id = layer->getInSTensorID();
     auto out_stensor_id = layer->getOutSTensorID();
@@ -1779,7 +1779,7 @@ void executorAtenLSTM1(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamE
 {
     DLOG(INFO) << "execute Aten LSTM1 node";
 
-    auto lstm1_layer = std::dynamic_pointer_cast<nn_compiler::ir::AtenLSTM1Layer>(layer);
+    auto lstm1_layer = std::static_pointer_cast<nn_compiler::ir::AtenLSTM1Layer>(layer);
 
     auto in_stensor_id = layer->getInSTensorID();
     auto out_stensor_id = layer->getOutSTensorID();
@@ -2133,7 +2133,7 @@ void executorAtenLSTM1(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamE
                         auto out4_layer = stream_executor.getGraph()->getLayerByPosition((layer->getNextLayerIDs())[3]);
                         auto out4_out1_layer = stream_executor.getGraph()->getLayerByPosition((out4_layer->getNextLayerIDs())[0]);
                         int64_t cat_mem_id =
-                            std::dynamic_pointer_cast<nn_compiler::ir::AtenCatLayer>(out4_out1_layer)->getMemLayerId();
+                            std::static_pointer_cast<nn_compiler::ir::AtenCatLayer>(out4_out1_layer)->getMemLayerId();
                         auto it = stream_executor.global_blobs_.find(cat_mem_id);
                         auto options = at::TensorOptions().dtype(at::kHalf).device(at::kCUDA);
                         auto cat_mem = it->second.second.toTensor();
@@ -2142,7 +2142,7 @@ void executorAtenLSTM1(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamE
                     if (stream_executor.model_type_ == "GNMT" && lstm1_layer->getCustomOptNumber() == 1) {
                         auto out1_layer = stream_executor.getGraph()->getLayerByPosition((layer->getNextLayerIDs())[0]);
                         auto out1_out1_layer = stream_executor.getGraph()->getLayerByPosition((out1_layer->getNextLayerIDs())[0]);
-                        int64_t cat_mem_id = std::dynamic_pointer_cast<nn_compiler::ir::AtenCatLayer>(out1_out1_layer)->getMemLayerId();
+                        int64_t cat_mem_id = std::static_pointer_cast<nn_compiler::ir::AtenCatLayer>(out1_out1_layer)->getMemLayerId();
                         auto it = stream_executor.global_blobs_.find(cat_mem_id);
                         auto options = at::TensorOptions().dtype(at::kHalf).device(at::kCUDA);
                         auto cat_mem = it->second.second.toTensor();
@@ -2167,7 +2167,7 @@ void executorAtenLSTM2(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamE
 {
     DLOG(INFO) << "execute Aten LSTM2 node";
 
-    auto lstm2_layer = std::dynamic_pointer_cast<nn_compiler::ir::AtenLSTM2Layer>(layer);
+    auto lstm2_layer = std::static_pointer_cast<nn_compiler::ir::AtenLSTM2Layer>(layer);
 
     auto in_stensor_id = layer->getInSTensorID();
     auto out_stensor_id = layer->getOutSTensorID();
@@ -2538,7 +2538,7 @@ void executorAtenMaskedFill(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, St
     auto in_stensor_id = layer->getInSTensorID();
     auto out_stensor_id = layer->getOutSTensorID();
 
-    auto mask_fill_layer = std::dynamic_pointer_cast<nn_compiler::ir::AtenMaskedFillLayer>(layer);
+    auto mask_fill_layer = std::static_pointer_cast<nn_compiler::ir::AtenMaskedFillLayer>(layer);
 
     // Find the input blob
     auto iv_self = stream_executor.findBlob(in_stensor_id[0]).second;
@@ -2748,7 +2748,7 @@ void executorAtenMax(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExe
 {
     DLOG(INFO) << "execute Aten Max node";
 
-    auto max_layer = std::dynamic_pointer_cast<nn_compiler::ir::AtenMaxLayer>(layer);
+    auto max_layer = std::static_pointer_cast<nn_compiler::ir::AtenMaxLayer>(layer);
 
     auto in_stensor_id = layer->getInSTensorID();
     auto out_stensor_id = layer->getOutSTensorID();
@@ -2818,7 +2818,7 @@ void executorAtenMaxPool2d(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, Str
 {
     DLOG(INFO) << "execute Aten MaxPool2d node";
 
-    auto max_pool_2d_layer = std::dynamic_pointer_cast<nn_compiler::ir::AtenMaxPool2dLayer>(layer);
+    auto max_pool_2d_layer = std::static_pointer_cast<nn_compiler::ir::AtenMaxPool2dLayer>(layer);
 
     auto in_stensor_id = layer->getInSTensorID();
     auto out_stensor_id = layer->getOutSTensorID();
@@ -2913,7 +2913,7 @@ void executorAtenMin(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExe
 {
     DLOG(INFO) << "execute Aten Min node";
 
-    auto min_layer = std::dynamic_pointer_cast<nn_compiler::ir::AtenMinLayer>(layer);
+    auto min_layer = std::static_pointer_cast<nn_compiler::ir::AtenMinLayer>(layer);
 
     auto in_stensor_id = layer->getInSTensorID();
     auto out_stensor_id = layer->getOutSTensorID();
@@ -3079,7 +3079,7 @@ void executorAtenNorm(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamEx
 {
     DLOG(INFO) << "execute Aten Norm node";
 
-    auto norm_layer = std::dynamic_pointer_cast<nn_compiler::ir::AtenNormLayer>(layer);
+    auto norm_layer = std::static_pointer_cast<nn_compiler::ir::AtenNormLayer>(layer);
 
     auto in_stensor_id = layer->getInSTensorID();
     auto out_stensor_id = layer->getOutSTensorID();
@@ -3124,7 +3124,7 @@ void executorAtenOnes(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamEx
 {
     DLOG(INFO) << "execute Aten Ones node";
 
-    auto ones_layer = std::dynamic_pointer_cast<nn_compiler::ir::AtenOnesLayer>(layer);
+    auto ones_layer = std::static_pointer_cast<nn_compiler::ir::AtenOnesLayer>(layer);
 
     auto in_stensor_id = layer->getInSTensorID();
     auto out_stensor_id = layer->getOutSTensorID();
@@ -3184,7 +3184,7 @@ void executorAtenPackPaddedSequence(std::shared_ptr<nn_compiler::ir::NNLayer>& l
 {
     DLOG(INFO) << "execute Aten PackPaddedSequence node";
 
-    auto pack_padded_sequence_layer = std::dynamic_pointer_cast<nn_compiler::ir::AtenPackPaddedSequenceLayer>(layer);
+    auto pack_padded_sequence_layer = std::static_pointer_cast<nn_compiler::ir::AtenPackPaddedSequenceLayer>(layer);
 
     auto in_stensor_id = layer->getInSTensorID();
     auto out_stensor_id = layer->getOutSTensorID();
@@ -3214,7 +3214,7 @@ void executorAtenPadPackedSequence(std::shared_ptr<nn_compiler::ir::NNLayer>& la
 {
     DLOG(INFO) << "execute Aten PadPackedSequence node";
 
-    auto pad_packed_sequence_layer = std::dynamic_pointer_cast<nn_compiler::ir::AtenPadPackedSequenceLayer>(layer);
+    auto pad_packed_sequence_layer = std::static_pointer_cast<nn_compiler::ir::AtenPadPackedSequenceLayer>(layer);
 
     auto in_stensor_id = layer->getInSTensorID();
     auto out_stensor_id = layer->getOutSTensorID();
@@ -3340,7 +3340,7 @@ void executorAtenSelect(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, Stream
 {
     DLOG(INFO) << "execute Aten Select node";
 
-    auto select_layer = std::dynamic_pointer_cast<nn_compiler::ir::AtenSelectLayer>(layer);
+    auto select_layer = std::static_pointer_cast<nn_compiler::ir::AtenSelectLayer>(layer);
 
     auto in_stensor_id = layer->getInSTensorID();
     auto out_stensor_id = layer->getOutSTensorID();
@@ -3372,7 +3372,7 @@ void executorAtenSetItem(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, Strea
 {
     DLOG(INFO) << "execute Aten SetItem node";
 
-    auto set_item_layer = std::dynamic_pointer_cast<nn_compiler::ir::AtenSetItemLayer>(layer);
+    auto set_item_layer = std::static_pointer_cast<nn_compiler::ir::AtenSetItemLayer>(layer);
 
     auto in_stensor_id = layer->getInSTensorID();
     auto out_stensor_id = layer->getOutSTensorID();
@@ -3401,7 +3401,7 @@ void executorAtenSize(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamEx
 {
     DLOG(INFO) << "execute Aten Size node";
 
-    auto size_layer = std::dynamic_pointer_cast<nn_compiler::ir::AtenSizeLayer>(layer);
+    auto size_layer = std::static_pointer_cast<nn_compiler::ir::AtenSizeLayer>(layer);
 
     auto in_stensor_id = layer->getInSTensorID();
     auto out_stensor_id = layer->getOutSTensorID();
@@ -3430,7 +3430,7 @@ void executorAtenSlice(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamE
 {
     DLOG(INFO) << "execute Aten Slice node";
 
-    auto slice_layer = std::dynamic_pointer_cast<nn_compiler::ir::AtenSliceLayer>(layer);
+    auto slice_layer = std::static_pointer_cast<nn_compiler::ir::AtenSliceLayer>(layer);
 
     auto in_stensor_id = layer->getInSTensorID();
     auto out_stensor_id = layer->getOutSTensorID();
@@ -3476,7 +3476,7 @@ void executorAtenSoftmax(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, Strea
 {
     DLOG(INFO) << "execute Aten Softmax node";
 
-    auto softmax_layer = std::dynamic_pointer_cast<nn_compiler::ir::AtenSoftmaxLayer>(layer);
+    auto softmax_layer = std::static_pointer_cast<nn_compiler::ir::AtenSoftmaxLayer>(layer);
 
     auto in_stensor_id = layer->getInSTensorID();
     auto out_stensor_id = layer->getOutSTensorID();
@@ -3512,7 +3512,7 @@ void executorAtenSqueeze(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, Strea
 {
     DLOG(INFO) << "execute Aten Squeeze node";
 
-    auto squeeze_layer = std::dynamic_pointer_cast<nn_compiler::ir::AtenSqueezeLayer>(layer);
+    auto squeeze_layer = std::static_pointer_cast<nn_compiler::ir::AtenSqueezeLayer>(layer);
 
     auto in_stensor_id = layer->getInSTensorID();
     auto out_stensor_id = layer->getOutSTensorID();
@@ -3537,7 +3537,7 @@ void executorAtenSub(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExe
 {
     DLOG(INFO) << "execute Aten Sub node";
 
-    auto sub_layer = std::dynamic_pointer_cast<nn_compiler::ir::AtenSubLayer>(layer);
+    auto sub_layer = std::static_pointer_cast<nn_compiler::ir::AtenSubLayer>(layer);
 
     auto in_stensor_id = layer->getInSTensorID();
     auto out_stensor_id = layer->getOutSTensorID();
@@ -3576,7 +3576,7 @@ void executorAtenSum(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExe
 {
     DLOG(INFO) << "execute Aten Sum node";
 
-    auto sum_layer = std::dynamic_pointer_cast<nn_compiler::ir::AtenSumLayer>(layer);
+    auto sum_layer = std::static_pointer_cast<nn_compiler::ir::AtenSumLayer>(layer);
 
     auto in_stensor_id = layer->getInSTensorID();
     auto out_stensor_id = layer->getOutSTensorID();
@@ -3699,7 +3699,7 @@ void executorAtenTo1(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExe
 {
     DLOG(INFO) << "execute Aten To1 node";
 
-    auto to1_layer = std::dynamic_pointer_cast<nn_compiler::ir::AtenTo1Layer>(layer);
+    auto to1_layer = std::static_pointer_cast<nn_compiler::ir::AtenTo1Layer>(layer);
 
     auto in_stensor_id = layer->getInSTensorID();
     auto out_stensor_id = layer->getOutSTensorID();
@@ -3762,7 +3762,7 @@ void executorAtenTo2(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExe
 {
     DLOG(INFO) << "execute Aten To2 node";
 
-    auto to2_layer = std::dynamic_pointer_cast<nn_compiler::ir::AtenTo2Layer>(layer);
+    auto to2_layer = std::static_pointer_cast<nn_compiler::ir::AtenTo2Layer>(layer);
 
     auto in_stensor_id = layer->getInSTensorID();
     auto out_stensor_id = layer->getOutSTensorID();
@@ -3821,7 +3821,7 @@ void executorAtenTopk(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamEx
 {
     DLOG(INFO) << "execute Aten Topk node";
 
-    auto topk_layer = std::dynamic_pointer_cast<nn_compiler::ir::AtenTopkLayer>(layer);
+    auto topk_layer = std::static_pointer_cast<nn_compiler::ir::AtenTopkLayer>(layer);
 
     auto in_stensor_id = layer->getInSTensorID();
     auto out_stensor_id = layer->getOutSTensorID();
@@ -3870,7 +3870,7 @@ void executorAtenTranspose(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, Str
 {
     DLOG(INFO) << "execute Aten Transpose node";
 
-    auto transpose_layer = std::dynamic_pointer_cast<nn_compiler::ir::AtenTransposeLayer>(layer);
+    auto transpose_layer = std::static_pointer_cast<nn_compiler::ir::AtenTransposeLayer>(layer);
 
     auto in_stensor_id = layer->getInSTensorID();
     auto out_stensor_id = layer->getOutSTensorID();
@@ -3901,7 +3901,7 @@ void executorAtenUnsqueeze(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, Str
 {
     DLOG(INFO) << "execute Aten Unsqueeze node";
 
-    auto unsqueeze_layer = std::dynamic_pointer_cast<nn_compiler::ir::AtenUnsqueezeLayer>(layer);
+    auto unsqueeze_layer = std::static_pointer_cast<nn_compiler::ir::AtenUnsqueezeLayer>(layer);
 
     auto in_stensor_id = layer->getInSTensorID();
     auto out_stensor_id = layer->getOutSTensorID();
@@ -4064,7 +4064,7 @@ void executorAtenBatchNorm2d(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, S
 {
     DLOG(INFO) << "execute Aten BN2d node";
 
-    auto batch_norm_2d_layer = std::dynamic_pointer_cast<nn_compiler::ir::AtenBatchNorm2dLayer>(layer);
+    auto batch_norm_2d_layer = std::static_pointer_cast<nn_compiler::ir::AtenBatchNorm2dLayer>(layer);
 
     auto in_stensor_id = layer->getInSTensorID();
     auto out_stensor_id = layer->getOutSTensorID();

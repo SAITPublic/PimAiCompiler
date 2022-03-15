@@ -50,7 +50,7 @@ RetVal StreamExecutor::preProcess(std::unique_ptr<nn_compiler::ir::NNModel>& mod
     auto graph = model->getGraphs()[0];
     for (auto layer : graph->getLayers()) {
         if (model_type_ == "GNMT" && layer->getType() == nn_compiler::ir::LayerType::ATENCAT) {
-            auto cat_layer = std::dynamic_pointer_cast<nn_compiler::ir::AtenCatLayer>(layer);
+            auto cat_layer = std::static_pointer_cast<nn_compiler::ir::AtenCatLayer>(layer);
             auto options = at::TensorOptions().dtype(at::kHalf).device(at::kCUDA);
             auto mem_blob_id = cat_layer->getMemLayerId();
             if (mem_blob_id != -1) {
@@ -77,7 +77,7 @@ RetVal StreamExecutor::preProcess(std::unique_ptr<nn_compiler::ir::NNModel>& mod
             // in every inference forward
             executePrimConstant(layer, *this);
         } else if (layer->getType() == nn_compiler::ir::LayerType::PRIMVARIABLE) {
-            auto variable_layer = std::dynamic_pointer_cast<nn_compiler::ir::PrimVariableLayer>(layer);
+            auto variable_layer = std::static_pointer_cast<nn_compiler::ir::PrimVariableLayer>(layer);
             if (variable_layer->getIsConstant()) {
                 // to speed up, runtime only load variable data once, all constants inside are reused
                 // in every inference forward
