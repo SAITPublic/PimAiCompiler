@@ -1,4 +1,3 @@
-#include "common/log.hpp"
 #include "half.hpp"
 #include "new_ir/include/layers/all_layers.h"
 #include "new_ir/include/tensors/data_tensor.h"
@@ -10,7 +9,7 @@ namespace runtime
 {
 
 RetVal ModelBuilder::preProcess(std::unique_ptr<nn_compiler::ir::NNModel>& model) {
-    Log::RT::I() << "ModelBuilder::preProcess() is called";
+    DLOG(INFO) << "ModelBuilder::preProcess() is called";
 
     auto graph = model->getGraphs()[0];
     for (auto layer : graph->getLayers()) {
@@ -27,7 +26,7 @@ RetVal ModelBuilder::preProcess(std::unique_ptr<nn_compiler::ir::NNModel>& model
 }
 
 RetVal ModelBuilder::preloadModel(std::unique_ptr<nn_compiler::ir::NNModel>& model) {
-    Log::RT::I() << "ModelBuilder::preloadModel() is called";
+    DLOG(INFO) << "ModelBuilder::preloadModel() is called";
 
     auto graph = model->getGraphs()[0];
     for (auto layer : graph->getLayers()) {
@@ -70,7 +69,7 @@ RetVal ModelBuilder::loadWeightAndBias(nn_compiler::ir::DTensor& data){
         torch::jit::IValue iv = torch::jit::IValue(tensor_data);
         this->preloaded_data_container_.insert({this_id, {DataType::TENSOR, iv}});
     } else {
-        Log::RT::E() << "Bit witdh Error!";
+        DLOG(FATAL) << "Bit witdh Error!";
     }
 
     return RetVal::SUCCESS;

@@ -7,7 +7,6 @@
 #include <unordered_map>
 #include <vector>
 
-#include "new_runtime/include/common/log.hpp"
 #include "new_runtime/include/executor/prim_utils.h"
 
 namespace nn_compiler
@@ -48,7 +47,7 @@ T primScalarConstant(T* data_ptr)
         std::is_same<T, double>::value) {
         return *data_ptr;
     } else {
-        Log::RT::E() << "Unsupported scalar type!";
+        DLOG(FATAL) << "Unsupported scalar type!";
     }
 }
 

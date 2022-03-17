@@ -5,7 +5,6 @@
 #include <vector>
 
 #include "builder/model_builder.h"
-#include "common/log.hpp"
 #include "executor/stream_executor.h"
 #include "new_ir/include/nn_model.h"
 

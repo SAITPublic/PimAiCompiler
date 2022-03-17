@@ -2,7 +2,6 @@
 #include <torch/script.h>
 
 #include "c10/hip/HIPFunctions.h"
-#include "common/log.hpp"
 #include "new_ir/include/types.h"
 #include "new_runtime/include/executor/aten_ops_executor.h"
 #include "new_runtime/include/executor/prim_ops_executor.h"
@@ -87,11 +86,11 @@ RetVal StreamExecutor::preProcess(std::unique_ptr<nn_compiler::ir::NNModel>& mod
         }
     }
 
-    Log::RT::D() << "Num inputs of Graph: " << input_blob_ids_.size();
-    Log::RT::D() << "Num outputs of Graph: " << output_blob_ids_.size();
+    DLOG(INFO) << "Num inputs of Graph: " << input_blob_ids_.size();
+    DLOG(INFO) << "Num outputs of Graph: " << output_blob_ids_.size();
 
     if (input_blob_ids_.size() == 0 || output_blob_ids_.size() == 0) {
-        Log::RT::E() << "The Graph must have >= 1 inputs and outputs!";
+        DLOG(FATAL) << "The Graph must have >= 1 inputs and outputs!";
     }
 
     return RetVal::SUCCESS;
@@ -106,7 +105,7 @@ RetVal StreamExecutor::inferenceModel(std::unique_ptr<nn_compiler::ir::NNModel>&
 
     // Set Input Tensors
     for (auto& in : input_tensors) {
-        Log::RT::D() << "Input Tensor:" << in.sizes() << " data:" << in;
+        DLOG(INFO) << "Input Tensor:" << in.sizes() << " data:" << in;
     }
     setInputTensors(input_tensors);
 
@@ -126,7 +125,7 @@ RetVal StreamExecutor::inferenceModel(std::unique_ptr<nn_compiler::ir::NNModel>&
     for (cursor_ = cursor_begin; cursor_ < cursor_end;) {
         auto layer = layers[cursor_];
         auto layer_type = layer->getType();
-        Log::RT::D() << "Layer id:" << layer->getID() << " name: " << layer->getName()
+        DLOG(INFO) << "Layer id:" << layer->getID() << " name: " << layer->getName()
                      << " type: " << convertLayerTypeToString(layer_type);
 
         if (layer_type == nn_compiler::ir::LayerType::PRIMCONSTANT) {
@@ -146,7 +145,7 @@ RetVal StreamExecutor::inferenceModel(std::unique_ptr<nn_compiler::ir::NNModel>&
     // Read Output Tensors
     getOutputTensors(output_tensors);
     for (auto& out : output_tensors) {
-        Log::RT::D() << "Output Tensor size: " << out.sizes();
+        DLOG(INFO) << "Output Tensor size: " << out.sizes();
     }
 
     return RetVal::SUCCESS;
@@ -163,7 +162,7 @@ RetVal StreamExecutor::inferenceModelwithProfiling(std::unique_ptr<nn_compiler::
 
     // Set Input Tensors
     for (auto& in : input_tensors) {
-        Log::RT::D() << "Input Tensor:" << in.sizes() << " data:" << in;
+        DLOG(INFO) << "Input Tensor:" << in.sizes() << " data:" << in;
     }
     setInputTensors(input_tensors);
 
@@ -184,7 +183,7 @@ RetVal StreamExecutor::inferenceModelwithProfiling(std::unique_ptr<nn_compiler::
         auto layer = layers[cursor_];
         auto layer_name = layer->getName();
         auto layer_type = layer->getType();
-        Log::RT::D() << "Layer id:" << layer->getID() << " name: " << layer->getName()
+        DLOG(INFO) << "Layer id:" << layer->getID() << " name: " << layer->getName()
                      << " type: " << convertLayerTypeToString(layer_type);
 
         if (layer_type == nn_compiler::ir::LayerType::PRIMCONSTANT) {
@@ -209,7 +208,7 @@ RetVal StreamExecutor::inferenceModelwithProfiling(std::unique_ptr<nn_compiler::
     // Read Output Tensors
     getOutputTensors(output_tensors);
     for (auto& out : output_tensors) {
-        Log::RT::D() << "Output Tensor size: " << out.sizes();
+        DLOG(INFO) << "Output Tensor size: " << out.sizes();
     }
 
     return RetVal::SUCCESS;
@@ -242,7 +241,7 @@ OpExecutorFn StreamExecutor::findOpExecutor(nn_compiler::ir::LayerType& type)
 {
     auto it = global_op_register_.find(type);
     if (it == global_op_register_.end()) {
-        Log::RT::E() << "Runtime error, Unregistered Op found: " << convertLayerTypeToString(type);
+        DLOG(FATAL) << "Runtime error, Unregistered Op found: " << convertLayerTypeToString(type);
         ;
     }
     assert(it != global_op_register_.end());
@@ -252,7 +251,7 @@ OpExecutorFn StreamExecutor::findOpExecutor(nn_compiler::ir::LayerType& type)
 void StreamExecutor::setInputTensors(const std::vector<torch::Tensor>& input_tensors)
 {
     if (input_tensors.size() != input_blob_ids_.size()) {
-        Log::RT::E() << "Num tensors must match the num inputs of Graph,"
+        DLOG(FATAL) << "Num tensors must match the num inputs of Graph,"
                      << "the Graph needs " << input_blob_ids_.size() << " inputs !";
     }
     // Set the input tensors to placeholder, assume all inputs & outputs are Tensor type
@@ -284,7 +283,7 @@ std::vector<torch::Tensor> StreamExecutor::iValueParser(torch::jit::IValue& iv)
                     out_tensor.push_back(out);
                 }
             } else {
-                Log::RT::E() << "Dtype of output is unsupported !";
+                DLOG(FATAL) << "Dtype of output is unsupported !";
             }
         }
     } else if (iv.isList()) {
@@ -301,7 +300,7 @@ std::vector<torch::Tensor> StreamExecutor::iValueParser(torch::jit::IValue& iv)
                     out_tensor.push_back(out);
                 }
             } else {
-                Log::RT::E() << "Dtype of output is unsupported !";
+                DLOG(FATAL) << "Dtype of output is unsupported !";
             }
         }
         if (out_list.size() != 0) {
@@ -317,7 +316,7 @@ std::vector<torch::Tensor> StreamExecutor::iValueParser(torch::jit::IValue& iv)
     } else if (iv.isTensor()) {
         out_tensor.push_back(iv.toTensor());
     } else {
-        Log::RT::E() << "Dtype of output is unsupported !";
+        DLOG(FATAL) << "Dtype of output is unsupported !";
     }
     return out_tensor;
 }
@@ -335,7 +334,7 @@ void StreamExecutor::getOutputTensors(std::vector<torch::Tensor>& output_tensors
         }
     }
     for (auto idx = 0; idx < output_tensors.size(); idx++) {
-        Log::RT::I() << "Output tensor" << idx << ": " << output_tensors[idx];
+        DLOG(INFO) << "Output tensor" << idx << ": " << output_tensors[idx];
     }
 }
 

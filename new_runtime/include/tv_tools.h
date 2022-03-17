@@ -25,13 +25,13 @@ static std::string showTensorInfo(const torch::Tensor& tensor)
 
 static bool checkTensorEqual(const torch::Tensor& tensor1, const torch::Tensor& tensor2, bool print_tensor = false)
 {
-    Log::RT::D() << "tensor1:" << showTensorInfo(tensor1);
-    Log::RT::D() << "tensor2:" << showTensorInfo(tensor2);
+    DLOG(INFO) << "tensor1:" << showTensorInfo(tensor1);
+    DLOG(INFO) << "tensor2:" << showTensorInfo(tensor2);
     if (print_tensor) {
-        Log::RT::D() << SPLITE_LINE;
-        Log::RT::D() << tensor1;
-        Log::RT::D() << SPLITE_LINE;
-        Log::RT::D() << tensor2;
+        DLOG(INFO) << SPLITE_LINE;
+        DLOG(INFO) << tensor1;
+        DLOG(INFO) << SPLITE_LINE;
+        DLOG(INFO) << tensor2;
     }
     bool ret = tensor1.equal(tensor2);
     return ret;
@@ -89,9 +89,9 @@ class TVComparator
         auto& other_tensor = iter->second;
         bool status = checkTensorEqual(input_tensor, other_tensor, print_tensor);
         if (status) {
-            Log::RT::D() << "TVComparator: Success !";
+            DLOG(INFO) << "TVComparator: Success !";
         } else {
-            Log::RT::D() << "TVComparator: Failed !";
+            DLOG(INFO) << "TVComparator: Failed !";
         }
         return status;
     }

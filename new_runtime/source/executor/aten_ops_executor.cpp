@@ -21,7 +21,7 @@ namespace runtime {
 
 void executorAtenAdd(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
-    Log::RT::D() << "execute Aten Add node";
+    DLOG(INFO) << "execute Aten Add node";
 
     auto add_layer = std::dynamic_pointer_cast<nn_compiler::ir::AtenAddLayer>(layer);
 
@@ -121,13 +121,13 @@ void executorAtenAdd(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExe
         // update output
         stream_executor.updateBlob(out_stensor_id[0], DataType::TENSOR, tensorToIValue(output));
     } else {
-        Log::RT::E() << "Unsupported input type for aten::add";
+        DLOG(FATAL) << "Unsupported input type for aten::add";
     }
 }  // executorAtenAdd
 
 void executorAtenAddmm(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
-    Log::RT::D() << "execute Aten Addmm node";
+    DLOG(INFO) << "execute Aten Addmm node";
 
     auto addmm_layer = std::dynamic_pointer_cast<nn_compiler::ir::AtenAddmmLayer>(layer);
     auto act_type = addmm_layer->get_act_type();
@@ -277,7 +277,7 @@ void executorAtenAddmm(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamE
 
 void executorAtenAnd(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
-    Log::RT::D() << "execute Aten And node";
+    DLOG(INFO) << "execute Aten And node";
     
     auto in_stensor_id = layer->getInSTensorID();
     auto out_stensor_id = layer->getOutSTensorID();
@@ -295,7 +295,7 @@ void executorAtenAnd(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExe
         value_a = iv_a.toInt();
         value_b = iv_b.toInt();
     } else {
-        Log::RT::E() << "Wrong input type for AtenAdd.";
+        DLOG(FATAL) << "Wrong input type for AtenAdd.";
     }
 
     auto output = atenAnd(value_a, value_b);
@@ -304,7 +304,7 @@ void executorAtenAnd(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExe
 
 void executorAtenAny(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
-    Log::RT::D() << "execute Aten Any node";
+    DLOG(INFO) << "execute Aten Any node";
 
     auto in_stensor_id = layer->getInSTensorID();
     auto out_stensor_id = layer->getOutSTensorID();
@@ -320,7 +320,7 @@ void executorAtenAny(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExe
 
 void executorAtenAppend(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
-    Log::RT::D() << "execute Aten Append node";
+    DLOG(INFO) << "execute Aten Append node";
 
     auto in_stensor_id = layer->getInSTensorID();
     auto out_stensor_id = layer->getOutSTensorID();
@@ -340,7 +340,7 @@ void executorAtenAppend(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, Stream
 
 void executorAtenArange1(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
-    Log::RT::D() << "execute Aten Arange1 node";
+    DLOG(INFO) << "execute Aten Arange1 node";
 
     auto arange1_layer = std::dynamic_pointer_cast<nn_compiler::ir::AtenArange1Layer>(layer);
 
@@ -401,7 +401,7 @@ void executorAtenArange1(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, Strea
 
 void executorAtenArange2(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
-    Log::RT::D() << "execute Aten Arange2 node";
+    DLOG(INFO) << "execute Aten Arange2 node";
 
     auto arange2_layer = std::dynamic_pointer_cast<nn_compiler::ir::AtenArange2Layer>(layer);
 
@@ -468,7 +468,7 @@ void executorAtenArange2(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, Strea
 
 void executorAtenArange3(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
-    Log::RT::D() << "execute Aten Arange3 node";
+    DLOG(INFO) << "execute Aten Arange3 node";
 
     auto arange3_layer = std::dynamic_pointer_cast<nn_compiler::ir::AtenArange3Layer>(layer);
 
@@ -541,7 +541,7 @@ void executorAtenArange3(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, Strea
 
 void executorAtenAsTensor(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
-    Log::RT::D() << "execute Aten AsTensor node";
+    DLOG(INFO) << "execute Aten AsTensor node";
 
     auto as_tensor_layer = std::dynamic_pointer_cast<nn_compiler::ir::AtenAsTensorLayer>(layer);
 
@@ -578,7 +578,7 @@ void executorAtenAsTensor(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, Stre
 
 void executorAtenBitwiseNot(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
-    Log::RT::D() << "execute Aten BitwiseNot node";
+    DLOG(INFO) << "execute Aten BitwiseNot node";
     auto in_stensor_id = layer->getInSTensorID();
     auto out_stensor_id = layer->getOutSTensorID();
 
@@ -593,7 +593,7 @@ void executorAtenBitwiseNot(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, St
 
 void executorAtenBmm(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
-    Log::RT::D() << "execute Aten Bmm node";
+    DLOG(INFO) << "execute Aten Bmm node";
     auto in_stensor_id = layer->getInSTensorID();
     auto out_stensor_id = layer->getOutSTensorID();
 
@@ -673,7 +673,7 @@ void executorAtenBmm(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExe
 
 void executorAtenBool(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
-    Log::RT::D() << "execute Aten Bool node";
+    DLOG(INFO) << "execute Aten Bool node";
     auto in_stensor_id = layer->getInSTensorID();
     auto out_stensor_id = layer->getOutSTensorID();
 
@@ -689,14 +689,14 @@ void executorAtenBool(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamEx
         auto double_value = ivalue.toDouble();
         output = atenBool(double_value);
     } else {
-        Log::RT::E() << "Unsupported type for aten::Bool.";
+        DLOG(FATAL) << "Unsupported type for aten::Bool.";
     }
     stream_executor.updateBlob(out_stensor_id[0], DataType::BOOL, boolToIValue(output));
 }
 
 void executorAtenCat(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
-    Log::RT::D() << "execute Aten Cat node";
+    DLOG(INFO) << "execute Aten Cat node";
 
     auto in_stensor_id = layer->getInSTensorID();
     auto out_stensor_id = layer->getOutSTensorID();
@@ -746,7 +746,7 @@ void executorAtenCat(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExe
 
 void executorAtenCeil(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
-    Log::RT::D() << "execute Aten Ceil node";
+    DLOG(INFO) << "execute Aten Ceil node";
     auto in_stensor_id = layer->getInSTensorID();
     auto out_stensor_id = layer->getOutSTensorID();
 
@@ -762,7 +762,7 @@ void executorAtenCeil(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamEx
 
 void executorAtenChunk(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
-    Log::RT::D() << "execute Aten Chunk node";
+    DLOG(INFO) << "execute Aten Chunk node";
 
     auto chunk_layer = std::dynamic_pointer_cast<nn_compiler::ir::AtenChunkLayer>(layer);
 
@@ -792,7 +792,7 @@ void executorAtenChunk(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamE
 
 void executorAtenClamp(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
-    Log::RT::D() << "execute Aten Clamp node";
+    DLOG(INFO) << "execute Aten Clamp node";
 
     auto clamp_layer = std::dynamic_pointer_cast<nn_compiler::ir::AtenClampLayer>(layer);
 
@@ -822,7 +822,7 @@ void executorAtenClamp(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamE
 
 void executorAtenClear(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
-    Log::RT::D() << "execute Aten Clear node";
+    DLOG(INFO) << "execute Aten Clear node";
     auto in_stensor_id = layer->getInSTensorID();
 
     torch::jit::IValue iv_self = stream_executor.findBlob(in_stensor_id[0]).second;
@@ -835,7 +835,7 @@ void executorAtenClear(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamE
 
 void executorAtenContiguous(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
-    Log::RT::D() << "execute Aten Contiguous node";
+    DLOG(INFO) << "execute Aten Contiguous node";
 
     auto contiguous_layer = std::dynamic_pointer_cast<nn_compiler::ir::AtenContiguousLayer>(layer);
 
@@ -859,7 +859,7 @@ void executorAtenContiguous(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, St
 
 void executorAtenConv2d(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
-    Log::RT::D() << "execute Aten Conv2d node";
+    DLOG(INFO) << "execute Aten Conv2d node";
 
     auto con2d_layer = std::dynamic_pointer_cast<nn_compiler::ir::AtenConv2dLayer>(layer);
 
@@ -893,7 +893,7 @@ void executorAtenConv2d(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, Stream
 
 void executorAtenCopy(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
-    Log::RT::D() << "execute Aten Copy node";
+    DLOG(INFO) << "execute Aten Copy node";
 
     auto copy_layer = std::dynamic_pointer_cast<nn_compiler::ir::AtenCopyLayer>(layer);
 
@@ -918,7 +918,7 @@ void executorAtenCopy(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamEx
 
 void executorAtenCpu(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
-    Log::RT::D() << "execute Aten Cpu node";
+    DLOG(INFO) << "execute Aten Cpu node";
 
     auto in_stensor_id = layer->getInSTensorID();
     auto out_stensor_id = layer->getOutSTensorID();
@@ -934,7 +934,7 @@ void executorAtenCpu(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExe
 
 void executorAtenCuda(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
-    Log::RT::D() << "execute Aten Cuda node";
+    DLOG(INFO) << "execute Aten Cuda node";
 
     auto in_stensor_id = layer->getInSTensorID();
     auto out_stensor_id = layer->getOutSTensorID();
@@ -950,7 +950,7 @@ void executorAtenCuda(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamEx
 
 void executorAtenDeriveIndex(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
-    Log::RT::D() << "execute Aten derive_index node";
+    DLOG(INFO) << "execute Aten derive_index node";
 
     auto derive_index_layer = std::dynamic_pointer_cast<nn_compiler::ir::AtenDeriveIndexLayer>(layer);
 
@@ -982,7 +982,7 @@ void executorAtenDeriveIndex(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, S
 
 void executorAtenDim(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
-    Log::RT::D() << "execute Aten Dim node";
+    DLOG(INFO) << "execute Aten Dim node";
 
     auto in_stensor_id = layer->getInSTensorID();
     auto out_stensor_id = layer->getOutSTensorID();
@@ -1000,7 +1000,7 @@ void executorAtenDim(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExe
 
 void executorAtenDiv(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
-    Log::RT::D() << "execute Aten Div node";
+    DLOG(INFO) << "execute Aten Div node";
 
     auto in_stensor_id = layer->getInSTensorID();
     auto out_stensor_id = layer->getOutSTensorID();
@@ -1026,13 +1026,13 @@ void executorAtenDiv(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExe
         // update output
         stream_executor.updateBlob(out_stensor_id[0], DataType::TENSOR, tensorToIValue(output));
     } else {
-        Log::RT::E() << "Unsupported input type for aten::div";
+        DLOG(FATAL) << "Unsupported input type for aten::div";
     }
 }
 
 void executorAtenDropout(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
-    Log::RT::D() << "execute Aten Dropout node";
+    DLOG(INFO) << "execute Aten Dropout node";
 
     auto dropout_layer = std::dynamic_pointer_cast<nn_compiler::ir::AtenDropoutLayer>(layer);
     
@@ -1064,7 +1064,7 @@ void executorAtenDropout(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, Strea
 
 void executorAtenEmbedding(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
-    Log::RT::D() << "execute Aten Embedding node";
+    DLOG(INFO) << "execute Aten Embedding node";
 
     auto embedding_layer = std::dynamic_pointer_cast<nn_compiler::ir::AtenEmbeddingLayer>(layer);
 
@@ -1121,7 +1121,7 @@ void executorAtenEmbedding(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, Str
 
 void executorAtenEq(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
-    Log::RT::D() << "execute Aten Eq node";
+    DLOG(INFO) << "execute Aten Eq node";
 
     auto in_stensor_id = layer->getInSTensorID();
     auto out_stensor_id = layer->getOutSTensorID();
@@ -1142,7 +1142,7 @@ void executorAtenEq(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExec
             at::Scalar other = iv_other.toScalar();
             output = atenEq(self_tensor, other);
         } else {
-            Log::RT::E() << "Aten eq op's data type do not support!";
+            DLOG(FATAL) << "Aten eq op's data type do not support!";
         }
         // update output
         stream_executor.updateBlob(out_stensor_id[0], DataType::TENSOR, tensorToIValue(output));
@@ -1154,13 +1154,13 @@ void executorAtenEq(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExec
         // update output
         stream_executor.updateBlob(out_stensor_id[0], DataType::BOOL, scalarToIValue(output));
     } else {
-        Log::RT::E() << "Unsupported input type for aten::eq";
+        DLOG(FATAL) << "Unsupported input type for aten::eq";
     }
 }
 
 void executorAtenEqual(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
-    Log::RT::D() << "execute Aten Equal node";
+    DLOG(INFO) << "execute Aten Equal node";
 
     auto in_stensor_id = layer->getInSTensorID();
     auto out_stensor_id = layer->getOutSTensorID();
@@ -1179,7 +1179,7 @@ void executorAtenEqual(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamE
 
 void executorAtenExpand(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
-    Log::RT::D() << "execute Aten Expand node";
+    DLOG(INFO) << "execute Aten Expand node";
 
     auto expand_layer = std::dynamic_pointer_cast<nn_compiler::ir::AtenExpandLayer>(layer);
 
@@ -1210,7 +1210,7 @@ void executorAtenExpand(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, Stream
 
 void executorAtenFill(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
-    Log::RT::D() << "execute Aten Fill node";
+    DLOG(INFO) << "execute Aten Fill node";
 
     auto in_stensor_id = layer->getInSTensorID();
     auto out_stensor_id = layer->getOutSTensorID();
@@ -1234,13 +1234,13 @@ void executorAtenFill(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamEx
         stream_executor.updateBlob(out_stensor_id[0], DataType::TENSOR, tensorToIValue(output));
         stream_executor.updateBlob(in_stensor_id[0], DataType::TENSOR, tensorToIValue(output));  // in-place op
     } else {
-        Log::RT::E() << "Unsupported input type for aten::fill_";
+        DLOG(FATAL) << "Unsupported input type for aten::fill_";
     }
 }
 
 void executorAtenFloorDivide(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
-    Log::RT::D() << "execute Aten FloorDivide node";
+    DLOG(INFO) << "execute Aten FloorDivide node";
 
     auto in_stensor_id = layer->getInSTensorID();
     auto out_stensor_id = layer->getOutSTensorID();
@@ -1262,13 +1262,13 @@ void executorAtenFloorDivide(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, S
         // update output
         stream_executor.updateBlob(out_stensor_id[0], DataType::TENSOR, tensorToIValue(output));
     } else {
-        Log::RT::E() << "Unsupported input type for aten::floor_divide";
+        DLOG(FATAL) << "Unsupported input type for aten::floor_divide";
     }
 }
 
 void executorAtenFormat(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
-    Log::RT::D() << "execute Aten Format node";
+    DLOG(INFO) << "execute Aten Format node";
 
     auto format_layer = std::dynamic_pointer_cast<nn_compiler::ir::AtenFormatLayer>(layer);
 
@@ -1323,13 +1323,13 @@ void executorAtenFormat(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, Stream
         // update output
         stream_executor.updateBlob(out_stensor_id[0], DataType::STRING, strToIValue(output));
     } else {
-        Log::RT::E() << "Unsupported input type for aten::format";
+        DLOG(FATAL) << "Unsupported input type for aten::format";
     }
 }
 
 void executorAtenGather(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
-    Log::RT::D() << "execute Aten Gather node";
+    DLOG(INFO) << "execute Aten Gather node";
 
     auto gather_layer = std::dynamic_pointer_cast<nn_compiler::ir::AtenGatherLayer>(layer);
 
@@ -1366,7 +1366,7 @@ void executorAtenGather(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, Stream
 
 void executorAtenGe(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
-    Log::RT::D() << "execute Aten Ge node";
+    DLOG(INFO) << "execute Aten Ge node";
 
     auto in_stensor_id = layer->getInSTensorID();
     auto out_stensor_id = layer->getOutSTensorID();
@@ -1388,13 +1388,13 @@ void executorAtenGe(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExec
         // update output
         stream_executor.updateBlob(out_stensor_id[0], DataType::TENSOR, tensorToIValue(output));
     } else {
-        Log::RT::E() << "Unsupported input type for aten::ge";
+        DLOG(FATAL) << "Unsupported input type for aten::ge";
     }
 }
 
 void executorAtenGetItem(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
-    Log::RT::D() << "execute Aten GetItem node";
+    DLOG(INFO) << "execute Aten GetItem node";
 
     auto get_item_layer = std::dynamic_pointer_cast<nn_compiler::ir::AtenGetItemLayer>(layer);
 
@@ -1420,7 +1420,7 @@ void executorAtenGetItem(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, Strea
 
 void executorAtenGt(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
-    Log::RT::D() << "execute Aten Gt node";
+    DLOG(INFO) << "execute Aten Gt node";
     
     auto in_stensor_id = layer->getInSTensorID();
     auto out_stensor_id = layer->getOutSTensorID();
@@ -1453,7 +1453,7 @@ void executorAtenGt(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExec
 
 void executorAtenIndex(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
-    Log::RT::D() << "execute Aten Index node";
+    DLOG(INFO) << "execute Aten Index node";
 
     auto in_stensor_id = layer->getInSTensorID();
     auto out_stensor_id = layer->getOutSTensorID();
@@ -1477,7 +1477,7 @@ void executorAtenIndex(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamE
 
 void executorAtenIndexPut(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
-    Log::RT::D() << "execute Aten IndexPut node";
+    DLOG(INFO) << "execute Aten IndexPut node";
 
     auto index_put_layer = std::dynamic_pointer_cast<nn_compiler::ir::AtenIndexPutLayer>(layer);
     
@@ -1517,7 +1517,7 @@ void executorAtenIndexPut(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, Stre
 
 void executorAtenIndexSelect(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
-    Log::RT::D() << "execute Aten IndexSelect node";
+    DLOG(INFO) << "execute Aten IndexSelect node";
 
     auto index_select_layer = std::dynamic_pointer_cast<nn_compiler::ir::AtenIndexSelectLayer>(layer);
 
@@ -1547,7 +1547,7 @@ void executorAtenIndexSelect(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, S
 
 void executorAtenInt(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
-    Log::RT::D() << "execute Aten Int node";
+    DLOG(INFO) << "execute Aten Int node";
 
     auto in_stensor_id = layer->getInSTensorID();
     auto out_stensor_id = layer->getOutSTensorID();
@@ -1561,7 +1561,7 @@ void executorAtenInt(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExe
         auto self_tensor = iv_self.toTensor();
         output = atenInt(self_tensor);
     } else {
-        Log::RT::E() << "AtenInt data type do not support!";
+        DLOG(FATAL) << "AtenInt data type do not support!";
     }
 
     // update output
@@ -1570,7 +1570,7 @@ void executorAtenInt(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExe
 
 void executorAtenIs(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
-    Log::RT::D() << "execute Aten Is node";
+    DLOG(INFO) << "execute Aten Is node";
 
     auto in_stensor_id = layer->getInSTensorID();
     auto out_stensor_id = layer->getOutSTensorID();
@@ -1587,7 +1587,7 @@ void executorAtenIs(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExec
 
 void executorAtenItem(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
-    Log::RT::D() << "execute Aten Item node";
+    DLOG(INFO) << "execute Aten Item node";
 
     auto in_stensor_id = layer->getInSTensorID();
     auto out_stensor_id = layer->getOutSTensorID();
@@ -1607,7 +1607,7 @@ void executorAtenItem(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamEx
 
 void executorAtenLeakyRelu(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
-    Log::RT::D() << "execute Aten LeakyRelu node";
+    DLOG(INFO) << "execute Aten LeakyRelu node";
 
     auto leaky_relu_layer = std::dynamic_pointer_cast<nn_compiler::ir::AtenLeakyReluLayer>(layer);
 
@@ -1633,7 +1633,7 @@ void executorAtenLeakyRelu(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, Str
 
 void executorAtenLen(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
-    Log::RT::D() << "execute Aten Len node";
+    DLOG(INFO) << "execute Aten Len node";
 
     auto in_stensor_id = layer->getInSTensorID();
     auto out_stensor_id = layer->getOutSTensorID();
@@ -1658,7 +1658,7 @@ void executorAtenLen(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExe
     } else if (iv.isTensor()) {
         output = atenLen(iv.toTensor());
     } else {
-        Log::RT::E() << "Aten len op's data type do not support!";
+        DLOG(FATAL) << "Aten len op's data type do not support!";
     }
 
     // update output
@@ -1667,7 +1667,7 @@ void executorAtenLen(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExe
 
 void executorAtenLinear(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
-    Log::RT::D() << "execute Aten Linear node";
+    DLOG(INFO) << "execute Aten Linear node";
 
     auto linear_layer = std::dynamic_pointer_cast<nn_compiler::ir::AtenLinearLayer>(layer);
 
@@ -1695,7 +1695,7 @@ void executorAtenLinear(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, Stream
 
 void executorAtenList(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
-    Log::RT::D() << "execute Aten List node";
+    DLOG(INFO) << "execute Aten List node";
 
     auto in_stensor_id = layer->getInSTensorID();
     auto out_stensor_id = layer->getOutSTensorID();
@@ -1710,7 +1710,7 @@ void executorAtenList(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamEx
 
 void executorAtenLog(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
-    Log::RT::D() << "execute Aten Log node";
+    DLOG(INFO) << "execute Aten Log node";
 
     auto in_stensor_id = layer->getInSTensorID();
     auto out_stensor_id = layer->getOutSTensorID();
@@ -1726,7 +1726,7 @@ void executorAtenLog(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExe
 
 void executorAtenLogSoftmax(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
-    Log::RT::D() << "execute Aten LogSoftmax node";
+    DLOG(INFO) << "execute Aten LogSoftmax node";
 
     auto log_softmax_layer = std::dynamic_pointer_cast<nn_compiler::ir::AtenLogSoftmaxLayer>(layer);
 
@@ -1769,7 +1769,7 @@ void executorAtenLogSoftmax(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, St
 
 void executorAtenLSTM1(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
-    Log::RT::D() << "execute Aten LSTM1 node";
+    DLOG(INFO) << "execute Aten LSTM1 node";
 
     auto lstm1_layer = std::dynamic_pointer_cast<nn_compiler::ir::AtenLSTM1Layer>(layer);
 
@@ -2158,7 +2158,7 @@ void executorAtenLSTM1(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamE
 
 void executorAtenLSTM2(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
-    Log::RT::D() << "execute Aten LSTM2 node";
+    DLOG(INFO) << "execute Aten LSTM2 node";
 
     auto lstm2_layer = std::dynamic_pointer_cast<nn_compiler::ir::AtenLSTM2Layer>(layer);
 
@@ -2493,7 +2493,7 @@ void executorAtenLSTM2(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamE
 
 void executorAtenLt(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
-    Log::RT::D() << "execute Aten Lt node";
+    DLOG(INFO) << "execute Aten Lt node";
 
     auto in_stensor_id = layer->getInSTensorID();
     auto out_stensor_id = layer->getOutSTensorID();
@@ -2524,7 +2524,7 @@ void executorAtenLt(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExec
 
 void executorAtenMaskedFill(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
-    Log::RT::D() << "execute Aten MaskedFill node";
+    DLOG(INFO) << "execute Aten MaskedFill node";
 
     auto in_stensor_id = layer->getInSTensorID();
     auto out_stensor_id = layer->getOutSTensorID();
@@ -2547,7 +2547,7 @@ void executorAtenMaskedFill(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, St
         at::Scalar value_scalar = iv_value.toScalar();
         output = atenMaskedFill(self_tensor, other_tensor, value_scalar);
     } else {
-        Log::RT::E() << "Unsupported input type for aten::masked_fill";
+        DLOG(FATAL) << "Unsupported input type for aten::masked_fill";
     }
 
     // update output
@@ -2563,7 +2563,7 @@ void executorAtenMaskedFill(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, St
 
 void executorAtenMaskedSelect(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
-    Log::RT::D() << "execute Aten MaskedSelect node";
+    DLOG(INFO) << "execute Aten MaskedSelect node";
 
     auto in_stensor_id = layer->getInSTensorID();
     auto out_stensor_id = layer->getOutSTensorID();
@@ -2582,7 +2582,7 @@ void executorAtenMaskedSelect(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, 
 
 void executorAtenMatmul(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
-    Log::RT::D() << "execute Aten Matmul node";
+    DLOG(INFO) << "execute Aten Matmul node";
 
     auto in_stensor_id = layer->getInSTensorID();
     auto out_stensor_id = layer->getOutSTensorID();
@@ -2737,7 +2737,7 @@ void executorAtenMatmul(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, Stream
 
 void executorAtenMax(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
-    Log::RT::D() << "execute Aten Max node";
+    DLOG(INFO) << "execute Aten Max node";
 
     auto max_layer = std::dynamic_pointer_cast<nn_compiler::ir::AtenMaxLayer>(layer);
 
@@ -2801,13 +2801,13 @@ void executorAtenMax(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExe
         stream_executor.updateBlob(out_stensor_id[1], DataType::TENSOR, tensorToIValue(std::get<1>(output)));
 
     } else {
-        Log::RT::E() << "Unsupported input type for aten::max";
+        DLOG(FATAL) << "Unsupported input type for aten::max";
     }
 }
 
 void executorAtenMaxPool2d(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
-    Log::RT::D() << "execute Aten MaxPool2d node";
+    DLOG(INFO) << "execute Aten MaxPool2d node";
 
     auto max_pool_2d_layer = std::dynamic_pointer_cast<nn_compiler::ir::AtenMaxPool2dLayer>(layer);
 
@@ -2902,7 +2902,7 @@ void executorAtenMaxPool2d(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, Str
 
 void executorAtenMin(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
-    Log::RT::D() << "execute Aten Min node";
+    DLOG(INFO) << "execute Aten Min node";
 
     auto min_layer = std::dynamic_pointer_cast<nn_compiler::ir::AtenMinLayer>(layer);
 
@@ -2953,7 +2953,7 @@ void executorAtenMin(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExe
 
 void executorAtenMul(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
-    Log::RT::D() << "execute Aten Mul node";
+    DLOG(INFO) << "execute Aten Mul node";
 
     auto in_stensor_id = layer->getInSTensorID();
     auto out_stensor_id = layer->getOutSTensorID();
@@ -2985,16 +2985,16 @@ void executorAtenMul(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExe
             auto output = atenMul(self_tensor, other_scalar);
             stream_executor.updateBlob(out_stensor_id[0], DataType::TENSOR, tensorToIValue(output));
         } else {
-            Log::RT::E() << "Unsupported input type for aten::mul";
+            DLOG(FATAL) << "Unsupported input type for aten::mul";
         }
     } else {
-        Log::RT::E() << "Unsupported input type for aten::mul";
+        DLOG(FATAL) << "Unsupported input type for aten::mul";
     }
 }
 
 void executorAtenNe(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
-    Log::RT::D() << "execute Aten Ne node";
+    DLOG(INFO) << "execute Aten Ne node";
 
     auto in_stensor_id = layer->getInSTensorID();
     auto out_stensor_id = layer->getOutSTensorID();
@@ -3033,13 +3033,13 @@ void executorAtenNe(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExec
         // update output
         stream_executor.updateBlob(out_stensor_id[0], DataType::BOOL, boolToIValue(output));
     } else {
-        Log::RT::E() << "Unsupported input type for aten::ne";
+        DLOG(FATAL) << "Unsupported input type for aten::ne";
     }
 }
 
 void executorAtenNeg(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
-    Log::RT::D() << "execute Aten Neg node";
+    DLOG(INFO) << "execute Aten Neg node";
 
     auto in_stensor_id = layer->getInSTensorID();
     auto out_stensor_id = layer->getOutSTensorID();
@@ -3062,13 +3062,13 @@ void executorAtenNeg(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExe
         stream_executor.updateBlob(out_stensor_id[0], DataType::TENSOR, tensorToIValue(output));
 
     } else {
-        Log::RT::E() << "AtenNeg: unsupported dtype!";
+        DLOG(FATAL) << "AtenNeg: unsupported dtype!";
     }
 }
 
 void executorAtenNorm(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
-    Log::RT::D() << "execute Aten Norm node";
+    DLOG(INFO) << "execute Aten Norm node";
 
     auto norm_layer = std::dynamic_pointer_cast<nn_compiler::ir::AtenNormLayer>(layer);
 
@@ -3092,7 +3092,7 @@ void executorAtenNorm(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamEx
 
 void executorAtenNot(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
-    Log::RT::D() << "execute Aten Not node";
+    DLOG(INFO) << "execute Aten Not node";
 
     auto in_stensor_id = layer->getInSTensorID();
     auto out_stensor_id = layer->getOutSTensorID();
@@ -3107,13 +3107,13 @@ void executorAtenNot(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExe
         auto output = atenNot(input);
         stream_executor.updateBlob(out_stensor_id[0], DataType::BOOL, boolToIValue(output));
     } else {
-        Log::RT::E() << "Aten not op's data type do not support!";
+        DLOG(FATAL) << "Aten not op's data type do not support!";
     }
 }
 
 void executorAtenOnes(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
-    Log::RT::D() << "execute Aten Ones node";
+    DLOG(INFO) << "execute Aten Ones node";
 
     auto ones_layer = std::dynamic_pointer_cast<nn_compiler::ir::AtenOnesLayer>(layer);
 
@@ -3173,7 +3173,7 @@ void executorAtenOnes(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamEx
 
 void executorAtenPackPaddedSequence(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
-    Log::RT::D() << "execute Aten PackPaddedSequence node";
+    DLOG(INFO) << "execute Aten PackPaddedSequence node";
 
     auto pack_padded_sequence_layer = std::dynamic_pointer_cast<nn_compiler::ir::AtenPackPaddedSequenceLayer>(layer);
 
@@ -3203,7 +3203,7 @@ void executorAtenPackPaddedSequence(std::shared_ptr<nn_compiler::ir::NNLayer>& l
 
 void executorAtenPadPackedSequence(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
-    Log::RT::D() << "execute Aten PadPackedSequence node";
+    DLOG(INFO) << "execute Aten PadPackedSequence node";
 
     auto pad_packed_sequence_layer = std::dynamic_pointer_cast<nn_compiler::ir::AtenPadPackedSequenceLayer>(layer);
 
@@ -3249,7 +3249,7 @@ void executorAtenPadPackedSequence(std::shared_ptr<nn_compiler::ir::NNLayer>& la
 
 void executorAtenPow(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
-    Log::RT::D() << "execute Aten Pow node";
+    DLOG(INFO) << "execute Aten Pow node";
 
     auto in_stensor_id = layer->getInSTensorID();
     auto out_stensor_id = layer->getOutSTensorID();
@@ -3277,13 +3277,13 @@ void executorAtenPow(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExe
         // update output
         stream_executor.updateBlob(out_stensor_id[0], DataType::TENSOR, tensorToIValue(output));
     } else {
-        Log::RT::E() << "Unsupported input type for aten::pow";
+        DLOG(FATAL) << "Unsupported input type for aten::pow";
     }
 }
 
 void executorAtenRelu(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
-    Log::RT::D() << "execute Aten Relu node";
+    DLOG(INFO) << "execute Aten Relu node";
 
     auto in_stensor_id = layer->getInSTensorID();
     auto out_stensor_id = layer->getOutSTensorID();
@@ -3300,7 +3300,7 @@ void executorAtenRelu(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamEx
 
 void executorAtenReshape(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
-    Log::RT::D() << "execute Aten Reshape node";
+    DLOG(INFO) << "execute Aten Reshape node";
 
     auto in_stensor_id = layer->getInSTensorID();
     auto out_stensor_id = layer->getOutSTensorID();
@@ -3329,7 +3329,7 @@ void executorAtenReshape(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, Strea
 
 void executorAtenSelect(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
-    Log::RT::D() << "execute Aten Select node";
+    DLOG(INFO) << "execute Aten Select node";
 
     auto select_layer = std::dynamic_pointer_cast<nn_compiler::ir::AtenSelectLayer>(layer);
 
@@ -3361,7 +3361,7 @@ void executorAtenSelect(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, Stream
 
 void executorAtenSetItem(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
-    Log::RT::D() << "execute Aten SetItem node";
+    DLOG(INFO) << "execute Aten SetItem node";
 
     auto set_item_layer = std::dynamic_pointer_cast<nn_compiler::ir::AtenSetItemLayer>(layer);
 
@@ -3390,7 +3390,7 @@ void executorAtenSetItem(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, Strea
 
 void executorAtenSize(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
-    Log::RT::D() << "execute Aten Size node";
+    DLOG(INFO) << "execute Aten Size node";
 
     auto size_layer = std::dynamic_pointer_cast<nn_compiler::ir::AtenSizeLayer>(layer);
 
@@ -3419,7 +3419,7 @@ void executorAtenSize(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamEx
 
 void executorAtenSlice(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
-    Log::RT::D() << "execute Aten Slice node";
+    DLOG(INFO) << "execute Aten Slice node";
 
     auto slice_layer = std::dynamic_pointer_cast<nn_compiler::ir::AtenSliceLayer>(layer);
 
@@ -3465,7 +3465,7 @@ void executorAtenSlice(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamE
 
 void executorAtenSoftmax(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
-    Log::RT::D() << "execute Aten Softmax node";
+    DLOG(INFO) << "execute Aten Softmax node";
 
     auto softmax_layer = std::dynamic_pointer_cast<nn_compiler::ir::AtenSoftmaxLayer>(layer);
 
@@ -3501,7 +3501,7 @@ void executorAtenSoftmax(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, Strea
 
 void executorAtenSqueeze(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
-    Log::RT::D() << "execute Aten Squeeze node";
+    DLOG(INFO) << "execute Aten Squeeze node";
 
     auto squeeze_layer = std::dynamic_pointer_cast<nn_compiler::ir::AtenSqueezeLayer>(layer);
 
@@ -3526,7 +3526,7 @@ void executorAtenSqueeze(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, Strea
 
 void executorAtenSub(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
-    Log::RT::D() << "execute Aten Sub node";
+    DLOG(INFO) << "execute Aten Sub node";
 
     auto sub_layer = std::dynamic_pointer_cast<nn_compiler::ir::AtenSubLayer>(layer);
 
@@ -3559,13 +3559,13 @@ void executorAtenSub(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExe
         // update output
         stream_executor.updateBlob(out_stensor_id[0], DataType::TENSOR, tensorToIValue(output));
     } else {
-        Log::RT::E() << "Unsupported input type for aten::sub";
+        DLOG(FATAL) << "Unsupported input type for aten::sub";
     }
 }
 
 void executorAtenSum(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
-    Log::RT::D() << "execute Aten Sum node";
+    DLOG(INFO) << "execute Aten Sum node";
 
     auto sum_layer = std::dynamic_pointer_cast<nn_compiler::ir::AtenSumLayer>(layer);
 
@@ -3612,7 +3612,7 @@ void executorAtenSum(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExe
 
 void executorAtenTanh(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
-    Log::RT::D() << "execute Aten Tanh node";
+    DLOG(INFO) << "execute Aten Tanh node";
 
     auto in_stensor_id = layer->getInSTensorID();
     auto out_stensor_id = layer->getOutSTensorID();
@@ -3627,7 +3627,7 @@ void executorAtenTanh(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamEx
 
 void executorAtenTensor(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
-    Log::RT::D() << "execute Aten Tensor node";
+    DLOG(INFO) << "execute Aten Tensor node";
 
     auto in_stensor_id = layer->getInSTensorID();
     auto out_stensor_id = layer->getOutSTensorID();
@@ -3651,7 +3651,7 @@ void executorAtenTensor(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, Stream
         } else if (iv_pin_memory.isBool()) {
             options = options.pinned_memory(iv_pin_memory.toBool());
         } else {
-            Log::RT::E() << "Unsupported data type to parse iv_pin_memory.";
+            DLOG(FATAL) << "Unsupported data type to parse iv_pin_memory.";
         }
     }
     // FIXME(SRCX): To get list item type, is there a better way?
@@ -3666,7 +3666,7 @@ void executorAtenTensor(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, Stream
     } else if (iv_self.isScalar()) {
         value_item = iv_self;
     } else {
-        Log::RT::E() << "Unsupported data type to IValue.";
+        DLOG(FATAL) << "Unsupported data type to IValue.";
     }
 
     at::Tensor output;
@@ -3681,14 +3681,14 @@ void executorAtenTensor(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, Stream
         parseIValueList<double>(stream_executor.findBlob(in_stensor_id[0]).second, value_vec, dim, 1);
         output = atenTensor(at::ArrayRef<double>(value_vec), options).reshape(at::ArrayRef<int64_t>(dim));
     } else {
-        Log::RT::E() << "Unsupported data type to parse IValue list.";
+        DLOG(FATAL) << "Unsupported data type to parse IValue list.";
     }
     stream_executor.updateBlob(out_stensor_id[0], DataType::TENSOR, tensorToIValue(output));
 }
 
 void executorAtenTo1(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
-    Log::RT::D() << "execute Aten To1 node";
+    DLOG(INFO) << "execute Aten To1 node";
 
     auto to1_layer = std::dynamic_pointer_cast<nn_compiler::ir::AtenTo1Layer>(layer);
 
@@ -3751,7 +3751,7 @@ void executorAtenTo1(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExe
 
 void executorAtenTo2(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
-    Log::RT::D() << "execute Aten To2 node";
+    DLOG(INFO) << "execute Aten To2 node";
 
     auto to2_layer = std::dynamic_pointer_cast<nn_compiler::ir::AtenTo2Layer>(layer);
 
@@ -3810,7 +3810,7 @@ void executorAtenTo2(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExe
 
 void executorAtenTopk(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
-    Log::RT::D() << "execute Aten Topk node";
+    DLOG(INFO) << "execute Aten Topk node";
 
     auto topk_layer = std::dynamic_pointer_cast<nn_compiler::ir::AtenTopkLayer>(layer);
 
@@ -3859,7 +3859,7 @@ void executorAtenTopk(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamEx
 
 void executorAtenTranspose(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
-    Log::RT::D() << "execute Aten Transpose node";
+    DLOG(INFO) << "execute Aten Transpose node";
 
     auto transpose_layer = std::dynamic_pointer_cast<nn_compiler::ir::AtenTransposeLayer>(layer);
 
@@ -3890,7 +3890,7 @@ void executorAtenTranspose(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, Str
 
 void executorAtenUnsqueeze(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
-    Log::RT::D() << "execute Aten Unsqueeze node";
+    DLOG(INFO) << "execute Aten Unsqueeze node";
 
     auto unsqueeze_layer = std::dynamic_pointer_cast<nn_compiler::ir::AtenUnsqueezeLayer>(layer);
 
@@ -3936,7 +3936,7 @@ void executorAtenUnsqueeze(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, Str
 
 void executorAtenView(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
-    Log::RT::D() << "execute Aten View node";
+    DLOG(INFO) << "execute Aten View node";
 
     auto in_stensor_id = layer->getInSTensorID();
     auto out_stensor_id = layer->getOutSTensorID();
@@ -3956,7 +3956,7 @@ void executorAtenView(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamEx
 
 void executorAtenWarn(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
-    Log::RT::D() << "execute AtenWarn node";
+    DLOG(INFO) << "execute AtenWarn node";
 
     auto in_stensor_id = layer->getInSTensorID();
     auto out_stensor_id = layer->getOutSTensorID();
@@ -3968,7 +3968,7 @@ void executorAtenWarn(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamEx
 
 void executorAtenZeros(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
-    Log::RT::D() << "execute Aten Zeros node";
+    DLOG(INFO) << "execute Aten Zeros node";
 
     auto in_stensor_id = layer->getInSTensorID();
     auto out_stensor_id = layer->getOutSTensorID();
@@ -4007,7 +4007,7 @@ void executorAtenZeros(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamE
 
 void executorAtenZerosLike(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
-    Log::RT::D() << "execute Aten ZerosLike node";
+    DLOG(INFO) << "execute Aten ZerosLike node";
 
     auto in_stensor_id = layer->getInSTensorID();
     auto out_stensor_id = layer->getOutSTensorID();
@@ -4053,7 +4053,7 @@ void executorAtenZerosLike(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, Str
 
 void executorAtenBatchNorm2d(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
-    Log::RT::D() << "execute Aten BN2d node";
+    DLOG(INFO) << "execute Aten BN2d node";
 
     auto batch_norm_2d_layer = std::dynamic_pointer_cast<nn_compiler::ir::AtenBatchNorm2dLayer>(layer);
 
@@ -4104,7 +4104,7 @@ void executorAtenBatchNorm2d(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, S
     }
 
     if (training == 1) {
-        Log::RT::E() << "Currently, NNRuntime only support inference !";
+        DLOG(FATAL) << "Currently, NNRuntime only support inference !";
     }
 
     // Call kernel

@@ -63,7 +63,7 @@ void primListConstruct(std::vector<torch::IValue>& stack)
         drop(stack, stack.size());
         push(stack, std::move(items));
     } else {
-        Log::RT::E() << "primListConstruct element type do not support!";
+        DLOG(FATAL) << "primListConstruct element type do not support!";
     }
 }
 
@@ -78,7 +78,7 @@ void primListUnpack(std::vector<torch::IValue>& stack, size_t num_outputs)
 void primRaiseException(std::string msg)
 {
     NNRuntimeException exception(msg);
-    Log::RT::I() << exception.what();
+    DLOG(INFO) << exception.what();
     throw exception;
 }
 
@@ -177,7 +177,7 @@ at::IValue primVariable(std::string ntype, std::vector<torch::IValue> inputs)
                     iv.push_back(temp_iv.at(0));
                     temp_iv.clear();
                 } else {
-                    Log::RT::E() << "Variable ntype: " << ntype_stack.top() << "is wrong!";
+                    DLOG(FATAL) << "Variable ntype: " << ntype_stack.top() << "is wrong!";
                 }
             } else {
                 //list[tuple, tuple] tuple[tuple, tuple]
@@ -200,7 +200,7 @@ at::IValue primVariable(std::string ntype, std::vector<torch::IValue> inputs)
                     ntype_stack.pop();
                     primTupleConstruct(temp_iv, temp_iv.size());
                 } else {
-                    Log::RT::E() << "Variable ntype: " << ntype_stack.top() << "is wrong!";
+                    DLOG(FATAL) << "Variable ntype: " << ntype_stack.top() << "is wrong!";
                 }
 
                 // update output to iv

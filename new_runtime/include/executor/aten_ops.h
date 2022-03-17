@@ -3,7 +3,6 @@
 #ifndef NNCOMPILER_ATEN_OP_H
 #define NNCOMPILER_ATEN_OP_H
 #include "ATen/ATen.h"
-#include "new_runtime/include/common/log.hpp"
 
 namespace nn_compiler
 {
@@ -116,7 +115,7 @@ static std::string atenFormat(const std::string &fmt)
 {
     int index = fmt.find("{}");
     if (index != std::string::npos) {
-        Log::RT::E() << "Too few arguments for format string:" << fmt;
+        DLOG(FATAL) << "Too few arguments for format string:" << fmt;
     }
     return fmt;
 }

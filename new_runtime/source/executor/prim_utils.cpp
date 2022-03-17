@@ -3,7 +3,6 @@
 #include <stdexcept>
 #include <vector>
 
-#include "new_runtime/include/common/log.hpp"
 #include "new_runtime/include/executor/prim_utils.h"
 
 namespace fs = std::experimental::filesystem;
@@ -45,7 +44,7 @@ torch::Tensor createPtTensor(void* data_ptr, const std::vector<int64_t>& shape, 
     } else if (dtype == DataType::BOOL) {
         scalar_type = c10::ScalarType::Bool;
     } else {
-        Log::RT::E() << "Unsupport dtype when create Tensor";
+        DLOG(FATAL) << "Unsupport dtype when create Tensor";
     }
     auto sizes = c10::IntArrayRef(shape);
     if (stride.size() == 0) {
@@ -92,7 +91,7 @@ torch::Tensor loadTensor(const std::string& bin_file, const std::vector<int64_t>
     } else if (dtype == DataType::BOOL) {
         total_size = num_elements * sizeof(bool);
     } else {
-        Log::RT::E() << "unsupported data type!";
+        DLOG(FATAL) << "unsupported data type!";
     }
     char* buffer = new char[total_size];
     // read binary file
@@ -125,7 +124,7 @@ std::pair<int, DataType> parseNtype(std::string& ntype)
                 ;
             element_type = DataType::INT64;
         } else {
-            Log::RT::E() << "unspported datatype for tuple.";
+            DLOG(FATAL) << "unspported datatype for tuple.";
         }
         return std::make_pair(element_num, element_type);
     };
@@ -161,7 +160,7 @@ torch::jit::IValue convertVaraibleData2IValve(uint8_t* ptr, DataType d_type)
             iv = scalarToIValue<int64_t>(*(int64_t*)(ptr));
             break;
         default:
-            Log::RT::E() << "Element type do not support! ";
+            DLOG(FATAL) << "Element type do not support! ";
             break;
     }
     return iv;

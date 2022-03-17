@@ -7,7 +7,7 @@ namespace runtime
 {
 void executePrimConstant(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
-    Log::RT::D() << "execute PrimConstant";
+    DLOG(INFO) << "execute PrimConstant";
     auto constant_layer = std::dynamic_pointer_cast<nn_compiler::ir::PrimConstantLayer>(layer);
     assert(layer->getInSTensorID().size() == 0);  // Constant Op
 
@@ -37,9 +37,9 @@ void executePrimConstant(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, Strea
         // set bool as int64
         int64_t tmp = 0;
         tmp = *(int64_t*)ptr;
-        Log::RT::D() << "Set Data: " << tmp;
+        DLOG(INFO) << "Set Data: " << tmp;
         iv = scalarToIValue(tmp);
-        Log::RT::D() << "IV: " << iv;
+        DLOG(INFO) << "IV: " << iv;
         dtype = DataType::INT64;
     } else if (ntype == "float") {
         // float64
@@ -55,7 +55,7 @@ void executePrimConstant(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, Strea
         } else if (bit_width == 32) {
             scalar_type = DataType::FLOAT32;
         } else {
-            Log::RT::E() << "PrimConstant Error, unsupport data type when create Tensor!";
+            DLOG(FATAL) << "PrimConstant Error, unsupport data type when create Tensor!";
         }
 
         std::vector<int64_t> input_shape = getDataShapeFromSTensor(shape_);
@@ -113,7 +113,7 @@ void executePrimConstant(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, Strea
                 double tmp = *(int64_t*)(ptr + sizeof(int64_t) * i);
                 iv_tmp = scalarToIValue<double>(tmp);
             } else {
-                Log::RT::E() << "unspported datatype for tuple.";
+                DLOG(FATAL) << "unspported datatype for tuple.";
             }
             inputs.push_back(iv_tmp);
         }
@@ -140,7 +140,7 @@ void executePrimConstant(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, Strea
         iv = inputs.at(0);
         dtype = DataType::LIST;
     } else {
-        Log::RT::E() << "PrimConstant Error, ntype: " << ntype << "unsupport!";
+        DLOG(FATAL) << "PrimConstant Error, ntype: " << ntype << "unsupport!";
     }
 
     // the stensor id of all output edge is same in Contant Op
@@ -150,7 +150,7 @@ void executePrimConstant(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, Strea
 
 void executePrimData(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
-    Log::RT::D() << "execute PrimData";
+    DLOG(INFO) << "execute PrimData";
 
     auto in_stensor_ids = layer->getInSTensorID();
     // Find the input blob
@@ -168,7 +168,7 @@ void executePrimData(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExe
 
 void executePrimDevice(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
-    Log::RT::D() << "execute PrimDevice";
+    DLOG(INFO) << "execute PrimDevice";
 
     auto in_stensor_ids = layer->getInSTensorID();
     // Find the input blob
@@ -185,7 +185,7 @@ void executePrimDevice(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamE
 
 void executePrimDtype(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
-    Log::RT::D() << "execute PrimDtype";
+    DLOG(INFO) << "execute PrimDtype";
 
     // Find input edge, primDtype only have one input & output
     auto in_stensor_ids = layer->getInSTensorID();
@@ -204,13 +204,13 @@ void executePrimDtype(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamEx
 
 void executePrimEndIf(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
-    Log::RT::D() << "execute PrimEndIf";
+    DLOG(INFO) << "execute PrimEndIf";
 
     auto end_if_layer = std::dynamic_pointer_cast<nn_compiler::ir::PrimEndIfLayer>(layer);
     int if_id = end_if_layer->getIfLayerId();
 
-    Log::RT::D() << "end_if_id: " << layer->getID();
-    Log::RT::D() << "if_id: " << if_id;
+    DLOG(INFO) << "end_if_id: " << layer->getID();
+    DLOG(INFO) << "if_id: " << if_id;
 
     int64_t next_layer_id = -1;
     nn_compiler::ir::NNLayer* next_layer = nullptr;
@@ -218,11 +218,11 @@ void executePrimEndIf(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamEx
     // if --- endif -(else body)--- end
     if (!end_if_layer->getIsElseNet()) {
         next_layer_id = end_if_layer->getGotoLayer();
-        Log::RT::D() << "If layer run then branch!";
+        DLOG(INFO) << "If layer run then branch!";
     } else {
-        Log::RT::D() << "If layer run else branch!";
+        DLOG(INFO) << "If layer run else branch!";
         next_layer_id = layer->getID() + 1;
-        Log::RT::D() << "EndIfLayer.next_layer_id:" << next_layer_id;
+        DLOG(INFO) << "EndIfLayer.next_layer_id:" << next_layer_id;
 
         auto in_stensor_ids = layer->getInSTensorID();
         if (in_stensor_ids.size() > 0) {
@@ -237,10 +237,10 @@ void executePrimEndIf(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamEx
             } else if (iv.isBool()) {
                 condiction = iv.toBool();
             } else {
-                Log::RT::E() << "PrimEndIf Error, unsupport data type!";
+                DLOG(FATAL) << "PrimEndIf Error, unsupport data type!";
             }
             assert(in_stensor_ids.size() % 2 == 0);
-            Log::RT::D() << "Num Input: " << in_stensor_ids.size();
+            DLOG(INFO) << "Num Input: " << in_stensor_ids.size();
 
             std::vector<int64_t> in_blob_ids;
             if (condiction == 1) {
@@ -271,7 +271,7 @@ void executePrimEndIf(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamEx
 
 void executePrimGetAttr(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
-    Log::RT::D() << "execute PrimGetAttr";
+    DLOG(INFO) << "execute PrimGetAttr";
 
     auto in_stensor_ids = layer->getInSTensorID();
     auto out_stensor_ids = getUniqueOutStensorIds(layer);
@@ -287,12 +287,12 @@ void executePrimGetAttr(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, Stream
 
 void executePrimIf(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
-    Log::RT::D() << "execute PrimIf";
+    DLOG(INFO) << "execute PrimIf";
     auto if_layer = std::dynamic_pointer_cast<nn_compiler::ir::PrimIfLayer>(layer);
     auto in_stensor_ids = layer->getInSTensorID();
     assert(in_stensor_ids.size() == 1);
 
-    Log::RT::D() << "PrimIfLayer.if" << layer->getID();
+    DLOG(INFO) << "PrimIfLayer.if" << layer->getID();
 
     // Find input edge, primIf only have one input
     // Find the input blob, named condition, it is a int64/bool value
@@ -303,7 +303,7 @@ void executePrimIf(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecu
     } else if (iv.isBool()) {
         condiction = iv.toBool();
     } else {
-        Log::RT::E() << "PrimIf Error, unsupport data type!";
+        DLOG(FATAL) << "PrimIf Error, unsupport data type!";
     }
     assert(condiction == 0 || condiction == 1);
 
@@ -312,23 +312,23 @@ void executePrimIf(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecu
 
     // ref: https://github.sec.samsung.net/PIM/NNCompiler/pull/74/files
     if (condiction == 1) {
-        Log::RT::D() << "PrimIf(True branch)";
+        DLOG(INFO) << "PrimIf(True branch)";
         // choose then_net
         // next_node = if_node.id + 1
         next_layer_id = layer->getID() + 1;
     } else {
-        Log::RT::D() << "PrimIf(False branch)";
+        DLOG(INFO) << "PrimIf(False branch)";
         // getElseNetStartNode
         next_layer_id = if_layer->getElseNetStartLayer();
     }
 
-    Log::RT::D() << "PrimIf_next_layer_id:" << next_layer_id;
+    DLOG(INFO) << "PrimIf_next_layer_id:" << next_layer_id;
     stream_executor.setCursor(next_layer_id);
 }
 
 void executePrimListConstruct(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
-    Log::RT::D() << "execute PrimListConstruct";
+    DLOG(INFO) << "execute PrimListConstruct";
     auto in_stensor_ids = layer->getInSTensorID();
     std::vector<torch::IValue> inputs;
     DataType type = DataType::NONE;
@@ -350,7 +350,7 @@ void executePrimListConstruct(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, 
 
 void executePrimListUnpack(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
-    Log::RT::D() << "execute PrimListUnpack";
+    DLOG(INFO) << "execute PrimListUnpack";
 
     auto in_stensor_ids = layer->getInSTensorID();
     // Find the input blob
@@ -371,13 +371,13 @@ void executePrimListUnpack(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, Str
 
 void executePrimLoopIndex(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
-    Log::RT::D() << "executePrimLoopIndex";
+    DLOG(INFO) << "executePrimLoopIndex";
 
     // cast Layer
     auto loop_index_layer = std::dynamic_pointer_cast<nn_compiler::ir::PrimLoopIndexLayer>(layer);
     int64_t loop_index = loop_index_layer->getIndex();
     if (loop_index < 0) {
-        Log::RT::D() << "Invalid value for LoopIndex! set default loopIndex = 0!";
+        DLOG(INFO) << "Invalid value for LoopIndex! set default loopIndex = 0!";
         loop_index = 0;
     }
 
@@ -393,7 +393,7 @@ void executePrimLoopIndex(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, Stre
 
 void executePrimRaiseException(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
-    Log::RT::D() << "execute PrimRaiseException";
+    DLOG(INFO) << "execute PrimRaiseException";
 
     auto in_stensor_ids = layer->getInSTensorID();
     // Find the input blob
@@ -404,7 +404,7 @@ void executePrimRaiseException(std::shared_ptr<nn_compiler::ir::NNLayer>& layer,
 
 void executePrimSetAttr(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
-    Log::RT::D() << "execute PrimSetAttr";
+    DLOG(INFO) << "execute PrimSetAttr";
 
     auto in_stensor_ids = layer->getInSTensorID();
     // first edge is variable node, second edge is the data saved to the variable node.
@@ -415,7 +415,7 @@ void executePrimSetAttr(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, Stream
 
 void executePrimTupleConstruct(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
-    Log::RT::D() << "execute PrimTupleConstruct";
+    DLOG(INFO) << "execute PrimTupleConstruct";
 
     auto in_stensor_ids = layer->getInSTensorID();
 
@@ -434,7 +434,7 @@ void executePrimTupleConstruct(std::shared_ptr<nn_compiler::ir::NNLayer>& layer,
 
 void executePrimTupleIndex(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
-    Log::RT::D() << "execute PrimTupleIndex";
+    DLOG(INFO) << "execute PrimTupleIndex";
 
     auto tuple_index_layer = std::dynamic_pointer_cast<nn_compiler::ir::PrimTupleIndexLayer>(layer);
     auto in_stensor_ids = layer->getInSTensorID();
@@ -465,14 +465,14 @@ void executePrimTupleIndex(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, Str
         } else if (output_iv.isTuple()) {
             stream_executor.updateBlob(out_stensor_id, DataType::TUPLE, output_iv);
         } else {
-            Log::RT::E() << "Unsupported input for PrimTupleIndex.";
+            DLOG(FATAL) << "Unsupported input for PrimTupleIndex.";
         }
     }
 }
 
 void executePrimTupleUnpack(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
-    Log::RT::D() << "execute PrimTupleUnpack";
+    DLOG(INFO) << "execute PrimTupleUnpack";
     auto in_stensor_ids = layer->getInSTensorID();
     torch::jit::IValue iv = stream_executor.findBlob(in_stensor_ids[0]).second;
 
@@ -489,7 +489,7 @@ void executePrimTupleUnpack(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, St
 
 void executePrimType(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
-    Log::RT::D() << "execute PrimType";
+    DLOG(INFO) << "execute PrimType";
 
     auto in_stensor_ids = layer->getInSTensorID();
     auto map_value = stream_executor.findBlob(in_stensor_ids[0]);
@@ -499,7 +499,7 @@ void executePrimType(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExe
     if (iv.isDevice()) {
         device_type = iv.toDevice().str();
     } else {
-        Log::RT::E() << "PrimType op's input data is incorrect!";
+        DLOG(FATAL) << "PrimType op's input data is incorrect!";
     }
 
     // update output
@@ -509,7 +509,7 @@ void executePrimType(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExe
 
 void executePrimUncheckedCast(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
-    Log::RT::D() << "execute PrimUncheckedCast";
+    DLOG(INFO) << "execute PrimUncheckedCast";
 
     auto in_stensor_ids = layer->getInSTensorID();
     auto map_value = stream_executor.findBlob(in_stensor_ids[0]);
@@ -525,7 +525,7 @@ void executePrimUncheckedCast(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, 
 
 void executePrimUninitialized(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
-    Log::RT::D() << "execute PrimUninitialized";
+    DLOG(INFO) << "execute PrimUninitialized";
 
     // Call OpKernel
     auto output = primUninitialized();
@@ -537,7 +537,7 @@ void executePrimUninitialized(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, 
 
 void executePrimVariable(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
-    Log::RT::D() << "execute PrimVariable";
+    DLOG(INFO) << "execute PrimVariable";
 
     auto variable_layer = std::dynamic_pointer_cast<nn_compiler::ir::PrimVariableLayer>(layer);
     auto ntype = variable_layer->getNType();
@@ -607,7 +607,7 @@ void executePrimVariable(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, Strea
         auto out_stensor_id = layer->getOutSTensorID()[0];
         stream_executor.updateBlob(out_stensor_id, DataType::TENSOR, iv);
     } else {
-        Log::RT::E() << "Variable op data type: " << ntype << "do not support! ";
+        DLOG(FATAL) << "Variable op data type: " << ntype << "do not support! ";
     }
 }
 
@@ -686,7 +686,7 @@ std::unordered_map<std::string, int64_t> getMatchedLoopInfo(int64_t loop_block_i
 
 void executePrimBlock(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
-    Log::RT::D() << "execute PrimBlock";
+    DLOG(INFO) << "execute PrimBlock";
 
     // Prim Blcok only transfer input -- block --> outputs
     // Block( loopIndex: int,  x1, x2.....xr : IValue)
@@ -761,7 +761,7 @@ void executePrimBlock(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamEx
 
 void executePrimLoop(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
-    Log::RT::D() << "execute PrimLoop";
+    DLOG(INFO) << "execute PrimLoop";
 
     auto loop_layer = std::dynamic_pointer_cast<nn_compiler::ir::PrimLoopLayer>(layer);
     int64_t loop_layer_id = layer->getID();
@@ -793,7 +793,7 @@ void executePrimLoop(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExe
     //
     executePrimLoopIndex(loop_index_layer_, stream_executor);  // BUG: this will reset loop_index
 
-    Log::RT::D() << "loop_index_blob_id: " << loop_index_blob_id;
+    DLOG(INFO) << "loop_index_blob_id: " << loop_index_blob_id;
     int64_t loop_index = stream_executor.findBlob(loop_index_layer_->getOutSTensorID()[0]).second.toInt();
 
     // Get LoopBlockNode.id
@@ -813,12 +813,12 @@ void executePrimLoop(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExe
     }
 
     executePrimBlock(loop_block_layer_, stream_executor);
-    Log::RT::D() << "PrimLoop: loop_index = " << loop_index;
+    DLOG(INFO) << "PrimLoop: loop_index = " << loop_index;
 }
 
 void executePrimEndLoop(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
-    Log::RT::D() << "execute PrimEndLoop";
+    DLOG(INFO) << "execute PrimEndLoop";
 
     auto end_loop_layer = std::dynamic_pointer_cast<nn_compiler::ir::PrimEndLoopLayer>(layer);
 
@@ -828,7 +828,7 @@ void executePrimEndLoop(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, Stream
 
     // Get newset LoopIndex
     int loop_index_blob_id = loop_index_layer_->getOutSTensorID()[0];
-    Log::RT::D() << "LoopIndexBlobId:" << loop_index_blob_id;
+    DLOG(INFO) << "LoopIndexBlobId:" << loop_index_blob_id;
     int64_t loop_index = stream_executor.findBlob(loop_index_blob_id).second.toInt();
 
     // loop_index ++
@@ -837,7 +837,7 @@ void executePrimEndLoop(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, Stream
     // update loop_index blob
     stream_executor.updateBlob(loop_index_blob_id, DataType::INT64, scalarToIValue<int64_t>(loop_index));
 
-    Log::RT::D() << "PrimEndLoop: loop_index=" << loop_index;
+    DLOG(INFO) << "PrimEndLoop: loop_index=" << loop_index;
 
     // jump to loopStart
     // LoopBlock
