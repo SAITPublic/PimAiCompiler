@@ -1,22 +1,20 @@
-#include "common/include/command_line_parser.hpp"
 #include "examples/runtime/include/pipeline_manager.hpp"
-
-static cl_opt::Option<std::string> input_file_path_option(std::vector<std::string>{"-i", "--input"}, "<file>",
-                                                          "Input file path", cl_opt::Required::YES);
-
-static cl_opt::Option<std::string> model_type_option(std::vector<std::string>{"-m", "--model"}, "<model type>",
-                                                     "Possible model type: RNNT/HWR/GNMT", cl_opt::Required::YES);
-
-static cl_opt::Option<bool> profiling_option("-p", "--profiling", "run with profiling", cl_opt::Required::NO,
-                                             cl_opt::Hidden::NO, false);
+#include "third_party/cmdline/cmdline.h"
 
 int main(int argc, char* argv[])
 {
-    cl_opt::CommandLineParser::getInstance().parseCommandLine(argc, argv);
+    cmdline::parser command_line_parser;
+
+    command_line_parser.add<std::string>("input", 'i', "Input file path", true, "");
+    command_line_parser.add<std::string>("model", 'm', "Model type (RNNT/GNMT/HWR)", true, "");
+    command_line_parser.add<bool>("profiling", 'p', "Profiling", false, false);
+
+    command_line_parser.parse_check(argc, argv);
+
     // parse command arguments
-    auto input_file_path = static_cast<std::string>(input_file_path_option);
-    auto model_type = static_cast<std::string>(model_type_option);
-    auto profiling = static_cast<bool>(profiling_option);
+    auto input_file_path = command_line_parser.get<std::string>("input");
+    auto model_type = command_line_parser.get<std::string>("model");
+    auto profiling = command_line_parser.get<bool>("profiling");
 
     examples::PipelineManager pipeline_manager;
 

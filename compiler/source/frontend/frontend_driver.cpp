@@ -1,7 +1,5 @@
 #include <experimental/filesystem>
 
-#include "common/include/command_line_parser.hpp"
-
 #include "compiler/include/frontend/frontend_driver.hpp"
 #include "compiler/include/frontend/optimizer/pass_manager.h"
 
