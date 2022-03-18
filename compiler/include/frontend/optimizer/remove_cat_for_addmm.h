@@ -1,10 +1,7 @@
 #pragma once
 
 #include "compiler/include/common/pass.hpp"
-
 #include "half.hpp"
-
-#include "ir/include/layers/prim_constant_layer.h"
 
 typedef half_float::half float16;
 

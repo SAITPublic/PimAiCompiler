@@ -4,7 +4,6 @@
 
 #include "ir/include/common/utils.hpp"
 #include "ir/include/layers/all_layers.h"
-#include "ir/include/layers/nn_layer.h"
 #include "runtime/include/executor/op_executor/prim_ops.h"
 #include "runtime/include/executor/stream_executor.h"
 #include "runtime/include/executor/utils/prim_utils.h"

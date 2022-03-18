@@ -1,7 +1,6 @@
 #include <string>
 
 #include "compiler/include/frontend/optimizer/remove_get_attr_layers.h"
-#include "ir/include/layers/prim_get_attr_layer.h"
 #include "ir/include/utils/graph_util.h"
 
 namespace nn_compiler {

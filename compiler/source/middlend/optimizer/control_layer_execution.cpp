@@ -1,14 +1,6 @@
 #include <string>
 
 #include "compiler/include/middlend/optimizer/control_layer_execution.h"
-#include "ir/include/layers/aten_lstm1_layer.h"
-#include "ir/include/layers/aten_lstm2_layer.h"
-#include "ir/include/layers/prim_constant_layer.h"
-#include "ir/include/layers/prim_end_if_layer.h"
-#include "ir/include/layers/prim_end_loop_layer.h"
-#include "ir/include/layers/prim_if_layer.h"
-#include "ir/include/layers/prim_loop_layer.h"
-#include "ir/include/layers/prim_variable_layer.h"
 #include "ir/include/tensors/data_tensor.h"
 #include "ir/include/types.h"
 #include "ir/include/utils/graph_util.h"

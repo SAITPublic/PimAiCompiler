@@ -3,8 +3,6 @@
 #include <vector>
 
 #include "compiler/include/middlend/optimizer/cat_labeling.h"
-#include "ir/include/layers/aten_cat_layer.h"
-#include "ir/include/layers/aten_lstm1_layer.h"
 #include "ir/include/nn_model.h"
 #include "ir/include/nn_network.h"
 #include "ir/include/types.h"

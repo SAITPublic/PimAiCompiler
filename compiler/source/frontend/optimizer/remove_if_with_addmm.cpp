@@ -1,10 +1,6 @@
 #include <string>
 
 #include "compiler/include/frontend/optimizer/remove_if_with_addmm.h"
-
-#include "ir/include/layers/aten_addmm_layer.h"
-#include "ir/include/layers/pim_general_layers.h"
-#include "ir/include/layers/prim_if_layer.h"
 #include "ir/include/utils/graph_util.h"
 
 namespace nn_compiler {

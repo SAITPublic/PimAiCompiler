@@ -54,12 +54,11 @@
 
 #include "ir/include/layers/prim_callmethod_layer.h"
 #include "ir/include/layers/prim_constant_layer.h"
+#include "ir/include/layers/prim_end_if_layer.h"
+#include "ir/include/layers/prim_end_loop_layer.h"
 #include "ir/include/layers/prim_get_attr_layer.h"
 #include "ir/include/layers/prim_if_layer.h"
 #include "ir/include/layers/prim_loop_index_layer.h"
 #include "ir/include/layers/prim_loop_layer.h"
 #include "ir/include/layers/prim_tuple_index_layer.h"
 #include "ir/include/layers/prim_variable_layer.h"
-
-#include "ir/include/layers/prim_end_if_layer.h"
-#include "ir/include/layers/prim_end_loop_layer.h"

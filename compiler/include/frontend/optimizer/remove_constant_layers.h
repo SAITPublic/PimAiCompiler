@@ -1,8 +1,6 @@
 #pragma once
 
 #include "compiler/include/common/pass.hpp"
-#include "ir/include/layers/prim_constant_layer.h"
-#include "ir/include/layers/prim_variable_layer.h"
 
 namespace nn_compiler
 {

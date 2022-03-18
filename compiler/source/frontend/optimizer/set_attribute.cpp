@@ -1,8 +1,6 @@
 #include <string>
 
 #include "compiler/include/frontend/optimizer/set_attribute.h"
-#include "ir/include/layers/prim_constant_layer.h"
-#include "ir/include/layers/prim_variable_layer.h"
 #include "ir/include/utils/graph_util.h"
 
 namespace nn_compiler

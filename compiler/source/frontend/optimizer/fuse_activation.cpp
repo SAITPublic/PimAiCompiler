@@ -1,5 +1,4 @@
 #include "compiler/include/frontend/optimizer/fuse_activation.h"
-#include "ir/include/layers/aten_addmm_layer.h"
 #include "ir/include/utils/graph_util.h"
 
 namespace nn_compiler {

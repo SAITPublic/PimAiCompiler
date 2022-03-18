@@ -1,7 +1,6 @@
 #include "ir/include/utils/graph_print.h"
 
-#include "ir/include/layers/prim_if_layer.h"
-#include "ir/include/layers/prim_loop_layer.h"
+#include "ir/include/layers/all_layers.h"
 
 #include "ir/include/types.h"
 
