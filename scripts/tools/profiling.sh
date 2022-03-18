@@ -34,11 +34,6 @@ do
             m=${!i}
             ARGS="$ARGS -m $(echo ${!i} | tr '[a-z]' '[A-Z]')"
             ;;
-        "--compile_level"|"-l")
-            let "i++"
-            l=${!i}
-            ARGS="$ARGS -l $(echo ${!i} | tr '[a-z]' '[A-Z]')"
-            ;;
         "--help"|"-h")
             usage
             exit 1
@@ -61,12 +56,6 @@ then
 fi
 
 if [[ $m == "" ]]
-then
-    usage
-    exit 1
-fi
-
-if [[ $l == "" ]]
 then
     usage
     exit 1

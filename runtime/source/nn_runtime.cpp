@@ -3,6 +3,7 @@
 #include <tuple>
 
 #include "c10/hip/HIPFunctions.h"
+#include "runtime/include/executor/op_executor/aten_ops_executor.h"
 #include "runtime/include/nn_runtime.h"
 #include "pim_runtime_api.h"
 
@@ -58,8 +59,7 @@ int NNRuntime::rocblas_init(void)
     int K = 4096;
     auto l_gpu = at::randn({M, K}, at::kCUDA);
     auto r_gpu = at::randn({K, N}, at::kCUDA);
-    // TODO(SRCX): release API when it gets ready
-    // auto result = atenMatmul(l_gpu, r_gpu);
+    auto result = atenMatmul(l_gpu, r_gpu);
     at::hip::device_synchronize();
 
     return 0;

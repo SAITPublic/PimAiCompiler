@@ -16,7 +16,6 @@ void PassManager::runPasses(std::unique_ptr<nn_compiler::ir::NNModel>& model)
     DLOG(INFO) << "PassManager::runPasses is called.";
     auto base_pass = std::make_shared<Pass>();
 
-    /*TODO: add middlend passes*/
     auto update_layer_id = std::make_shared<UpdateLayerId>();
     auto control_layer_execution = std::make_shared<ControlLayerExecution>();
     auto lstm_labeling = std::make_shared<LstmLabeling>();

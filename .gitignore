@@ -33,9 +33,6 @@
 .vscode
 .idea
 
-# Generated files
-ir_generated.h
-
 # cmake-build-debug
 cmake-build-debug
 

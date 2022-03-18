@@ -69,7 +69,6 @@ class NNCompiler
      */
     RetVal frontend(const std::string& file_path, const std::string& model_name, std::unique_ptr<ir::NNModel>& model);
 
-    // TODO(SRCX): remove this interface after refactor.
     /**
      * @brief   Milddlend compilation pipeline.
      * @details This function runs middlend compilation pipeline with NNIR input.

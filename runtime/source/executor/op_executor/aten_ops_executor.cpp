@@ -661,7 +661,7 @@ void executorAtenCat(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExe
 
     auto input1_layer = stream_executor.getGraph()->getLayerByPosition((layer->getPreLayerIDs())[0]);
     auto in_input1_stensor_id = input1_layer->getInSTensorID();
-    // TODO(SRCX): implement this part of optimization.
+
     if (stream_executor.model_type_ == "GNMT" && in_input1_stensor_id.size() == 0) {
         int cat_mem_id = cat_layer->getMemLayerId();
         auto it = stream_executor.global_blobs_.find(cat_mem_id);
@@ -1604,7 +1604,6 @@ void executorAtenLen(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExe
     int64_t output = -1;
     if (iv.isList()) {
         output = atenLen(iv.toList());
-        // TODO(SRCX): implement this part of optimization.
         auto input1_layer = stream_executor.getGraph()->getLayerByPosition((layer->getPreLayerIDs())[0]);
         auto out1_layer = stream_executor.getGraph()->getLayerByPosition((layer->getNextLayerIDs())[0]);
         if (stream_executor.model_type_ == "GNMT" &&
