@@ -3,20 +3,19 @@
 
 #include "ir/include/layers/nn_layer.h"
 
-namespace nn_compiler {
-namespace ir {
-
-
-class AtenOnesLayer : public NNLayer {
- public:
+namespace nn_compiler
+{
+namespace ir
+{
+class AtenOnesLayer : public NNLayer
+{
+   public:
     AtenOnesLayer() {}
 
-    AtenOnesLayer(std::string name, LayerType type)
-            : NNLayer(name, type) {
-    }
+    AtenOnesLayer(std::string name, LayerType type) : NNLayer(name, type) {}
 
-    explicit AtenOnesLayer(const AtenOnesLayer& aten_ones_layer) :
-        NNLayer(aten_ones_layer) {
+    explicit AtenOnesLayer(const AtenOnesLayer& aten_ones_layer) : NNLayer(aten_ones_layer)
+    {
         this->dtype_ = aten_ones_layer.dtype_;
         this->layout_ = aten_ones_layer.layout_;
         this->device_ = aten_ones_layer.device_;
@@ -25,9 +24,7 @@ class AtenOnesLayer : public NNLayer {
 
     virtual ~AtenOnesLayer() {}
 
-    virtual std::shared_ptr<NNLayer> clone() {
-        return  std::shared_ptr<AtenOnesLayer>(new AtenOnesLayer(*this));
-    }
+    virtual std::shared_ptr<NNLayer> clone() { return std::shared_ptr<AtenOnesLayer>(new AtenOnesLayer(*this)); }
 
     void setDType(int64_t dtype) { dtype_ = dtype; }
 
@@ -45,7 +42,8 @@ class AtenOnesLayer : public NNLayer {
 
     int getPinMemory() const { return pin_memory_; }
 
-    void printAttr() {
+    void printAttr()
+    {
         DLOG(INFO) << "    AtenOnesAttr   ";
         DLOG(INFO) << "    dtype is       " << dtype_;
         DLOG(INFO) << "    layout is      " << layout_;
@@ -53,12 +51,12 @@ class AtenOnesLayer : public NNLayer {
         DLOG(INFO) << "    pin_memory is  " << pin_memory_;
     }
 
- private:
-    int64_t dtype_      = INT64_MIN;
-    int64_t layout_     = INT64_MIN;
+   private:
+    int64_t dtype_ = INT64_MIN;
+    int64_t layout_ = INT64_MIN;
     std::string device_ = "";
-    int pin_memory_     = INT32_MAX;
+    int pin_memory_ = INT32_MAX;
 };
 
-} // namespace ir
-} // namespace nn_compiler
+}  // namespace ir
+}  // namespace nn_compiler

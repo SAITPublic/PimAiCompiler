@@ -2,26 +2,26 @@
 
 #include "ir/include/layers/nn_layer.h"
 
-namespace nn_compiler {
-namespace ir {
-
-
-class AtenMaskedFillLayer : public NNLayer {
- public:
+namespace nn_compiler
+{
+namespace ir
+{
+class AtenMaskedFillLayer : public NNLayer
+{
+   public:
     AtenMaskedFillLayer() {}
 
-    AtenMaskedFillLayer(std::string name, LayerType type)
-            : NNLayer(name, type) {
-    }
+    AtenMaskedFillLayer(std::string name, LayerType type) : NNLayer(name, type) {}
 
-    explicit AtenMaskedFillLayer(const AtenMaskedFillLayer &aten_masked_fill_layer) :
-        NNLayer(aten_masked_fill_layer) {
-            this->is_inplace_ = aten_masked_fill_layer.is_inplace_;
+    explicit AtenMaskedFillLayer(const AtenMaskedFillLayer &aten_masked_fill_layer) : NNLayer(aten_masked_fill_layer)
+    {
+        this->is_inplace_ = aten_masked_fill_layer.is_inplace_;
     }
 
     virtual ~AtenMaskedFillLayer() {}
 
-    virtual std::shared_ptr<NNLayer> clone() {
+    virtual std::shared_ptr<NNLayer> clone()
+    {
         return std::shared_ptr<AtenMaskedFillLayer>(new AtenMaskedFillLayer(*this));
     }
 
@@ -29,13 +29,11 @@ class AtenMaskedFillLayer : public NNLayer {
 
     bool getIsInplace() const { return is_inplace_; }
 
-    void printAttr() {
-        DLOG(INFO) << "    AtenMaskedFillAttr      ";
-    }
+    void printAttr() { DLOG(INFO) << "    AtenMaskedFillAttr      "; }
 
- private:
+   private:
     bool is_inplace_ = false;
 };
 
-} // namespace ir
-} // namespace nn_compiler
+}  // namespace ir
+}  // namespace nn_compiler

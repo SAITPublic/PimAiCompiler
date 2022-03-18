@@ -76,23 +76,19 @@ class AtenLSTM1Layer : public NNLayer
 
     std::vector<at::Tensor> getWeights() { return this->weights_; }
 
-    void setWeights(const std::vector<at::Tensor> &weights) {
-        this->weights_ = weights;
-    }
+    void setWeights(const std::vector<at::Tensor> &weights) { this->weights_ = weights; }
 
     std::vector<at::Tensor> getBiases() { return this->biases_; }
 
-    void setBiases(const std::vector<at::Tensor> &biases) {
-        this->biases_ = biases;
-    }
+    void setBiases(const std::vector<at::Tensor> &biases) { this->biases_ = biases; }
 
     std::vector<int64_t> getWeightIds() { return weight_ids_; }
 
-    void setWeightIds(const std::vector<int64_t>& weight_ids) { weight_ids_ = weight_ids; }
+    void setWeightIds(const std::vector<int64_t> &weight_ids) { weight_ids_ = weight_ids; }
 
     std::vector<int64_t> getBiasIds() { return bias_ids_; }
 
-    void setBiasIds(const std::vector<int64_t>& bias_ids) { bias_ids_ = bias_ids; }
+    void setBiasIds(const std::vector<int64_t> &bias_ids) { bias_ids_ = bias_ids; }
 
     int getHasBiases() { return this->has_biases_; }
 
@@ -148,8 +144,8 @@ class AtenLSTM1Layer : public NNLayer
     int batch_first_ = INT32_MAX;
 
     // weights & bias, 8 or 12 tensors
-    std::vector<at::Tensor> weights_;     // only weight, dim > 1
-    std::vector<at::Tensor> biases_;        // bias, dim == 1
+    std::vector<at::Tensor> weights_;  // only weight, dim > 1
+    std::vector<at::Tensor> biases_;   // bias, dim == 1
     std::vector<int64_t> weight_ids_;
     std::vector<int64_t> bias_ids_;
 

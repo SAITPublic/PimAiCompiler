@@ -24,16 +24,17 @@
 
 #include "ir/include/tensors/shape_tensor.h"
 
-namespace nn_compiler {
-namespace ir {
+namespace nn_compiler
+{
+namespace ir
+{
+class NNLayer
+{
+   public:
+    NNLayer() {}
 
-class NNLayer {
- public:
-    NNLayer() {
-    }
-
-    NNLayer(std::string name, LayerType type)
-            : name_(name), type_(type) {
+    NNLayer(std::string name, LayerType type) : name_(name), type_(type)
+    {
         static uint32_t increased_cnt = 0;
         id_ = increased_cnt++;
     }

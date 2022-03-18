@@ -2,19 +2,19 @@
 
 #include "ir/include/layers/nn_layer.h"
 
-namespace nn_compiler {
-namespace ir {
-
-class AtenMaxPool2dLayer : public NNLayer {
- public:
+namespace nn_compiler
+{
+namespace ir
+{
+class AtenMaxPool2dLayer : public NNLayer
+{
+   public:
     AtenMaxPool2dLayer() {}
 
-    AtenMaxPool2dLayer(std::string name, LayerType type)
-            : NNLayer(name, type) {
-    }
+    AtenMaxPool2dLayer(std::string name, LayerType type) : NNLayer(name, type) {}
 
-    explicit AtenMaxPool2dLayer(const AtenMaxPool2dLayer &aten_max_pool2d_layer) :
-        NNLayer(aten_max_pool2d_layer) {
+    explicit AtenMaxPool2dLayer(const AtenMaxPool2dLayer &aten_max_pool2d_layer) : NNLayer(aten_max_pool2d_layer)
+    {
         this->kernel_size_ = aten_max_pool2d_layer.kernel_size_;
         this->pad_ = aten_max_pool2d_layer.pad_;
         this->stride_ = aten_max_pool2d_layer.stride_;
@@ -24,7 +24,8 @@ class AtenMaxPool2dLayer : public NNLayer {
 
     virtual ~AtenMaxPool2dLayer() {}
 
-    virtual std::shared_ptr<NNLayer> clone() {
+    virtual std::shared_ptr<NNLayer> clone()
+    {
         return std::shared_ptr<AtenMaxPool2dLayer>(new AtenMaxPool2dLayer(*this));
     }
 
@@ -48,7 +49,8 @@ class AtenMaxPool2dLayer : public NNLayer {
 
     int getCeilMode() const { return ceil_mode_; }
 
-    void printAttr() {
+    void printAttr()
+    {
         DLOG(INFO) << "  AtemMaxPool2dAttr";
         DLOG(INFO) << "  Kernel size are  " << kernel_size_[0];
         DLOG(INFO) << "                   " << kernel_size_[1];
@@ -61,7 +63,7 @@ class AtenMaxPool2dLayer : public NNLayer {
         DLOG(INFO) << "  ceil_mode is     " << ceil_mode_;
     }
 
- private:
+   private:
     std::vector<int64_t> kernel_size_ = {INT64_MIN, INT64_MIN};
 
     std::vector<int64_t> stride_ = {INT64_MIN, INT64_MIN};
@@ -73,5 +75,5 @@ class AtenMaxPool2dLayer : public NNLayer {
     int ceil_mode_ = INT32_MAX;
 };
 
-} // namespace ir
-} // namespace nn_compiler
+}  // namespace ir
+}  // namespace nn_compiler
