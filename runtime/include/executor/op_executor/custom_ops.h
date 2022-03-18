@@ -6,8 +6,8 @@
 #include <algorithm>
 #include <iostream>
 
-#include "hip/hip_runtime.h"
 #include "hip/hip_fp16.h"
+#include "hip/hip_runtime.h"
 
 struct rocblas_reduce_sum {
     template <typename T>
@@ -368,44 +368,51 @@ void rocblas_addmv_template_Axy(hipStream_t p_stream, const V *b, const V *A, co
 }
 
 template <int block_x, int ele_per_thread, typename U>
-__global__ void add_kernel(int m, int n, U *A, U *B, U *C) {
+__global__ void add_kernel(int m, int n, U *A, U *B, U *C)
+{
     if (hipBlockIdx_y >= m || (hipBlockIdx_x * block_x + hipThreadIdx_x) * ele_per_thread >= n) {
         return;
     }
-    U* index_a = A + hipBlockIdx_y * n + (hipBlockIdx_x * block_x + hipThreadIdx_x) * ele_per_thread;
-    U* index_b = B + hipBlockIdx_y * n + (hipBlockIdx_x * block_x + hipThreadIdx_x) * ele_per_thread;
-    U* index_c = C + hipBlockIdx_y * n + (hipBlockIdx_x * block_x + hipThreadIdx_x) * ele_per_thread;
+    U *index_a = A + hipBlockIdx_y * n + (hipBlockIdx_x * block_x + hipThreadIdx_x) * ele_per_thread;
+    U *index_b = B + hipBlockIdx_y * n + (hipBlockIdx_x * block_x + hipThreadIdx_x) * ele_per_thread;
+    U *index_c = C + hipBlockIdx_y * n + (hipBlockIdx_x * block_x + hipThreadIdx_x) * ele_per_thread;
 
-    reinterpret_cast<half2 *>(index_c)[0] = reinterpret_cast<half2* >(index_a)[0] + reinterpret_cast<half2* >(index_b)[0];
-    reinterpret_cast<half2 *>(index_c)[1] = reinterpret_cast<half2* >(index_a)[1] + reinterpret_cast<half2* >(index_b)[1];
+    reinterpret_cast<half2 *>(index_c)[0] =
+        reinterpret_cast<half2 *>(index_a)[0] + reinterpret_cast<half2 *>(index_b)[0];
+    reinterpret_cast<half2 *>(index_c)[1] =
+        reinterpret_cast<half2 *>(index_a)[1] + reinterpret_cast<half2 *>(index_b)[1];
 }
 
 template <int block_x, int ele_per_thread, typename U>
-__global__ void add_kernel_unsym(int m, int n, U *A, U *B, U *C) {
+__global__ void add_kernel_unsym(int m, int n, U *A, U *B, U *C)
+{
     if (hipBlockIdx_y >= m || (hipBlockIdx_x * block_x + hipThreadIdx_x) * ele_per_thread >= n) {
         return;
     }
-    U* index_a = A + hipBlockIdx_y * n + (hipBlockIdx_x * block_x + hipThreadIdx_x) * ele_per_thread;
-    U* index_b = B + (hipBlockIdx_x * block_x + hipThreadIdx_x) * ele_per_thread;
-    U* index_c = C + hipBlockIdx_y * n + (hipBlockIdx_x * block_x + hipThreadIdx_x) * ele_per_thread;
+    U *index_a = A + hipBlockIdx_y * n + (hipBlockIdx_x * block_x + hipThreadIdx_x) * ele_per_thread;
+    U *index_b = B + (hipBlockIdx_x * block_x + hipThreadIdx_x) * ele_per_thread;
+    U *index_c = C + hipBlockIdx_y * n + (hipBlockIdx_x * block_x + hipThreadIdx_x) * ele_per_thread;
 
-    reinterpret_cast<half2 *>(index_c)[0] = reinterpret_cast<half2* >(index_a)[0] + reinterpret_cast<half2* >(index_b)[0];
-    reinterpret_cast<half2 *>(index_c)[1] = reinterpret_cast<half2* >(index_a)[1] + reinterpret_cast<half2* >(index_b)[1];
+    reinterpret_cast<half2 *>(index_c)[0] =
+        reinterpret_cast<half2 *>(index_a)[0] + reinterpret_cast<half2 *>(index_b)[0];
+    reinterpret_cast<half2 *>(index_c)[1] =
+        reinterpret_cast<half2 *>(index_a)[1] + reinterpret_cast<half2 *>(index_b)[1];
 }
 
 template <typename U, typename W>
-void custom_add(hipStream_t p_stream, U *A, U *B, U *C, int m, int n, W alpha, bool sym, int a_m_s, int a_n_s, int b_m_s, int b_n_s) {
-
+void custom_add(hipStream_t p_stream, U *A, U *B, U *C, int m, int n, W alpha, bool sym, int a_m_s, int a_n_s,
+                int b_m_s, int b_n_s)
+{
     static constexpr int block_x = 256;
-    static constexpr int ele_per_thread = 4;
-    int num_n = (n + block_x - 1) / block_x / ele_per_thread;
+    static constexpr int per_thread = 4;
+    int num_n = (n + block_x - 1) / block_x / per_thread;
     dim3 add_grid(num_n, m);
     dim3 add_threads(block_x);
 
     if (sym) {
-        hipLaunchKernelGGL((add_kernel<block_x, ele_per_thread>), add_grid, add_threads, 0, p_stream, m, n, A, B, C);
+        hipLaunchKernelGGL((add_kernel<block_x, per_thread>), add_grid, add_threads, 0, p_stream, m, n, A, B, C);
     } else {
-        hipLaunchKernelGGL((add_kernel_unsym<block_x, ele_per_thread>), add_grid, add_threads, 0, p_stream, m, n, A, B, C);
+        hipLaunchKernelGGL((add_kernel_unsym<block_x, per_thread>), add_grid, add_threads, 0, p_stream, m, n, A, B, C);
     }
 }
 

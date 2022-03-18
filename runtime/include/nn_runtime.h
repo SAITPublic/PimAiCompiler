@@ -19,8 +19,7 @@ class NNRuntime
 
     NNRuntime(std::unique_ptr<nn_compiler::ir::NNModel>& model, std::string model_type = "");
 
-    void inferenceModel(const std::vector<torch::Tensor>& input_tensors,
-                        std::vector<torch::Tensor>& output_tensors,
+    void inferenceModel(const std::vector<torch::Tensor>& input_tensors, std::vector<torch::Tensor>& output_tensors,
                         bool profiling = false);
 
     int rocblas_init(void);

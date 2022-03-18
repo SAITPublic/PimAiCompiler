@@ -1,14 +1,14 @@
+#include "runtime/include/builder/model_builder.h"
 #include "half.hpp"
 #include "ir/include/layers/all_layers.h"
 #include "ir/include/tensors/data_tensor.h"
-#include "runtime/include/builder/model_builder.h"
 
 namespace nn_compiler
 {
 namespace runtime
 {
-
-RetVal ModelBuilder::preProcess(std::unique_ptr<nn_compiler::ir::NNModel>& model) {
+RetVal ModelBuilder::preProcess(std::unique_ptr<nn_compiler::ir::NNModel>& model)
+{
     DLOG(INFO) << "ModelBuilder::preProcess() is called";
 
     auto graph = model->getGraphs()[0];
@@ -25,7 +25,8 @@ RetVal ModelBuilder::preProcess(std::unique_ptr<nn_compiler::ir::NNModel>& model
     return RetVal::SUCCESS;
 }
 
-RetVal ModelBuilder::preloadModel(std::unique_ptr<nn_compiler::ir::NNModel>& model) {
+RetVal ModelBuilder::preloadModel(std::unique_ptr<nn_compiler::ir::NNModel>& model)
+{
     DLOG(INFO) << "ModelBuilder::preloadModel() is called";
 
     auto graph = model->getGraphs()[0];
@@ -67,8 +68,9 @@ RetVal ModelBuilder::preloadModel(std::unique_ptr<nn_compiler::ir::NNModel>& mod
     return RetVal::SUCCESS;
 }
 
-std::pair<std::vector<int64_t>, std::vector<int64_t> >
-ModelBuilder::loadWeightAndBias(std::vector<at::Tensor> weight_data, std::vector<at::Tensor> bias_data) {
+std::pair<std::vector<int64_t>, std::vector<int64_t> > ModelBuilder::loadWeightAndBias(
+    std::vector<at::Tensor> weight_data, std::vector<at::Tensor> bias_data)
+{
     std::vector<int64_t> weight_ids;
     std::vector<int64_t> bias_ids;
 

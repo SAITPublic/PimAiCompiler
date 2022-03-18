@@ -36,8 +36,7 @@ class StreamExecutor
 
     RetVal preProcess();
 
-    RetVal inferenceModel(const std::vector<torch::Tensor>& input_tensors,
-                          std::vector<torch::Tensor>& output_tensors);
+    RetVal inferenceModel(const std::vector<torch::Tensor>& input_tensors, std::vector<torch::Tensor>& output_tensors);
 
     RetVal inferenceModelwithProfiling(const std::vector<torch::Tensor>& input_tensors,
                                        std::vector<torch::Tensor>& output_tensors);

@@ -38,7 +38,8 @@ torch::jit::IValue doubleToIValue(const double& value);
 torch::jit::IValue listToIValue(const c10::List<at::IValue>& value);
 
 template <typename T>
-torch::jit::IValue vectorToIValue(const std::vector<T>& value) {
+torch::jit::IValue vectorToIValue(const std::vector<T>& value)
+{
     return torch::jit::IValue(value);
 }
 

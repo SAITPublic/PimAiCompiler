@@ -172,4 +172,4 @@ class TVComparator
 #endif  // TV_ENABLE
 
 }  // namespace runtime
-} // namespace nn_compiler
+}  // namespace nn_compiler

@@ -20,7 +20,10 @@ c10::Device primDevice(const torch::Tensor& input_tensor);
 int64_t primDtype(const torch::Tensor& input_tensor);
 
 template <typename T>
-T& primEndIf(T& inputs) { return inputs; }
+T& primEndIf(T& inputs)
+{
+    return inputs;
+}
 
 std::vector<torch::Tensor> primEndLoop(const std::vector<torch::Tensor>& inputs);
 
@@ -61,7 +64,10 @@ torch::IValue primTupleIndex(const std::vector<torch::IValue>& inputs, int64_t i
 std::vector<torch::IValue> primTupleUnpack(c10::intrusive_ptr<c10::ivalue::Tuple> tuple);
 
 template <typename T>
-T& primUncheckedCast(T& inputs) { return inputs; }
+T& primUncheckedCast(T& inputs)
+{
+    return inputs;
+}
 
 torch::IValue primUninitialized();
 

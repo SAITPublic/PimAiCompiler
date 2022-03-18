@@ -10,7 +10,6 @@ namespace nn_compiler
 {
 namespace runtime
 {
-
 using namespace nn_compiler::ir;
 class ModelBuilder
 {
@@ -21,8 +20,8 @@ class ModelBuilder
 
     RetVal preloadModel(std::unique_ptr<nn_compiler::ir::NNModel>& model);
 
-    std::pair<std::vector<int64_t>, std::vector<int64_t> >
-    loadWeightAndBias(std::vector<at::Tensor> weight_data, std::vector<at::Tensor> bias_data);
+    std::pair<std::vector<int64_t>, std::vector<int64_t>> loadWeightAndBias(std::vector<at::Tensor> weight_data,
+                                                                            std::vector<at::Tensor> bias_data);
 
     data_store_type getPreLoadedData() { return preloaded_data_container_; }
 

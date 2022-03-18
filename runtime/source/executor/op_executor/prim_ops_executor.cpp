@@ -733,7 +733,8 @@ void executePrimBlock(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamEx
         stream_executor.setCursor(end_loop_next_id);
     } else {
         auto graph = stream_executor.getGraph();
-        auto loop_layer = std::static_pointer_cast<nn_compiler::ir::PrimLoopLayer>(graph->getLayerByPosition(loop_layer_id));
+        auto loop_layer =
+            std::static_pointer_cast<nn_compiler::ir::PrimLoopLayer>(graph->getLayerByPosition(loop_layer_id));
         if (!loopHasExtraInputs(loop_layer)) {
             // the in_stensor_ids[0] is invalid, only is maintain linkage
             // only need to pass LoopIndex into Block's inner

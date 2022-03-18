@@ -23,7 +23,6 @@
 #define PROFILE_FUNCTION() PROFILE_SCOPE(__FUNSIG__)
 #endif
 
-
 struct ProfileResult {
     std::string name;
     long long start, end;

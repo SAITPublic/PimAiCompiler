@@ -22,7 +22,7 @@ at::Tensor &atenAdd_(at::Tensor &self, const at::Scalar &other, const at::Scalar
 at::Tensor atenAddmm(const at::Tensor &self, const at::Tensor &mat1, const at::Tensor &mat2, const at::Scalar &beta = 1,
                      const at::Scalar &alpha = 1);
 
-bool atenAnd(bool& a, bool& b);
+bool atenAnd(bool &a, bool &b);
 
 at::Tensor atenAny(const at::Tensor &self);
 
@@ -47,9 +47,9 @@ at::Tensor atenBmm(const at::Tensor &self, const at::Tensor &other);
 
 bool atenBool(const at::Tensor &self);
 
-bool atenBool(const int64_t& i);
+bool atenBool(const int64_t &i);
 
-bool atenBool(const double& d);
+bool atenBool(const double &d);
 
 at::Tensor atenCat(at::TensorList tensors, int64_t dim = 0);
 
@@ -62,14 +62,15 @@ std::vector<at::Tensor> atenChunk(const at::Tensor &self, int chunks, int dim);
 at::Tensor atenClamp(const at::Tensor &self, const at::Scalar &min, const at::Scalar &max);
 
 template <typename T>
-void atenClear(at::List<T>& list) { list.clear(); }
+void atenClear(at::List<T> &list)
+{
+    list.clear();
+}
 
 at::Tensor atenContiguous(const at::Tensor &self, at::MemoryFormat memory_format);
 
-at::Tensor atenConv2d(const at::Tensor &input, const at::Tensor &weight,
-                      const at::Tensor &bias, at::IntArrayRef stride,
-                      at::IntArrayRef padding, at::IntArrayRef dilation, 
-                      int64_t groups);
+at::Tensor atenConv2d(const at::Tensor &input, const at::Tensor &weight, const at::Tensor &bias, at::IntArrayRef stride,
+                      at::IntArrayRef padding, at::IntArrayRef dilation, int64_t groups);
 
 at::Tensor &atenCopy_(at::Tensor &self, const at::Tensor &src, bool non_blocking = false);
 
@@ -93,7 +94,7 @@ at::Tensor atenDropout(const at::Tensor &input, double p, bool train);
 
 at::Tensor &atenDropout_(at::Tensor &self, double p, bool train);
 
-at::Tensor atenEmbedding(const at::Tensor &weight, const at::Tensor &indices, int64_t padding_idx = -1,	
+at::Tensor atenEmbedding(const at::Tensor &weight, const at::Tensor &indices, int64_t padding_idx = -1,
                          bool scale_grad_by_freq = false, bool sparse = false);
 
 at::Tensor atenEq(const at::Tensor &self, const at::Scalar &other);
@@ -155,9 +156,10 @@ at::Tensor atenGt(const at::Tensor &self, const at::Scalar &other);
 
 at::Tensor atenGt(const at::Tensor &self, const at::Tensor &other);
 
-at::Tensor atenIndex(const at::Tensor &self, const c10::List<c10::optional<at::Tensor>>& indices);
+at::Tensor atenIndex(const at::Tensor &self, const c10::List<c10::optional<at::Tensor>> &indices);
 
-at::Tensor &atenIndexPut(at::Tensor &self, const c10::List<c10::optional<at::Tensor>>& indices, const at::Tensor &values, bool accumulate);
+at::Tensor &atenIndexPut(at::Tensor &self, const c10::List<c10::optional<at::Tensor>> &indices,
+                         const at::Tensor &values, bool accumulate);
 
 at::Tensor atenIndexSelect(const at::Tensor &self, int64_t dim, const at::Tensor &index);
 
@@ -187,7 +189,7 @@ c10::List<at::IValue> atenList(const c10::List<at::IValue> &list);
 
 at::Tensor atenLog(const at::Tensor &self);
 
-at::Tensor atenLogSoftmax(const at::Tensor &self, int64_t dim, c10::optional<at::ScalarType> dtype=c10::nullopt);
+at::Tensor atenLogSoftmax(const at::Tensor &self, int64_t dim, c10::optional<at::ScalarType> dtype = c10::nullopt);
 
 std::tuple<at::Tensor, at::Tensor, at::Tensor> atenLstm1(const at::Tensor &input, at::TensorList hx,
                                                          at::TensorList params, bool has_biases, int64_t num_layers,
@@ -207,7 +209,7 @@ at::Tensor atenMaskedFill(const at::Tensor &self, const at::Tensor &mask, at::Sc
 
 at::Tensor atenMaskedFill(const at::Tensor &self, const at::Tensor &mask, const at::Tensor &value);
 
-at::Tensor atenMaskedSelect(const at::Tensor & self, const at::Tensor & mask);
+at::Tensor atenMaskedSelect(const at::Tensor &self, const at::Tensor &mask);
 
 at::Tensor atenMatmul(const at::Tensor &self, const at::Tensor &other);
 
@@ -215,11 +217,9 @@ at::Tensor atenMax(const at::Tensor &self);
 
 at::Tensor atenMax(const at::Tensor &self, const at::Tensor &other);
 
-std::tuple<at::Tensor, at::Tensor> atenMax(const at::Tensor &self, int64_t dim,
-                                           bool keepdim = false);
+std::tuple<at::Tensor, at::Tensor> atenMax(const at::Tensor &self, int64_t dim, bool keepdim = false);
 
-std::tuple<at::Tensor, at::Tensor> atenMax(const at::Tensor &self, at::Dimname dim,
-                                           bool keepdim = false);
+std::tuple<at::Tensor, at::Tensor> atenMax(const at::Tensor &self, at::Dimname dim, bool keepdim = false);
 
 at::Tensor atenMaxPool2d(const at::Tensor &self, at::IntArrayRef kernel_size, at::IntArrayRef stride,
                          at::IntArrayRef padding, at::IntArrayRef dilation, bool ceil_mode);
@@ -262,13 +262,11 @@ bool atenNot(const bool &input);
 
 at::Tensor atenOnes(at::IntArrayRef size, const at::TensorOptions &options);
 
-std::tuple<at::Tensor, at::Tensor> atenPackPaddedSequence(const at::Tensor &input,
-                                                          const at::Tensor &lengths, bool batch_first);
+std::tuple<at::Tensor, at::Tensor> atenPackPaddedSequence(const at::Tensor &input, const at::Tensor &lengths,
+                                                          bool batch_first);
 
-std::tuple<at::Tensor, at::Tensor> atenPadPackedSequence(const at::Tensor &data,
-                                                         const at::Tensor &batch_sizes,
-                                                         bool batch_first,
-                                                         at::Scalar padding_value,
+std::tuple<at::Tensor, at::Tensor> atenPadPackedSequence(const at::Tensor &data, const at::Tensor &batch_sizes,
+                                                         bool batch_first, at::Scalar padding_value,
                                                          int64_t total_length);
 
 at::Tensor atenPow(const at::Tensor &self, const at::Tensor &exponent);
@@ -279,14 +277,14 @@ at::Tensor atenPow(const at::Tensor &self, at::Scalar exponent);
 
 at::Tensor atenRelu(const at::Tensor &self);
 
-at::Tensor atenReshape(const at::Tensor & self, at::IntArrayRef shape);
+at::Tensor atenReshape(const at::Tensor &self, at::IntArrayRef shape);
 
 at::Tensor atenSelect(const at::Tensor &self, at::Dimname dim, int64_t index);
 
 at::Tensor atenSelect(const at::Tensor &self, int64_t dim, int64_t index);
 
-template<typename T>
-at::List<T> atenSetItem(at::List<T> list, int indice, T item) 
+template <typename T>
+at::List<T> atenSetItem(at::List<T> list, int indice, T item)
 {
     list[indice] = item;
     return list;
@@ -321,9 +319,10 @@ at::Tensor atenTensor(at::ArrayRef<int64_t> array, const at::TensorOptions &opti
 
 at::Tensor atenTensor(at::ArrayRef<double> array, const at::TensorOptions &options);
 
-at::Tensor atenTo(const at::Tensor & self, c10::optional<at::ScalarType> dtype={}, c10::optional<at::Layout> layout={},
-                  c10::optional<at::Device> device={}, c10::optional<bool> pin_memory={}, bool non_blocking=false,
-                  bool copy=false, c10::optional<at::MemoryFormat> memory_format=c10::nullopt);
+at::Tensor atenTo(const at::Tensor &self, c10::optional<at::ScalarType> dtype = {},
+                  c10::optional<at::Layout> layout = {}, c10::optional<at::Device> device = {},
+                  c10::optional<bool> pin_memory = {}, bool non_blocking = false, bool copy = false,
+                  c10::optional<at::MemoryFormat> memory_format = c10::nullopt);
 
 at::Tensor atenTo(const at::Tensor &self, at::Device device, at::ScalarType dtype, bool non_blocking = false,
                   bool copy = false, c10::optional<at::MemoryFormat> memory_format = c10::nullopt);

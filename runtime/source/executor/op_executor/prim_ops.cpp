@@ -180,7 +180,7 @@ at::IValue primVariable(std::string ntype, std::vector<torch::IValue> inputs)
                     DLOG(FATAL) << "Variable ntype: " << ntype_stack.top() << "is wrong!";
                 }
             } else {
-                //list[tuple, tuple] tuple[tuple, tuple]
+                // list[tuple, tuple] tuple[tuple, tuple]
                 auto temp_num = element_num_stack.top();
                 element_num_stack.pop();
                 int total_iv_num = 0;

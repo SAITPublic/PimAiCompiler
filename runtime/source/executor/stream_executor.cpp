@@ -123,7 +123,7 @@ RetVal StreamExecutor::inferenceModel(const std::vector<torch::Tensor>& input_te
         auto layer = layers[cursor_];
         auto layer_type = layer->getType();
         DLOG(INFO) << "Layer id:" << layer->getID() << " name: " << layer->getName()
-                     << " type: " << convertLayerTypeToString(layer_type);
+                   << " type: " << convertLayerTypeToString(layer_type);
 
         if (layer_type == nn_compiler::ir::LayerType::PRIMCONSTANT) {
             // skip PrimConstant, constant are pre-loaded
@@ -179,7 +179,7 @@ RetVal StreamExecutor::inferenceModelwithProfiling(const std::vector<torch::Tens
         auto layer_name = layer->getName();
         auto layer_type = layer->getType();
         DLOG(INFO) << "Layer id:" << layer->getID() << " name: " << layer->getName()
-                     << " type: " << convertLayerTypeToString(layer_type);
+                   << " type: " << convertLayerTypeToString(layer_type);
 
         if (layer_type == nn_compiler::ir::LayerType::PRIMCONSTANT) {
             // skip PrimConstant, constant are pre-loaded
@@ -227,10 +227,7 @@ std::pair<DataType, torch::jit::IValue>& StreamExecutor::findBlob(int64_t blob_i
     return it->second;
 }
 
-bool StreamExecutor::checkValidBlobID(int64_t blob_id)
-{
-    return (global_blobs_.find(blob_id) != global_blobs_.end());
-}
+bool StreamExecutor::checkValidBlobID(int64_t blob_id) { return (global_blobs_.find(blob_id) != global_blobs_.end()); }
 
 OpExecutorFn StreamExecutor::findOpExecutor(nn_compiler::ir::LayerType& type)
 {
@@ -247,7 +244,7 @@ void StreamExecutor::setInputTensors(const std::vector<torch::Tensor>& input_ten
 {
     if (input_tensors.size() != input_blob_ids_.size()) {
         DLOG(FATAL) << "Num tensors must match the num inputs of Graph,"
-                     << "the Graph needs " << input_blob_ids_.size() << " inputs !";
+                    << "the Graph needs " << input_blob_ids_.size() << " inputs !";
     }
     // Set the input tensors to placeholder, assume all inputs & outputs are Tensor type
     int k = 0;
@@ -402,8 +399,10 @@ void StreamExecutor::registerOp()
     this->global_op_register_.insert({nn_compiler::ir::LayerType::ATENNORM, executorAtenNorm});
     this->global_op_register_.insert({nn_compiler::ir::LayerType::ATENNOT, executorAtenNot});
     this->global_op_register_.insert({nn_compiler::ir::LayerType::ATENONES, executorAtenOnes});
-    this->global_op_register_.insert({nn_compiler::ir::LayerType::ATENPACKPADDEDSEQUENCE, executorAtenPackPaddedSequence});
-    this->global_op_register_.insert({nn_compiler::ir::LayerType::ATENPADPACKEDSEQUENCE, executorAtenPadPackedSequence});
+    this->global_op_register_.insert(
+        {nn_compiler::ir::LayerType::ATENPACKPADDEDSEQUENCE, executorAtenPackPaddedSequence});
+    this->global_op_register_.insert(
+        {nn_compiler::ir::LayerType::ATENPADPACKEDSEQUENCE, executorAtenPadPackedSequence});
     this->global_op_register_.insert({nn_compiler::ir::LayerType::ATENPOW, executorAtenPow});
     this->global_op_register_.insert({nn_compiler::ir::LayerType::ATENRELU, executorAtenRelu});
     this->global_op_register_.insert({nn_compiler::ir::LayerType::ATENRESHAPE, executorAtenReshape});

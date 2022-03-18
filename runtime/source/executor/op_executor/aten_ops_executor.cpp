@@ -2,23 +2,24 @@
 #include <vector>
 
 #include "c10/hip/HIPFunctions.h"
+#include "ir/include/common/utils.hpp"
+#include "ir/include/layers/all_layers.h"
 #include "ir/include/nn_model.h"
 #include "ir/include/nn_network.h"
 #include "ir/include/types.h"
-#include "ir/include/common/utils.hpp"
-#include "ir/include/layers/all_layers.h"
+#include "pim_runtime_api.h"
 #include "runtime/include/executor/op_executor/aten_ops.h"
 #include "runtime/include/executor/op_executor/aten_ops_executor.h"
 #include "runtime/include/executor/op_executor/custom_ops.h"
 #include "runtime/include/executor/op_executor/prim_ops_executor.h"
 #include "runtime/include/executor/stream_executor.h"
 #include "runtime/include/executor/utils/utils.h"
-#include "pim_runtime_api.h"
 #include "tv_tools.h"
 
-namespace nn_compiler {
-namespace runtime {
-
+namespace nn_compiler
+{
+namespace runtime
+{
 void executorAtenAdd(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
     DLOG(INFO) << "execute Aten Add node";
@@ -77,13 +78,15 @@ void executorAtenAdd(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExe
             at::Tensor tmp;
             auto input1_layer = stream_executor.getGraph()->getLayerByPosition((layer->getPreLayerIDs())[0]);
             auto input2_layer = stream_executor.getGraph()->getLayerByPosition((layer->getPreLayerIDs())[1]);
-            bool add_opt_flag = input1_layer->getType() == nn_compiler::ir::LayerType::ATENLSTM1 &&
+            bool add_opt_flag =
+                input1_layer->getType() == nn_compiler::ir::LayerType::ATENLSTM1 &&
                 input2_layer->getType() == nn_compiler::ir::LayerType::ATENLSTM1 &&
                 std::static_pointer_cast<nn_compiler::ir::AtenLSTM1Layer>(input1_layer)->getCustomOptNumber() == 2 &&
                 std::static_pointer_cast<nn_compiler::ir::AtenLSTM1Layer>(input2_layer)->getCustomOptNumber() == 1;
             if (stream_executor.model_type_ == "GNMT" && add_opt_flag) {
-                    auto out1_layer = stream_executor.getGraph()->getLayerByPosition((layer->getNextLayerIDs())[0]);
-                    auto out1_out1_layer = stream_executor.getGraph()->getLayerByPosition((out1_layer->getNextLayerIDs())[0]);
+                auto out1_layer = stream_executor.getGraph()->getLayerByPosition((layer->getNextLayerIDs())[0]);
+                auto out1_out1_layer =
+                    stream_executor.getGraph()->getLayerByPosition((out1_layer->getNextLayerIDs())[0]);
                 int cat_mem_id =
                     std::static_pointer_cast<nn_compiler::ir::AtenCatLayer>(out1_out1_layer)->getMemLayerId();
                 auto it = stream_executor.global_blobs_.find(cat_mem_id);
@@ -165,7 +168,7 @@ void executorAtenAddmm(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamE
 void executorAtenAnd(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
     DLOG(INFO) << "execute Aten And node";
-    
+
     auto in_stensor_id = layer->getInSTensorID();
     auto out_stensor_id = layer->getOutSTensorID();
 
@@ -562,9 +565,12 @@ void executorAtenBmm(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExe
         auto out2_out1_layer = stream_executor.getGraph()->getLayerByPosition((out2_layer->getNextLayerIDs())[0]);
         auto out2_out2_layer = stream_executor.getGraph()->getLayerByPosition((out2_layer->getNextLayerIDs())[1]);
         auto out2_out3_layer = stream_executor.getGraph()->getLayerByPosition((out2_layer->getNextLayerIDs())[2]);
-        auto out2_out1_out1_layer = stream_executor.getGraph()->getLayerByPosition((out2_out1_layer->getNextLayerIDs())[0]);
-        auto out2_out2_out1_layer = stream_executor.getGraph()->getLayerByPosition((out2_out2_layer->getNextLayerIDs())[0]);
-        auto out2_out3_out1_layer = stream_executor.getGraph()->getLayerByPosition((out2_out3_layer->getNextLayerIDs())[0]);
+        auto out2_out1_out1_layer =
+            stream_executor.getGraph()->getLayerByPosition((out2_out1_layer->getNextLayerIDs())[0]);
+        auto out2_out2_out1_layer =
+            stream_executor.getGraph()->getLayerByPosition((out2_out2_layer->getNextLayerIDs())[0]);
+        auto out2_out3_out1_layer =
+            stream_executor.getGraph()->getLayerByPosition((out2_out3_layer->getNextLayerIDs())[0]);
         // auto end_if_node = op_node.getOutEdge(1).getOutNode();
         int64_t cat_mem_id =
             std::static_pointer_cast<nn_compiler::ir::AtenCatLayer>(out2_out1_out1_layer)->getMemLayerId();
@@ -572,13 +578,11 @@ void executorAtenBmm(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExe
         auto options = at::TensorOptions().dtype(at::kHalf).device(at::kCUDA);
         tmp0 = torch::from_blob((_Float16*)(it->second.second.toTensor().data_ptr()) + 1024, {1, 1, 1024}, options);
 
-        cat_mem_id =
-            std::static_pointer_cast<nn_compiler::ir::AtenCatLayer>(out2_out2_out1_layer)->getMemLayerId();
+        cat_mem_id = std::static_pointer_cast<nn_compiler::ir::AtenCatLayer>(out2_out2_out1_layer)->getMemLayerId();
         it = stream_executor.global_blobs_.find(cat_mem_id);
         tmp1 = torch::from_blob((_Float16*)(it->second.second.toTensor().data_ptr()) + 1024, {1, 1, 1024}, options);
 
-        cat_mem_id =
-            std::static_pointer_cast<nn_compiler::ir::AtenCatLayer>(out2_out3_out1_layer)->getMemLayerId();
+        cat_mem_id = std::static_pointer_cast<nn_compiler::ir::AtenCatLayer>(out2_out3_out1_layer)->getMemLayerId();
         it = stream_executor.global_blobs_.find(cat_mem_id);
         tmp2 = torch::from_blob((_Float16*)(it->second.second.toTensor().data_ptr()) + 1024, {1, 1, 1024}, options);
     }
@@ -654,7 +658,7 @@ void executorAtenCat(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExe
 
     auto in_stensor_id = layer->getInSTensorID();
     auto out_stensor_id = layer->getOutSTensorID();
-    
+
     auto cat_layer = std::static_pointer_cast<nn_compiler::ir::AtenCatLayer>(layer);
 
     std::vector<at::Tensor> tensor_vec;
@@ -844,7 +848,7 @@ void executorAtenConv2d(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, Stream
     std::vector<int64_t> dilation_vec = {static_cast<int64_t>(dilation[0]), static_cast<int64_t>(dilation[1])};
 
     auto output = atenConv2d(self_tensor, weight_tensor, bias_tensor, at::ArrayRef<int64_t>(stride_vec),
-                                   at::ArrayRef<int64_t>(padding_vec), at::ArrayRef<int64_t>(dilation_vec), groups);
+                             at::ArrayRef<int64_t>(padding_vec), at::ArrayRef<int64_t>(dilation_vec), groups);
     // update output
     stream_executor.updateBlob(out_stensor_id[0], DataType::TENSOR, tensorToIValue(output));
 }
@@ -993,7 +997,7 @@ void executorAtenDropout(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, Strea
     DLOG(INFO) << "execute Aten Dropout node";
 
     auto dropout_layer = std::static_pointer_cast<nn_compiler::ir::AtenDropoutLayer>(layer);
-    
+
     auto in_stensor_id = layer->getInSTensorID();
     auto out_stensor_id = layer->getOutSTensorID();
 
@@ -1379,7 +1383,7 @@ void executorAtenGetItem(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, Strea
 void executorAtenGt(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
     DLOG(INFO) << "execute Aten Gt node";
-    
+
     auto in_stensor_id = layer->getInSTensorID();
     auto out_stensor_id = layer->getOutSTensorID();
 
@@ -1438,7 +1442,7 @@ void executorAtenIndexPut(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, Stre
     DLOG(INFO) << "execute Aten IndexPut node";
 
     auto index_put_layer = std::static_pointer_cast<nn_compiler::ir::AtenIndexPutLayer>(layer);
-    
+
     auto in_stensor_id = layer->getInSTensorID();
     auto out_stensor_id = layer->getOutSTensorID();
 
@@ -1461,7 +1465,6 @@ void executorAtenIndexPut(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, Stre
 
     auto accumulate = index_put_layer->getAccumulate();
     if (nn_compiler::ir::isDefaultValue(accumulate)) {
- 
         auto accumulate_iv = stream_executor.findBlob(in_stensor_id[in_id++]).second;
         assert(accumulate_iv.isInt());
         accumulate = accumulate_iv.toInt();
@@ -1607,8 +1610,7 @@ void executorAtenLen(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExe
         auto input1_layer = stream_executor.getGraph()->getLayerByPosition((layer->getPreLayerIDs())[0]);
         auto out1_layer = stream_executor.getGraph()->getLayerByPosition((layer->getNextLayerIDs())[0]);
         if (stream_executor.model_type_ == "GNMT" &&
-            input1_layer->getType() == nn_compiler::ir::LayerType::PRIMVARIABLE &&
-            iv.toList().size() == 4) {
+            input1_layer->getType() == nn_compiler::ir::LayerType::PRIMVARIABLE && iv.toList().size() == 4) {
             int next_node_id = std::static_pointer_cast<nn_compiler::ir::PrimLoopLayer>(out1_layer)->getGotoLayer() - 1;
             stream_executor.setCursor(next_node_id);
         }
@@ -1869,12 +1871,12 @@ void executorAtenLSTM1(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamE
         int hidden_size = hx_list_tensor_vector[0].size(hx_dim - 1);
 
         std::vector<int> in_len({batch_size, input_size});
-        std::vector<int> hid_len({bidirectional_int *  (int)(num_layers),  hidden_size});
+        std::vector<int> hid_len({bidirectional_int * (int)(num_layers), hidden_size});
         std::vector<int> out_len({bidirectional_int * hidden_size});
 
         int dims = 2;
         for (int i = 0; i < seq_len; i++) {
-            std::array<int, 2> in_lens = {in_len[0],  in_len.back() };
+            std::array<int, 2> in_lens = {in_len[0], in_len.back()};
             miopenCreateTensorDescriptor(&stream_executor.input_tensor_);
             miopenSetTensorDescriptor(stream_executor.input_tensor_, miopenHalf, dims, in_lens.data(), nullptr);
             stream_executor.input_tensors_.push_back(stream_executor.input_tensor_);
@@ -1887,29 +1889,35 @@ void executorAtenLSTM1(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamE
         std::array<int, 3> hid_lens = {{hid_len[0], in_len[0], hid_len[1]}};
         miopenSetTensorDescriptor(stream_executor.hidden_tensor_, miopenHalf, 3, hid_lens.data(), nullptr);
 
-        miopenRNNMode_t mode = miopenRNNMode_t::miopenLSTM;;
+        miopenRNNMode_t mode = miopenRNNMode_t::miopenLSTM;
+        ;
         miopenRNNBiasMode_t biasMode = static_cast<bool>(has_biases) ? miopenRNNwithBias : miopenRNNNoBias;
         miopenRNNDirectionMode_t directionMode = bidirectional_int == 2 ? miopenRNNbidirection : miopenRNNunidirection;
         miopenRNNInputMode_t inMode = miopenRNNlinear;
         miopenRNNAlgo_t algo = miopenRNNdefault;
 
-        miopenSetRNNDescriptor(stream_executor.rnn_desc_, hidden_size, num_layers, inMode, directionMode, mode, biasMode, algo, miopenHalf);
-        miopenGetRNNParamsDescriptor(stream_executor.handle_, stream_executor.rnn_desc_, stream_executor.input_tensor_, stream_executor.weight_tensor_, miopenHalf);
+        miopenSetRNNDescriptor(stream_executor.rnn_desc_, hidden_size, num_layers, inMode, directionMode, mode,
+                               biasMode, algo, miopenHalf);
+        miopenGetRNNParamsDescriptor(stream_executor.handle_, stream_executor.rnn_desc_, stream_executor.input_tensor_,
+                                     stream_executor.weight_tensor_, miopenHalf);
         size_t workspace_size;
-        miopenGetRNNWorkspaceSize(stream_executor.handle_, stream_executor.rnn_desc_, seq_len, stream_executor.input_tensors_.data(), &workspace_size);
+        miopenGetRNNWorkspaceSize(stream_executor.handle_, stream_executor.rnn_desc_, seq_len,
+                                  stream_executor.input_tensors_.data(), &workspace_size);
         auto workspace = at::empty(workspace_size, input.options().dtype(at::kByte));
 
-        int datasize = 2; //miopenHalf
+        int datasize = 2;  // miopenHalf
         in_dev = input.data_ptr();
 
-
-        hash_id += 10000; // avert id conflict
+        hash_id += 10000;  // avert id conflict
         auto it = stream_executor.global_blobs_.find(hash_id);
         if (it == stream_executor.global_blobs_.end()) {
             size_t weight_size = 0;
-            miopenGetRNNParamsSize(stream_executor.handle_, stream_executor.rnn_desc_, stream_executor.input_tensor_, &weight_size, miopenHalf);
+            miopenGetRNNParamsSize(stream_executor.handle_, stream_executor.rnn_desc_, stream_executor.input_tensor_,
+                                   &weight_size, miopenHalf);
             auto weight_buf = at::empty(weight_size / datasize, input.options());
-            int expected_weight_size = hidden_size * 4 * (input_size + hidden_size + 2) * bidirectional_int + hidden_size * 4 * (hidden_size + hidden_size + 2) * (num_layers - 1) * bidirectional_int;
+            int expected_weight_size =
+                hidden_size * 4 * (input_size + hidden_size + 2) * bidirectional_int +
+                hidden_size * 4 * (hidden_size + hidden_size + 2) * (num_layers - 1) * bidirectional_int;
             assert((weight_size / datasize) == expected_weight_size);
 
             size_t offset = 0;
@@ -1918,7 +1926,8 @@ void executorAtenLSTM1(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamE
             offset = 0;
             param_size = 0;
 
-            int param_num = static_cast<bool>(has_biases) ? 4 * num_layers * bidirectional_int: 2 * num_layers * bidirectional_int;
+            int param_num =
+                static_cast<bool>(has_biases) ? 4 * num_layers * bidirectional_int : 2 * num_layers * bidirectional_int;
             int num = 0;
             int num_offset = static_cast<bool>(has_biases) ? 4 * bidirectional_int : 2 * bidirectional_int;
             for (; num < param_num; num += num_offset) {
@@ -1928,7 +1937,8 @@ void executorAtenLSTM1(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamE
                     param_size *= in_wei_vec[i];
                 }
 
-                at::Tensor param = at::from_blob((_Float16*)(weight_buf.data_ptr()) + offset, {static_cast<long>(param_size)}, weight_buf.options());
+                at::Tensor param = at::from_blob((_Float16*)(weight_buf.data_ptr()) + offset,
+                                                 {static_cast<long>(param_size)}, weight_buf.options());
                 auto sliced_tensor = param_vector[num].chunk(4, 0);
                 auto permuted_wei = at::cat({sliced_tensor[0], sliced_tensor[1], sliced_tensor[3], sliced_tensor[2]});
                 param.copy_(permuted_wei.view_as(param));
@@ -1940,7 +1950,8 @@ void executorAtenLSTM1(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamE
                     for (int i = 0; i < in_wei_vec.size(); ++i) {
                         param_size *= in_wei_vec[i];
                     }
-                    param = at::from_blob((_Float16*)(weight_buf.data_ptr()) + offset, {static_cast<long>(param_size)}, weight_buf.options());
+                    param = at::from_blob((_Float16*)(weight_buf.data_ptr()) + offset, {static_cast<long>(param_size)},
+                                          weight_buf.options());
                     sliced_tensor = param_vector[num + (num_offset / bidirectional_int)].chunk(4, 0);
                     permuted_wei = at::cat({sliced_tensor[0], sliced_tensor[1], sliced_tensor[3], sliced_tensor[2]});
                     param.copy_(permuted_wei.view_as(param));
@@ -1952,7 +1963,8 @@ void executorAtenLSTM1(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamE
                 for (int i = 0; i < in_wei_vec.size(); ++i) {
                     param_size *= in_wei_vec[i];
                 }
-                param = at::from_blob((_Float16*)(weight_buf.data_ptr()) + offset, {static_cast<long>(param_size)}, weight_buf.options());
+                param = at::from_blob((_Float16*)(weight_buf.data_ptr()) + offset, {static_cast<long>(param_size)},
+                                      weight_buf.options());
                 sliced_tensor = param_vector[num + 1].chunk(4, 0);
                 permuted_wei = at::cat({sliced_tensor[0], sliced_tensor[1], sliced_tensor[3], sliced_tensor[2]});
                 param.copy_(permuted_wei.view_as(param));
@@ -1964,7 +1976,8 @@ void executorAtenLSTM1(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamE
                     for (int i = 0; i < in_wei_vec.size(); ++i) {
                         param_size *= in_wei_vec[i];
                     }
-                    param = at::from_blob((_Float16*)(weight_buf.data_ptr()) + offset, {static_cast<long>(param_size)}, weight_buf.options());
+                    param = at::from_blob((_Float16*)(weight_buf.data_ptr()) + offset, {static_cast<long>(param_size)},
+                                          weight_buf.options());
                     sliced_tensor = param_vector[num + (num_offset / bidirectional_int) + 1].chunk(4, 0);
                     permuted_wei = at::cat({sliced_tensor[0], sliced_tensor[1], sliced_tensor[3], sliced_tensor[2]});
                     param.copy_(permuted_wei.view_as(param));
@@ -1979,9 +1992,11 @@ void executorAtenLSTM1(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamE
                     for (int i = 0; i < in_wei_vec.size(); ++i) {
                         param_size *= in_wei_vec[i];
                     }
-                    at::Tensor param = at::from_blob((_Float16*)(weight_buf.data_ptr()) + offset, {static_cast<long>(param_size)}, weight_buf.options());
+                    at::Tensor param = at::from_blob((_Float16*)(weight_buf.data_ptr()) + offset,
+                                                     {static_cast<long>(param_size)}, weight_buf.options());
                     auto sliced_tensor = param_vector[num].chunk(4, 0);
-                    auto permuted_wei = at::cat({sliced_tensor[0], sliced_tensor[1], sliced_tensor[3], sliced_tensor[2]});
+                    auto permuted_wei =
+                        at::cat({sliced_tensor[0], sliced_tensor[1], sliced_tensor[3], sliced_tensor[2]});
                     param.copy_(permuted_wei.view_as(param));
                     offset += param_size;
 
@@ -1991,9 +2006,11 @@ void executorAtenLSTM1(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamE
                         for (int i = 0; i < in_wei_vec.size(); ++i) {
                             param_size *= in_wei_vec[i];
                         }
-                        param = at::from_blob((_Float16*)(weight_buf.data_ptr()) + offset, {static_cast<long>(param_size)}, weight_buf.options());
+                        param = at::from_blob((_Float16*)(weight_buf.data_ptr()) + offset,
+                                              {static_cast<long>(param_size)}, weight_buf.options());
                         sliced_tensor = param_vector[num + (num_offset / bidirectional_int)].chunk(4, 0);
-                        permuted_wei = at::cat({sliced_tensor[0], sliced_tensor[1], sliced_tensor[3], sliced_tensor[2]});
+                        permuted_wei =
+                            at::cat({sliced_tensor[0], sliced_tensor[1], sliced_tensor[3], sliced_tensor[2]});
                         param.copy_(permuted_wei.view_as(param));
                         offset += param_size;
                     }
@@ -2003,7 +2020,8 @@ void executorAtenLSTM1(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamE
                     for (int i = 0; i < in_wei_vec.size(); ++i) {
                         param_size *= in_wei_vec[i];
                     }
-                    param = at::from_blob((_Float16*)(weight_buf.data_ptr()) + offset, {static_cast<long>(param_size)}, weight_buf.options());
+                    param = at::from_blob((_Float16*)(weight_buf.data_ptr()) + offset, {static_cast<long>(param_size)},
+                                          weight_buf.options());
                     sliced_tensor = param_vector[num + 1].chunk(4, 0);
                     permuted_wei = at::cat({sliced_tensor[0], sliced_tensor[1], sliced_tensor[3], sliced_tensor[2]});
                     param.copy_(permuted_wei.view_as(param));
@@ -2015,9 +2033,11 @@ void executorAtenLSTM1(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamE
                         for (int i = 0; i < in_wei_vec.size(); ++i) {
                             param_size *= in_wei_vec[i];
                         }
-                        param = at::from_blob((_Float16*)(weight_buf.data_ptr()) + offset, {static_cast<long>(param_size)}, weight_buf.options());
+                        param = at::from_blob((_Float16*)(weight_buf.data_ptr()) + offset,
+                                              {static_cast<long>(param_size)}, weight_buf.options());
                         sliced_tensor = param_vector[num + (num_offset / bidirectional_int) + 1].chunk(4, 0);
-                        permuted_wei = at::cat({sliced_tensor[0], sliced_tensor[1], sliced_tensor[3], sliced_tensor[2]});
+                        permuted_wei =
+                            at::cat({sliced_tensor[0], sliced_tensor[1], sliced_tensor[3], sliced_tensor[2]});
                         param.copy_(permuted_wei.view_as(param));
                         offset += param_size;
                     }
@@ -2039,10 +2059,12 @@ void executorAtenLSTM1(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamE
             out_dev = it0->second.second.toTensor().data_ptr();
             hy_dev = stream_executor.global_blobs_.find(out_stensor_id[1])->second.second.toTensor().data_ptr();
             cy_dev = stream_executor.global_blobs_.find(out_stensor_id[2])->second.second.toTensor().data_ptr();
-            miopenRNNForwardInference(stream_executor.handle_, stream_executor.rnn_desc_, seq_len, stream_executor.input_tensors_.data(), in_dev,
-                                  stream_executor.hidden_tensor_, hx_dev, stream_executor.hidden_tensor_, cx_dev, stream_executor.weight_tensor_, wei_dev,
-                                  stream_executor.output_tensors_.data(), out_dev, stream_executor.hidden_tensor_, hy_dev, stream_executor.hidden_tensor_, cy_dev,
-                                  workspace_dev, workspace_size);
+            miopenRNNForwardInference(stream_executor.handle_, stream_executor.rnn_desc_, seq_len,
+                                      stream_executor.input_tensors_.data(), in_dev, stream_executor.hidden_tensor_,
+                                      hx_dev, stream_executor.hidden_tensor_, cx_dev, stream_executor.weight_tensor_,
+                                      wei_dev, stream_executor.output_tensors_.data(), out_dev,
+                                      stream_executor.hidden_tensor_, hy_dev, stream_executor.hidden_tensor_, cy_dev,
+                                      workspace_dev, workspace_size);
         } else {
             auto output = at::empty({in_len[0], seq_len, out_len[0]}, input.options());
             out_dev = output.data_ptr();
@@ -2066,17 +2088,17 @@ void executorAtenLSTM1(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamE
                         cy = torch::from_blob((_Float16*)(cat_mem.data_ptr()) + 1024, {1, 1, 1024}, options);
                         hy_dev = hy.data_ptr();
                         cy_dev = cy.data_ptr();
-                    }else if (lstm1_layer->getCustomOptNumber() == 1) {
+                    } else if (lstm1_layer->getCustomOptNumber() == 1) {
                         hy = torch::from_blob((_Float16*)(cat_mem.data_ptr()) + 2048, {1, 1, 1024}, options);
                         cy = torch::from_blob((_Float16*)(cat_mem.data_ptr()) + 3072, {1, 1, 1024}, options);
                         hy_dev = hy.data_ptr();
                         cy_dev = cy.data_ptr();
-                    }else if (lstm1_layer->getCustomOptNumber() == 2) {
+                    } else if (lstm1_layer->getCustomOptNumber() == 2) {
                         hy = torch::from_blob((_Float16*)(cat_mem.data_ptr()) + 4096, {1, 1, 1024}, options);
                         cy = torch::from_blob((_Float16*)(cat_mem.data_ptr()) + 5120, {1, 1, 1024}, options);
                         hy_dev = hy.data_ptr();
                         cy_dev = cy.data_ptr();
-                    }else if (lstm1_layer->getCustomOptNumber() == 3) {
+                    } else if (lstm1_layer->getCustomOptNumber() == 3) {
                         hy = torch::from_blob((_Float16*)(cat_mem.data_ptr()) + 6144, {1, 1, 1024}, options);
                         cy = torch::from_blob((_Float16*)(cat_mem.data_ptr()) + 7168, {1, 1, 1024}, options);
                         hy_dev = hy.data_ptr();
@@ -2084,7 +2106,8 @@ void executorAtenLSTM1(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamE
                     }
                     if (stream_executor.model_type_ == "GNMT" && lstm1_layer->getCustomOptNumber() == 0) {
                         auto out4_layer = stream_executor.getGraph()->getLayerByPosition((layer->getNextLayerIDs())[3]);
-                        auto out4_out1_layer = stream_executor.getGraph()->getLayerByPosition((out4_layer->getNextLayerIDs())[0]);
+                        auto out4_out1_layer =
+                            stream_executor.getGraph()->getLayerByPosition((out4_layer->getNextLayerIDs())[0]);
                         int64_t cat_mem_id =
                             std::static_pointer_cast<nn_compiler::ir::AtenCatLayer>(out4_out1_layer)->getMemLayerId();
                         auto it = stream_executor.global_blobs_.find(cat_mem_id);
@@ -2094,8 +2117,10 @@ void executorAtenLSTM1(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamE
                     }
                     if (stream_executor.model_type_ == "GNMT" && lstm1_layer->getCustomOptNumber() == 1) {
                         auto out1_layer = stream_executor.getGraph()->getLayerByPosition((layer->getNextLayerIDs())[0]);
-                        auto out1_out1_layer = stream_executor.getGraph()->getLayerByPosition((out1_layer->getNextLayerIDs())[0]);
-                        int64_t cat_mem_id = std::static_pointer_cast<nn_compiler::ir::AtenCatLayer>(out1_out1_layer)->getMemLayerId();
+                        auto out1_out1_layer =
+                            stream_executor.getGraph()->getLayerByPosition((out1_layer->getNextLayerIDs())[0]);
+                        int64_t cat_mem_id =
+                            std::static_pointer_cast<nn_compiler::ir::AtenCatLayer>(out1_out1_layer)->getMemLayerId();
                         auto it = stream_executor.global_blobs_.find(cat_mem_id);
                         auto options = at::TensorOptions().dtype(at::kHalf).device(at::kCUDA);
                         auto cat_mem = it->second.second.toTensor();
@@ -2103,10 +2128,12 @@ void executorAtenLSTM1(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamE
                     }
                 }
             }
-            miopenRNNForwardInference(stream_executor.handle_, stream_executor.rnn_desc_, seq_len, stream_executor.input_tensors_.data(), in_dev,
-                                    stream_executor.hidden_tensor_, hx_dev, stream_executor.hidden_tensor_, cx_dev, stream_executor.weight_tensor_, wei_dev,
-                                    stream_executor.output_tensors_.data(), out_dev, stream_executor.hidden_tensor_, hy_dev, stream_executor.hidden_tensor_, cy_dev,
-                                    workspace_dev, workspace_size);
+            miopenRNNForwardInference(stream_executor.handle_, stream_executor.rnn_desc_, seq_len,
+                                      stream_executor.input_tensors_.data(), in_dev, stream_executor.hidden_tensor_,
+                                      hx_dev, stream_executor.hidden_tensor_, cx_dev, stream_executor.weight_tensor_,
+                                      wei_dev, stream_executor.output_tensors_.data(), out_dev,
+                                      stream_executor.hidden_tensor_, hy_dev, stream_executor.hidden_tensor_, cy_dev,
+                                      workspace_dev, workspace_size);
 
             if (!static_cast<bool>(batch_first)) output = output.transpose(0, 1);
             stream_executor.updateBlob(out_stensor_id[0], DataType::TENSOR, tensorToIValue(output));
@@ -2256,12 +2283,12 @@ void executorAtenLSTM2(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamE
         int hidden_size = hx_list_tensor_vector[0].size(hx_dim - 1);
 
         std::vector<int> in_len({batch_size, input_size});
-        std::vector<int> hid_len({bidirectional_int *  (int)(num_layers),  hidden_size});
+        std::vector<int> hid_len({bidirectional_int * (int)(num_layers), hidden_size});
         std::vector<int> out_len({bidirectional_int * hidden_size});
 
         int dims = 2;
         for (int i = 0; i < seq_len; i++) {
-            std::array<int, 2> in_lens = {in_len[0],  in_len.back() };
+            std::array<int, 2> in_lens = {in_len[0], in_len.back()};
             miopenCreateTensorDescriptor(&stream_executor.input_tensor_);
             miopenSetTensorDescriptor(stream_executor.input_tensor_, miopenHalf, dims, in_lens.data(), nullptr);
             stream_executor.input_tensors_.push_back(stream_executor.input_tensor_);
@@ -2274,28 +2301,35 @@ void executorAtenLSTM2(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamE
         std::array<int, 3> hid_lens = {{hid_len[0], in_len[0], hid_len[1]}};
         miopenSetTensorDescriptor(stream_executor.hidden_tensor_, miopenHalf, 3, hid_lens.data(), nullptr);
 
-        miopenRNNMode_t mode = miopenRNNMode_t::miopenLSTM;;
+        miopenRNNMode_t mode = miopenRNNMode_t::miopenLSTM;
+        ;
         miopenRNNBiasMode_t biasMode = static_cast<bool>(has_biases) ? miopenRNNwithBias : miopenRNNNoBias;
         miopenRNNDirectionMode_t directionMode = bidirectional_int == 2 ? miopenRNNbidirection : miopenRNNunidirection;
         miopenRNNInputMode_t inMode = miopenRNNlinear;
         miopenRNNAlgo_t algo = miopenRNNdefault;
 
-        miopenSetRNNDescriptor(stream_executor.rnn_desc_, hidden_size, num_layers, inMode, directionMode, mode, biasMode, algo, miopenHalf);
-        miopenGetRNNParamsDescriptor(stream_executor.handle_, stream_executor.rnn_desc_, stream_executor.input_tensor_, stream_executor.weight_tensor_, miopenHalf);
+        miopenSetRNNDescriptor(stream_executor.rnn_desc_, hidden_size, num_layers, inMode, directionMode, mode,
+                               biasMode, algo, miopenHalf);
+        miopenGetRNNParamsDescriptor(stream_executor.handle_, stream_executor.rnn_desc_, stream_executor.input_tensor_,
+                                     stream_executor.weight_tensor_, miopenHalf);
         size_t workspace_size;
-        miopenGetRNNWorkspaceSize(stream_executor.handle_, stream_executor.rnn_desc_, seq_len, stream_executor.input_tensors_.data(), &workspace_size);
+        miopenGetRNNWorkspaceSize(stream_executor.handle_, stream_executor.rnn_desc_, seq_len,
+                                  stream_executor.input_tensors_.data(), &workspace_size);
         auto workspace = at::empty(workspace_size, input.options().dtype(at::kByte));
 
-        int datasize = 2; //miopenHalf
+        int datasize = 2;  // miopenHalf
         in_dev = input.data_ptr();
 
-        hash_id += 10000; // avert id conflict
+        hash_id += 10000;  // avert id conflict
         auto it = stream_executor.global_blobs_.find(hash_id);
         if (it == stream_executor.global_blobs_.end()) {
             size_t weight_size = 0;
-            miopenGetRNNParamsSize(stream_executor.handle_, stream_executor.rnn_desc_, stream_executor.input_tensor_, &weight_size, miopenHalf);
+            miopenGetRNNParamsSize(stream_executor.handle_, stream_executor.rnn_desc_, stream_executor.input_tensor_,
+                                   &weight_size, miopenHalf);
             auto weight_buf = at::empty(weight_size / datasize, input.options());
-            int expected_weight_size = hidden_size * 4 * (input_size + hidden_size + 2) * bidirectional_int + hidden_size * 4 * (hidden_size + hidden_size + 2) * (num_layers - 1) * bidirectional_int;
+            int expected_weight_size =
+                hidden_size * 4 * (input_size + hidden_size + 2) * bidirectional_int +
+                hidden_size * 4 * (hidden_size + hidden_size + 2) * (num_layers - 1) * bidirectional_int;
             assert((weight_size / datasize) == expected_weight_size);
             size_t offset = 0;
             size_t param_size = 0;
@@ -2303,7 +2337,8 @@ void executorAtenLSTM2(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamE
             offset = 0;
             param_size = 0;
 
-            int param_num = static_cast<bool>(has_biases) ? 4 * num_layers * bidirectional_int: 2 * num_layers * bidirectional_int;
+            int param_num =
+                static_cast<bool>(has_biases) ? 4 * num_layers * bidirectional_int : 2 * num_layers * bidirectional_int;
             int num = 0;
             int num_offset = static_cast<bool>(has_biases) ? 4 * bidirectional_int : 2 * bidirectional_int;
             for (; num < param_num; num += num_offset) {
@@ -2313,7 +2348,8 @@ void executorAtenLSTM2(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamE
                     param_size *= in_wei_vec[i];
                 }
 
-                at::Tensor param = at::from_blob((_Float16*)(weight_buf.data_ptr()) + offset, {static_cast<long>(param_size)}, weight_buf.options());
+                at::Tensor param = at::from_blob((_Float16*)(weight_buf.data_ptr()) + offset,
+                                                 {static_cast<long>(param_size)}, weight_buf.options());
                 auto sliced_tensor = param_vector[num].chunk(4, 0);
                 auto permuted_wei = at::cat({sliced_tensor[0], sliced_tensor[1], sliced_tensor[3], sliced_tensor[2]});
                 param.copy_(permuted_wei.view_as(param));
@@ -2325,7 +2361,8 @@ void executorAtenLSTM2(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamE
                     for (int i = 0; i < in_wei_vec.size(); ++i) {
                         param_size *= in_wei_vec[i];
                     }
-                    param = at::from_blob((_Float16*)(weight_buf.data_ptr()) + offset, {static_cast<long>(param_size)}, weight_buf.options());
+                    param = at::from_blob((_Float16*)(weight_buf.data_ptr()) + offset, {static_cast<long>(param_size)},
+                                          weight_buf.options());
                     sliced_tensor = param_vector[num + (num_offset / bidirectional_int)].chunk(4, 0);
                     permuted_wei = at::cat({sliced_tensor[0], sliced_tensor[1], sliced_tensor[3], sliced_tensor[2]});
                     param.copy_(permuted_wei.view_as(param));
@@ -2337,7 +2374,8 @@ void executorAtenLSTM2(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamE
                 for (int i = 0; i < in_wei_vec.size(); ++i) {
                     param_size *= in_wei_vec[i];
                 }
-                param = at::from_blob((_Float16*)(weight_buf.data_ptr()) + offset, {static_cast<long>(param_size)}, weight_buf.options());
+                param = at::from_blob((_Float16*)(weight_buf.data_ptr()) + offset, {static_cast<long>(param_size)},
+                                      weight_buf.options());
                 sliced_tensor = param_vector[num + 1].chunk(4, 0);
                 permuted_wei = at::cat({sliced_tensor[0], sliced_tensor[1], sliced_tensor[3], sliced_tensor[2]});
                 param.copy_(permuted_wei.view_as(param));
@@ -2349,7 +2387,8 @@ void executorAtenLSTM2(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamE
                     for (int i = 0; i < in_wei_vec.size(); ++i) {
                         param_size *= in_wei_vec[i];
                     }
-                    param = at::from_blob((_Float16*)(weight_buf.data_ptr()) + offset, {static_cast<long>(param_size)}, weight_buf.options());
+                    param = at::from_blob((_Float16*)(weight_buf.data_ptr()) + offset, {static_cast<long>(param_size)},
+                                          weight_buf.options());
                     sliced_tensor = param_vector[num + (num_offset / bidirectional_int) + 1].chunk(4, 0);
                     permuted_wei = at::cat({sliced_tensor[0], sliced_tensor[1], sliced_tensor[3], sliced_tensor[2]});
                     param.copy_(permuted_wei.view_as(param));
@@ -2364,9 +2403,11 @@ void executorAtenLSTM2(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamE
                     for (int i = 0; i < in_wei_vec.size(); ++i) {
                         param_size *= in_wei_vec[i];
                     }
-                    at::Tensor param = at::from_blob((_Float16*)(weight_buf.data_ptr()) + offset, {static_cast<long>(param_size)}, weight_buf.options());
+                    at::Tensor param = at::from_blob((_Float16*)(weight_buf.data_ptr()) + offset,
+                                                     {static_cast<long>(param_size)}, weight_buf.options());
                     auto sliced_tensor = param_vector[num].chunk(4, 0);
-                    auto permuted_wei = at::cat({sliced_tensor[0], sliced_tensor[1], sliced_tensor[3], sliced_tensor[2]});
+                    auto permuted_wei =
+                        at::cat({sliced_tensor[0], sliced_tensor[1], sliced_tensor[3], sliced_tensor[2]});
                     param.copy_(permuted_wei.view_as(param));
                     offset += param_size;
 
@@ -2376,9 +2417,11 @@ void executorAtenLSTM2(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamE
                         for (int i = 0; i < in_wei_vec.size(); ++i) {
                             param_size *= in_wei_vec[i];
                         }
-                        param = at::from_blob((_Float16*)(weight_buf.data_ptr()) + offset, {static_cast<long>(param_size)}, weight_buf.options());
+                        param = at::from_blob((_Float16*)(weight_buf.data_ptr()) + offset,
+                                              {static_cast<long>(param_size)}, weight_buf.options());
                         sliced_tensor = param_vector[num + (num_offset / bidirectional_int)].chunk(4, 0);
-                        permuted_wei = at::cat({sliced_tensor[0], sliced_tensor[1], sliced_tensor[3], sliced_tensor[2]});
+                        permuted_wei =
+                            at::cat({sliced_tensor[0], sliced_tensor[1], sliced_tensor[3], sliced_tensor[2]});
                         param.copy_(permuted_wei.view_as(param));
                         offset += param_size;
                     }
@@ -2388,7 +2431,8 @@ void executorAtenLSTM2(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamE
                     for (int i = 0; i < in_wei_vec.size(); ++i) {
                         param_size *= in_wei_vec[i];
                     }
-                    param = at::from_blob((_Float16*)(weight_buf.data_ptr()) + offset, {static_cast<long>(param_size)}, weight_buf.options());
+                    param = at::from_blob((_Float16*)(weight_buf.data_ptr()) + offset, {static_cast<long>(param_size)},
+                                          weight_buf.options());
                     sliced_tensor = param_vector[num + 1].chunk(4, 0);
                     permuted_wei = at::cat({sliced_tensor[0], sliced_tensor[1], sliced_tensor[3], sliced_tensor[2]});
                     param.copy_(permuted_wei.view_as(param));
@@ -2400,9 +2444,11 @@ void executorAtenLSTM2(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamE
                         for (int i = 0; i < in_wei_vec.size(); ++i) {
                             param_size *= in_wei_vec[i];
                         }
-                        param = at::from_blob((_Float16*)(weight_buf.data_ptr()) + offset, {static_cast<long>(param_size)}, weight_buf.options());
+                        param = at::from_blob((_Float16*)(weight_buf.data_ptr()) + offset,
+                                              {static_cast<long>(param_size)}, weight_buf.options());
                         sliced_tensor = param_vector[num + (num_offset / bidirectional_int) + 1].chunk(4, 0);
-                        permuted_wei = at::cat({sliced_tensor[0], sliced_tensor[1], sliced_tensor[3], sliced_tensor[2]});
+                        permuted_wei =
+                            at::cat({sliced_tensor[0], sliced_tensor[1], sliced_tensor[3], sliced_tensor[2]});
                         param.copy_(permuted_wei.view_as(param));
                         offset += param_size;
                     }
@@ -2423,10 +2469,12 @@ void executorAtenLSTM2(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamE
             out_dev = it0->second.second.toTensor().data_ptr();
             hy_dev = stream_executor.global_blobs_.find(out_stensor_id[1])->second.second.toTensor().data_ptr();
             cy_dev = stream_executor.global_blobs_.find(out_stensor_id[2])->second.second.toTensor().data_ptr();
-            miopenRNNForwardInference(stream_executor.handle_, stream_executor.rnn_desc_, seq_len, stream_executor.input_tensors_.data(), in_dev,
-                                  stream_executor.hidden_tensor_, hx_dev, stream_executor.hidden_tensor_, cx_dev, stream_executor.weight_tensor_, wei_dev,
-                                  stream_executor.output_tensors_.data(), out_dev, stream_executor.hidden_tensor_, hy_dev, stream_executor.hidden_tensor_, cy_dev,
-                                  workspace_dev, workspace_size);
+            miopenRNNForwardInference(stream_executor.handle_, stream_executor.rnn_desc_, seq_len,
+                                      stream_executor.input_tensors_.data(), in_dev, stream_executor.hidden_tensor_,
+                                      hx_dev, stream_executor.hidden_tensor_, cx_dev, stream_executor.weight_tensor_,
+                                      wei_dev, stream_executor.output_tensors_.data(), out_dev,
+                                      stream_executor.hidden_tensor_, hy_dev, stream_executor.hidden_tensor_, cy_dev,
+                                      workspace_dev, workspace_size);
 
         } else {
             auto output = at::empty({seq_len, out_len[0]}, input.options());
@@ -2441,10 +2489,12 @@ void executorAtenLSTM2(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamE
                 hy_dev = hy.data_ptr();
                 cy_dev = cy.data_ptr();
             }
-            miopenRNNForwardInference(stream_executor.handle_, stream_executor.rnn_desc_, seq_len, stream_executor.input_tensors_.data(), in_dev,
-                                    stream_executor.hidden_tensor_, hx_dev, stream_executor.hidden_tensor_, cx_dev, stream_executor.weight_tensor_, wei_dev,
-                                    stream_executor.output_tensors_.data(), out_dev, stream_executor.hidden_tensor_, hy_dev, stream_executor.hidden_tensor_, cy_dev,
-                                    workspace_dev, workspace_size);
+            miopenRNNForwardInference(stream_executor.handle_, stream_executor.rnn_desc_, seq_len,
+                                      stream_executor.input_tensors_.data(), in_dev, stream_executor.hidden_tensor_,
+                                      hx_dev, stream_executor.hidden_tensor_, cx_dev, stream_executor.weight_tensor_,
+                                      wei_dev, stream_executor.output_tensors_.data(), out_dev,
+                                      stream_executor.hidden_tensor_, hy_dev, stream_executor.hidden_tensor_, cy_dev,
+                                      workspace_dev, workspace_size);
 
             stream_executor.updateBlob(out_stensor_id[0], DataType::TENSOR, tensorToIValue(output));
             stream_executor.updateBlob(out_stensor_id[1], DataType::TENSOR, tensorToIValue(hy));
@@ -2646,7 +2696,7 @@ void executorAtenMaxPool2d(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, Str
     auto self_tensor = iv_self.toTensor();
 
     // In PyTorch, kernel_size is a tuple(int, int)
-    auto kernel_size =  getDataShapeFromVector(max_pool_2d_layer->getKernelSize());
+    auto kernel_size = getDataShapeFromVector(max_pool_2d_layer->getKernelSize());
     std::vector<int64_t> kernel_size_vec;
     if (kernel_size.size() == 0) {
         // empty stride vector means kernel size = 0
@@ -2720,9 +2770,9 @@ void executorAtenMaxPool2d(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, Str
         ceil_mode = data_iv.toInt();
     }
 
-    auto output = atenMaxPool2d(self_tensor, at::ArrayRef<int64_t>(kernel_size_vec),
-                                      at::ArrayRef<int64_t>(stride_vec), at::ArrayRef<int64_t>(padding_vec),
-                                      at::ArrayRef<int64_t>(dilation_vec), static_cast<bool>(ceil_mode));
+    auto output = atenMaxPool2d(self_tensor, at::ArrayRef<int64_t>(kernel_size_vec), at::ArrayRef<int64_t>(stride_vec),
+                                at::ArrayRef<int64_t>(padding_vec), at::ArrayRef<int64_t>(dilation_vec),
+                                static_cast<bool>(ceil_mode));
     stream_executor.updateBlob(out_stensor_id[0], DataType::TENSOR, tensorToIValue(output));
 }
 
@@ -3065,8 +3115,8 @@ void executorAtenPadPackedSequence(std::shared_ptr<nn_compiler::ir::NNLayer>& la
         total_length = data_iv.toInt();
     }
 
-    auto output = atenPadPackedSequence(self_tensor, other_tensor, static_cast<bool>(batch_first), padding_value,
-                                              total_length);
+    auto output =
+        atenPadPackedSequence(self_tensor, other_tensor, static_cast<bool>(batch_first), padding_value, total_length);
     auto pos = std::unique(out_stensor_id.begin(), out_stensor_id.end());
     out_stensor_id.erase(pos, out_stensor_id.end());
     stream_executor.updateBlob(out_stensor_id[0], DataType::TENSOR, tensorToIValue(std::get<0>(output)));
@@ -3430,8 +3480,7 @@ void executorAtenSum(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExe
     if (nn_compiler::ir::isDefaultValue(dtype)) {
         output = atenSum(self_tensor, at::ArrayRef<int64_t>(dims), static_cast<bool>(keepdim), c10::nullopt);
     } else {
-        output =
-            atenSum(self_tensor, at::ArrayRef<int64_t>(dims), static_cast<bool>(keepdim), at::ScalarType(dtype));
+        output = atenSum(self_tensor, at::ArrayRef<int64_t>(dims), static_cast<bool>(keepdim), at::ScalarType(dtype));
     }
     stream_executor.updateBlob(out_stensor_id[0], DataType::TENSOR, tensorToIValue(output));
 }
