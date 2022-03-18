@@ -6,17 +6,15 @@
 
 namespace nn_compiler
 {
-
 namespace frontend
 {
-
 bool AttributeHelper::putAttribute(std::string name, layer_inID_type& layer_inID, dtensor_ptr_type& d_tensor)
 {
     bool ret_code = false;
     std::map<std::string, putAttributeFunc>::iterator iter = type_to_function_.find(name);
     if (iter == type_to_function_.end()) {
         DLOG(INFO) << convertLayerTypeToString(layer_inID.first->getType())
-                     << " don't require attribute setting, or this prim::Constant is used as input.";
+                   << " don't require attribute setting, or this prim::Constant is used as input.";
     } else {
         ret_code = (this->*(iter->second))(layer_inID, d_tensor);
     }

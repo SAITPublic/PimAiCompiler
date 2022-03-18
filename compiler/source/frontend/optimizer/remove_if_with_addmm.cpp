@@ -3,14 +3,14 @@
 #include "compiler/include/frontend/optimizer/remove_if_with_addmm.h"
 #include "ir/include/utils/graph_util.h"
 
-namespace nn_compiler {
+namespace nn_compiler
+{
+namespace frontend
+{
+RemoveIfWithAddmm::RemoveIfWithAddmm() {}
 
-namespace frontend {
-
-RemoveIfWithAddmm::RemoveIfWithAddmm() {
-}
-
-bool RemoveIfWithAddmm::fitCondition(std::unique_ptr<nn_compiler::ir::NNModel> &model) {
+bool RemoveIfWithAddmm::fitCondition(std::unique_ptr<nn_compiler::ir::NNModel> &model)
+{
     // there will be only one graph after take_in_body_net pass.
     auto graph = model->getGraphs()[0];
     auto layers = graph->getLayers();
@@ -23,8 +23,8 @@ bool RemoveIfWithAddmm::fitCondition(std::unique_ptr<nn_compiler::ir::NNModel> &
         auto cur_layer = layers[idx];
         auto next_layer = layers[idx + 1];
         if (pre_layer->getType() == nn_compiler::ir::LayerType::PRIMIF &&
-                cur_layer->getType() == nn_compiler::ir::LayerType::ATENADDMM &&
-                    next_layer->getType() == nn_compiler::ir::LayerType::PRIMENDIF) {
+            cur_layer->getType() == nn_compiler::ir::LayerType::ATENADDMM &&
+            next_layer->getType() == nn_compiler::ir::LayerType::PRIMENDIF) {
             if_layer_idx_.push_back(idx - 1);
         }
         pre_layer = cur_layer;
@@ -33,7 +33,8 @@ bool RemoveIfWithAddmm::fitCondition(std::unique_ptr<nn_compiler::ir::NNModel> &
     return (if_layer_idx_.size() != 0);
 }
 
-void RemoveIfWithAddmm::run(std::unique_ptr<nn_compiler::ir::NNModel> &model) {
+void RemoveIfWithAddmm::run(std::unique_ptr<nn_compiler::ir::NNModel> &model)
+{
     DLOG(INFO) << "RemoveIfWithAddmm::run is called.";
 
     auto graph = model->getGraphs()[0];
@@ -41,7 +42,7 @@ void RemoveIfWithAddmm::run(std::unique_ptr<nn_compiler::ir::NNModel> &model) {
     std::vector<std::shared_ptr<nn_compiler::ir::NNLayer>> delete_layers;
     assert(layers.size() > 0);
 
-    /* order in the vector of layers is: 
+    /* order in the vector of layers is:
         -> prim::If -> aten::addmm -> prim::EndIf -> aten::matmul -> aten::add -> prim::EndIf ->
     */
     for (auto layer_idx : if_layer_idx_) {
@@ -76,8 +77,9 @@ void RemoveIfWithAddmm::run(std::unique_ptr<nn_compiler::ir::NNModel> &model) {
 
 void RemoveIfWithAddmm::getDeleteLayers(std::shared_ptr<nn_compiler::ir::NNNetwork> graph,
                                         std::shared_ptr<nn_compiler::ir::NNLayer> layer,
-                                        std::vector<std::shared_ptr<nn_compiler::ir::NNLayer>>& delete_layers) {
-    if ((ir::searchSuccessors(layer, graph)).size()  == 1) {
+                                        std::vector<std::shared_ptr<nn_compiler::ir::NNLayer>> &delete_layers)
+{
+    if ((ir::searchSuccessors(layer, graph)).size() == 1) {
         // the compute result of layer is only used by this if branch
         delete_layers.push_back(layer);
         auto predecessors = ir::searchPredecessor(layer, graph);

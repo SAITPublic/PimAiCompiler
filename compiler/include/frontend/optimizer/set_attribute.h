@@ -6,10 +6,8 @@
 
 namespace nn_compiler
 {
-
 namespace frontend
 {
-
 class SetAttribute : public Pass
 {
    public:

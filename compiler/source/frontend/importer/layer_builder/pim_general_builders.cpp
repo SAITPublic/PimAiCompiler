@@ -2,21 +2,24 @@
 #include "ir/include/tensors/data_tensor.h"
 #include "ir/include/types.h"
 
-#define DECLARE_TORCH_OP_BUILDER(op_name, type_name, layer_name)                                 \
-  namespace nn_compiler {                                                                        \
-  namespace frontend {                                                                           \
-  using nn_compiler::ir::DTensor;                                                                \
-  using nn_compiler::ir::STensor;                                                                \
-  std::shared_ptr<ir::NNLayer> op_name##Builder::buildLayer(const torch::jit::Node *node_ref) {  \
-    DLOG(INFO) << "build " << convertLayerTypeToString(type_name);                            \
-    nn_compiler::ir::LayerType type = type_name;                                                 \
-    std::string name = "";                                                                       \
-    layer_name = std::make_shared<ir::op_name##Layer>(name, type);                               \
-    const auto& layer = std::dynamic_pointer_cast<ir::NNLayer>(layer_name);                      \
-    return layer;                                                                                \
-  }                                                                                              \
-  }                                                                                              \
-  }  // namespace nn_compiler
+#define DECLARE_TORCH_OP_BUILDER(op_name, type_name, layer_name)                                \
+    namespace nn_compiler                                                                       \
+    {                                                                                           \
+    namespace frontend                                                                          \
+    {                                                                                           \
+    using nn_compiler::ir::DTensor;                                                             \
+    using nn_compiler::ir::STensor;                                                             \
+    std::shared_ptr<ir::NNLayer> op_name##Builder::buildLayer(const torch::jit::Node* node_ref) \
+    {                                                                                           \
+        DLOG(INFO) << "build " << convertLayerTypeToString(type_name);                          \
+        nn_compiler::ir::LayerType type = type_name;                                            \
+        std::string name = "";                                                                  \
+        layer_name = std::make_shared<ir::op_name##Layer>(name, type);                          \
+        const auto& layer = std::dynamic_pointer_cast<ir::NNLayer>(layer_name);                 \
+        return layer;                                                                           \
+    }                                                                                           \
+    }                                                                                           \
+    }  // namespace nn_compiler
 
 DECLARE_TORCH_OP_BUILDER(AtenAdd, nn_compiler::ir::LayerType::ATENADD, aten_add_layer_)
 DECLARE_TORCH_OP_BUILDER(AtenAddmm, nn_compiler::ir::LayerType::ATENADDMM, aten_addmm_layer_)
@@ -27,8 +30,8 @@ DECLARE_TORCH_OP_BUILDER(AtenArange1, nn_compiler::ir::LayerType::ATENARANGE1, a
 DECLARE_TORCH_OP_BUILDER(AtenArange2, nn_compiler::ir::LayerType::ATENARANGE2, aten_arange_layer_)
 DECLARE_TORCH_OP_BUILDER(AtenArange3, nn_compiler::ir::LayerType::ATENARANGE3, aten_arange_layer_)
 DECLARE_TORCH_OP_BUILDER(AtenAsTensor, nn_compiler::ir::LayerType::ATENASTENSOR, aten_as_tensor_layer_)
-DECLARE_TORCH_OP_BUILDER(AtenBitwiseNot, nn_compiler::ir::LayerType::ATENBITWISENOT,aten_bitwise_not_layer_)
-DECLARE_TORCH_OP_BUILDER(AtenBmm, nn_compiler::ir::LayerType::ATENBMM,aten_bmm_layer_)
+DECLARE_TORCH_OP_BUILDER(AtenBitwiseNot, nn_compiler::ir::LayerType::ATENBITWISENOT, aten_bitwise_not_layer_)
+DECLARE_TORCH_OP_BUILDER(AtenBmm, nn_compiler::ir::LayerType::ATENBMM, aten_bmm_layer_)
 DECLARE_TORCH_OP_BUILDER(AtenBool, nn_compiler::ir::LayerType::ATENBOOL, aten_bool_layer_)
 DECLARE_TORCH_OP_BUILDER(AtenCat, nn_compiler::ir::LayerType::ATENCAT, aten_cat_layer_)
 DECLARE_TORCH_OP_BUILDER(AtenCeil, nn_compiler::ir::LayerType::ATENCEIL, aten_ceil_layer_)
@@ -78,8 +81,10 @@ DECLARE_TORCH_OP_BUILDER(AtenNeg, nn_compiler::ir::LayerType::ATENNEG, aten_neg_
 DECLARE_TORCH_OP_BUILDER(AtenNorm, nn_compiler::ir::LayerType::ATENNORM, aten_norm_layer_)
 DECLARE_TORCH_OP_BUILDER(AtenNot, nn_compiler::ir::LayerType::ATENNOT, aten_not_layer_)
 DECLARE_TORCH_OP_BUILDER(AtenOnes, nn_compiler::ir::LayerType::ATENONES, aten_ones_layer_)
-DECLARE_TORCH_OP_BUILDER(AtenPackPaddedSequence, nn_compiler::ir::LayerType::ATENPACKPADDEDSEQUENCE, aten_pack_padded_sequence_layer_)
-DECLARE_TORCH_OP_BUILDER(AtenPadPackedSequence, nn_compiler::ir::LayerType::ATENPADPACKEDSEQUENCE, aten_pad_packed_sequence_layer_)
+DECLARE_TORCH_OP_BUILDER(AtenPackPaddedSequence, nn_compiler::ir::LayerType::ATENPACKPADDEDSEQUENCE,
+                         aten_pack_padded_sequence_layer_)
+DECLARE_TORCH_OP_BUILDER(AtenPadPackedSequence, nn_compiler::ir::LayerType::ATENPADPACKEDSEQUENCE,
+                         aten_pad_packed_sequence_layer_)
 DECLARE_TORCH_OP_BUILDER(AtenPow, nn_compiler::ir::LayerType::ATENPOW, aten_pow_layer_)
 DECLARE_TORCH_OP_BUILDER(AtenRelu, nn_compiler::ir::LayerType::ATENRELU, aten_relu_layer_)
 DECLARE_TORCH_OP_BUILDER(AtenReshape, nn_compiler::ir::LayerType::ATENRESHAPE, aten_reshape_layer_)
@@ -117,9 +122,11 @@ DECLARE_TORCH_OP_BUILDER(PrimListUnpack, nn_compiler::ir::LayerType::PRIMLISTUNP
 DECLARE_TORCH_OP_BUILDER(PrimLoop, nn_compiler::ir::LayerType::PRIMLOOP, prim_loop_layer_)
 DECLARE_TORCH_OP_BUILDER(PrimLoopIndex, nn_compiler::ir::LayerType::PRIMLOOPINDEX, prim_loop_index_layer_)
 DECLARE_TORCH_OP_BUILDER(PrimOutput, nn_compiler::ir::LayerType::PRIMOUTPUT, prim_output_layer_)
-DECLARE_TORCH_OP_BUILDER(PrimRaiseException, nn_compiler::ir::LayerType::PRIMRAISEEXCEPTION, prim_raise_exception_layer_)
+DECLARE_TORCH_OP_BUILDER(PrimRaiseException, nn_compiler::ir::LayerType::PRIMRAISEEXCEPTION,
+                         prim_raise_exception_layer_)
 DECLARE_TORCH_OP_BUILDER(PrimSetAttr, nn_compiler::ir::LayerType::PRIMSETATTR, prim_set_attr_layer_)
-DECLARE_TORCH_OP_BUILDER(PrimTupleConstruct, nn_compiler::ir::LayerType::PRIMTUPLECONSTRUCT, prim_tuple_construct_layer_)
+DECLARE_TORCH_OP_BUILDER(PrimTupleConstruct, nn_compiler::ir::LayerType::PRIMTUPLECONSTRUCT,
+                         prim_tuple_construct_layer_)
 DECLARE_TORCH_OP_BUILDER(PrimTupleIndex, nn_compiler::ir::LayerType::PRIMTUPLEINDEX, prim_tuple_index_layer_)
 DECLARE_TORCH_OP_BUILDER(PrimTupleUnpack, nn_compiler::ir::LayerType::PRIMTUPLEUNPACK, prim_tuple_unpack_layer_)
 DECLARE_TORCH_OP_BUILDER(PrimType, nn_compiler::ir::LayerType::PRIMTYPE, prim_type_layer_)

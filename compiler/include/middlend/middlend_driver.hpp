@@ -5,19 +5,20 @@
 #include "common/include/types.hpp"
 #include "ir/include/nn_model.h"
 
-namespace nn_compiler {
-namespace middlend {
-
-class MiddlendDriver {
- public:
+namespace nn_compiler
+{
+namespace middlend
+{
+class MiddlendDriver
+{
+   public:
     MiddlendDriver() = default;
 
     MiddlendDriver(const MiddlendDriver&) = delete;
-    MiddlendDriver(MiddlendDriver&&)      = delete;
+    MiddlendDriver(MiddlendDriver&&) = delete;
 
     MiddlendDriver& operator=(const MiddlendDriver&) = delete;
-    MiddlendDriver& operator=(MiddlendDriver&&)      = delete;
-
+    MiddlendDriver& operator=(MiddlendDriver&&) = delete;
 
     /**
      * @brief     initialize a compilation pipeline
@@ -41,15 +42,15 @@ class MiddlendDriver {
      */
     RetVal finalize();
 
- private:
-   /**
+   private:
+    /**
      * @brief   Apply optimizations
      * @details This function runs optimization passes onto model graph
      * @returns return code
      */
     RetVal optimizer(std::unique_ptr<nn_compiler::ir::NNModel>& model);
 
-}; // class MiddlendDriver
+};  // class MiddlendDriver
 
-} // namespace middlend
-} // namespace nn_compiler
+}  // namespace middlend
+}  // namespace nn_compiler

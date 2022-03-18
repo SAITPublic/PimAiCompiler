@@ -1,17 +1,17 @@
 #include "compiler/include/frontend/optimizer/fuse_activation.h"
 #include "ir/include/utils/graph_util.h"
 
-namespace nn_compiler {
+namespace nn_compiler
+{
+namespace frontend
+{
+FuseActivation::FuseActivation() {}
 
-namespace frontend {
-
-FuseActivation::FuseActivation() {
-}
-
-bool FuseActivation::fitCondition(std::unique_ptr<nn_compiler::ir::NNModel>& model) {
-    auto dependCheck = [&] (const std::shared_ptr<nn_compiler::ir::NNNetwork> network,
-                            const std::shared_ptr<nn_compiler::ir::NNLayer> predecessor,
-                            const std::shared_ptr<nn_compiler::ir::NNLayer> successor) {
+bool FuseActivation::fitCondition(std::unique_ptr<nn_compiler::ir::NNModel>& model)
+{
+    auto dependCheck = [&](const std::shared_ptr<nn_compiler::ir::NNNetwork> network,
+                           const std::shared_ptr<nn_compiler::ir::NNLayer> predecessor,
+                           const std::shared_ptr<nn_compiler::ir::NNLayer> successor) {
         std::string predecessor_type = convertLayerTypeToString(predecessor->getType());
         if (!this->feasibleHostType(predecessor_type)) {
             DLOG(INFO) << "failed to satisfy with fusion dependency";
@@ -58,12 +58,13 @@ bool FuseActivation::fitCondition(std::unique_ptr<nn_compiler::ir::NNModel>& mod
     return (layers_.size() != 0);
 }
 
-void FuseActivation::run(std::unique_ptr<nn_compiler::ir::NNModel>& model) {
+void FuseActivation::run(std::unique_ptr<nn_compiler::ir::NNModel>& model)
+{
     DLOG(INFO) << "FuseActivation::run is called.";
     auto graph = model->getGraphs()[0];
 
     std::vector<std::shared_ptr<nn_compiler::ir::NNLayer>> layers_to_be_removed;
-    std::vector<uint32_t > tensors_to_be_removed;
+    std::vector<uint32_t> tensors_to_be_removed;
     for (auto cur_layer : layers_) {
         std::string type = convertLayerTypeToString(cur_layer->getType());
         if (feasibleParasiteType(type)) {
@@ -98,16 +99,15 @@ void FuseActivation::run(std::unique_ptr<nn_compiler::ir::NNModel>& model) {
     }
 }
 
-bool FuseActivation::feasibleHostType(const std::string &type) {
-    return (std::find(supportd_host_types_.begin(),
-                      supportd_host_types_.end(),
-                      type) != supportd_host_types_.end());
+bool FuseActivation::feasibleHostType(const std::string& type)
+{
+    return (std::find(supportd_host_types_.begin(), supportd_host_types_.end(), type) != supportd_host_types_.end());
 }
 
-bool FuseActivation::feasibleParasiteType(const std::string &type) {
-    return (std::find(supported_parasite_types_.begin(),
-                      supported_parasite_types_.end(),
-                      type) != supported_parasite_types_.end());
+bool FuseActivation::feasibleParasiteType(const std::string& type)
+{
+    return (std::find(supported_parasite_types_.begin(), supported_parasite_types_.end(), type) !=
+            supported_parasite_types_.end());
 }
 
 }  // namespace frontend

@@ -3,10 +3,8 @@
 
 namespace nn_compiler
 {
-
 namespace frontend
 {
-
 RemoveSetAttrLayers::RemoveSetAttrLayers() {}
 
 bool RemoveSetAttrLayers::fitCondition(std::unique_ptr<nn_compiler::ir::NNModel>& model)
@@ -16,7 +14,8 @@ bool RemoveSetAttrLayers::fitCondition(std::unique_ptr<nn_compiler::ir::NNModel>
         for (auto layer : graph->getLayers()) {
             if (layer->getType() == nn_compiler::ir::LayerType::PRIMSETATTR) {
                 auto predecessors = ir::searchPredecessor(layer, graph);
-                if (predecessors.size() == 2 && predecessors[0]->getType() == nn_compiler::ir::LayerType::PRIMVARIABLE) {
+                if (predecessors.size() == 2 &&
+                    predecessors[0]->getType() == nn_compiler::ir::LayerType::PRIMVARIABLE) {
                     remove_layers_.push_back(layer);
                 }
             }

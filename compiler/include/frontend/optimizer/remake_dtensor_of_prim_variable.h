@@ -5,10 +5,8 @@
 
 namespace nn_compiler
 {
-
 namespace frontend
 {
-
 class RemakeDTensorOfPrimVariable : public Pass
 {
    public:

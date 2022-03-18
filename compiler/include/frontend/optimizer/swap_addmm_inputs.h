@@ -6,10 +6,10 @@
 #include "half.hpp"
 #include "ir/include/nn_network.h"
 
-namespace nn_compiler {
-
-namespace frontend {
-
+namespace nn_compiler
+{
+namespace frontend
+{
 /** @Details:
  *  1. Change structure 1 to structure 2 to run custom GEMV in runtime.
  *                                                                               |
@@ -24,8 +24,9 @@ namespace frontend {
  *     structure 1                                              sturcture 2
  **/
 
-class SwapAddmmInputs : public Pass {
- public:
+class SwapAddmmInputs : public Pass
+{
+   public:
     SwapAddmmInputs();
 
     bool fitCondition(std::unique_ptr<nn_compiler::ir::NNModel>& model);
@@ -34,7 +35,7 @@ class SwapAddmmInputs : public Pass {
 
     ~SwapAddmmInputs() = default;
 
- private:
+   private:
     std::vector<std::shared_ptr<nn_compiler::ir::NNLayer>> layers_;
 
     ConstantParser constant_parser_;

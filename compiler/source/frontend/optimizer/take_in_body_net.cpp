@@ -6,10 +6,8 @@
 
 namespace nn_compiler
 {
-
 namespace frontend
 {
-
 TakeInBodyNet::TakeInBodyNet() {}
 
 void TakeInBodyNet::fitIfCondition(std::unique_ptr<nn_compiler::ir::NNModel>& model)
@@ -170,14 +168,15 @@ void TakeInBodyNet::take_in_loop_body(std::unique_ptr<nn_compiler::ir::NNModel>&
                 auto index_to_block_id = getUniqueTensorId(model);
                 auto index_to_block_id_shape_tensor = model->getTSSTensors()[index_to_block_id];
                 index_to_block_id_shape_tensor->setFeaturemapType(nn_compiler::ir::DataType::UINT8);
-                auto loop_index_layer =
-                    std::make_shared<nn_compiler::ir::PrimLoopIndexLayer>("", nn_compiler::ir::LayerType::PRIMLOOPINDEX);
+                auto loop_index_layer = std::make_shared<nn_compiler::ir::PrimLoopIndexLayer>(
+                    "", nn_compiler::ir::LayerType::PRIMLOOPINDEX);
                 loop_index_layer->setName(convertLayerTypeToString(loop_index_layer->getType()) + "_" +
                                           std::to_string(loop_index_layer->getID()));
 
                 loop_index_layer->addOutSTensorID(index_to_block_id);
 
-                auto block_layer = std::make_shared<nn_compiler::ir::PrimBlockLayer>("", nn_compiler::ir::LayerType::PRIMBLOCK);
+                auto block_layer =
+                    std::make_shared<nn_compiler::ir::PrimBlockLayer>("", nn_compiler::ir::LayerType::PRIMBLOCK);
                 block_layer->setName(convertLayerTypeToString(block_layer->getType()) + "_" +
                                      std::to_string(block_layer->getID()));
 
@@ -206,8 +205,8 @@ void TakeInBodyNet::take_in_loop_body(std::unique_ptr<nn_compiler::ir::NNModel>&
                 main_graph->addLayer2pos(temp_layer, layer_pos_in_main_graph++);
                 auto subnet_outputs = body_net->getGraphOutTensorID();
                 if (subnet_outputs.size() != 0) {
-                    auto end_layer =
-                        std::make_shared<nn_compiler::ir::PrimEndLoopLayer>("", nn_compiler::ir::LayerType::PRIMENDLOOP);
+                    auto end_layer = std::make_shared<nn_compiler::ir::PrimEndLoopLayer>(
+                        "", nn_compiler::ir::LayerType::PRIMENDLOOP);
                     end_layer->setName(convertLayerTypeToString(end_layer->getType()) + "_" +
                                        std::to_string(end_layer->getID()));
                     end_layer->setInSTensorID(subnet_outputs);

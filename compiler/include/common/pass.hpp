@@ -4,13 +4,15 @@
 #include "ir/include/layers/all_layers.h"
 #include "ir/include/nn_model.h"
 
-namespace nn_compiler {
-
-class Pass {
- public:
+namespace nn_compiler
+{
+class Pass
+{
+   public:
     Pass() {}
 
-    void add(std::shared_ptr<Pass> pass) {
+    void add(std::shared_ptr<Pass> pass)
+    {
         if (successor_) {
             successor_->add(pass);
         } else {
@@ -18,22 +20,16 @@ class Pass {
         }
     }
 
-    virtual std::shared_ptr<Pass> getSuccessor() {
-        return successor_;
-    }
+    virtual std::shared_ptr<Pass> getSuccessor() { return successor_; }
 
-    virtual bool fitCondition(std::unique_ptr<nn_compiler::ir::NNModel>& model) {
-        return true;
-    }
+    virtual bool fitCondition(std::unique_ptr<nn_compiler::ir::NNModel>& model) { return true; }
 
-    virtual void run(std::unique_ptr<nn_compiler::ir::NNModel>& model) {
-        successor_->run(model);
-    }
+    virtual void run(std::unique_ptr<nn_compiler::ir::NNModel>& model) { successor_->run(model); }
 
     virtual ~Pass() = default;
 
- protected:
+   protected:
     std::shared_ptr<Pass> successor_ = nullptr;
 };
 
-} // namespace nn_compiler
+}  // namespace nn_compiler

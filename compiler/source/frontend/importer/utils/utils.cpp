@@ -9,13 +9,13 @@ namespace frontend
  * Module--->SubModule--->SubModule.methods--->SubModules.method[i].graph
  * --->SubModules.method[i].graph.nodes
  */
-#define SPLIT_NODE(i)                \
+#define SPLIT_NODE(i)             \
     DLOG(INFO) << "[" << i << "]" \
-                  << "===================Node=================="
+               << "===================Node=================="
 
-#define SPLIT_GRAPH(i)               \
+#define SPLIT_GRAPH(i)            \
     DLOG(INFO) << "[" << i << "]" \
-                  << "===================Graph=================="
+               << "===================Graph=================="
 
 #define SPLIT(name) DLOG(INFO) << "*****" << name << "*****";
 

@@ -6,10 +6,8 @@
 
 namespace nn_compiler
 {
-
 namespace middlend
 {
-
 UpdateLayerId::UpdateLayerId() {}
 
 bool UpdateLayerId::fitCondition(std::unique_ptr<nn_compiler::ir::NNModel>& model) { return true; }

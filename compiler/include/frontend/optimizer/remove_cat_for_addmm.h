@@ -5,11 +5,10 @@
 
 typedef half_float::half float16;
 
-namespace nn_compiler {
-
-namespace frontend {
-
-
+namespace nn_compiler
+{
+namespace frontend
+{
 /** @Details:
  *  1. Change structure 1 to structure 2.
  *  2. Remove: a Listconstruct Op and a cat Op. Add: an addmm Op.
@@ -41,7 +40,7 @@ namespace frontend {
  *                    \     |     /
  *                     aten::addmm
  *                            |     input2    splitted_weights_2
- *                             \       |       /      
+ *                             \       |       /
  *                              aten::addmm (new)
  *                                     |
  *
@@ -49,8 +48,9 @@ namespace frontend {
  *
  */
 
-class RemoveCatForAddmm : public Pass {
- public:
+class RemoveCatForAddmm : public Pass
+{
+   public:
     RemoveCatForAddmm();
 
     bool fitCondition(std::unique_ptr<nn_compiler::ir::NNModel>& model);
@@ -59,7 +59,7 @@ class RemoveCatForAddmm : public Pass {
 
     ~RemoveCatForAddmm() = default;
 
- private:
+   private:
     std::vector<std::vector<std::shared_ptr<nn_compiler::ir::NNLayer>>> layers_;
 
     // shape with height and width
@@ -68,8 +68,8 @@ class RemoveCatForAddmm : public Pass {
 
     std::vector<int> shape_of_matmul_weight_ = {1344, 512};
 
-    std::vector<std::shared_ptr<nn_compiler::ir::NNLayer>>
-    create_new_constants(std::shared_ptr<nn_compiler::ir::PrimConstantLayer> old_constant_layer);
+    std::vector<std::shared_ptr<nn_compiler::ir::NNLayer>> create_new_constants(
+        std::shared_ptr<nn_compiler::ir::PrimConstantLayer> old_constant_layer);
 
     void reorganize_graph(std::unique_ptr<nn_compiler::ir::NNModel>& graph_model,
                           std::vector<std::shared_ptr<nn_compiler::ir::NNLayer>> new_constants);
@@ -77,5 +77,4 @@ class RemoveCatForAddmm : public Pass {
 
 }  // namespace frontend
 
-} // namespace nn_compiler
-
+}  // namespace nn_compiler

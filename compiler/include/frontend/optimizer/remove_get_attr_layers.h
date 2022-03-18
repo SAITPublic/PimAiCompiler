@@ -2,10 +2,10 @@
 
 #include "compiler/include/common/pass.hpp"
 
-namespace nn_compiler {
-
-namespace frontend {
-
+namespace nn_compiler
+{
+namespace frontend
+{
 /***@Detail:
  *  There is no need to keep prim::GetAttr in our graph, because the connection for prim::GetAttr
  *  is always like:
@@ -21,10 +21,11 @@ namespace frontend {
  *            |
  *    a computation op (e.g. aten::len)
  *            |
-***/
+ ***/
 
-class RemoveGetAttrLayers : public Pass {
- public:
+class RemoveGetAttrLayers : public Pass
+{
+   public:
     RemoveGetAttrLayers();
 
     bool fitCondition(std::unique_ptr<nn_compiler::ir::NNModel>& model);
@@ -33,7 +34,7 @@ class RemoveGetAttrLayers : public Pass {
 
     ~RemoveGetAttrLayers() = default;
 
- private:
+   private:
     std::vector<std::shared_ptr<nn_compiler::ir::NNLayer>> remove_layers_;
 };
 

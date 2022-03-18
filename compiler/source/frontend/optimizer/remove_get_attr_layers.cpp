@@ -3,14 +3,14 @@
 #include "compiler/include/frontend/optimizer/remove_get_attr_layers.h"
 #include "ir/include/utils/graph_util.h"
 
-namespace nn_compiler {
+namespace nn_compiler
+{
+namespace frontend
+{
+RemoveGetAttrLayers::RemoveGetAttrLayers() {}
 
-namespace frontend {
-
-RemoveGetAttrLayers::RemoveGetAttrLayers() {
-}
-
-bool RemoveGetAttrLayers::fitCondition(std::unique_ptr<nn_compiler::ir::NNModel>& model) {
+bool RemoveGetAttrLayers::fitCondition(std::unique_ptr<nn_compiler::ir::NNModel>& model)
+{
     auto graphs = model->getGraphs();
     for (auto graph : graphs) {
         for (auto layer : graph->getLayers()) {
@@ -23,7 +23,8 @@ bool RemoveGetAttrLayers::fitCondition(std::unique_ptr<nn_compiler::ir::NNModel>
     return (remove_layers_.size() != 0);
 }
 
-void RemoveGetAttrLayers::run(std::unique_ptr<nn_compiler::ir::NNModel>& model) {
+void RemoveGetAttrLayers::run(std::unique_ptr<nn_compiler::ir::NNModel>& model)
+{
     DLOG(INFO) << "RemoveGetAttrLayers::run is called.";
     // there will be only one graph after take_in_body_net pass.
     auto graph = model->getGraphs()[0];

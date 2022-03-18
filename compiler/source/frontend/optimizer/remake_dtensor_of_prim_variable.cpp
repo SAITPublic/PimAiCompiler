@@ -3,10 +3,8 @@
 
 namespace nn_compiler
 {
-
 namespace frontend
 {
-
 bool RemakeDTensorOfPrimVariable::checkVariableUsage(const std::shared_ptr<nn_compiler::ir::NNLayer>& layer,
                                                      const std::shared_ptr<nn_compiler::ir::NNNetwork>& graph,
                                                      const std::shared_ptr<nn_compiler::ir::DTensor>& data)
@@ -19,8 +17,8 @@ bool RemakeDTensorOfPrimVariable::checkVariableUsage(const std::shared_ptr<nn_co
             std::pair<const std::shared_ptr<nn_compiler::ir::NNLayer>, unsigned int> layer_inID(cloned_layer_for_check,
                                                                                                 inID);
 
-            if (!helper_->putAttribute(convertLayerTypeToString(cloned_layer_for_check->getType()),
-                                                                layer_inID, cloned_data_for_check)) {
+            if (!helper_->putAttribute(convertLayerTypeToString(cloned_layer_for_check->getType()), layer_inID,
+                                       cloned_data_for_check)) {
                 return false;
             }
         }

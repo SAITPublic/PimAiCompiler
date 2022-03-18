@@ -6,7 +6,6 @@ namespace nn_compiler
 {
 namespace frontend
 {
-
 class RemoveDropoutLayers : public Pass
 {
    public:

@@ -4,10 +4,8 @@
 
 namespace nn_compiler
 {
-
 namespace frontend
 {
-
 class RemoveConstantLayers : public Pass
 {
    public:

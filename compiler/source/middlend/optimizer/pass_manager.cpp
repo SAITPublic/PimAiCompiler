@@ -1,15 +1,14 @@
+#include "compiler/include/middlend/optimizer/pass_manager.h"
 #include "compiler/include/middlend/optimizer/cat_labeling.h"
 #include "compiler/include/middlend/optimizer/control_layer_execution.h"
 #include "compiler/include/middlend/optimizer/lstm_labeling.h"
-#include "compiler/include/middlend/optimizer/pass_manager.h"
 #include "compiler/include/middlend/optimizer/update_layer_id.h"
 
 namespace nn_compiler
 {
 namespace middlend
 {
-
-PassManager::PassManager() { }
+PassManager::PassManager() {}
 
 void PassManager::runPasses(std::unique_ptr<nn_compiler::ir::NNModel>& model)
 {

@@ -7,10 +7,8 @@
 
 namespace nn_compiler
 {
-
 namespace middlend
 {
-
 ControlLayerExecution::ControlLayerExecution() {}
 
 bool ControlLayerExecution::fitCondition(std::unique_ptr<nn_compiler::ir::NNModel>& model)

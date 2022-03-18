@@ -1,5 +1,5 @@
-#include "common/include/types.hpp"
 #include "compiler/include/nn_compiler.hpp"
+#include "common/include/types.hpp"
 
 namespace nn_compiler
 {

@@ -4,23 +4,21 @@
 #include "compiler/include/frontend/optimizer/swap_matmul_inputs.h"
 #include "ir/include/utils/graph_util.h"
 
-namespace nn_compiler {
+namespace nn_compiler
+{
+namespace frontend
+{
+SwapMatmulInputs::SwapMatmulInputs() {}
 
-namespace frontend {
-
-SwapMatmulInputs::SwapMatmulInputs() {
-}
-
-bool SwapMatmulInputs::fitCondition(std::unique_ptr<nn_compiler::ir::NNModel>& model) {
+bool SwapMatmulInputs::fitCondition(std::unique_ptr<nn_compiler::ir::NNModel>& model)
+{
     // there will be only one graph after take_in_body_net pass.
     auto graph = model->getGraphs()[0];
     for (auto layer : graph->getLayers()) {
         if (layer->getType() == nn_compiler::ir::LayerType::ATENMATMUL) {
             auto predecessors = ir::searchPredecessor(layer, graph);
-            if (predecessors.size() == 2 &&
-                    predecessors[1]->getType() == nn_compiler::ir::LayerType::PRIMCONSTANT) {
-                auto constant_layer =
-                    std::dynamic_pointer_cast<nn_compiler::ir::PrimConstantLayer>(predecessors[1]);
+            if (predecessors.size() == 2 && predecessors[1]->getType() == nn_compiler::ir::LayerType::PRIMCONSTANT) {
+                auto constant_layer = std::dynamic_pointer_cast<nn_compiler::ir::PrimConstantLayer>(predecessors[1]);
                 auto dtensor = constant_layer->getAttr();
                 std::vector<int> shape;
                 auto b = dtensor->getTensorShape().getBatch();
@@ -41,7 +39,8 @@ bool SwapMatmulInputs::fitCondition(std::unique_ptr<nn_compiler::ir::NNModel>& m
     return (layers_.size() != 0);
 }
 
-void SwapMatmulInputs::run(std::unique_ptr<nn_compiler::ir::NNModel>& model) {
+void SwapMatmulInputs::run(std::unique_ptr<nn_compiler::ir::NNModel>& model)
+{
     DLOG(INFO) << "SwapMatmulInputs::run is called.";
     auto graph = model->getGraphs()[0];
     for (auto layer : layers_) {

@@ -8,10 +8,8 @@
 
 namespace nn_compiler
 {
-
 namespace middlend
 {
-
 class ControlLayerExecution : public Pass
 {
    public:

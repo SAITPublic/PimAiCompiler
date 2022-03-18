@@ -4,10 +4,8 @@
 
 namespace nn_compiler
 {
-
 namespace frontend
 {
-
 class AttributeHelper
 {
    public:
@@ -85,7 +83,8 @@ class AttributeHelper
     }
 
     template <typename T>
-    std::vector<T> getVectorFromConstant(dtensor_ptr_type& d_tensor, nn_compiler::ir::LayerType layer_type, std::string attr_type)
+    std::vector<T> getVectorFromConstant(dtensor_ptr_type& d_tensor, nn_compiler::ir::LayerType layer_type,
+                                         std::string attr_type)
     {
         std::vector<T> ret_vec;
         auto data = d_tensor->getData<T>();
@@ -99,7 +98,8 @@ class AttributeHelper
         return ret_vec;
     }
 
-    std::string getStringFromConstant(dtensor_ptr_type& d_tensor, nn_compiler::ir::LayerType layer_type, std::string attr_type)
+    std::string getStringFromConstant(dtensor_ptr_type& d_tensor, nn_compiler::ir::LayerType layer_type,
+                                      std::string attr_type)
     {
         std::string str = "";
         auto data = d_tensor->getData<uint8_t>();

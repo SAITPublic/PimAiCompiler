@@ -5,14 +5,14 @@
 #include "compiler/include/frontend/optimizer/swap_addmm_inputs.h"
 #include "ir/include/utils/graph_util.h"
 
-namespace nn_compiler {
+namespace nn_compiler
+{
+namespace frontend
+{
+SwapAddmmInputs::SwapAddmmInputs() {}
 
-namespace frontend {
-
-SwapAddmmInputs::SwapAddmmInputs() {
-}
-
-bool SwapAddmmInputs::fitCondition(std::unique_ptr<nn_compiler::ir::NNModel>& model) {
+bool SwapAddmmInputs::fitCondition(std::unique_ptr<nn_compiler::ir::NNModel>& model)
+{
     // there will be only one graph after take_in_body_net pass.
     auto graph = model->getGraphs()[0];
     for (auto layer : graph->getLayers()) {
@@ -27,7 +27,8 @@ bool SwapAddmmInputs::fitCondition(std::unique_ptr<nn_compiler::ir::NNModel>& mo
     return (layers_.size() != 0);
 }
 
-void SwapAddmmInputs::run(std::unique_ptr<nn_compiler::ir::NNModel>& model) {
+void SwapAddmmInputs::run(std::unique_ptr<nn_compiler::ir::NNModel>& model)
+{
     DLOG(INFO) << "SwapAddmmInputs::run is called.";
     auto graph = model->getGraphs()[0];
     for (auto layer : layers_) {
@@ -79,4 +80,3 @@ void SwapAddmmInputs::run(std::unique_ptr<nn_compiler::ir::NNModel>& model) {
 
 }  // namespace frontend
 }  // namespace nn_compiler
-

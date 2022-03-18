@@ -4,10 +4,8 @@
 
 namespace nn_compiler
 {
-
 namespace frontend
 {
-
 /***@Detail:
  *  There is no need to keep prim::SetAttr in our graph, it always comes out afer a prim::Variabl layer,
  *  and update its value by a computation result.

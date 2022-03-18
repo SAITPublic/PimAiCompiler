@@ -2,11 +2,11 @@
 
 #include "ir/include/layers/prim_constant_layer.h"
 
-namespace nn_compiler {
-
-namespace frontend {
-ConstantParser::ConstantParser() {
-}
+namespace nn_compiler
+{
+namespace frontend
+{
+ConstantParser::ConstantParser() {}
 
 }  // namespace frontend
 }  // namespace nn_compiler

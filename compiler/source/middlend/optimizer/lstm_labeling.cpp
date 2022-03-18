@@ -8,10 +8,8 @@
 
 namespace nn_compiler
 {
-
 namespace middlend
 {
-
 LstmLabeling::LstmLabeling() {}
 
 bool LstmLabeling::fitCondition(std::unique_ptr<nn_compiler::ir::NNModel>& model)

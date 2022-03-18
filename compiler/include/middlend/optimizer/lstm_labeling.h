@@ -8,10 +8,8 @@
 
 namespace nn_compiler
 {
-
 namespace middlend
 {
-
 class LstmLabeling : public Pass
 {
    public:

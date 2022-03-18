@@ -3,10 +3,8 @@
 
 namespace nn_compiler
 {
-
 namespace frontend
 {
-
 RemoveConstantLayers::RemoveConstantLayers() {}
 
 bool RemoveConstantLayers::fitCondition(std::unique_ptr<nn_compiler::ir::NNModel>& model)

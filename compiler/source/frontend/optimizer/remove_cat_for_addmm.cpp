@@ -4,14 +4,14 @@
 #include "ir/include/utils/graph_search.h"
 #include "ir/include/utils/graph_util.h"
 
-namespace nn_compiler {
+namespace nn_compiler
+{
+namespace frontend
+{
+RemoveCatForAddmm::RemoveCatForAddmm() {}
 
-namespace frontend {
-
-RemoveCatForAddmm::RemoveCatForAddmm() {
-}
-
-bool RemoveCatForAddmm::fitCondition(std::unique_ptr<nn_compiler::ir::NNModel>& model) {
+bool RemoveCatForAddmm::fitCondition(std::unique_ptr<nn_compiler::ir::NNModel>& model)
+{
     auto graph = model->getGraphs()[0];
     for (auto layer : graph->getLayers()) {
         if (layer->getType() == nn_compiler::ir::LayerType::PRIMLISTCONSTRUCT) {
@@ -24,10 +24,9 @@ bool RemoveCatForAddmm::fitCondition(std::unique_ptr<nn_compiler::ir::NNModel>& 
                 auto cat_layer = successors[0];
                 auto successors_of_cat = ir::searchSuccessorLayerOnly(cat_layer, graph);
                 if (successors_of_cat.size() == 1 &&
-                        successors_of_cat[0]->getType() == nn_compiler::ir::LayerType::ATENADDMM) {
+                    successors_of_cat[0]->getType() == nn_compiler::ir::LayerType::ATENADDMM) {
                     auto addmm_layer = successors_of_cat[0];
-                    std::vector<std::shared_ptr<nn_compiler::ir::NNLayer>>
-                                layer_set = {layer, cat_layer, addmm_layer};
+                    std::vector<std::shared_ptr<nn_compiler::ir::NNLayer>> layer_set = {layer, cat_layer, addmm_layer};
                     layers_.push_back(layer_set);
                 }
             }
@@ -37,7 +36,8 @@ bool RemoveCatForAddmm::fitCondition(std::unique_ptr<nn_compiler::ir::NNModel>& 
     return (layers_.size() != 0);
 }
 
-void RemoveCatForAddmm::run(std::unique_ptr<nn_compiler::ir::NNModel>& model) {
+void RemoveCatForAddmm::run(std::unique_ptr<nn_compiler::ir::NNModel>& model)
+{
     DLOG(INFO) << "RemoveCatForAddmm::run is called.";
 
     auto graph = model->getGraphs()[0];
@@ -46,16 +46,17 @@ void RemoveCatForAddmm::run(std::unique_ptr<nn_compiler::ir::NNModel>& model) {
         auto addmm_layer = layer_set[2];
         auto addmm_predecessors = ir::searchPredecessor(addmm_layer, graph);
         auto old_weight = addmm_predecessors[2];
-        auto new_weights = create_new_constants(
-            std::dynamic_pointer_cast<nn_compiler::ir::PrimConstantLayer>(old_weight));
+        auto new_weights =
+            create_new_constants(std::dynamic_pointer_cast<nn_compiler::ir::PrimConstantLayer>(old_weight));
         graph->deleteLayer(old_weight->getID());
         model->deleteTSSTensor(old_weight->getOutSTensorID()[0]);
         reorganize_graph(model, new_weights);
     }
 }
 
-std::vector<std::shared_ptr<nn_compiler::ir::NNLayer>>
-RemoveCatForAddmm::create_new_constants(std::shared_ptr<nn_compiler::ir::PrimConstantLayer> old_constant_layer) {
+std::vector<std::shared_ptr<nn_compiler::ir::NNLayer>> RemoveCatForAddmm::create_new_constants(
+    std::shared_ptr<nn_compiler::ir::PrimConstantLayer> old_constant_layer)
+{
     std::vector<std::shared_ptr<nn_compiler::ir::NNLayer>> new_constants;
 
     auto origin_dtensor = old_constant_layer->getAttr();
@@ -64,17 +65,17 @@ RemoveCatForAddmm::create_new_constants(std::shared_ptr<nn_compiler::ir::PrimCon
     auto x_stride = stride[2], y_stride = stride[3];
 
     float16 origin_data[shape_of_matmul_weight_[0]][shape_of_matmul_weight_[1]];
-    for (auto i = 0; i < shape_of_matmul_weight_[0]; i ++) {
+    for (auto i = 0; i < shape_of_matmul_weight_[0]; i++) {
         auto idx_in_vec = i + x_stride - 1;
-        for (auto j = 0; j < shape_of_matmul_weight_[1]; j ++) {
+        for (auto j = 0; j < shape_of_matmul_weight_[1]; j++) {
             origin_data[i][j] = (*origin_data_vec)[idx_in_vec];
             idx_in_vec += y_stride;
         }
     }
 
     std::vector<float16> contiguous_data_vec;
-    for (auto i = 0; i < shape_of_matmul_weight_[0]; i ++) {
-        for (auto j = 0; j < shape_of_matmul_weight_[1]; j ++) {
+    for (auto i = 0; i < shape_of_matmul_weight_[0]; i++) {
+        for (auto j = 0; j < shape_of_matmul_weight_[1]; j++) {
             contiguous_data_vec.push_back(origin_data[i][j]);
         }
     }
@@ -114,7 +115,8 @@ RemoveCatForAddmm::create_new_constants(std::shared_ptr<nn_compiler::ir::PrimCon
 }
 
 void RemoveCatForAddmm::reorganize_graph(std::unique_ptr<nn_compiler::ir::NNModel>& model,
-                                         std::vector<std::shared_ptr<nn_compiler::ir::NNLayer>> new_constants) {
+                                         std::vector<std::shared_ptr<nn_compiler::ir::NNLayer>> new_constants)
+{
     auto graph = model->getGraphs()[0];
     for (auto layer_set : layers_) {
         auto list_construct_layer = layer_set[0], cat_layer = layer_set[1];
@@ -138,7 +140,8 @@ void RemoveCatForAddmm::reorganize_graph(std::unique_ptr<nn_compiler::ir::NNMode
         addmm_layer->renewInSTensorID(2, constant_out_stensor1->getID());
 
         // create second addmm Op
-        auto new_addmm_layer = std::make_shared<nn_compiler::ir::AtenAddmmLayer>("", nn_compiler::ir::LayerType::ATENADDMM);
+        auto new_addmm_layer =
+            std::make_shared<nn_compiler::ir::AtenAddmmLayer>("", nn_compiler::ir::LayerType::ATENADDMM);
         new_addmm_layer->setName("splitted_" + addmm_layer->getName());
         graph->addLayer2pos(new_addmm_layer, graph->getLayerPos(addmm_layer));
         auto new_addmm_out_stensor = std::make_shared<nn_compiler::ir::TSSTensor>();

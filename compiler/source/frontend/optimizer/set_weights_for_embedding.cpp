@@ -3,14 +3,14 @@
 #include "compiler/include/frontend/optimizer/set_weights_for_embedding.h"
 #include "ir/include/utils/graph_util.h"
 
-namespace nn_compiler {
+namespace nn_compiler
+{
+namespace frontend
+{
+SetWeightsForEmbedding::SetWeightsForEmbedding() {}
 
-namespace frontend {
-
-SetWeightsForEmbedding::SetWeightsForEmbedding() {
-}
-
-bool SetWeightsForEmbedding::fitCondition(std::unique_ptr<nn_compiler::ir::NNModel>& graph_model) {
+bool SetWeightsForEmbedding::fitCondition(std::unique_ptr<nn_compiler::ir::NNModel>& graph_model)
+{
     auto graphs = graph_model->getGraphs();
     for (auto graph : graphs) {
         for (auto layer : graph->getLayers()) {
@@ -23,7 +23,8 @@ bool SetWeightsForEmbedding::fitCondition(std::unique_ptr<nn_compiler::ir::NNMod
     return (layers_.size() != 0);
 }
 
-void SetWeightsForEmbedding::run(std::unique_ptr<nn_compiler::ir::NNModel>& graph_model) {
+void SetWeightsForEmbedding::run(std::unique_ptr<nn_compiler::ir::NNModel>& graph_model)
+{
     DLOG(INFO) << "SetWeightsForEmbedding::run is called.";
     auto graph = graph_model->getGraphs()[0];
 
@@ -45,8 +46,8 @@ void SetWeightsForEmbedding::run(std::unique_ptr<nn_compiler::ir::NNModel>& grap
             std::vector<at::Tensor> weights;
             auto matrix = constant_parser_.parse<half_float::half>(d_tensor);
             std::vector<half_float::half> matrix_t_flat;
-            for (auto i = 0; i < height; i ++) {
-                for (auto j = 0; j < width; j ++) {
+            for (auto i = 0; i < height; i++) {
+                for (auto j = 0; j < width; j++) {
                     matrix_t_flat.push_back(matrix[i][j]);
                 }
             }
@@ -56,8 +57,8 @@ void SetWeightsForEmbedding::run(std::unique_ptr<nn_compiler::ir::NNModel>& grap
                 for (auto w = 0; w < width; w++) {
                     data.push_back(matrix_t_flat[count++]);
                 }
-                auto data_tensor_cpu =torch::from_blob(data.data(), {1, 1, width},
-                                                       at::TensorOptions().dtype(torch::kFloat16));
+                auto data_tensor_cpu =
+                    torch::from_blob(data.data(), {1, 1, width}, at::TensorOptions().dtype(torch::kFloat16));
                 auto data_tensor = std::move(data_tensor_cpu.cuda());
                 weights.push_back(data_tensor);
             }

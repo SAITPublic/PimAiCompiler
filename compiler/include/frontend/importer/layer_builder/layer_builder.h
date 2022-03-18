@@ -287,7 +287,7 @@ class AtenEmbeddingBuilder : public LayerBuilder
    public:
     std::shared_ptr<ir::NNLayer> buildLayer(const torch::jit::Node* node_ref);
 
- private:
+   private:
     std::shared_ptr<ir::AtenEmbeddingLayer> aten_embedding_layer_;
 };
 
@@ -476,7 +476,7 @@ class AtenLogBuilder : public LayerBuilder
    public:
     std::shared_ptr<ir::NNLayer> buildLayer(const torch::jit::Node* node_ref);
 
- private:
+   private:
     std::shared_ptr<ir::AtenLogLayer> aten_log_layer_;
 };
 
@@ -593,7 +593,7 @@ class AtenNegBuilder : public LayerBuilder
    public:
     std::shared_ptr<ir::NNLayer> buildLayer(const torch::jit::Node* node_ref);
 
- private:
+   private:
     std::shared_ptr<ir::AtenNegLayer> aten_neg_layer_;
 };
 

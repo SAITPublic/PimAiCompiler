@@ -5,10 +5,8 @@
 
 namespace nn_compiler
 {
-
 namespace frontend
 {
-
 bool SetAttribute::fitCondition(std::unique_ptr<nn_compiler::ir::NNModel> &model)
 {
     auto graphs = model->getGraphs();
