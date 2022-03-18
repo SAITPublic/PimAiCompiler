@@ -89,7 +89,7 @@ void PipelineManager::load_and_run_rnnt()
 
     for (auto item : input_tensors) {
         DLOG(INFO) << "Input: "
-                     << "size: " << item.sizes() << " dtype:" << item.dtype() << " device:" << item.device();
+                   << "size: " << item.sizes() << " dtype:" << item.dtype() << " device:" << item.device();
     }
     // Inference
     runtime.inferenceModel(input_tensors, output_tensors, is_profiling_);
@@ -132,7 +132,7 @@ void PipelineManager::load_and_run_gnmt()
 
     for (auto item : input_tensors) {
         DLOG(INFO) << "Input: "
-                     << "size: " << item.sizes() << " dtype:" << item.dtype() << " device:" << item.device();
+                   << "size: " << item.sizes() << " dtype:" << item.dtype() << " device:" << item.device();
     }
     // Inference
     runtime.inferenceModel(input_tensors, output_tensors, is_profiling_);
@@ -165,7 +165,7 @@ void PipelineManager::load_and_run_hwr()
 
     for (auto item : input_tensors) {
         DLOG(INFO) << "Input: "
-                     << "size: " << item.sizes() << " dtype:" << item.dtype() << " device:" << item.device();
+                   << "size: " << item.sizes() << " dtype:" << item.dtype() << " device:" << item.device();
     }
     // Inference
     runtime.inferenceModel(input_tensors, output_tensors, is_profiling_);
