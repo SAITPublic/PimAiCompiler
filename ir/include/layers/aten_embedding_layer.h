@@ -3,19 +3,19 @@
 #include <torch/script.h>
 #include "ir/include/layers/nn_layer.h"
 
-namespace nn_compiler {
-namespace ir {
-
-class AtenEmbeddingLayer : public NNLayer {
- public:
+namespace nn_compiler
+{
+namespace ir
+{
+class AtenEmbeddingLayer : public NNLayer
+{
+   public:
     AtenEmbeddingLayer() {}
 
-    AtenEmbeddingLayer(std::string name, LayerType type)
-            : NNLayer(name, type) {
-    }
+    AtenEmbeddingLayer(std::string name, LayerType type) : NNLayer(name, type) {}
 
-    explicit AtenEmbeddingLayer(const AtenEmbeddingLayer &aten_embedding_layer) :
-        NNLayer(aten_embedding_layer) {
+    explicit AtenEmbeddingLayer(const AtenEmbeddingLayer &aten_embedding_layer) : NNLayer(aten_embedding_layer)
+    {
         this->weights_ = aten_embedding_layer.weights_;
         this->weights_shape_ = aten_embedding_layer.weights_shape_;
         this->padding_idx_ = aten_embedding_layer.padding_idx_;
@@ -25,7 +25,8 @@ class AtenEmbeddingLayer : public NNLayer {
 
     virtual ~AtenEmbeddingLayer() {}
 
-    virtual std::shared_ptr<NNLayer> clone() {
+    virtual std::shared_ptr<NNLayer> clone()
+    {
         return std::shared_ptr<AtenEmbeddingLayer>(new AtenEmbeddingLayer(*this));
     }
 
@@ -49,20 +50,21 @@ class AtenEmbeddingLayer : public NNLayer {
 
     int getSparse() const { return sparse_; }
 
-    void printAttr() {
+    void printAttr()
+    {
         DLOG(INFO) << "    AtenEmbeddingAttr      ";
-        DLOG(INFO) << "    padding_idx is         "<< padding_idx_;
-        DLOG(INFO) << "    scale_grad_by_freq is  "<< scale_grad_by_freq_;
-        DLOG(INFO) << "    sparse is              "<< sparse_;
+        DLOG(INFO) << "    padding_idx is         " << padding_idx_;
+        DLOG(INFO) << "    scale_grad_by_freq is  " << scale_grad_by_freq_;
+        DLOG(INFO) << "    sparse is              " << sparse_;
     }
 
- private:
+   private:
     std::vector<at::Tensor> weights_;
     std::vector<int> weights_shape_;
-    int64_t  padding_idx_       = INT64_MIN;
-    int     scale_grad_by_freq_ = INT32_MAX;
-    int     sparse_             = INT32_MAX;
+    int64_t padding_idx_ = INT64_MIN;
+    int scale_grad_by_freq_ = INT32_MAX;
+    int sparse_ = INT32_MAX;
 };
 
-} // namespace ir
-} // namespace nn_compiler
+}  // namespace ir
+}  // namespace nn_compiler
