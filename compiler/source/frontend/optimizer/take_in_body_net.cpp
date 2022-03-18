@@ -1,6 +1,5 @@
 #include <string>
 
-#include "compiler/include/common/log.hpp"
 #include "compiler/include/frontend/optimizer/take_in_body_net.h"
 
 #include "ir/include/layers/pim_general_layers.h"
@@ -55,7 +54,7 @@ bool TakeInBodyNet::fitCondition(std::unique_ptr<nn_compiler::ir::NNModel>& mode
 
 void TakeInBodyNet::take_in_if_body(std::unique_ptr<nn_compiler::ir::NNModel>& model)
 {
-    Log::FE::I() << "Take in if body net start.";
+    DLOG(INFO) << "Take in if body net start.";
     auto graphs = model->getGraphs();
     for (auto layer_pair : prim_if_layers_) {
         std::shared_ptr<nn_compiler::ir::NNNetwork> main_graph = layer_pair.second;
@@ -65,18 +64,18 @@ void TakeInBodyNet::take_in_if_body(std::unique_ptr<nn_compiler::ir::NNModel>& m
         for (auto graph : graphs) {
             if (graph->getName() == prim_if_layer->getThenNet()) {
                 if (then_net != nullptr) {
-                    Log::IR::E() << "duplicated network name occurs.";
+                    DLOG(FATAL) << "duplicated network name occurs.";
                 }
                 then_net = graph;
             } else if (graph->getName() == prim_if_layer->getElseNet()) {
                 if (else_net != nullptr) {
-                    Log::IR::E() << "duplicated network name occurs.";
+                    DLOG(FATAL) << "duplicated network name occurs.";
                 }
                 else_net = graph;
             }
         }
         if (then_net == nullptr || else_net == nullptr) {
-            Log::IR::E() << (then_net == nullptr ? "then" : "else") << " branch of prim::If missed.";
+            DLOG(FATAL) << (then_net == nullptr ? "then" : "else") << " branch of prim::If missed.";
         }
         std::vector<std::shared_ptr<nn_compiler::ir::NNNetwork>> if_nets = {then_net, else_net};
         std::vector<uint32_t> if_layer_out_tensor_ids = layer->getOutSTensorID();
@@ -125,7 +124,7 @@ void TakeInBodyNet::take_in_if_body(std::unique_ptr<nn_compiler::ir::NNModel>& m
 
 void TakeInBodyNet::take_in_loop_body(std::unique_ptr<nn_compiler::ir::NNModel>& model)
 {
-    Log::FE::I() << "Take in loop body net start.";
+    DLOG(INFO) << "Take in loop body net start.";
     auto graphs = model->getGraphs();
     // need find loop layer belongs to which net. when loop layer in if body net, after take_in_if_body()
     // executed, if body net removed, it need update the map(prim_loop_layers_)
@@ -139,13 +138,13 @@ void TakeInBodyNet::take_in_loop_body(std::unique_ptr<nn_compiler::ir::NNModel>&
         for (auto graph : graphs) {
             if (graph->getName() == prim_loop_layer->getBodyNet()) {
                 if (body_net != nullptr) {
-                    Log::IR::E() << "duplicated network name occurs.";
+                    DLOG(FATAL) << "duplicated network name occurs.";
                 }
                 body_net = graph;
             }
         }
         if (body_net == nullptr) {
-            Log::IR::E() << " body block of prim::Loop missed.";
+            DLOG(FATAL) << " body block of prim::Loop missed.";
         }
 
         std::vector<uint32_t> loop_layer_out_tensor_ids = layer->getOutSTensorID();
@@ -233,7 +232,7 @@ void TakeInBodyNet::take_in_loop_body(std::unique_ptr<nn_compiler::ir::NNModel>&
 
 void TakeInBodyNet::run(std::unique_ptr<nn_compiler::ir::NNModel>& model)
 {
-    Log::FE::I() << "TakeInBodyNet::run is called.";
+    DLOG(INFO) << "TakeInBodyNet::run is called.";
 
     take_in_if_body(model);
 

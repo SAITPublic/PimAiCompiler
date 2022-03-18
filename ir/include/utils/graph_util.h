@@ -1,6 +1,5 @@
 #pragma once
 
-#include "common/include/log.hpp"
 #include "ir/include/types.h"
 #include "ir/include/utils/graph_print.h"
 #include "ir/include/utils/graph_search.h"

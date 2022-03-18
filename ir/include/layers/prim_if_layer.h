@@ -46,9 +46,9 @@ class PrimIfLayer : public NNLayer
 
     void printAttr()
     {
-        Log::IR::I() << "    PrimIfAttr        ";
-        Log::IR::I() << "    Then net is       " << _then_net;
-        Log::IR::I() << "    Else net is       " << _else_net;
+        DLOG(INFO) << "    PrimIfAttr        ";
+        DLOG(INFO) << "    Then net is       " << _then_net;
+        DLOG(INFO) << "    Else net is       " << _else_net;
     }
 
    private:

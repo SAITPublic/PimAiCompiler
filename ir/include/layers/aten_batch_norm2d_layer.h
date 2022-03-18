@@ -66,11 +66,11 @@ class AtenBatchNorm2dLayer : public NNLayer {
     int getCudnnEnabled() { return cudnn_enabled_; }
 
     void printAttr() {
-        Log::IR::I() << "    AtenAsTensorAttr       ";
-        Log::IR::I() << "    training is          " << training_;
-        Log::IR::I() << "    momentum is          " << momentum_;
-        Log::IR::I() << "    eps is               " << eps_;
-        Log::IR::I() << "    cudnn_enabled is     " << cudnn_enabled_;
+        DLOG(INFO) << "    AtenAsTensorAttr       ";
+        DLOG(INFO) << "    training is          " << training_;
+        DLOG(INFO) << "    momentum is          " << momentum_;
+        DLOG(INFO) << "    eps is               " << eps_;
+        DLOG(INFO) << "    cudnn_enabled is     " << cudnn_enabled_;
     }
 
  private:

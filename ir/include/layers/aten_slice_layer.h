@@ -33,7 +33,7 @@ class AtenSliceLayer : public NNLayer {
     }
 
      void printAttr() {
-        Log::IR::I() << "      AtenSliceAttr      ";
+        DLOG(INFO) << "      AtenSliceAttr      ";
     }
 
  private:

@@ -7,6 +7,6 @@ target_include_directories(frontend PUBLIC
     ${PROJECT_SOURCE_DIR}/compiler/include/frontend
     ${TORCH_INCLUDE_DIRS})
 
-target_link_libraries(frontend common ir ir)
+target_link_libraries(frontend ir)
 
 install (TARGETS frontend LIBRARY DESTINATION ${ROCM_PATH}/lib/)

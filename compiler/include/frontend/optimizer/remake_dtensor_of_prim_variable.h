@@ -2,7 +2,6 @@
 
 #include "compiler/include/common/pass.hpp"
 #include "compiler/include/frontend/optimizer/utils/attribute_helper.h"
-#include "ir/include/common/log.hpp"
 #include "ir/include/layers/prim_variable_layer.h"
 
 namespace nn_compiler
@@ -42,7 +41,7 @@ class RemakeDTensorOfPrimVariable : public Pass
         T ret_value;
         auto data = d_tensor->getData<T>();
         if ((*data).size() == 0) {
-            Log::IR::E() << "processing data of prim::Variable gets NONE";
+            DLOG(FATAL) << "processing data of prim::Variable gets NONE";
         } else {
             ret_value = (*data)[0];
         }

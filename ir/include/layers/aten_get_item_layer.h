@@ -32,7 +32,7 @@ class AtenGetItemLayer : public NNLayer {
     int getIdx() { return idx_; }
 
     void printAttr() {
-        Log::IR::I() << "    AtenGetItemAttr      ";
+        DLOG(INFO) << "    AtenGetItemAttr      ";
     }
 
  private:

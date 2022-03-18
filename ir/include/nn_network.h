@@ -133,7 +133,7 @@ class NNNetwork {
     void setName(const std::string &name) { name_ = name; }
 
     void printNetwork() {
-        Log::IR::I() << "NNLayer Cnt: " << layers_.size();
+        DLOG(INFO) << "NNLayer Cnt: " << layers_.size();
         for (size_t i = 0; i < layers_.size(); i++) {
             layers_[i]->printInfo();
         }

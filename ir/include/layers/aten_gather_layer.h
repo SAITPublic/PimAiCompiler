@@ -34,9 +34,9 @@ class AtenGatherLayer : public NNLayer {
     int getSparseGrad() const { return _sparse_grad; }
 
     void printAttr() {
-        Log::IR::I() << "    AtenGatherAttr      ";
-        Log::IR::I() << "    dim is              "<< _dim;
-        Log::IR::I() << "    sparse_grad is      "<< _sparse_grad;
+        DLOG(INFO) << "    AtenGatherAttr      ";
+        DLOG(INFO) << "    dim is              "<< _dim;
+        DLOG(INFO) << "    sparse_grad is      "<< _sparse_grad;
     }
 
  private:

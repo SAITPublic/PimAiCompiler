@@ -36,9 +36,9 @@ class AtenSoftmaxLayer : public NNLayer {
     int64_t getDtype() const { return _dtype; }
 
     void printAttr() {
-        Log::IR::I() << "    AtenSoftmaxAttr";
-        Log::IR::I() << "    dim is         " << _dim;
-        Log::IR::I() << "    dtype is       " << _dtype;
+        DLOG(INFO) << "    AtenSoftmaxAttr";
+        DLOG(INFO) << "    dim is         " << _dim;
+        DLOG(INFO) << "    dtype is       " << _dtype;
     }
 
  private:

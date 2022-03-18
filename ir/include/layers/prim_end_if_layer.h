@@ -36,7 +36,7 @@ class PrimEndIfLayer : public NNLayer
     bool getIsElseNet() const { return is_else_net_; }
     int64_t getIfLayerId() const { return if_layer_id_; }
 
-    void printAttr() { Log::IR::I() << "PrimEndIf Attr  "; }
+    void printAttr() { DLOG(INFO) << "PrimEndIf Attr  "; }
 
    private:
     int64_t goto_layer_;

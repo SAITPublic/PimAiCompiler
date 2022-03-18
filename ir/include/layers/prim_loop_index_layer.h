@@ -32,7 +32,7 @@ class PrimLoopIndexLayer : public NNLayer {
     int64_t getIndex() { return index_; }
 
     void printAttr() {
-        Log::IR::I() << "     PrimLoopIndexAttr    ";
+        DLOG(INFO) << "     PrimLoopIndexAttr    ";
     }
 
  private:

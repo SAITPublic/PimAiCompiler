@@ -1,6 +1,5 @@
 #include "importer/layer_builder/layer_builder.h"
 #include "importer/utils/attr_parser.h"
-#include "ir/include/common/log.hpp"
 #include "ir/include/tensors/data_tensor.h"
 
 using nn_compiler::ir::DTensor;
@@ -12,7 +11,7 @@ namespace frontend
 {
 std::shared_ptr<ir::NNLayer> AtenBatchNorm2dBuilder::buildLayer(const torch::jit::Node* node_ref)
 {
-    Log::IR::I() << "build aten::batch_norm";
+    DLOG(INFO) << "build aten::batch_norm";
 
     nn_compiler::ir::LayerType type = nn_compiler::ir::LayerType::ATENBATCHNORM2D;
     std::string name = "";

@@ -49,10 +49,10 @@ class PrimLoopLayer : public NNLayer
 
     void printAttr()
     {
-        Log::IR::I() << "     PrimLoopAttr    ";
-        Log::IR::I() << "     body_net        " << body_net_;
-        Log::IR::I() << "     trip_count      " << trip_count_;
-        Log::IR::I() << "     cond            " << cond_;
+        DLOG(INFO) << "     PrimLoopAttr    ";
+        DLOG(INFO) << "     body_net        " << body_net_;
+        DLOG(INFO) << "     trip_count      " << trip_count_;
+        DLOG(INFO) << "     cond            " << cond_;
     }
 
    private:

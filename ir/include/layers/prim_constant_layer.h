@@ -32,7 +32,7 @@ class PrimConstantLayer : public NNLayer {
     }
 
     void printAttr() {
-        Log::IR::I() << "      PrimConstantAttr     ";
+        DLOG(INFO) << "      PrimConstantAttr     ";
     }
 
     void setAttr(std::shared_ptr<DTensor>  data) {

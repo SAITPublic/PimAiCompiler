@@ -37,9 +37,9 @@ class AtenDeriveIndexLayer : public NNLayer {
     int64_t getStart() const { return _start; }
 
     void printAttr() {
-        Log::IR::I() << "    AtenDeriveIndexAttr      ";
-        Log::IR::I() << "    start is                 "<< _start;
-        Log::IR::I() << "    step is                  "<< _step;
+        DLOG(INFO) << "    AtenDeriveIndexAttr      ";
+        DLOG(INFO) << "    start is                 "<< _start;
+        DLOG(INFO) << "    step is                  "<< _step;
     }
 
  private:

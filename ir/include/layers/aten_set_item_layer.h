@@ -32,8 +32,8 @@ class AtenSetItemLayer : public NNLayer {
     int getIndices() const { return _indices; }
 
     void printAttr() {
-        Log::IR::I() << "    AtenSetItemAttr     ";
-        Log::IR::I() << "    indices is          " << _indices;
+        DLOG(INFO) << "    AtenSetItemAttr     ";
+        DLOG(INFO) << "    indices is          " << _indices;
     }
 
  private:

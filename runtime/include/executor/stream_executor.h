@@ -7,6 +7,7 @@
 #include <string>
 #include <vector>
 
+#include "common/include/types.hpp"
 #include "ir/include/layers/all_layers.h"
 #include "ir/include/nn_model.h"
 #include "ir/include/nn_network.h"

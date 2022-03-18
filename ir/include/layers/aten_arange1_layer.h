@@ -50,11 +50,11 @@ class AtenArange1Layer : public NNLayer {
     int getPinMemory() const { return _pin_memory; }
 
     void printAttr() {
-        Log::IR::I() << "    AtenArangeAttr          ";
-        Log::IR::I() << "    end is                 "<< _end;
-        Log::IR::I() << "    dtype is                "<< _dtype;
-        Log::IR::I() << "    layout is               "<< _layout;
-        Log::IR::I() << "    pin_memory is           "<< _pin_memory;
+        DLOG(INFO) << "    AtenArangeAttr          ";
+        DLOG(INFO) << "    end is                 "<< _end;
+        DLOG(INFO) << "    dtype is                "<< _dtype;
+        DLOG(INFO) << "    layout is               "<< _layout;
+        DLOG(INFO) << "    pin_memory is           "<< _pin_memory;
     }
 
  private:

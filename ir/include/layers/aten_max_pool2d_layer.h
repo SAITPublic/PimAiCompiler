@@ -49,16 +49,16 @@ class AtenMaxPool2dLayer : public NNLayer {
     int getCeilMode() const { return _ceil_mode; }
 
     void printAttr() {
-        Log::IR::I() << "  AtemMaxPool2dAttr";
-        Log::IR::I() << "  Kernel size are  " << _kernel_size[0];
-        Log::IR::I() << "                   " << _kernel_size[1];
-        Log::IR::I() << "  Pad are          " << _pad[0];
-        Log::IR::I() << "                   " << _pad[1];
-        Log::IR::I() << "  Stride are       " << _stride[0];
-        Log::IR::I() << "                   " << _stride[1];
-        Log::IR::I() << "  Dilation are     " << _dilation[0];
-        Log::IR::I() << "                   " << _dilation[1];
-        Log::IR::I() << "  ceil_mode is     " << _ceil_mode;
+        DLOG(INFO) << "  AtemMaxPool2dAttr";
+        DLOG(INFO) << "  Kernel size are  " << _kernel_size[0];
+        DLOG(INFO) << "                   " << _kernel_size[1];
+        DLOG(INFO) << "  Pad are          " << _pad[0];
+        DLOG(INFO) << "                   " << _pad[1];
+        DLOG(INFO) << "  Stride are       " << _stride[0];
+        DLOG(INFO) << "                   " << _stride[1];
+        DLOG(INFO) << "  Dilation are     " << _dilation[0];
+        DLOG(INFO) << "                   " << _dilation[1];
+        DLOG(INFO) << "  ceil_mode is     " << _ceil_mode;
     }
 
  private:

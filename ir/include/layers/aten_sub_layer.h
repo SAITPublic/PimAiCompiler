@@ -30,7 +30,7 @@ class AtenSubLayer : public NNLayer {
     }
 
     void printAttr() {
-        Log::IR::I() <<   "AtenSubAttr";
+        DLOG(INFO) <<   "AtenSubAttr";
     }
 
     void setAlpha(int64_t alpha) { alpha_ = alpha; }

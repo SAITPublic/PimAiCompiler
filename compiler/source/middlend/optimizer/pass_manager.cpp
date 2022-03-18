@@ -1,4 +1,3 @@
-#include "compiler/include/common/log.hpp"
 #include "compiler/include/middlend/optimizer/cat_labeling.h"
 #include "compiler/include/middlend/optimizer/control_layer_execution.h"
 #include "compiler/include/middlend/optimizer/lstm_labeling.h"
@@ -14,7 +13,7 @@ PassManager::PassManager() { }
 
 void PassManager::runPasses(std::unique_ptr<nn_compiler::ir::NNModel>& model)
 {
-    Log::FE::I() << "PassManager::runPasses is called.";
+    DLOG(INFO) << "PassManager::runPasses is called.";
     auto base_pass = std::make_shared<Pass>();
 
     /*TODO: add middlend passes*/

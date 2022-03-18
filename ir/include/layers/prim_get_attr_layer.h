@@ -31,7 +31,7 @@ class PrimGetAttrLayer : public NNLayer {
     }
 
     void printAttr() {
-        Log::IR::I() << "      PrimGetAttrAttr     ";
+        DLOG(INFO) << "      PrimGetAttrAttr     ";
     }
 
  private:

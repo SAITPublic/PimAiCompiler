@@ -1,6 +1,5 @@
 #include <string>
 
-#include "compiler/include/common/log.hpp"
 #include "compiler/include/middlend/optimizer/update_layer_id.h"
 #include "ir/include/layers/aten_lstm1_layer.h"
 #include "ir/include/layers/aten_lstm2_layer.h"

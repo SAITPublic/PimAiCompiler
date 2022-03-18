@@ -71,14 +71,14 @@ class AtenConv2dLayer : public NNLayer {
     int64_t getGroups() const { return groups_; }
 
     void printAttr() {
-        Log::IR::I() << "    AtenConv2dAttr          ";
-        Log::IR::I() << "    stride[0] is            "<< stride_[0];
-        Log::IR::I() << "    stride[1] is            "<< stride_[1];
-        Log::IR::I() << "    padding[0] is           "<< padding_[0];
-        Log::IR::I() << "    padding[1] is           "<< padding_[1];
-        Log::IR::I() << "    dialation[0] is         "<< dialation_[0];
-        Log::IR::I() << "    dialation[1] is         "<< dialation_[1];
-        Log::IR::I() << "    groups is               "<< groups_;
+        DLOG(INFO) << "    AtenConv2dAttr          ";
+        DLOG(INFO) << "    stride[0] is            "<< stride_[0];
+        DLOG(INFO) << "    stride[1] is            "<< stride_[1];
+        DLOG(INFO) << "    padding[0] is           "<< padding_[0];
+        DLOG(INFO) << "    padding[1] is           "<< padding_[1];
+        DLOG(INFO) << "    dialation[0] is         "<< dialation_[0];
+        DLOG(INFO) << "    dialation[1] is         "<< dialation_[1];
+        DLOG(INFO) << "    groups is               "<< groups_;
     }
 
  private:

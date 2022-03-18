@@ -47,11 +47,11 @@ class AtenTo1Layer : public NNLayer {
     int getOptionalMemoryFormat() { return _optional_memory_format; }
 
     void printAttr() {
-        Log::IR::I() << "    AtenToAttr                     ";
-        Log::IR::I() << "    dtype is                       " << _dtype;
-        Log::IR::I() << "    non_blocking                   " << _non_blocking;
-        Log::IR::I() << "    copy is                        " << _copy;
-        Log::IR::I() << "    optional_memory_format is      " << _optional_memory_format;
+        DLOG(INFO) << "    AtenToAttr                     ";
+        DLOG(INFO) << "    dtype is                       " << _dtype;
+        DLOG(INFO) << "    non_blocking                   " << _non_blocking;
+        DLOG(INFO) << "    copy is                        " << _copy;
+        DLOG(INFO) << "    optional_memory_format is      " << _optional_memory_format;
     }
 
  private:

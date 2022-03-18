@@ -29,8 +29,8 @@ class AtenIndexPutLayer : public NNLayer {
     int getAccumulate() const { return _accumulate; }
 
     void printAttr() {
-        Log::IR::I() << "    AtenIndexPutAttr             ";
-        Log::IR::I() << "    accumulate is                "<< _accumulate;
+        DLOG(INFO) << "    AtenIndexPutAttr             ";
+        DLOG(INFO) << "    accumulate is                "<< _accumulate;
     }
 
  private:

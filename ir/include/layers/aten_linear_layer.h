@@ -48,7 +48,7 @@ class AtenLinearLayer : public NNLayer {
     void setBiasIds(const std::vector<int64_t>& bias_ids) { bias_ids_ = bias_ids; }
 
     void printAttr() {
-        Log::IR::I() << "    AtenLinearAttr      ";
+        DLOG(INFO) << "    AtenLinearAttr      ";
     }
 
  private:

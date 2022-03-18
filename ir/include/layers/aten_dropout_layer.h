@@ -32,9 +32,9 @@ class AtenDropoutLayer : public NNLayer {
     int getTrain() { return _train; }
 
     void printAttr() {
-        Log::IR::I() << "    AtenDropoutAttr            ";
-        Log::IR::I() << "    proportion is              " << _proportion;
-        Log::IR::I() << "    train value is             " << _train;
+        DLOG(INFO) << "    AtenDropoutAttr            ";
+        DLOG(INFO) << "    proportion is              " << _proportion;
+        DLOG(INFO) << "    train value is             " << _train;
     }
 
  private:

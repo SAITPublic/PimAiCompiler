@@ -35,8 +35,8 @@ class AtenPackPaddedSequenceLayer : public NNLayer {
     int getBatchFirst() const { return _batch_first; }
 
     void printAttr() {
-        Log::IR::I() << "    AtenPackPaddedSequenceAttr     ";
-        Log::IR::I() << "    batch_first is                 "<< _batch_first;
+        DLOG(INFO) << "    AtenPackPaddedSequenceAttr     ";
+        DLOG(INFO) << "    batch_first is                 "<< _batch_first;
     }
 
  private:

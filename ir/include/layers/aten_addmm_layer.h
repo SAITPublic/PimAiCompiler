@@ -27,7 +27,7 @@ class AtenAddmmLayer : public NNLayer {
     }
 
     void printAttr() {
-        Log::IR::I() << "    AtenAddmmAttr      ";
+        DLOG(INFO) << "    AtenAddmmAttr      ";
     }
 
     void set_act_type(const std::string& type) {

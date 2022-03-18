@@ -1,4 +1,3 @@
-#include "compiler/include/common/log.hpp"
 #include "compiler/include/frontend/optimizer/remove_constant_layers.h"
 #include "ir/include/utils/graph_util.h"
 
@@ -34,7 +33,7 @@ bool RemoveConstantLayers::fitCondition(std::unique_ptr<nn_compiler::ir::NNModel
 
 void RemoveConstantLayers::run(std::unique_ptr<nn_compiler::ir::NNModel>& model)
 {
-    Log::FE::I() << "RemoveConstantLayers::run is called.";
+    DLOG(INFO) << "RemoveConstantLayers::run is called.";
 
     // there will be only one graph after take_in_body_net pass.
     auto graph = model->getGraphs()[0];

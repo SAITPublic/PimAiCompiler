@@ -34,9 +34,9 @@ class AtenChunkLayer : public NNLayer {
     int getDim() { return _dim; }
 
     void printAttr() {
-        Log::IR::I() << "    AtenChunkAttr          ";
-        Log::IR::I() << "    chunks is              " << _chunks;
-        Log::IR::I() << "    dim is                 " << _dim;
+        DLOG(INFO) << "    AtenChunkAttr          ";
+        DLOG(INFO) << "    chunks is              " << _chunks;
+        DLOG(INFO) << "    dim is                 " << _dim;
     }
 
  private:

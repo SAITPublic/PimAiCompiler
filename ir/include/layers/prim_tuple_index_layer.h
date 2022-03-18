@@ -32,8 +32,8 @@ class PrimTupleIndexLayer : public NNLayer {
     void setIndex(int64_t index) { _index = index; }
 
     void printAttr() {
-        Log::IR::I() << "   PrimTupleIndexAttr    ";
-        Log::IR::I() << "   index is    " << _index;
+        DLOG(INFO) << "   PrimTupleIndexAttr    ";
+        DLOG(INFO) << "   index is    " << _index;
     }
 
  private:

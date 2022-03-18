@@ -9,7 +9,7 @@ namespace frontend
 {
 RetVal FrontendDriver::initialize(const std::string& in_file_path, const std::string& model_name)
 {
-    Log::FE::I() << "NNCompiler FrontendDriver::initialize() is called";
+    DLOG(INFO) << "NNCompiler FrontendDriver::initialize() is called";
     in_file_path_ = in_file_path;
     model_name_ = model_name;
 
@@ -18,7 +18,7 @@ RetVal FrontendDriver::initialize(const std::string& in_file_path, const std::st
 
 RetVal FrontendDriver::run(std::unique_ptr<nn_compiler::ir::NNModel>& model)
 {
-    Log::FE::I() << "NNCompiler FrontendDriver::run() is called";
+    DLOG(INFO) << "NNCompiler FrontendDriver::run() is called";
 
     importer(model);
 
@@ -29,7 +29,7 @@ RetVal FrontendDriver::run(std::unique_ptr<nn_compiler::ir::NNModel>& model)
 
 RetVal FrontendDriver::finalize()
 {
-    Log::FE::I() << "NNCompiler FrontendDriver::finalize() is called";
+    DLOG(INFO) << "NNCompiler FrontendDriver::finalize() is called";
 
     return RetVal::SUCCESS;
 }

@@ -34,9 +34,9 @@ class AtenMinLayer : public NNLayer {
     int getKeepDim() { return _keep_dim; }
 
     void printAttr() {
-        Log::IR::I() <<   " AtemMinAttr ";
-        Log::IR::I() <<   " dim_or_y is " << _dim_or_y;
-        Log::IR::I() <<   " keepdim is  " << _keep_dim;
+        DLOG(INFO) <<   " AtemMinAttr ";
+        DLOG(INFO) <<   " dim_or_y is " << _dim_or_y;
+        DLOG(INFO) <<   " keepdim is  " << _keep_dim;
     }
 
  private:

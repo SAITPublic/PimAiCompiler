@@ -1,6 +1,5 @@
 #pragma once
 
-#include "ir/include/common/log.hpp"
 #include "ir/include/layers/nn_layer.h"
 #include "ir/include/nn_model.h"
 

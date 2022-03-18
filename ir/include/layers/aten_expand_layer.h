@@ -31,8 +31,8 @@ class AtenExpandLayer : public NNLayer {
 
 
     void printAttr() {
-        Log::IR::I() << "    AtenExpandAttr      ";
-        Log::IR::I() << "    implicit is         " << implicit_;
+        DLOG(INFO) << "    AtenExpandAttr      ";
+        DLOG(INFO) << "    implicit is         " << implicit_;
     }
 
  private:

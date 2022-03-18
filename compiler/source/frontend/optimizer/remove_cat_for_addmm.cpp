@@ -1,6 +1,5 @@
 #include <string>
 
-#include "compiler/include/common/log.hpp"
 #include "compiler/include/frontend/optimizer/remove_cat_for_addmm.h"
 #include "ir/include/layers/pim_general_layers.h"
 #include "ir/include/layers/aten_addmm_layer.h"
@@ -43,7 +42,7 @@ bool RemoveCatForAddmm::fitCondition(std::unique_ptr<nn_compiler::ir::NNModel>& 
 }
 
 void RemoveCatForAddmm::run(std::unique_ptr<nn_compiler::ir::NNModel>& model) {
-    Log::FE::I() << "RemoveCatForAddmm::run is called.";
+    DLOG(INFO) << "RemoveCatForAddmm::run is called.";
 
     auto graph = model->getGraphs()[0];
 

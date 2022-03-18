@@ -1,6 +1,5 @@
 #include <string>
 
-#include "compiler/include/common/log.hpp"
 #include "compiler/include/frontend/optimizer/construct_list.h"
 
 #include "ir/include/layers/aten_lstm1_layer.h"
@@ -66,9 +65,9 @@ bool ConstructList::fitCondition(std::unique_ptr<nn_compiler::ir::NNModel>& mode
                             dtensor_type = constant_layer->getNType();
                             data_type = dtensor->getDataType();
                         } else if (constant_layer->getNType() != dtensor_type) {
-                            Log::FE::E() << "DTensors with different types attempt to construct a list.";
+                            DLOG(FATAL) << "DTensors with different types attempt to construct a list.";
                         } else if (dtensor->getDataType() != data_type) {
-                            Log::FE::E() << "Data from DTensors with different types attempt to construct a list.";
+                            DLOG(FATAL) << "Data from DTensors with different types attempt to construct a list.";
                         }
 
                         dtensor_vec.push_back(dtensor);
@@ -86,7 +85,7 @@ bool ConstructList::fitCondition(std::unique_ptr<nn_compiler::ir::NNModel>& mode
 
 void ConstructList::run(std::unique_ptr<nn_compiler::ir::NNModel>& model)
 {
-    Log::FE::I() << "ConstructList::run is called.";
+    DLOG(INFO) << "ConstructList::run is called.";
     auto graph = model->getGraphs()[0];
 
     for (auto process_layer_and_dtensor : process_layer_and_dtensor_) {

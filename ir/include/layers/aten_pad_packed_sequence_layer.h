@@ -46,10 +46,10 @@ class AtenPadPackedSequenceLayer : public NNLayer {
     int64_t getTotalLength() const { return _total_length; }
 
     void printAttr() {
-        Log::IR::I() << "    AtenPadPackedSequenceAttr     ";
-        Log::IR::I() << "    batch_first is                 " << _batch_first;
-        Log::IR::I() << "    padding_value is               " << _padding_value;
-        Log::IR::I() << "    total_length is                " << _total_length;
+        DLOG(INFO) << "    AtenPadPackedSequenceAttr     ";
+        DLOG(INFO) << "    batch_first is                 " << _batch_first;
+        DLOG(INFO) << "    padding_value is               " << _padding_value;
+        DLOG(INFO) << "    total_length is                " << _total_length;
     }
 
  private:

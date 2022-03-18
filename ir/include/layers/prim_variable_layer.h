@@ -35,7 +35,7 @@ class PrimVariableLayer : public NNLayer {
 
 
     void printAttr() {
-        Log::IR::I() << "      PrimVariableAttr     ";
+        DLOG(INFO) << "      PrimVariableAttr     ";
     }
 
     void setAttr(std::shared_ptr<DTensor> data) {

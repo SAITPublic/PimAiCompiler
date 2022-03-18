@@ -1,6 +1,5 @@
 #include <torch/script.h>
 
-#include "compiler/include/common/log.hpp"
 #include "compiler/include/frontend/optimizer/set_weights_for_embedding.h"
 #include "ir/include/utils/graph_util.h"
 
@@ -25,7 +24,7 @@ bool SetWeightsForEmbedding::fitCondition(std::unique_ptr<nn_compiler::ir::NNMod
 }
 
 void SetWeightsForEmbedding::run(std::unique_ptr<nn_compiler::ir::NNModel>& graph_model) {
-    Log::FE::I() << "SetWeightsForEmbedding::run is called.";
+    DLOG(INFO) << "SetWeightsForEmbedding::run is called.";
     auto graph = graph_model->getGraphs()[0];
 
     for (auto layer : layers_) {

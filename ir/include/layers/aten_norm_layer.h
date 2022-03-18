@@ -31,7 +31,7 @@ class AtenNormLayer : public NNLayer {
     int64_t getP() { return p_; }
 
     void printAttr() {
-        Log::IR::I() << "    AtenNormAttr      ";
+        DLOG(INFO) << "    AtenNormAttr      ";
     }
 
  private:

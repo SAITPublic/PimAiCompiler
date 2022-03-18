@@ -1,7 +1,5 @@
 #pragma once
 
-#include "ir/include/common/log.hpp"
-
 #include <float.h>
 #include <math.h>
 #include <typeinfo>

@@ -47,9 +47,9 @@ class AtenTransposeLayer : public NNLayer {
     int64_t getDim1() { return this->_dim1; }
 
     void printAttr() {
-        Log::IR::I() << "    AtenTransposeAttr    ";
-        Log::IR::I() << "    dim0 is              "<< _dim0;
-        Log::IR::I() << "    dim1 is              "<< _dim1;
+        DLOG(INFO) << "    AtenTransposeAttr    ";
+        DLOG(INFO) << "    dim0 is              "<< _dim0;
+        DLOG(INFO) << "    dim1 is              "<< _dim1;
     }
 
  private:

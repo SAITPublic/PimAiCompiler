@@ -30,8 +30,8 @@ class AtenContiguousLayer : public NNLayer {
     int getMemoryFormat() { return _memory_format; }
 
     void printAttr() {
-        Log::IR::I() << "    AtenContiguousAttr          ";
-        Log::IR::I() << "    memory_format is            " << _memory_format;
+        DLOG(INFO) << "    AtenContiguousAttr          ";
+        DLOG(INFO) << "    memory_format is            " << _memory_format;
     }
 
  private:

@@ -30,8 +30,8 @@ class AtenSizeLayer : public NNLayer {
     int64_t getDim() const { return _dim; }
 
     void printAttr() {
-        Log::IR::I() << "    AtenSizeAttr      ";
-        Log::IR::I() << "    dim is           " << _dim;
+        DLOG(INFO) << "    AtenSizeAttr      ";
+        DLOG(INFO) << "    dim is           " << _dim;
     }
 
  private:

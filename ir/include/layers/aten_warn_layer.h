@@ -34,8 +34,8 @@ class AtenWarnLayer : public NNLayer {
     int getValue() const { return _value; }
 
     void printAttr() {
-        Log::IR::I() << "      AtenWarnAttr     ";
-        Log::IR::I() << "      value is         "<< _value;
+        DLOG(INFO) << "      AtenWarnAttr     ";
+        DLOG(INFO) << "      value is         "<< _value;
     }
 
  private:

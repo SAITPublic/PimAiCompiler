@@ -20,7 +20,6 @@
 #include <vector>
 
 #include "glog/logging.h"
-#include "ir/include/common/log.hpp"
 #include "ir/include/types.h"
 
 #include "ir/include/tensors/shape_tensor.h"
@@ -122,11 +121,11 @@ class NNLayer {
 
     void printInfo()
     {
-        Log::IR::I() << name_;
-        Log::IR::I() << "{";
-        Log::IR::I() << "    Type is      " << convertLayerTypeToString(type_);
-        Log::IR::I() << "input ZP ";
-        Log::IR::I() << "}";
+        DLOG(INFO) << name_;
+        DLOG(INFO) << "{";
+        DLOG(INFO) << "    Type is      " << convertLayerTypeToString(type_);
+        DLOG(INFO) << "input ZP ";
+        DLOG(INFO) << "}";
     }
 
     virtual ~NNLayer() = default;

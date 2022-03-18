@@ -1,3 +1,4 @@
+#include "common/include/types.hpp"
 #include "compiler/include/nn_compiler.hpp"
 
 namespace nn_compiler
@@ -6,7 +7,7 @@ namespace compiler
 {
 RetVal NNCompiler::initialize(const std::string& file_path, const std::string& model_name)
 {
-    Log::NC::I() << "NNCompiler::initialize(compile_level, file_path) is called";
+    DLOG(INFO) << "NNCompiler::initialize(file_path, model_name) is called";
 
     input_file_path_ = file_path;
     model_name_ = model_name;
@@ -23,7 +24,7 @@ RetVal NNCompiler::initialize(const std::string& file_path, const std::string& m
 
 RetVal NNCompiler::compile(std::unique_ptr<ir::NNModel>& model)
 {
-    Log::NC::I() << "NNCompiler::compile() is called";
+    DLOG(INFO) << "NNCompiler::compile() is called";
 
     frontend(input_file_path_, model_name_, model);
     middlend(model);
@@ -34,7 +35,7 @@ RetVal NNCompiler::compile(std::unique_ptr<ir::NNModel>& model)
 
 RetVal NNCompiler::finalize()
 {
-    Log::NC::I() << "NNCompiler::finalize(void) is called";
+    DLOG(INFO) << "NNCompiler::finalize() is called";
 
     return RetVal::SUCCESS;
 }
@@ -42,7 +43,7 @@ RetVal NNCompiler::finalize()
 RetVal NNCompiler::frontend(const std::string& file_path, const std::string& model_name,
                             std::unique_ptr<ir::NNModel>& model)
 {
-    Log::NC::I() << "NNCompiler::frontend() is called";
+    DLOG(INFO) << "NNCompiler::frontend() is called";
 
     frontend_driver_->initialize(file_path, model_name);
     frontend_driver_->run(model);
@@ -53,7 +54,7 @@ RetVal NNCompiler::frontend(const std::string& file_path, const std::string& mod
 
 RetVal NNCompiler::middlend(std::unique_ptr<ir::NNModel>& model)
 {
-    Log::NC::I() << "NNCompiler::middlend() is called";
+    DLOG(INFO) << "NNCompiler::middlend() is called";
 
     middlend_driver_->initialize();
     middlend_driver_->run(model);
@@ -64,7 +65,7 @@ RetVal NNCompiler::middlend(std::unique_ptr<ir::NNModel>& model)
 
 RetVal NNCompiler::backend()
 {
-    Log::NC::I() << "NNCompiler::backend(void) is called";
+    DLOG(INFO) << "NNCompiler::backend() is called";
 
     // TODO: backend pipeline
 

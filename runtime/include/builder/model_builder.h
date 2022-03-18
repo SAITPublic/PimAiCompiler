@@ -2,6 +2,7 @@
 
 #include <torch/script.h>
 
+#include "common/include/types.hpp"
 #include "ir/include/nn_model.h"
 #include "ir/include/types.h"
 

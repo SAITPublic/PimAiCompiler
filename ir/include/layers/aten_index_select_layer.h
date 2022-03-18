@@ -31,8 +31,8 @@ class AtenIndexSelectLayer : public NNLayer {
     int getDim() const { return _dim; }
 
     void printAttr() {
-        Log::IR::I() << "    AtenIndexSelectAttr     ";
-        Log::IR::I() << "    dim is                  "<< _dim;
+        DLOG(INFO) << "    AtenIndexSelectAttr     ";
+        DLOG(INFO) << "    dim is                  "<< _dim;
     }
 
  private:

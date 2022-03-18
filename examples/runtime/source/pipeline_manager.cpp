@@ -29,7 +29,7 @@ RetVal PipelineManager::initialize(const std::string& input_file, const std::str
     } else if (model_type == "HWR") {
         model_type_ = ModelType::HWR;
     } else {
-        Log::EG::E() << "Unsupported model type.";
+        DLOG(FATAL) << "Unsupported model type.";
     }
     input_file_path_ = input_file;
     is_profiling_ = profiling;
@@ -68,7 +68,7 @@ void PipelineManager::load_and_run_rnnt()
         feature_file = "../" + feature_file;
     }
     if (access(feature_len_file.c_str(), F_OK) == -1 || access(feature_file.c_str(), F_OK) == -1) {
-        Log::EG::E() << "Please run at base or build directory.";
+        DLOG(FATAL) << "Please run at base or build directory.";
     }
 
     std::unique_ptr<nn_compiler::ir::NNModel> model = std::make_unique<nn_compiler::ir::NNModel>();
@@ -88,7 +88,7 @@ void PipelineManager::load_and_run_rnnt()
     input_tensors.push_back(tensor_feature_len);
 
     for (auto item : input_tensors) {
-        Log::EG::I() << "Input: "
+        DLOG(INFO) << "Input: "
                      << "size: " << item.sizes() << " dtype:" << item.dtype() << " device:" << item.device();
     }
     // Inference
@@ -108,7 +108,7 @@ void PipelineManager::load_and_run_gnmt()
     }
     if (access(src_file.c_str(), F_OK) == -1 || access(src_length_file.c_str(), F_OK) == -1 ||
         access(bos_file.c_str(), F_OK) == -1) {
-        Log::EG::E() << "Please run at base or build directory.";
+        DLOG(FATAL) << "Please run at base or build directory.";
     }
 
     std::unique_ptr<nn_compiler::ir::NNModel> model = std::make_unique<nn_compiler::ir::NNModel>();
@@ -131,7 +131,7 @@ void PipelineManager::load_and_run_gnmt()
     input_tensors.push_back(tensor_bos);
 
     for (auto item : input_tensors) {
-        Log::EG::I() << "Input: "
+        DLOG(INFO) << "Input: "
                      << "size: " << item.sizes() << " dtype:" << item.dtype() << " device:" << item.device();
     }
     // Inference
@@ -146,7 +146,7 @@ void PipelineManager::load_and_run_hwr()
         input_file = "../" + input_file;
     }
     if (access(input_file.c_str(), F_OK) == -1) {
-        Log::EG::E() << "Please run at base or build directory.";
+        DLOG(FATAL) << "Please run at base or build directory.";
     }
 
     std::unique_ptr<nn_compiler::ir::NNModel> model = std::make_unique<nn_compiler::ir::NNModel>();
@@ -164,7 +164,7 @@ void PipelineManager::load_and_run_hwr()
     input_tensors.push_back(tensor_);
 
     for (auto item : input_tensors) {
-        Log::EG::I() << "Input: "
+        DLOG(INFO) << "Input: "
                      << "size: " << item.sizes() << " dtype:" << item.dtype() << " device:" << item.device();
     }
     // Inference
@@ -174,9 +174,9 @@ void PipelineManager::load_and_run_hwr()
     tv_comp.loadTV("./examples/runtime/resource/hwr/inputs/output_hwr_y_hat_128_1_98.bin", {128, 1, 98},
                    DataType::FLOAT16, "hwr_final_output");
     if (tv_comp.compare(output_tensors.at(0).cpu(), "hwr_final_output")) {
-        Log::EG::I() << "HWR run successfully, output is correct !";
+        DLOG(INFO) << "HWR run successfully, output is correct !";
     } else {
-        Log::EG::I() << "HWR run failed, output is incorrect !";
+        DLOG(INFO) << "HWR run failed, output is incorrect !";
     }
 }
 

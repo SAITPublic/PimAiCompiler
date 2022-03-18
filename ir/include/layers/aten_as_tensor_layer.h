@@ -35,9 +35,9 @@ class AtenAsTensorLayer : public NNLayer {
     std::string getDevice() const { return _device; }
 
     void printAttr() {
-        Log::IR::I() << "    AtenAsTensorAttr       ";
-        Log::IR::I() << "    dtype is               " << _dtype;
-        Log::IR::I() << "    device is              " << _device;
+        DLOG(INFO) << "    AtenAsTensorAttr       ";
+        DLOG(INFO) << "    dtype is               " << _dtype;
+        DLOG(INFO) << "    device is              " << _device;
     }
 
  private:

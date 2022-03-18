@@ -12,7 +12,8 @@
 
 #include <float.h>
 #include <unordered_map>
-#include "ir/include/common/log.hpp"
+
+#include "glog/logging.h"
 
 namespace nn_compiler
 {

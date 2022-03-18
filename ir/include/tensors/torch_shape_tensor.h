@@ -50,7 +50,7 @@ class TSSTensor
     void setDimN(int32_t num_dim, int32_t dim_val)
     {
         if (num_dim > dim_size_) {
-            Log::IR::I() << "Max dimension is " << dim_size_ << ", but " << num_dim << " is given.";
+            DLOG(INFO) << "Max dimension is " << dim_size_ << ", but " << num_dim << " is given.";
             assert(false);
         }
         dims_[num_dim - 1] = dim_val;
@@ -58,7 +58,7 @@ class TSSTensor
     int32_t getDimN(int32_t num_dim)
     {
         if (num_dim > dim_size_) {
-            Log::IR::I() << "Max dimension is " << dim_size_ << ", but " << num_dim << " is given.";
+            DLOG(INFO) << "Max dimension is " << dim_size_ << ", but " << num_dim << " is given.";
             assert(false);
         }
         return dims_[num_dim - 1];

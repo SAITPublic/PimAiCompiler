@@ -124,7 +124,7 @@ std::string convertLayerTypeToString(LayerType type) {
 
     auto iter = converter.find(type);
     if (iter == converter.end()) {
-        Log::IR::E() << "Found unsupported layer type.";
+        DLOG(FATAL) << "Found unsupported layer type.";
     } else {
         return iter->second;
     }

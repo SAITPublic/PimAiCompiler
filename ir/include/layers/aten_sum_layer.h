@@ -39,10 +39,10 @@ class AtenSumLayer : public NNLayer {
     int64_t getDtype() const { return _dtype; }
 
     void printAttr() {
-        Log::IR::I() << "    AtenSumAttr         ";
-        Log::IR::I() << "    dim is              " << &_dim;
-        Log::IR::I() << "    keepdim is          " << _keepdim;
-        Log::IR::I() << "    dtype is            " << _dtype;
+        DLOG(INFO) << "    AtenSumAttr         ";
+        DLOG(INFO) << "    dim is              " << &_dim;
+        DLOG(INFO) << "    keepdim is          " << _keepdim;
+        DLOG(INFO) << "    dtype is            " << _dtype;
     }
 
  private:

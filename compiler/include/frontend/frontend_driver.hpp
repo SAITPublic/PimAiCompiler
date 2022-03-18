@@ -4,7 +4,7 @@
 #include <string>
 #include <vector>
 
-#include "compiler/include/common/log.hpp"
+#include "common/include/types.hpp"
 #include "compiler/include/frontend/importer/model_builder.h"
 #include "compiler/include/frontend/optimizer/pass_manager.h"
 #include "ir/include/nn_model.h"

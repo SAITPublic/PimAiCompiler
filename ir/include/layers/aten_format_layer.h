@@ -28,8 +28,8 @@ class AtenFormatLayer : public NNLayer {
     std::string getAssemblyFormat() const { return _assembly_format; }
 
     void printAttr() {
-        Log::IR::I() << "    AtenFormatAttr      ";
-        Log::IR::I() << "    assembly_format is  "<< _assembly_format;
+        DLOG(INFO) << "    AtenFormatAttr      ";
+        DLOG(INFO) << "    assembly_format is  "<< _assembly_format;
     }
 
  private:

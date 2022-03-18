@@ -1,5 +1,4 @@
 #include "importer/layer_builder/layer_builder.h"
-#include "ir/include/common/log.hpp"
 #include "ir/include/tensors/data_tensor.h"
 
 namespace nn_compiler
@@ -8,12 +7,12 @@ namespace frontend
 {
 std::shared_ptr<ir::NNLayer> PrimCallMethodBuilder::buildLayer(const torch::jit::Node* node_ref)
 {
-    Log::IR::I() << "NOT uesed PrimCallMethodBuilder::buildLayer";
+    DLOG(INFO) << "NOT uesed PrimCallMethodBuilder::buildLayer";
     return nullptr;
 }
 std::shared_ptr<ir::NNLayer> PrimCallMethodBuilder::buildLayerCustom(const std::string target_network_name)
 {
-    Log::IR::I() << "build prim::callmethod";
+    DLOG(INFO) << "build prim::callmethod";
     nn_compiler::ir::LayerType type = nn_compiler::ir::LayerType::PRIMCALLMETHOD;
     std::string name = "";
 

@@ -30,8 +30,8 @@ class AtenLeakyReluLayer : public NNLayer {
     double getScalar() const { return _scalar; }
 
     void printAttr() {
-        Log::IR::I() << "    AtenLeakyReluAttr      ";
-        Log::IR::I() << "    sclar is               " << _scalar;
+        DLOG(INFO) << "    AtenLeakyReluAttr      ";
+        DLOG(INFO) << "    sclar is               " << _scalar;
     }
 
  private:

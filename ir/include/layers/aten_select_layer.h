@@ -38,9 +38,9 @@ class AtenSelectLayer : public NNLayer {
     int64_t getIndex() const { return _index; }
 
     void printAttr() {
-        Log::IR::I() << "    AtenSelectAttr     ";
-        Log::IR::I() << "    dim is             " << _dim;
-        Log::IR::I() << "    index is           " << _index;
+        DLOG(INFO) << "    AtenSelectAttr     ";
+        DLOG(INFO) << "    dim is             " << _dim;
+        DLOG(INFO) << "    index is           " << _index;
     }
 
  private:

@@ -1,6 +1,5 @@
 #include <string>
 
-#include "compiler/include/common/log.hpp"
 #include "compiler/include/frontend/optimizer/remove_get_attr_layers.h"
 #include "ir/include/layers/prim_get_attr_layer.h"
 #include "ir/include/utils/graph_util.h"
@@ -26,7 +25,7 @@ bool RemoveGetAttrLayers::fitCondition(std::unique_ptr<nn_compiler::ir::NNModel>
 }
 
 void RemoveGetAttrLayers::run(std::unique_ptr<nn_compiler::ir::NNModel>& model) {
-    Log::FE::I() << "RemoveGetAttrLayers::run is called.";
+    DLOG(INFO) << "RemoveGetAttrLayers::run is called.";
     // there will be only one graph after take_in_body_net pass.
     auto graph = model->getGraphs()[0];
 

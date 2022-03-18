@@ -34,9 +34,9 @@ class AtenClampLayer : public NNLayer {
     int getMax() { return _max; }
 
     void printAttr() {
-        Log::IR::I() << "    AtenClampAttr          ";
-        Log::IR::I() << "    min is                 " << _min;
-        Log::IR::I() << "    max is                 " << _max;
+        DLOG(INFO) << "    AtenClampAttr          ";
+        DLOG(INFO) << "    min is                 " << _min;
+        DLOG(INFO) << "    max is                 " << _max;
     }
 
  private:

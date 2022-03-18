@@ -10,7 +10,6 @@
 
 #pragma once
 
-#include "common/include/log.hpp"
 #include "compiler/include/frontend/frontend_driver.hpp"
 #include "compiler/include/middlend/middlend_driver.hpp"
 

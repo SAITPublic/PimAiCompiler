@@ -1,4 +1,3 @@
-#include "compiler/include/common/log.hpp"
 #include "compiler/include/frontend/optimizer/fuse_activation.h"
 #include "ir/include/layers/aten_addmm_layer.h"
 #include "ir/include/utils/graph_util.h"
@@ -16,24 +15,24 @@ bool FuseActivation::fitCondition(std::unique_ptr<nn_compiler::ir::NNModel>& mod
                             const std::shared_ptr<nn_compiler::ir::NNLayer> successor) {
         std::string predecessor_type = convertLayerTypeToString(predecessor->getType());
         if (!this->feasibleHostType(predecessor_type)) {
-            Log::FE::D() << "failed to satisfy with fusion dependency";
+            DLOG(INFO) << "failed to satisfy with fusion dependency";
             return false;
         }
 
         auto successors = ir::searchSuccessor(predecessor, network);
         if (successors.size() > 1) {
-            Log::FE::D() << "failed to satisfy with fusion dependency";
+            DLOG(INFO) << "failed to satisfy with fusion dependency";
             return false;
         }
 
         if (predecessor_type.compare("aten::transpose") == 0) {
             if (successor->getType() != nn_compiler::ir::LayerType::ATENADDMM) {
-                Log::FE::D() << "The predecessor of transpose layer is not addmm layer.";
+                DLOG(INFO) << "The predecessor of transpose layer is not addmm layer.";
                 return false;
             }
             auto successors = ir::searchSuccessor(successor, network);
             if (successors.size() > 1) {
-                Log::FE::D() << "failed to satisfy with fusion dependency";
+                DLOG(INFO) << "failed to satisfy with fusion dependency";
                 return false;
             }
         }
@@ -61,7 +60,7 @@ bool FuseActivation::fitCondition(std::unique_ptr<nn_compiler::ir::NNModel>& mod
 }
 
 void FuseActivation::run(std::unique_ptr<nn_compiler::ir::NNModel>& model) {
-    Log::FE::I() << "FuseActivation::run is called.";
+    DLOG(INFO) << "FuseActivation::run is called.";
     auto graph = model->getGraphs()[0];
 
     std::vector<std::shared_ptr<nn_compiler::ir::NNLayer>> layers_to_be_removed;

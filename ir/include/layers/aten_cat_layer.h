@@ -31,8 +31,8 @@ class AtenCatLayer : public NNLayer
 
     void printAttr()
     {
-        Log::IR::I() << "    AtenCatAttr       ";
-        Log::IR::I() << "    dim is            " << dim_;
+        DLOG(INFO) << "    AtenCatAttr       ";
+        DLOG(INFO) << "    dim is            " << dim_;
     }
 
    private:

@@ -27,7 +27,7 @@ class AtenAddLayer : public NNLayer {
     }
 
     void printAttr() {
-        Log::IR::I() << "    AtenAddAttr      ";
+        DLOG(INFO) << "    AtenAddAttr      ";
     }
 
     void setAlpha(int64_t alpha) { alpha_ = alpha; }

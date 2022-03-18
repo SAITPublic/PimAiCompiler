@@ -32,8 +32,8 @@ class AtenCopyLayer : public NNLayer {
     int getNonBlocking() const { return _non_blocking; }
 
     void printAttr() {
-        Log::IR::I() << "    AtenCopyAttr      ";
-        Log::IR::I() << "    non_blocking is   "<< _non_blocking;
+        DLOG(INFO) << "    AtenCopyAttr      ";
+        DLOG(INFO) << "    non_blocking is   "<< _non_blocking;
     }
 
  private:

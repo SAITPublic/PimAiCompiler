@@ -30,7 +30,7 @@ class AtenMaskedFillLayer : public NNLayer {
     bool getIsInplace() const { return is_inplace_; }
 
     void printAttr() {
-        Log::IR::I() << "    AtenMaskedFillAttr      ";
+        DLOG(INFO) << "    AtenMaskedFillAttr      ";
     }
 
  private:

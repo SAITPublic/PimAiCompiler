@@ -1,6 +1,5 @@
 #include <string>
 
-#include "compiler/include/common/log.hpp"
 #include "compiler/include/frontend/optimizer/set_attribute.h"
 #include "ir/include/layers/prim_constant_layer.h"
 #include "ir/include/layers/prim_variable_layer.h"
@@ -34,7 +33,7 @@ bool SetAttribute::fitCondition(std::unique_ptr<nn_compiler::ir::NNModel> &model
 
 void SetAttribute::run(std::unique_ptr<nn_compiler::ir::NNModel> &model)
 {
-    Log::FE::I() << "SetAttribute::run is called.";
+    DLOG(INFO) << "SetAttribute::run is called.";
 
     // there will be only one graph after take_in_body_net pass.
     auto graph = model->getGraphs()[0];

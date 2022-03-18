@@ -37,9 +37,9 @@ class AtenUnsqueezeLayer : public NNLayer {
     bool getIsInplace() const { return is_inplace_; }
 
     void printAttr() {
-        Log::IR::I() << "     AtenUnsqueezeAttr      ";
-        Log::IR::I() << "     dim is                 " << dim_;
-        Log::IR::I() << "     is_inplace is          " << is_inplace_;
+        DLOG(INFO) << "     AtenUnsqueezeAttr      ";
+        DLOG(INFO) << "     dim is                 " << dim_;
+        DLOG(INFO) << "     is_inplace is          " << is_inplace_;
     }
 
  private:

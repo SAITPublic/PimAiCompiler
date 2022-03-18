@@ -1,6 +1,5 @@
 
 #include "importer/layer_builder/layer_builder.h"
-#include "ir/include/common/log.hpp"
 #include "ir/include/tensors/data_tensor.h"
 
 using nn_compiler::ir::DTensor;
@@ -12,7 +11,7 @@ namespace frontend
 {
 std::shared_ptr<ir::NNLayer> PrimConstantBuilder::buildLayer(const torch::jit::Node *node_ref)
 {
-    Log::IR::I() << "build prim::Constant";
+    DLOG(INFO) << "build prim::Constant";
     nn_compiler::ir::LayerType type = nn_compiler::ir::LayerType::PRIMCONSTANT;
     std::string name = "";
     prim_constant_layer_ = std::make_shared<ir::PrimConstantLayer>(name, type);

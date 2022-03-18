@@ -1,6 +1,5 @@
 #pragma once
 
-#include "ir/include/common/log.hpp"
 #include "ir/include/nn_network.h"
 
 namespace nn_compiler
@@ -78,7 +77,7 @@ class AttributeHelper
         T ret_value;
         auto data = d_tensor->getData<T>();
         if ((*data).size() == 0) {
-            Log::IR::E() << attr_type << " of " << convertLayerTypeToString(layer_type) << " cannot be NONE";
+            DLOG(FATAL) << attr_type << " of " << convertLayerTypeToString(layer_type) << " cannot be NONE";
         } else {
             ret_value = (*data)[0];
         }
@@ -91,7 +90,7 @@ class AttributeHelper
         std::vector<T> ret_vec;
         auto data = d_tensor->getData<T>();
         if ((*data).size() == 0) {
-            Log::IR::E() << attr_type << " of " << convertLayerTypeToString(layer_type) << " cannot be NONE";
+            DLOG(FATAL) << attr_type << " of " << convertLayerTypeToString(layer_type) << " cannot be NONE";
         } else {
             for (auto item : *data) {
                 ret_vec.push_back(item);
@@ -109,7 +108,7 @@ class AttributeHelper
                 str += static_cast<char>((*data)[i]);
             }
         } else {
-            Log::IR::E() << attr_type << " of " << convertLayerTypeToString(layer_type) << " cannot be NONE";
+            DLOG(FATAL) << attr_type << " of " << convertLayerTypeToString(layer_type) << " cannot be NONE";
         }
         return str;
     }

@@ -50,10 +50,10 @@ class AtenEmbeddingLayer : public NNLayer {
     int getSparse() const { return _sparse; }
 
     void printAttr() {
-        Log::IR::I() << "    AtenEmbeddingAttr      ";
-        Log::IR::I() << "    padding_idx is         "<< _padding_idx;
-        Log::IR::I() << "    scale_grad_by_freq is  "<< _scale_grad_by_freq;
-        Log::IR::I() << "    sparse is              "<< _sparse;
+        DLOG(INFO) << "    AtenEmbeddingAttr      ";
+        DLOG(INFO) << "    padding_idx is         "<< _padding_idx;
+        DLOG(INFO) << "    scale_grad_by_freq is  "<< _scale_grad_by_freq;
+        DLOG(INFO) << "    sparse is              "<< _sparse;
     }
 
  private:

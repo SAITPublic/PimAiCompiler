@@ -1,8 +1,6 @@
 #include <set>
 #include <vector>
 
-#include "common/include/common.hpp"
-#include "compiler/include/common/log.hpp"
 #include "compiler/include/middlend/optimizer/lstm_labeling.h"
 #include "ir/include/layers/aten_lstm1_layer.h"
 #include "ir/include/nn_model.h"
@@ -32,7 +30,7 @@ bool LstmLabeling::fitCondition(std::unique_ptr<nn_compiler::ir::NNModel>& model
 
 void LstmLabeling::run(std::unique_ptr<nn_compiler::ir::NNModel>& model)
 {
-    Log::FE::I() << "LstmLabeling::run is called.";
+    DLOG(INFO) << "LstmLabeling::run is called.";
     int custom_opt_number = 0;
 
     auto graph = model->getGraphs()[0];

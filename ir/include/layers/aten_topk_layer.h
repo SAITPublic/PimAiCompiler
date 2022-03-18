@@ -47,11 +47,11 @@ class AtenTopkLayer : public NNLayer {
     int getSorted() { return _sorted; }
 
     void printAttr() {
-        Log::IR::I() << "    AtenTopkAttr    ";
-        Log::IR::I() << "    k is            "<< _k;
-        Log::IR::I() << "    dim is          "<< _dim;
-        Log::IR::I() << "    largest is      "<< _largest;
-        Log::IR::I() << "    sorted is       "<< _sorted;
+        DLOG(INFO) << "    AtenTopkAttr    ";
+        DLOG(INFO) << "    k is            "<< _k;
+        DLOG(INFO) << "    dim is          "<< _dim;
+        DLOG(INFO) << "    largest is      "<< _largest;
+        DLOG(INFO) << "    sorted is       "<< _sorted;
     }
 
  private:

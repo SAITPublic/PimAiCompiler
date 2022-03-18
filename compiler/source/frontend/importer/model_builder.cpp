@@ -24,7 +24,7 @@ std::shared_ptr<torch::jit::Module> ModelBuilder::parseTorchScript(const std::st
     try {
         script_model = torch::jit::load(torch_model_path, torch::kCPU);
     } catch (c10::Error& e) {
-        Log::IR::E() << "error loading the model";
+        DLOG(FATAL) << "error loading the model";
     }
     std::shared_ptr<torch::jit::Module> torch_model = std::make_shared<torch::jit::Module>(script_model);
     return torch_model;
@@ -128,14 +128,14 @@ void addAttributeToLayer(c10::IValue ival, std::shared_ptr<nn_compiler::ir::Prim
             data->setData(&value, 8);
             data->setTensorShape(nn_compiler::ir::STensor(0, 0, 0, 1));
             data->setDataType(nn_compiler::ir::DataType::INT64);
-            Log::IR::I() << "set bool as int64: " << value;
+            DLOG(INFO) << "set bool as int64: " << value;
 
         } else if (ival.isInt()) {
             auto value = ival.toInt();
             data->setData(&value, 8);
             data->setTensorShape(nn_compiler::ir::STensor(0, 0, 0, 1));
             data->setDataType(nn_compiler::ir::DataType::INT64);
-            Log::IR::I() << "set int64: " << value;
+            DLOG(INFO) << "set int64: " << value;
 
         } else if (ival.isString()) {
             auto value = ival.toString()->string();
@@ -143,7 +143,7 @@ void addAttributeToLayer(c10::IValue ival, std::shared_ptr<nn_compiler::ir::Prim
             data->setData(value.c_str(), len + 1);
             data->setTensorShape(nn_compiler::ir::STensor(0, 0, 0, 1));
             data->setDataType(nn_compiler::ir::DataType::UINT8);
-            Log::IR::I() << "set str: " << value;
+            DLOG(INFO) << "set str: " << value;
 
         } else if (ival.isNone()) {
             auto value = ival.toNone();
@@ -151,14 +151,14 @@ void addAttributeToLayer(c10::IValue ival, std::shared_ptr<nn_compiler::ir::Prim
             data->setData(value.c_str(), len + 1);
             data->setTensorShape(nn_compiler::ir::STensor(0, 0, 0, len));
             data->setDataType(nn_compiler::ir::DataType::UINT8);
-            Log::IR::I() << "set None: " << value;
+            DLOG(INFO) << "set None: " << value;
 
         } else if (ival.isDouble()) {
             auto value = ival.toDouble();
             data->setData(&value, 1 * sizeof(value));
             data->setTensorShape(nn_compiler::ir::STensor(0, 0, 0, 1));
             data->setDataType(nn_compiler::ir::DataType::FLOAT64);
-            Log::IR::I() << "set float64: " << value;
+            DLOG(INFO) << "set float64: " << value;
 
         } else if (ival.isDevice()) {
             auto value = ival.toDevice().str();
@@ -166,16 +166,16 @@ void addAttributeToLayer(c10::IValue ival, std::shared_ptr<nn_compiler::ir::Prim
             data->setData(value.c_str(), len + 1);
             data->setTensorShape(nn_compiler::ir::STensor(0, 0, 0, len));
             data->setDataType(nn_compiler::ir::DataType::UINT8);
-            Log::IR::I() << "set Device: " << value;
+            DLOG(INFO) << "set Device: " << value;
 
         } else if (ival.isTensor()) {
             auto value = ival.toTensor();
             c10::ScalarType dtype = value.scalar_type();
             nn_compiler::frontend::ptTensor2DTensor(value, data);
-            Log::IR::I() << "set Tensor with size: " << value.sizes() << " dtype: " << dtype;
+            DLOG(INFO) << "set Tensor with size: " << value.sizes() << " dtype: " << dtype;
 
         } else {
-            Log::IR::I() << ival.type()->repr_str() << " is not supported yet.";
+            DLOG(INFO) << ival.type()->repr_str() << " is not supported yet.";
             return;
         }
         layer->setAttr(data);
@@ -466,7 +466,7 @@ void ModelBuilder::importTorchScriptMethodBlock(std::unique_ptr<ir::NNModel>& nn
                 } else if (input_num == 7) {
                     builder = this->layer_builders_.get("aten::arange3");
                 } else {
-                    Log::IR::E() << "Unsupported input number of aten::arange.";
+                    DLOG(FATAL) << "Unsupported input number of aten::arange.";
                 }
 
                 if (builder != nullptr) {
@@ -493,7 +493,7 @@ void ModelBuilder::importTorchScriptMethodBlock(std::unique_ptr<ir::NNModel>& nn
                     }
                     network->addLayer(layer);
                 } else {
-                    Log::IR::E() << kind.toQualString() << " layer builder not found.";
+                    DLOG(FATAL) << kind.toQualString() << " layer builder not found.";
                 }
                 break;
             }
@@ -508,7 +508,7 @@ void ModelBuilder::importTorchScriptMethodBlock(std::unique_ptr<ir::NNModel>& nn
                 } else if (lstm_type == 2) {
                     builder = this->layer_builders_.get("aten::lstm2");
                 } else {
-                    Log::IR::E() << "Unsupported input number of aten::lstm.";
+                    DLOG(FATAL) << "Unsupported input number of aten::lstm.";
                 }
 
                 if (builder != nullptr) {
@@ -535,7 +535,7 @@ void ModelBuilder::importTorchScriptMethodBlock(std::unique_ptr<ir::NNModel>& nn
                     }
                     network->addLayer(layer);
                 } else {
-                    Log::IR::E() << kind.toQualString() << " layer builder not found.";
+                    DLOG(FATAL) << kind.toQualString() << " layer builder not found.";
                 }
                 break;
             }
@@ -548,7 +548,7 @@ void ModelBuilder::importTorchScriptMethodBlock(std::unique_ptr<ir::NNModel>& nn
                 } else if (type == "IntType") {
                     builder = this->layer_builders_.get("aten::to1");
                 } else {
-                    Log::IR::E() << "Unsupported input type of aten::to.";
+                    DLOG(FATAL) << "Unsupported input type of aten::to.";
                 }
 
                 if (builder != nullptr) {
@@ -575,7 +575,7 @@ void ModelBuilder::importTorchScriptMethodBlock(std::unique_ptr<ir::NNModel>& nn
                     }
                     network->addLayer(layer);
                 } else {
-                    Log::IR::E() << kind.toQualString() << " layer builder not found.";
+                    DLOG(FATAL) << kind.toQualString() << " layer builder not found.";
                 }
                 break;
             }
@@ -607,7 +607,7 @@ void ModelBuilder::importTorchScriptMethodBlock(std::unique_ptr<ir::NNModel>& nn
                     network->addLayer(layer);
                 } else {
                     // Must be error, ensure each Op has its LayerBuilder
-                    Log::IR::E() << kind.toQualString() << " layer builder not found.";
+                    DLOG(FATAL) << kind.toQualString() << " layer builder not found.";
                 }
                 break;
             }

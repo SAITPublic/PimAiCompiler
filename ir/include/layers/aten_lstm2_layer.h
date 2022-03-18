@@ -47,12 +47,12 @@ class AtenLSTM2Layer : public NNLayer {
     }
 
     void printAttr() {
-        Log::IR::I() << "     AtenLSTM2Attr   ";
-        Log::IR::I() << "     has_biases is    " << this->has_biases_;
-        Log::IR::I() << "     num_layers is    " << this->num_layers_;
-        Log::IR::I() << "     dropout is       " << this->dropout_;
-        Log::IR::I() << "     bidirectional is " << this->bidirectional_;
-        Log::IR::I() << "     train is         " << this->train_;
+        DLOG(INFO) << "     AtenLSTM2Attr   ";
+        DLOG(INFO) << "     has_biases is    " << this->has_biases_;
+        DLOG(INFO) << "     num_layers is    " << this->num_layers_;
+        DLOG(INFO) << "     dropout is       " << this->dropout_;
+        DLOG(INFO) << "     bidirectional is " << this->bidirectional_;
+        DLOG(INFO) << "     train is         " << this->train_;
     }
 
     void setAttr(int has_biases, int64_t num_layers, double dropout, int train,

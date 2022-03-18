@@ -28,8 +28,8 @@ class AtenSqueezeLayer : public NNLayer {
     int64_t getDim() const { return _dim; }
 
     void printAttr() {
-        Log::IR::I() << "    AtenSqueezeAttr    ";
-        Log::IR::I() << "    dim is              " << _dim;
+        DLOG(INFO) << "    AtenSqueezeAttr    ";
+        DLOG(INFO) << "    dim is              " << _dim;
     }
 
  private:

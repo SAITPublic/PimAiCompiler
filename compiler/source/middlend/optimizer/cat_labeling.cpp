@@ -2,8 +2,6 @@
 #include <set>
 #include <vector>
 
-#include "common/include/common.hpp"
-#include "compiler/include/common/log.hpp"
 #include "compiler/include/middlend/optimizer/cat_labeling.h"
 #include "ir/include/layers/aten_cat_layer.h"
 #include "ir/include/layers/aten_lstm1_layer.h"

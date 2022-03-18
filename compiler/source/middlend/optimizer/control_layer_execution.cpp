@@ -1,7 +1,5 @@
 #include <string>
 
-#include "common/include/common.hpp"
-#include "compiler/include/common/log.hpp"
 #include "compiler/include/middlend/optimizer/control_layer_execution.h"
 #include "ir/include/layers/aten_lstm1_layer.h"
 #include "ir/include/layers/aten_lstm2_layer.h"
@@ -39,7 +37,7 @@ bool ControlLayerExecution::fitCondition(std::unique_ptr<nn_compiler::ir::NNMode
 
 void ControlLayerExecution::run(std::unique_ptr<nn_compiler::ir::NNModel>& model)
 {
-    Log::FE::I() << "ControlLayerExecution::run is called.";
+    DLOG(INFO) << "ControlLayerExecution::run is called.";
     std::stack<std::pair<bool, std::shared_ptr<nn_compiler::ir::PrimIfLayer>>> if_layers;
     std::stack<std::shared_ptr<nn_compiler::ir::PrimEndIfLayer>> then_net_end_if_layers;
     std::stack<std::shared_ptr<nn_compiler::ir::PrimLoopLayer>> loop_layers;

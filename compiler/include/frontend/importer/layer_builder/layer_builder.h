@@ -1199,7 +1199,7 @@ class LayerBuilders
     std::shared_ptr<LayerBuilder> get(std::string layer_type)
     {
         if (layer_builders_[layer_type] == nullptr) {
-            LOG(INFO) << "layer type " << layer_type << " is unsupport.";
+            DLOG(INFO) << "layer type " << layer_type << " is unsupport.";
         }
         return layer_builders_[layer_type];
     }

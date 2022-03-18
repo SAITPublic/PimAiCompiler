@@ -1,7 +1,6 @@
 #include <cstdio>
 #include <cstdlib> 
 
-#include "compiler/include/common/log.hpp"
 #include "compiler/include/middlend/middlend_driver.hpp"
 #include "compiler/include/middlend/optimizer/pass_manager.h"
 
@@ -13,7 +12,7 @@ RetVal MiddlendDriver::initialize() {
 }
 
 RetVal MiddlendDriver::run(std::unique_ptr<nn_compiler::ir::NNModel>& model) {
-    Log::ME::I() << "NNCompiler MiddlendDriver::run() is called";
+    DLOG(INFO) << "NNCompiler MiddlendDriver::run() is called";
 
     optimizer(model);
 
@@ -22,7 +21,7 @@ RetVal MiddlendDriver::run(std::unique_ptr<nn_compiler::ir::NNModel>& model) {
 
 RetVal MiddlendDriver::optimizer(std::unique_ptr<nn_compiler::ir::NNModel>& model)
 {
-    Log::ME::I() << "NNCompiler MiddlendDriver::optimizer() is called";
+    DLOG(INFO) << "NNCompiler MiddlendDriver::optimizer() is called";
     
     auto pass_manager = std::make_shared<PassManager>();
     pass_manager->runPasses(model);

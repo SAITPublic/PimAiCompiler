@@ -2,7 +2,6 @@
 
 #include <assert.h>
 #include <torch/script.h>
-#include "ir/include/common/log.hpp"
 #include "ir/include/tensors/data_tensor.h"
 
 namespace nn_compiler

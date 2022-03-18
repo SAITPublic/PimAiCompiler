@@ -25,7 +25,7 @@ class PrimCallMethodLayer : public NNLayer {
 
 
     void printAttr() {
-        Log::IR::I() << "    target network name is     " << _target_network_name;
+        DLOG(INFO) << "    target network name is     " << _target_network_name;
     }
 
     void setAttr(std::string target_network_name) {

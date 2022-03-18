@@ -13,7 +13,7 @@
       virtual std::shared_ptr<NNLayer> clone() {                                                  \
           return std::shared_ptr<op_name##Layer>(new op_name##Layer(*this));                      \
       }                                                                                           \
-      void printAttr() { Log::IR::I() << "     " << #op_name << "Attr   "; }                      \
+      void printAttr() { DLOG(INFO) << "     " << #op_name << "Attr   "; }                      \
                                                                                                   \
   };                                                                                              \
   }                                                                                               \

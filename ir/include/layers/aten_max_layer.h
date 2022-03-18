@@ -34,7 +34,7 @@ class AtenMaxLayer : public NNLayer {
     int getKeepDim() { return keep_dim_; }
 
     void printAttr() {
-        Log::IR::I() << "   AtemMaxAttr   ";
+        DLOG(INFO) << "   AtemMaxAttr   ";
     }
 
  private:
