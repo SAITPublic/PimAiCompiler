@@ -31,21 +31,10 @@ $ git submodule update
 ```
 $ export LIBTORCH_DIR=/home/user/.local/lib/python3.6/site-packages/torch
 ```
-if you do not have libtorch, you can get it from 75.12.84.67:/home/srcxfim/share/torch-1.7.0a0-cp36-cp36m-linux_x86_64.whl
-and install the torch in container first
+if you do not have libtorch, you can get it from 75.12.84.95: /home/srcxfim/public_file/torch-1.10.0a0+git6f4069a-cp36-cp36m-linux_x86_64.whl
+and install the torch package in container first
 ```
-$ pip install torch-1.7.0a0-cp36-cp36m-linux_x86_64.whl
-
-```
-
-**modify Caffe2Targets.cmake**, while `find_package(Torch REQUIRED)` can't find **gloo_hip** 
-
-```
-$ cd $LIBTORCH_DIR/share/cmake/Caffe2
-
-# delete **gloo_hip**
-Caffe2Targets.cmake 93: INTERFACE_LINK_LIBRARIES c10_hip;torch_cpu_library; ... gloo_hip" 
-Caffe2Targets.cmake 161: foreach(_target "protobuf::libprotobuf" "gloo_hip" )
+$ pip install torch-1.10.0a0+git6f4069a-cp36-cp36m-linux_x86_64.whl
 
 ```
 
@@ -54,51 +43,18 @@ Caffe2Targets.cmake 161: foreach(_target "protobuf::libprotobuf" "gloo_hip" )
 $ ./scripts/build.sh all -o .
 ```
 
-[Set env path: ME_PASS_CONFIG_PATH]
-```
-default file is: compiler/include/middlend/passes/pass_config.json
-```
-
 # How to run
 
-## Compiler
-
-```
-./build/compiler/compiler -h [--help]
-
-General Options:
-  -h [ --help ]            Help info
-  -i, <input file>         Input file path
-  -m, <model type>         Model type. Possible values: RNNT/GNMT/HWR
-  -l, <compile level>      Compile level. Possible values (default: 0):
-                                                    0 (frontend->middlend->backend);
-                                                    1 (middlend->backend);
-                                                    2 (backend)
-  -g, <graphgen_path>      GraphGen real path
-```
-### Note:
-When running with compile level 0 (frontend->middlend->backend) in __docker__, please update docker with:
-```
-sudo apt-get update
-sudo apt-get install libprotobuf-dev protobuf-compiler --fix-missing
-```
-
-And then __rebuild GraphGen in docker__.
-
-## Compiler + Runtime
+## NNCompiler
 
 ```
 ./build/examples/runtime/simpleMain -h [--help]
 
 General Options:
-  -h [ --help ]            Help info
   -i, <input file>         Input file path
   -m, <model type>         Model type. Possible values: RNNT/GNMT/HWR
-  -l, <compile level>      Compile level. Possible values (default: 0):
-                                                    0 (frontend->middlend->backend);
-                                                    1 (middlend->backend);
-                                                    2 (backend)
   -p, <profiling>          Run with profiling
+  -?, <--help>             Help info
 ```
 
 # How to test
