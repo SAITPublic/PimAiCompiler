@@ -15,8 +15,8 @@ class AtenChunkLayer : public NNLayer {
     }
 
     explicit AtenChunkLayer(const AtenChunkLayer& aten_chunk_layer) : NNLayer(aten_chunk_layer) {
-        this->_chunks  = aten_chunk_layer._chunks;
-        this->_dim = aten_chunk_layer._dim;
+        this->chunks_  = aten_chunk_layer.chunks_;
+        this->dim_ = aten_chunk_layer.dim_;
     }
 
     virtual ~AtenChunkLayer() {}
@@ -25,23 +25,23 @@ class AtenChunkLayer : public NNLayer {
         return  std::shared_ptr<AtenChunkLayer>(new AtenChunkLayer(*this));
     }
 
-    void setChunks(int chunks) { _chunks = chunks; }
+    void setChunks(int chunks) { chunks_ = chunks; }
 
-    int getChunks() { return _chunks; }
+    int getChunks() { return chunks_; }
 
-    void setDim(int dim) { _dim = dim; }
+    void setDim(int dim) { dim_ = dim; }
 
-    int getDim() { return _dim; }
+    int getDim() { return dim_; }
 
     void printAttr() {
         DLOG(INFO) << "    AtenChunkAttr          ";
-        DLOG(INFO) << "    chunks is              " << _chunks;
-        DLOG(INFO) << "    dim is                 " << _dim;
+        DLOG(INFO) << "    chunks is              " << chunks_;
+        DLOG(INFO) << "    dim is                 " << dim_;
     }
 
  private:
-    int _chunks = INT32_MAX;
-    int _dim    = INT32_MAX;
+    int chunks_ = INT32_MAX;
+    int dim_    = INT32_MAX;
 };
 
 } // namespace ir

@@ -16,7 +16,7 @@ class AtenLeakyReluLayer : public NNLayer {
 
     explicit AtenLeakyReluLayer(const AtenLeakyReluLayer &aten_leaky_relu_layer) :
         NNLayer(aten_leaky_relu_layer) {
-        this->_scalar = aten_leaky_relu_layer._scalar;
+        this->scalar_ = aten_leaky_relu_layer.scalar_;
     }
 
     virtual ~AtenLeakyReluLayer() {}
@@ -25,17 +25,17 @@ class AtenLeakyReluLayer : public NNLayer {
         return std::shared_ptr<AtenLeakyReluLayer>(new AtenLeakyReluLayer(*this));
     }
 
-    void setScalar(double scalar) { _scalar = scalar; }
+    void setScalar(double scalar) { scalar_ = scalar; }
 
-    double getScalar() const { return _scalar; }
+    double getScalar() const { return scalar_; }
 
     void printAttr() {
         DLOG(INFO) << "    AtenLeakyReluAttr      ";
-        DLOG(INFO) << "    sclar is               " << _scalar;
+        DLOG(INFO) << "    sclar is               " << scalar_;
     }
 
  private:
-    double _scalar = DBL_MAX;
+    double scalar_ = DBL_MAX;
 };
 
 } // namespace ir

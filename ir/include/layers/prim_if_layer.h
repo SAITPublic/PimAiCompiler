@@ -23,8 +23,8 @@ class PrimIfLayer : public NNLayer
 
     explicit PrimIfLayer(const PrimIfLayer& prim_if_layer) : NNLayer(prim_if_layer)
     {
-        this->_then_net = prim_if_layer._then_net;
-        this->_else_net = prim_if_layer._else_net;
+        this->then_net_ = prim_if_layer.then_net_;
+        this->else_net_ = prim_if_layer.else_net_;
         this->else_net_start_layer_ = prim_if_layer.else_net_start_layer_;
     }
 
@@ -32,13 +32,13 @@ class PrimIfLayer : public NNLayer
 
     virtual std::shared_ptr<NNLayer> clone() { return std::shared_ptr<PrimIfLayer>(new PrimIfLayer(*this)); }
 
-    void setThenNet(const std::string netName) { _then_net = netName; }
+    void setThenNet(const std::string netName) { then_net_ = netName; }
 
-    void setElseNet(const std::string netName) { _else_net = netName; }
+    void setElseNet(const std::string netName) { else_net_ = netName; }
 
-    const std::string getThenNet() const { return _then_net; }
+    const std::string getThenNet() const { return then_net_; }
 
-    const std::string getElseNet() const { return _else_net; }
+    const std::string getElseNet() const { return else_net_; }
 
     void setElseNetStartLayer(int64_t else_net_start_layer) { else_net_start_layer_ = else_net_start_layer; }
 
@@ -47,13 +47,13 @@ class PrimIfLayer : public NNLayer
     void printAttr()
     {
         DLOG(INFO) << "    PrimIfAttr        ";
-        DLOG(INFO) << "    Then net is       " << _then_net;
-        DLOG(INFO) << "    Else net is       " << _else_net;
+        DLOG(INFO) << "    Then net is       " << then_net_;
+        DLOG(INFO) << "    Else net is       " << else_net_;
     }
 
    private:
-    std::string _then_net;
-    std::string _else_net;
+    std::string then_net_;
+    std::string else_net_;
 
     int64_t else_net_start_layer_;
 };

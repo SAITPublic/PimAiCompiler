@@ -18,8 +18,8 @@ class AtenDeriveIndexLayer : public NNLayer {
 
     explicit AtenDeriveIndexLayer(const AtenDeriveIndexLayer& aten_derive_index_layer) :
             NNLayer(aten_derive_index_layer) {
-                this->_start = aten_derive_index_layer._start;
-                this->_step  = aten_derive_index_layer._step;
+                this->start_ = aten_derive_index_layer.start_;
+                this->step_  = aten_derive_index_layer.step_;
             }
 
     virtual ~AtenDeriveIndexLayer() {}
@@ -28,23 +28,23 @@ class AtenDeriveIndexLayer : public NNLayer {
         return  std::shared_ptr<AtenDeriveIndexLayer>(new AtenDeriveIndexLayer(*this));
     }
 
-    void setStep(int64_t step) { _step = step; }
+    void setStep(int64_t step) { step_ = step; }
 
-    int64_t getStep() const { return _step; }
+    int64_t getStep() const { return step_; }
 
-    void setStart(int64_t start) { _start = start; }
+    void setStart(int64_t start) { start_ = start; }
 
-    int64_t getStart() const { return _start; }
+    int64_t getStart() const { return start_; }
 
     void printAttr() {
         DLOG(INFO) << "    AtenDeriveIndexAttr      ";
-        DLOG(INFO) << "    start is                 "<< _start;
-        DLOG(INFO) << "    step is                  "<< _step;
+        DLOG(INFO) << "    start is                 "<< start_;
+        DLOG(INFO) << "    step is                  "<< step_;
     }
 
  private:
-    int64_t _start = INT64_MIN;
-    int64_t _step = INT64_MIN;
+    int64_t start_ = INT64_MIN;
+    int64_t step_ = INT64_MIN;
 };
 
 }  // namespace ir

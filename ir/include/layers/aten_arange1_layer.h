@@ -16,11 +16,11 @@ class AtenArange1Layer : public NNLayer {
     }
 
     explicit AtenArange1Layer(const AtenArange1Layer& aten_arange_layer) :  NNLayer(aten_arange_layer) {
-        this->_end        = aten_arange_layer._end;
-        this->_dtype      = aten_arange_layer._dtype;
-        this->_layout     = aten_arange_layer._layout;
-        this->_device     = aten_arange_layer._device;
-        this->_pin_memory = aten_arange_layer._pin_memory;
+        this->end_        = aten_arange_layer.end_;
+        this->dtype_      = aten_arange_layer.dtype_;
+        this->layout_     = aten_arange_layer.layout_;
+        this->device_     = aten_arange_layer.device_;
+        this->pin_memory_ = aten_arange_layer.pin_memory_;
     }
 
     virtual ~AtenArange1Layer() {}
@@ -29,40 +29,40 @@ class AtenArange1Layer : public NNLayer {
         return  std::shared_ptr<AtenArange1Layer> ( new AtenArange1Layer(*this) );
     }
 
-    void setEnd(int64_t end) { _end = end; }
+    void setEnd(int64_t end) { end_ = end; }
 
-    int64_t getEnd() const { return _end; }
+    int64_t getEnd() const { return end_; }
 
-    void setDtype(int64_t dtype) { _dtype = dtype; }
+    void setDtype(int64_t dtype) { dtype_ = dtype; }
 
-    int64_t getDtype() const { return _dtype; }
+    int64_t getDtype() const { return dtype_; }
 
-    void setLayout(int64_t layout) { _layout = layout; }
+    void setLayout(int64_t layout) { layout_ = layout; }
 
-    int64_t getLayout() const { return _layout; }
+    int64_t getLayout() const { return layout_; }
 
-    void setDevice(std::string device) { _device = device; }
+    void setDevice(std::string device) { device_ = device; }
 
-    std::string getDevice() const { return _device; }
+    std::string getDevice() const { return device_; }
 
-    void setPinMemory(int pin_memory) { _pin_memory = pin_memory; }
+    void setPinMemory(int pin_memory) { pin_memory_ = pin_memory; }
 
-    int getPinMemory() const { return _pin_memory; }
+    int getPinMemory() const { return pin_memory_; }
 
     void printAttr() {
         DLOG(INFO) << "    AtenArangeAttr          ";
-        DLOG(INFO) << "    end is                 "<< _end;
-        DLOG(INFO) << "    dtype is                "<< _dtype;
-        DLOG(INFO) << "    layout is               "<< _layout;
-        DLOG(INFO) << "    pin_memory is           "<< _pin_memory;
+        DLOG(INFO) << "    end is                 "<< end_;
+        DLOG(INFO) << "    dtype is                "<< dtype_;
+        DLOG(INFO) << "    layout is               "<< layout_;
+        DLOG(INFO) << "    pin_memory is           "<< pin_memory_;
     }
 
  private:
-    int64_t _end        = INT64_MIN;
-    int64_t _dtype      = INT64_MIN;
-    int64_t _layout     = INT64_MIN;
-    std::string _device = "";
-    int _pin_memory     = INT32_MAX;
+    int64_t end_        = INT64_MIN;
+    int64_t dtype_      = INT64_MIN;
+    int64_t layout_     = INT64_MIN;
+    std::string device_ = "";
+    int pin_memory_     = INT32_MAX;
 };
 
 }  // namespace ir

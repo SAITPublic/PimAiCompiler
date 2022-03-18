@@ -15,9 +15,9 @@ class AtenSumLayer : public NNLayer {
     }
 
     explicit AtenSumLayer(const AtenSumLayer& aten_sum_layer) : NNLayer(aten_sum_layer) {
-        this->_dim = aten_sum_layer._dim;
-        this->_keepdim = aten_sum_layer._keepdim;
-        this->_dtype = aten_sum_layer._dtype;
+        this->dim_ = aten_sum_layer.dim_;
+        this->keepdim_ = aten_sum_layer.keepdim_;
+        this->dtype_ = aten_sum_layer.dtype_;
     }
 
     virtual ~AtenSumLayer() {}
@@ -26,29 +26,29 @@ class AtenSumLayer : public NNLayer {
         return  std::shared_ptr<AtenSumLayer>(new AtenSumLayer(*this));
     }
 
-    void setDim(const std::vector<int64_t> &dim) { _dim = dim; }
+    void setDim(const std::vector<int64_t> &dim) { dim_ = dim; }
 
-    const std::vector<int64_t> getDim() const { return _dim; }
+    const std::vector<int64_t> getDim() const { return dim_; }
 
-    void setKeepdim(int keepdim) { _keepdim = keepdim; }
+    void setKeepdim(int keepdim) { keepdim_ = keepdim; }
 
-    int getKeepdim() const { return _keepdim; }
+    int getKeepdim() const { return keepdim_; }
 
-    void setDtype(int64_t dtype) { _dtype = dtype; }
+    void setDtype(int64_t dtype) { dtype_ = dtype; }
 
-    int64_t getDtype() const { return _dtype; }
+    int64_t getDtype() const { return dtype_; }
 
     void printAttr() {
         DLOG(INFO) << "    AtenSumAttr         ";
-        DLOG(INFO) << "    dim is              " << &_dim;
-        DLOG(INFO) << "    keepdim is          " << _keepdim;
-        DLOG(INFO) << "    dtype is            " << _dtype;
+        DLOG(INFO) << "    dim is              " << &dim_;
+        DLOG(INFO) << "    keepdim is          " << keepdim_;
+        DLOG(INFO) << "    dtype is            " << dtype_;
     }
 
  private:
-    std::vector<int64_t> _dim;
-    int _keepdim   = INT32_MAX;
-    int64_t _dtype = INT64_MIN;
+    std::vector<int64_t> dim_;
+    int keepdim_   = INT32_MAX;
+    int64_t dtype_ = INT64_MIN;
 };
 
 } // namespace ir

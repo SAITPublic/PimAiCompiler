@@ -17,10 +17,10 @@ class AtenOnesLayer : public NNLayer {
 
     explicit AtenOnesLayer(const AtenOnesLayer& aten_ones_layer) :
         NNLayer(aten_ones_layer) {
-        this->_dtype = aten_ones_layer._dtype;
-        this->_layout = aten_ones_layer._layout;
-        this->_device = aten_ones_layer._device;
-        this->_pin_memory = aten_ones_layer._pin_memory;
+        this->dtype_ = aten_ones_layer.dtype_;
+        this->layout_ = aten_ones_layer.layout_;
+        this->device_ = aten_ones_layer.device_;
+        this->pin_memory_ = aten_ones_layer.pin_memory_;
     }
 
     virtual ~AtenOnesLayer() {}
@@ -29,35 +29,35 @@ class AtenOnesLayer : public NNLayer {
         return  std::shared_ptr<AtenOnesLayer>(new AtenOnesLayer(*this));
     }
 
-    void setDType(int64_t dtype) { _dtype = dtype; }
+    void setDType(int64_t dtype) { dtype_ = dtype; }
 
-    void setLayout(int64_t layout) { _layout = layout; }
+    void setLayout(int64_t layout) { layout_ = layout; }
 
-    void setDevice(std::string device) { _device = device; }
+    void setDevice(std::string device) { device_ = device; }
 
-    void setPinMemory(int pin_memory) { _pin_memory = pin_memory; }
+    void setPinMemory(int pin_memory) { pin_memory_ = pin_memory; }
 
-    int64_t getDType() const { return _dtype; }
+    int64_t getDType() const { return dtype_; }
 
-    int64_t getLayout() const { return _layout; }
+    int64_t getLayout() const { return layout_; }
 
-    std::string getDevice() const { return _device; }
+    std::string getDevice() const { return device_; }
 
-    int getPinMemory() const { return _pin_memory; }
+    int getPinMemory() const { return pin_memory_; }
 
     void printAttr() {
         DLOG(INFO) << "    AtenOnesAttr   ";
-        DLOG(INFO) << "    dtype is       " << _dtype;
-        DLOG(INFO) << "    layout is      " << _layout;
-        DLOG(INFO) << "    device is      " << _device;
-        DLOG(INFO) << "    pin_memory is  " << _pin_memory;
+        DLOG(INFO) << "    dtype is       " << dtype_;
+        DLOG(INFO) << "    layout is      " << layout_;
+        DLOG(INFO) << "    device is      " << device_;
+        DLOG(INFO) << "    pin_memory is  " << pin_memory_;
     }
 
  private:
-    int64_t _dtype      = INT64_MIN;
-    int64_t _layout     = INT64_MIN;
-    std::string _device = "";
-    int _pin_memory     = INT32_MAX;
+    int64_t dtype_      = INT64_MIN;
+    int64_t layout_     = INT64_MIN;
+    std::string device_ = "";
+    int pin_memory_     = INT32_MAX;
 };
 
 } // namespace ir

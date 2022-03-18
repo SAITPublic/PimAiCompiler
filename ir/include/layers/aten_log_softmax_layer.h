@@ -16,8 +16,8 @@ class AtenLogSoftmaxLayer : public NNLayer {
 
     explicit AtenLogSoftmaxLayer(const AtenLogSoftmaxLayer &aten_log_softmax_layer) :
         NNLayer(aten_log_softmax_layer) {
-        this->_dim = aten_log_softmax_layer._dim;
-        this->_dtype = aten_log_softmax_layer._dtype;
+        this->dim_ = aten_log_softmax_layer.dim_;
+        this->dtype_ = aten_log_softmax_layer.dtype_;
     }
 
     virtual ~AtenLogSoftmaxLayer() {}
@@ -26,23 +26,23 @@ class AtenLogSoftmaxLayer : public NNLayer {
         return std::shared_ptr<AtenLogSoftmaxLayer>(new AtenLogSoftmaxLayer(*this));
     }
 
-    void setDim(int64_t dim) { _dim = dim; }
+    void setDim(int64_t dim) { dim_ = dim; }
 
-    void setDType(int64_t dtype) { _dtype = dtype; }
+    void setDType(int64_t dtype) { dtype_ = dtype; }
 
-    int64_t getDim() const { return _dim; }
+    int64_t getDim() const { return dim_; }
 
-    int64_t getDType() const { return _dtype; }
+    int64_t getDType() const { return dtype_; }
 
     void printAttr() {
         DLOG(INFO) << "    AtenLogSoftmaxAttr      ";
-        DLOG(INFO) << "    dim is                  " << _dim;
-        DLOG(INFO) << "    dtype is                " << _dtype;
+        DLOG(INFO) << "    dim is                  " << dim_;
+        DLOG(INFO) << "    dtype is                " << dtype_;
     }
 
  private:
-    int64_t _dim   = INT64_MIN;
-    int64_t _dtype = INT64_MIN;
+    int64_t dim_   = INT64_MIN;
+    int64_t dtype_ = INT64_MIN;
 };
 
 } // namespace ir

@@ -18,7 +18,7 @@ class PrimTupleIndexLayer : public NNLayer {
 
     explicit PrimTupleIndexLayer(const PrimTupleIndexLayer& prim_tuple_index_layer) :
         NNLayer(prim_tuple_index_layer) {
-        this->_index = prim_tuple_index_layer._index;
+        this->index_ = prim_tuple_index_layer.index_;
     }
 
     virtual ~PrimTupleIndexLayer() {}
@@ -27,17 +27,17 @@ class PrimTupleIndexLayer : public NNLayer {
         return std::shared_ptr<PrimTupleIndexLayer>(new PrimTupleIndexLayer(*this));
     }
 
-    int64_t getIndex() const { return _index; }
+    int64_t getIndex() const { return index_; }
 
-    void setIndex(int64_t index) { _index = index; }
+    void setIndex(int64_t index) { index_ = index; }
 
     void printAttr() {
         DLOG(INFO) << "   PrimTupleIndexAttr    ";
-        DLOG(INFO) << "   index is    " << _index;
+        DLOG(INFO) << "   index is    " << index_;
     }
 
  private:
-    int64_t _index = INT64_MIN;
+    int64_t index_ = INT64_MIN;
 };
 
 }  // namespace ir

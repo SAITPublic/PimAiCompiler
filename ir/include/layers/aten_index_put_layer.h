@@ -15,7 +15,7 @@ class AtenIndexPutLayer : public NNLayer {
 
     explicit AtenIndexPutLayer(const AtenIndexPutLayer &aten_index_put_layer) :
         NNLayer(aten_index_put_layer) {
-        this->_accumulate = aten_index_put_layer._accumulate;
+        this->accumulate_ = aten_index_put_layer.accumulate_;
     }
 
     virtual ~AtenIndexPutLayer() {}
@@ -24,17 +24,17 @@ class AtenIndexPutLayer : public NNLayer {
         return std::shared_ptr<AtenIndexPutLayer>(new AtenIndexPutLayer(*this));
     }
 
-    void setAccumulate(int accumulate) { _accumulate = accumulate; }
+    void setAccumulate(int accumulate) { accumulate_ = accumulate; }
 
-    int getAccumulate() const { return _accumulate; }
+    int getAccumulate() const { return accumulate_; }
 
     void printAttr() {
         DLOG(INFO) << "    AtenIndexPutAttr             ";
-        DLOG(INFO) << "    accumulate is                "<< _accumulate;
+        DLOG(INFO) << "    accumulate is                "<< accumulate_;
     }
 
  private:
-    int _accumulate = INT32_MAX;
+    int accumulate_ = INT32_MAX;
 };
 
 } // namespace ir

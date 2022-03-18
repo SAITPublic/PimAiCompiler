@@ -20,7 +20,7 @@ class AtenPackPaddedSequenceLayer : public NNLayer {
     explicit AtenPackPaddedSequenceLayer(
         const AtenPackPaddedSequenceLayer& aten_pack_padded_sequence_layer) :
             NNLayer(aten_pack_padded_sequence_layer) {
-        this->_batch_first = aten_pack_padded_sequence_layer._batch_first;
+        this->batch_first_ = aten_pack_padded_sequence_layer.batch_first_;
     }
 
     virtual ~AtenPackPaddedSequenceLayer() {}
@@ -30,17 +30,17 @@ class AtenPackPaddedSequenceLayer : public NNLayer {
                     (new AtenPackPaddedSequenceLayer(*this));
     }
 
-    void setBatchFirst(int batch_first) { _batch_first = batch_first; }
+    void setBatchFirst(int batch_first) { batch_first_ = batch_first; }
 
-    int getBatchFirst() const { return _batch_first; }
+    int getBatchFirst() const { return batch_first_; }
 
     void printAttr() {
         DLOG(INFO) << "    AtenPackPaddedSequenceAttr     ";
-        DLOG(INFO) << "    batch_first is                 "<< _batch_first;
+        DLOG(INFO) << "    batch_first is                 "<< batch_first_;
     }
 
  private:
-    int _batch_first = INT32_MAX;
+    int batch_first_ = INT32_MAX;
 };
 
 }  // namespace ir

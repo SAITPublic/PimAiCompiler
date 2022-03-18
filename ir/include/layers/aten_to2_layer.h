@@ -14,9 +14,9 @@ class AtenTo2Layer : public NNLayer {
     }
 
     explicit AtenTo2Layer(const AtenTo2Layer& aten_to_layer) : NNLayer(aten_to_layer) {
-        this->_non_blocking = aten_to_layer._non_blocking;
-        this->_copy = aten_to_layer._copy;
-        this->_optional_memory_format = aten_to_layer._optional_memory_format;
+        this->non_blocking_ = aten_to_layer.non_blocking_;
+        this->copy_ = aten_to_layer.copy_;
+        this->optional_memory_format_ = aten_to_layer.optional_memory_format_;
     }
 
     virtual ~AtenTo2Layer() {}
@@ -25,31 +25,31 @@ class AtenTo2Layer : public NNLayer {
         return  std::shared_ptr<AtenTo2Layer>(new AtenTo2Layer(*this));
     }
 
-    void setNonBlocking(int nonblocking) { _non_blocking = nonblocking; }
+    void setNonBlocking(int nonblocking) { non_blocking_ = nonblocking; }
 
-    void setCopy(int copy) { _copy = copy; }
+    void setCopy(int copy) { copy_ = copy; }
 
     void setOptionalMemoryFormat(int optional_memory_format) {
-        _optional_memory_format = optional_memory_format;
+        optional_memory_format_ = optional_memory_format;
     }
 
-    int getNonBlocking() const { return _non_blocking; }
+    int getNonBlocking() const { return non_blocking_; }
 
-    int getCopy() const { return _copy; }
+    int getCopy() const { return copy_; }
 
-    int getOptionalMemoryFormat() { return _optional_memory_format; }
+    int getOptionalMemoryFormat() { return optional_memory_format_; }
 
     void printAttr() {
         DLOG(INFO) << "    AtenToAttr                     ";
-        DLOG(INFO) << "    non_blocking                   " << _non_blocking;
-        DLOG(INFO) << "    copy is                        " << _copy;
-        DLOG(INFO) << "    optional_memory_format is      " << _optional_memory_format;
+        DLOG(INFO) << "    non_blocking                   " << non_blocking_;
+        DLOG(INFO) << "    copy is                        " << copy_;
+        DLOG(INFO) << "    optional_memory_format is      " << optional_memory_format_;
     }
 
  private:
-    int    _non_blocking = INT32_MAX;
-    int    _copy         = INT32_MAX;
-    int _optional_memory_format = -1;
+    int    non_blocking_ = INT32_MAX;
+    int    copy_         = INT32_MAX;
+    int optional_memory_format_ = -1;
 };
 
 } // namespace ir

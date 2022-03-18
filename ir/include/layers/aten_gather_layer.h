@@ -15,8 +15,8 @@ class AtenGatherLayer : public NNLayer {
 
     explicit AtenGatherLayer(const AtenGatherLayer &aten_gather_layer) :
         NNLayer(aten_gather_layer) {
-        this->_dim = aten_gather_layer._dim;
-        this->_sparse_grad = aten_gather_layer._sparse_grad;
+        this->dim_ = aten_gather_layer.dim_;
+        this->sparse_grad_ = aten_gather_layer.sparse_grad_;
     }
 
     virtual ~AtenGatherLayer() {}
@@ -25,23 +25,23 @@ class AtenGatherLayer : public NNLayer {
         return std::shared_ptr<AtenGatherLayer>(new AtenGatherLayer(*this));
     }
 
-    void setDim(int dim) { _dim = dim; }
+    void setDim(int dim) { dim_ = dim; }
 
-    int getDim() const { return _dim; }
+    int getDim() const { return dim_; }
 
-    void setSparseGrad(int sparse_grad) { _sparse_grad = sparse_grad; }
+    void setSparseGrad(int sparse_grad) { sparse_grad_ = sparse_grad; }
 
-    int getSparseGrad() const { return _sparse_grad; }
+    int getSparseGrad() const { return sparse_grad_; }
 
     void printAttr() {
         DLOG(INFO) << "    AtenGatherAttr      ";
-        DLOG(INFO) << "    dim is              "<< _dim;
-        DLOG(INFO) << "    sparse_grad is      "<< _sparse_grad;
+        DLOG(INFO) << "    dim is              "<< dim_;
+        DLOG(INFO) << "    sparse_grad is      "<< sparse_grad_;
     }
 
  private:
-    int  _dim        = INT32_MAX;
-    int _sparse_grad = INT32_MAX;
+    int  dim_        = INT32_MAX;
+    int sparse_grad_ = INT32_MAX;
 };
 
 } // namespace ir

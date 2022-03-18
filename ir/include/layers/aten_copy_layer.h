@@ -18,7 +18,7 @@ class AtenCopyLayer : public NNLayer {
 
     explicit AtenCopyLayer(const AtenCopyLayer& aten_copy_layer) :
         NNLayer(aten_copy_layer) {
-        this->_non_blocking = aten_copy_layer._non_blocking;
+        this->non_blocking_ = aten_copy_layer.non_blocking_;
     }
 
     virtual ~AtenCopyLayer() {}
@@ -27,17 +27,17 @@ class AtenCopyLayer : public NNLayer {
         return  std::shared_ptr<AtenCopyLayer>(new AtenCopyLayer(*this));
     }
 
-    void setNonBlocking(int nonblocking) { _non_blocking = nonblocking; }
+    void setNonBlocking(int nonblocking) { non_blocking_ = nonblocking; }
 
-    int getNonBlocking() const { return _non_blocking; }
+    int getNonBlocking() const { return non_blocking_; }
 
     void printAttr() {
         DLOG(INFO) << "    AtenCopyAttr      ";
-        DLOG(INFO) << "    non_blocking is   "<< _non_blocking;
+        DLOG(INFO) << "    non_blocking is   "<< non_blocking_;
     }
 
  private:
-    int  _non_blocking = INT32_MAX;
+    int  non_blocking_ = INT32_MAX;
 };
 
 }  // namespace ir

@@ -16,7 +16,7 @@ class AtenSizeLayer : public NNLayer {
 
     explicit AtenSizeLayer(const AtenSizeLayer& aten_size_layer) :
         NNLayer(aten_size_layer) {
-        this->_dim = aten_size_layer.getDim();
+        this->dim_ = aten_size_layer.getDim();
     }
 
     virtual ~AtenSizeLayer() {}
@@ -25,17 +25,17 @@ class AtenSizeLayer : public NNLayer {
         return  std::shared_ptr<AtenSizeLayer>(new AtenSizeLayer(*this));
     }
 
-    void setDim(int64_t dim) { _dim = dim; }
+    void setDim(int64_t dim) { dim_ = dim; }
 
-    int64_t getDim() const { return _dim; }
+    int64_t getDim() const { return dim_; }
 
     void printAttr() {
         DLOG(INFO) << "    AtenSizeAttr      ";
-        DLOG(INFO) << "    dim is           " << _dim;
+        DLOG(INFO) << "    dim is           " << dim_;
     }
 
  private:
-    int64_t _dim = INT64_MIN;
+    int64_t dim_ = INT64_MIN;
 };
 
 } // namespace ir

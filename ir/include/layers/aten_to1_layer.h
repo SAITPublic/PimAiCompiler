@@ -16,10 +16,10 @@ class AtenTo1Layer : public NNLayer {
     }
 
     explicit AtenTo1Layer(const AtenTo1Layer& aten_to_layer) : NNLayer(aten_to_layer) {
-        this->_dtype = aten_to_layer._dtype;
-        this->_non_blocking = aten_to_layer._non_blocking;
-        this->_copy = aten_to_layer._copy;
-        this->_optional_memory_format = aten_to_layer._optional_memory_format;
+        this->dtype_ = aten_to_layer.dtype_;
+        this->non_blocking_ = aten_to_layer.non_blocking_;
+        this->copy_ = aten_to_layer.copy_;
+        this->optional_memory_format_ = aten_to_layer.optional_memory_format_;
     }
 
     virtual ~AtenTo1Layer() {}
@@ -28,41 +28,41 @@ class AtenTo1Layer : public NNLayer {
         return  std::shared_ptr<AtenTo1Layer>(new AtenTo1Layer(*this));
     }
 
-    void setDType(int64_t dtype) { _dtype = dtype; }
+    void setDType(int64_t dtype) { dtype_ = dtype; }
 
-    void setNonBlocking(int nonblocking) { _non_blocking = nonblocking; }
+    void setNonBlocking(int nonblocking) { non_blocking_ = nonblocking; }
 
-    void setCopy(int copy) { _copy = copy; }
+    void setCopy(int copy) { copy_ = copy; }
 
     void setOptionalMemoryFormat(int optional_memory_format) {
-        _optional_memory_format = optional_memory_format;
+        optional_memory_format_ = optional_memory_format;
     }
 
-    int64_t getDType() const { return _dtype; }
+    int64_t getDType() const { return dtype_; }
 
-    int getNonBlocking() const { return _non_blocking; }
+    int getNonBlocking() const { return non_blocking_; }
 
-    int getCopy() const { return _copy; }
+    int getCopy() const { return copy_; }
 
-    int getOptionalMemoryFormat() { return _optional_memory_format; }
+    int getOptionalMemoryFormat() { return optional_memory_format_; }
 
     void printAttr() {
         DLOG(INFO) << "    AtenToAttr                     ";
-        DLOG(INFO) << "    dtype is                       " << _dtype;
-        DLOG(INFO) << "    non_blocking                   " << _non_blocking;
-        DLOG(INFO) << "    copy is                        " << _copy;
-        DLOG(INFO) << "    optional_memory_format is      " << _optional_memory_format;
+        DLOG(INFO) << "    dtype is                       " << dtype_;
+        DLOG(INFO) << "    non_blocking                   " << non_blocking_;
+        DLOG(INFO) << "    copy is                        " << copy_;
+        DLOG(INFO) << "    optional_memory_format is      " << optional_memory_format_;
     }
 
  private:
-    int64_t _dtype       = INT64_MIN;
-    int    _non_blocking = INT32_MAX;
-    int    _copy         = INT32_MAX;
+    int64_t dtype_       = INT64_MIN;
+    int    non_blocking_ = INT32_MAX;
+    int    copy_         = INT32_MAX;
     /* according to pytorch/c10/core/MemoryFormat.h,
        enum MemoryFormat: { Contiguous, Preserve, ChannelsLast, ChannelsLast3d }
-       -1 stands for _optional_memory_format = NONE.
+       -1 stands for optional_memory_format_ = NONE.
      */
-    int _optional_memory_format = -1;
+    int optional_memory_format_ = -1;
 };
 
 } // namespace ir

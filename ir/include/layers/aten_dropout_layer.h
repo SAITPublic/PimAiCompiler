@@ -16,8 +16,8 @@ class AtenDropoutLayer : public NNLayer {
 
     explicit AtenDropoutLayer(const AtenDropoutLayer& aten_drop_layer) :
         NNLayer(aten_drop_layer) {
-        this->_proportion = aten_drop_layer._proportion;
-        this->_train = aten_drop_layer._train;
+        this->proportion_ = aten_drop_layer.proportion_;
+        this->train_ = aten_drop_layer.train_;
     }
 
     virtual ~AtenDropoutLayer() {}
@@ -26,20 +26,20 @@ class AtenDropoutLayer : public NNLayer {
         return  std::shared_ptr<AtenDropoutLayer>(new AtenDropoutLayer(*this));
     }
 
-    void setProportion(double proportion) { _proportion = proportion; }
-    void setTrain(int train) { _train = train; }
-    double getProportion() { return _proportion; }
-    int getTrain() { return _train; }
+    void setProportion(double proportion) { proportion_ = proportion; }
+    void setTrain(int train) { train_ = train; }
+    double getProportion() { return proportion_; }
+    int getTrain() { return train_; }
 
     void printAttr() {
         DLOG(INFO) << "    AtenDropoutAttr            ";
-        DLOG(INFO) << "    proportion is              " << _proportion;
-        DLOG(INFO) << "    train value is             " << _train;
+        DLOG(INFO) << "    proportion is              " << proportion_;
+        DLOG(INFO) << "    train value is             " << train_;
     }
 
  private:
-    double _proportion = DBL_MAX;
-    int  _train       = INT32_MAX;
+    double proportion_ = DBL_MAX;
+    int  train_       = INT32_MAX;
 };
 
 } // namespace ir

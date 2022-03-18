@@ -22,8 +22,8 @@ class AtenSliceLayer : public NNLayer {
 
     explicit AtenSliceLayer(const AtenSliceLayer& aten_slice_layer) :
         NNLayer(aten_slice_layer) {
-        this->setAttr(aten_slice_layer._dim, aten_slice_layer._start, 
-                      aten_slice_layer._end, aten_slice_layer._step);
+        this->setAttr(aten_slice_layer.dim_, aten_slice_layer.start_, 
+                      aten_slice_layer.end_, aten_slice_layer.step_);
     }
 
     virtual ~AtenSliceLayer() {}
@@ -36,48 +36,47 @@ class AtenSliceLayer : public NNLayer {
         DLOG(INFO) << "      AtenSliceAttr      ";
     }
 
- private:
-    // Attributes
-    int64_t _dim   = INT64_MIN;
-    int64_t _start = INT64_MIN;
-    int64_t _end   = INT64_MIN;
-    int64_t _step  = INT64_MIN;
-
- public:
     void setAttr(int64_t dim, int64_t start, int64_t end, int64_t step) {
-        this->_dim   = dim;
-        this->_start = start;
-        this->_end   = end;
-        this->_step  = step;
+        this->dim_   = dim;
+        this->start_ = start;
+        this->end_   = end;
+        this->step_  = step;
     }
 
     std::vector<int64_t> getAttr() {
-        return std::vector<int64_t>{this->_dim, this->_start, this->_end, this->_step};
+        return std::vector<int64_t>{this->dim_, this->start_, this->end_, this->step_};
     }
 
     void setDim(int64_t dim) {
-        this->_dim = dim;
+        this->dim_ = dim;
     }
 
-    int64_t getDim() { return this->_dim; }
+    int64_t getDim() { return this->dim_; }
 
     void setStart(int64_t start) {
-        this->_start = start;
+        this->start_ = start;
     }
 
-    int64_t getStart() { return this->_start; }
+    int64_t getStart() { return this->start_; }
 
     void setEnd(int64_t end) {
-        this->_end = end;
+        this->end_ = end;
     }
 
-    int64_t getEnd() { return this->_end; }
+    int64_t getEnd() { return this->end_; }
 
     void setStep(int64_t step) {
-        this->_step = step;
+        this->step_ = step;
     }
 
-    int64_t getStep() { return this->_step; }
+    int64_t getStep() { return this->step_; }
+
+ private:
+    // Attributes
+    int64_t dim_   = INT64_MIN;
+    int64_t start_ = INT64_MIN;
+    int64_t end_   = INT64_MIN;
+    int64_t step_  = INT64_MIN;
 };
 
 }  // namespace ir

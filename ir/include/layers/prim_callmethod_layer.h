@@ -14,7 +14,7 @@ class PrimCallMethodLayer : public NNLayer {
 
     explicit PrimCallMethodLayer(const PrimCallMethodLayer& callmethod_layer) :
         NNLayer(callmethod_layer) {
-        this->_target_network_name = callmethod_layer._target_network_name;
+        this->target_network_name_ = callmethod_layer.target_network_name_;
     }
 
     virtual ~PrimCallMethodLayer() {}
@@ -25,19 +25,19 @@ class PrimCallMethodLayer : public NNLayer {
 
 
     void printAttr() {
-        DLOG(INFO) << "    target network name is     " << _target_network_name;
+        DLOG(INFO) << "    target network name is     " << target_network_name_;
     }
 
     void setAttr(std::string target_network_name) {
-        _target_network_name = target_network_name;
+        target_network_name_ = target_network_name;
     }
 
     std::string getAttr() const {
-        return _target_network_name;
+        return target_network_name_;
     }
 
  private:
-    std::string _target_network_name;
+    std::string target_network_name_;
 };
 
 } // namespace ir

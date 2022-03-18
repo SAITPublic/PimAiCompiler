@@ -19,8 +19,8 @@ class AtenTransposeLayer : public NNLayer {
 
     explicit AtenTransposeLayer(const AtenTransposeLayer& aten_transpose_layer) :
         NNLayer(aten_transpose_layer) {
-        this->_dim0 = aten_transpose_layer._dim0;
-        this->_dim1 = aten_transpose_layer._dim1;
+        this->dim0_ = aten_transpose_layer.dim0_;
+        this->dim1_ = aten_transpose_layer.dim1_;
     }
 
     virtual ~AtenTransposeLayer() {}
@@ -30,31 +30,31 @@ class AtenTransposeLayer : public NNLayer {
     }
 
     void setAttr(int64_t dim0, int64_t dim1) {
-        this->_dim0 = dim0;
-        this->_dim1 = dim1;
+        this->dim0_ = dim0;
+        this->dim1_ = dim1;
     }
 
     std::vector<int64_t> getAttr() {
-        return std::vector<int64_t>{this->_dim0, this->_dim1};
+        return std::vector<int64_t>{this->dim0_, this->dim1_};
     }
 
-    void setDim0(int64_t dim0) { this->_dim0 = dim0; }
+    void setDim0(int64_t dim0) { this->dim0_ = dim0; }
 
-    int64_t getDim0() { return this->_dim0; }
+    int64_t getDim0() { return this->dim0_; }
 
-    void setDim1(int64_t dim1) { this->_dim1 = dim1; }
+    void setDim1(int64_t dim1) { this->dim1_ = dim1; }
 
-    int64_t getDim1() { return this->_dim1; }
+    int64_t getDim1() { return this->dim1_; }
 
     void printAttr() {
         DLOG(INFO) << "    AtenTransposeAttr    ";
-        DLOG(INFO) << "    dim0 is              "<< _dim0;
-        DLOG(INFO) << "    dim1 is              "<< _dim1;
+        DLOG(INFO) << "    dim0 is              "<< dim0_;
+        DLOG(INFO) << "    dim1 is              "<< dim1_;
     }
 
  private:
-    int64_t _dim0 = INT64_MIN;
-    int64_t _dim1 = INT64_MIN;
+    int64_t dim0_ = INT64_MIN;
+    int64_t dim1_ = INT64_MIN;
 };
 
 }  // namespace ir

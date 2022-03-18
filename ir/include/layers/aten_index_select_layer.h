@@ -17,7 +17,7 @@ class AtenIndexSelectLayer : public NNLayer {
 
     explicit AtenIndexSelectLayer(const AtenIndexSelectLayer& aten_index_select_layer) :
         NNLayer(aten_index_select_layer) {
-        this->_dim = aten_index_select_layer._dim;
+        this->dim_ = aten_index_select_layer.dim_;
     }
 
     virtual ~AtenIndexSelectLayer() {}
@@ -26,17 +26,17 @@ class AtenIndexSelectLayer : public NNLayer {
         return  std::shared_ptr<AtenIndexSelectLayer>(new AtenIndexSelectLayer(*this));
     }
 
-    void setDim(int dim) { _dim = dim; }
+    void setDim(int dim) { dim_ = dim; }
 
-    int getDim() const { return _dim; }
+    int getDim() const { return dim_; }
 
     void printAttr() {
         DLOG(INFO) << "    AtenIndexSelectAttr     ";
-        DLOG(INFO) << "    dim is                  "<< _dim;
+        DLOG(INFO) << "    dim is                  "<< dim_;
     }
 
  private:
-    int _dim = INT32_MAX;
+    int dim_ = INT32_MAX;
 };
 
 } // namespace ir

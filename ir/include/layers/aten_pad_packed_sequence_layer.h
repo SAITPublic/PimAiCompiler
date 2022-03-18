@@ -21,9 +21,9 @@ class AtenPadPackedSequenceLayer : public NNLayer {
     explicit AtenPadPackedSequenceLayer(
         const AtenPadPackedSequenceLayer& aten_pad_packed_sequence_layer) :
             NNLayer(aten_pad_packed_sequence_layer) {
-        this->_batch_first   = aten_pad_packed_sequence_layer._batch_first;
-        this->_padding_value = aten_pad_packed_sequence_layer._padding_value;
-        this->_total_length  = aten_pad_packed_sequence_layer._total_length;
+        this->batch_first_   = aten_pad_packed_sequence_layer.batch_first_;
+        this->padding_value_ = aten_pad_packed_sequence_layer.padding_value_;
+        this->total_length_  = aten_pad_packed_sequence_layer.total_length_;
     }
 
     virtual ~AtenPadPackedSequenceLayer() {}
@@ -33,29 +33,29 @@ class AtenPadPackedSequenceLayer : public NNLayer {
                     (new AtenPadPackedSequenceLayer(*this));
     }
 
-    void setBatchFirst(int batch_first) { _batch_first = batch_first; }
+    void setBatchFirst(int batch_first) { batch_first_ = batch_first; }
 
-    int getBatchFirst() const { return _batch_first; }
+    int getBatchFirst() const { return batch_first_; }
 
-    void setPaddingValue(float padding_value) { _padding_value = padding_value; }
+    void setPaddingValue(float padding_value) { padding_value_ = padding_value; }
 
-    float getPaddingValue() const { return _padding_value; }
+    float getPaddingValue() const { return padding_value_; }
 
-    void setTotalLength(int64_t total_length) { _total_length = total_length; }
+    void setTotalLength(int64_t total_length) { total_length_ = total_length; }
 
-    int64_t getTotalLength() const { return _total_length; }
+    int64_t getTotalLength() const { return total_length_; }
 
     void printAttr() {
         DLOG(INFO) << "    AtenPadPackedSequenceAttr     ";
-        DLOG(INFO) << "    batch_first is                 " << _batch_first;
-        DLOG(INFO) << "    padding_value is               " << _padding_value;
-        DLOG(INFO) << "    total_length is                " << _total_length;
+        DLOG(INFO) << "    batch_first is                 " << batch_first_;
+        DLOG(INFO) << "    padding_value is               " << padding_value_;
+        DLOG(INFO) << "    total_length is                " << total_length_;
     }
 
  private:
-    int  _batch_first     = INT32_MAX;
-    float _padding_value  = FLT_MAX;
-    int64_t _total_length = INT64_MIN;
+    int  batch_first_     = INT32_MAX;
+    float padding_value_  = FLT_MAX;
+    int64_t total_length_ = INT64_MIN;
 };
 
 }  // namespace ir

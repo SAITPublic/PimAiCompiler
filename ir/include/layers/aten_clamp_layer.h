@@ -15,8 +15,8 @@ class AtenClampLayer : public NNLayer {
     }
 
     explicit AtenClampLayer(const AtenClampLayer& aten_clamp_layer) : NNLayer(aten_clamp_layer) {
-        this->_min  = aten_clamp_layer._min;
-        this->_max = aten_clamp_layer._max;
+        this->min_  = aten_clamp_layer.min_;
+        this->max_ = aten_clamp_layer.max_;
     }
 
     virtual ~AtenClampLayer() {}
@@ -25,23 +25,23 @@ class AtenClampLayer : public NNLayer {
         return  std::shared_ptr<AtenClampLayer>(new AtenClampLayer(*this));
     }
 
-    void setMin(int min) { _min = min; }
+    void setMin(int min) { min_ = min; }
 
-    int getMin() { return _min; }
+    int getMin() { return min_; }
 
-    void setMax(int max) { _max = max; }
+    void setMax(int max) { max_ = max; }
 
-    int getMax() { return _max; }
+    int getMax() { return max_; }
 
     void printAttr() {
         DLOG(INFO) << "    AtenClampAttr          ";
-        DLOG(INFO) << "    min is                 " << _min;
-        DLOG(INFO) << "    max is                 " << _max;
+        DLOG(INFO) << "    min is                 " << min_;
+        DLOG(INFO) << "    max is                 " << max_;
     }
 
  private:
-    int _min = INT32_MAX;
-    int _max = INT32_MAX;
+    int min_ = INT32_MAX;
+    int max_ = INT32_MAX;
 };
 
 } // namespace ir

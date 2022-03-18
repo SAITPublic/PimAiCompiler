@@ -14,7 +14,7 @@ class AtenFormatLayer : public NNLayer {
     }
 
     explicit AtenFormatLayer(const AtenFormatLayer &aten_format_layer) : NNLayer(aten_format_layer) {
-        this->_assembly_format = aten_format_layer._assembly_format;
+        this->assembly_format_ = aten_format_layer.assembly_format_;
     }
 
     virtual ~AtenFormatLayer() {}
@@ -23,17 +23,17 @@ class AtenFormatLayer : public NNLayer {
         return std::shared_ptr<AtenFormatLayer>(new AtenFormatLayer(*this));
     }
 
-    void setAssemblyFormat(std::string assembly_format) { _assembly_format = assembly_format; }
+    void setAssemblyFormat(std::string assembly_format) { assembly_format_ = assembly_format; }
 
-    std::string getAssemblyFormat() const { return _assembly_format; }
+    std::string getAssemblyFormat() const { return assembly_format_; }
 
     void printAttr() {
         DLOG(INFO) << "    AtenFormatAttr      ";
-        DLOG(INFO) << "    assembly_format is  "<< _assembly_format;
+        DLOG(INFO) << "    assembly_format is  "<< assembly_format_;
     }
 
  private:
-    std::string _assembly_format;
+    std::string assembly_format_;
 };
 
 } // namespace ir

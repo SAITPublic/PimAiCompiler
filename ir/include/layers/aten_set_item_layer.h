@@ -18,7 +18,7 @@ class AtenSetItemLayer : public NNLayer {
 
     explicit AtenSetItemLayer(const AtenSetItemLayer& aten_set_item_layer) :
         NNLayer(aten_set_item_layer) {
-        this->_indices = aten_set_item_layer._indices;
+        this->indices_ = aten_set_item_layer.indices_;
     }
 
     virtual ~AtenSetItemLayer() {}
@@ -27,17 +27,17 @@ class AtenSetItemLayer : public NNLayer {
         return  std::shared_ptr<AtenSetItemLayer>(new AtenSetItemLayer(*this));
     }
 
-    void setIndices(int indices) { _indices = indices; }
+    void setIndices(int indices) { indices_ = indices; }
 
-    int getIndices() const { return _indices; }
+    int getIndices() const { return indices_; }
 
     void printAttr() {
         DLOG(INFO) << "    AtenSetItemAttr     ";
-        DLOG(INFO) << "    indices is          " << _indices;
+        DLOG(INFO) << "    indices is          " << indices_;
     }
 
  private:
-    int _indices = INT32_MAX;
+    int indices_ = INT32_MAX;
 };
 
 }  // namespace ir

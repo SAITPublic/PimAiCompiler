@@ -16,7 +16,7 @@ class AtenContiguousLayer : public NNLayer {
 
     explicit AtenContiguousLayer(const AtenContiguousLayer& aten_contiguous_layer) :
         NNLayer(aten_contiguous_layer) {
-        this->_memory_format  = aten_contiguous_layer._memory_format;
+        this->memory_format_  = aten_contiguous_layer.memory_format_;
     }
 
     virtual ~AtenContiguousLayer() {}
@@ -25,17 +25,17 @@ class AtenContiguousLayer : public NNLayer {
         return  std::shared_ptr<AtenContiguousLayer>(new AtenContiguousLayer(*this));
     }
 
-    void setMemoryFormat(int memory_format) { _memory_format = memory_format; }
+    void setMemoryFormat(int memory_format) { memory_format_ = memory_format; }
 
-    int getMemoryFormat() { return _memory_format; }
+    int getMemoryFormat() { return memory_format_; }
 
     void printAttr() {
         DLOG(INFO) << "    AtenContiguousAttr          ";
-        DLOG(INFO) << "    memory_format is            " << _memory_format;
+        DLOG(INFO) << "    memory_format is            " << memory_format_;
     }
 
  private:
-    int _memory_format = INT32_MAX;
+    int memory_format_ = INT32_MAX;
 };
 
 } // namespace ir

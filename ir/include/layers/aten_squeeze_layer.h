@@ -14,7 +14,7 @@ class AtenSqueezeLayer : public NNLayer {
 
     explicit AtenSqueezeLayer(const AtenSqueezeLayer& aten_squeeze_layer) :
         NNLayer(aten_squeeze_layer) {
-        this->_dim = aten_squeeze_layer._dim;
+        this->dim_ = aten_squeeze_layer.dim_;
     }
 
     virtual ~AtenSqueezeLayer() {}
@@ -23,17 +23,17 @@ class AtenSqueezeLayer : public NNLayer {
         return  std::shared_ptr<AtenSqueezeLayer>(new AtenSqueezeLayer(*this));
     }
 
-    void setDim(int64_t dim) { _dim = dim; }
+    void setDim(int64_t dim) { dim_ = dim; }
 
-    int64_t getDim() const { return _dim; }
+    int64_t getDim() const { return dim_; }
 
     void printAttr() {
         DLOG(INFO) << "    AtenSqueezeAttr    ";
-        DLOG(INFO) << "    dim is              " << _dim;
+        DLOG(INFO) << "    dim is              " << dim_;
     }
 
  private:
-    int64_t _dim = INT64_MIN;
+    int64_t dim_ = INT64_MIN;
 };
 
 } // namespace ir

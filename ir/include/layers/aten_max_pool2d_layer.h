@@ -15,11 +15,11 @@ class AtenMaxPool2dLayer : public NNLayer {
 
     explicit AtenMaxPool2dLayer(const AtenMaxPool2dLayer &aten_max_pool2d_layer) :
         NNLayer(aten_max_pool2d_layer) {
-        this->_kernel_size = aten_max_pool2d_layer._kernel_size;
-        this->_pad = aten_max_pool2d_layer._pad;
-        this->_stride = aten_max_pool2d_layer._stride;
-        this->_dilation = aten_max_pool2d_layer._dilation;
-        this->_ceil_mode = aten_max_pool2d_layer._ceil_mode;
+        this->kernel_size_ = aten_max_pool2d_layer.kernel_size_;
+        this->pad_ = aten_max_pool2d_layer.pad_;
+        this->stride_ = aten_max_pool2d_layer.stride_;
+        this->dilation_ = aten_max_pool2d_layer.dilation_;
+        this->ceil_mode_ = aten_max_pool2d_layer.ceil_mode_;
     }
 
     virtual ~AtenMaxPool2dLayer() {}
@@ -28,49 +28,49 @@ class AtenMaxPool2dLayer : public NNLayer {
         return std::shared_ptr<AtenMaxPool2dLayer>(new AtenMaxPool2dLayer(*this));
     }
 
-    void setKernelSize(const std::vector<int64_t> &kernel_size) { _kernel_size = kernel_size; }
+    void setKernelSize(const std::vector<int64_t> &kernel_size) { kernel_size_ = kernel_size; }
 
-    void setPad(const std::vector<int64_t> &pad) { _pad = pad; }
+    void setPad(const std::vector<int64_t> &pad) { pad_ = pad; }
 
-    void setStride(const std::vector<int64_t> &stride) { _stride = stride; }
+    void setStride(const std::vector<int64_t> &stride) { stride_ = stride; }
 
-    void setDilation(const std::vector<int64_t> &dilation) { _dilation = dilation; }
+    void setDilation(const std::vector<int64_t> &dilation) { dilation_ = dilation; }
 
-    void setCeilMode(int ceil_mode) { _ceil_mode = ceil_mode; }
+    void setCeilMode(int ceil_mode) { ceil_mode_ = ceil_mode; }
 
-    const std::vector<int64_t> &getKernelSize() const { return _kernel_size; }
+    const std::vector<int64_t> &getKernelSize() const { return kernel_size_; }
 
-    const std::vector<int64_t> &getStride() const { return _stride; }
+    const std::vector<int64_t> &getStride() const { return stride_; }
 
-    const std::vector<int64_t> &getDilation() const { return _dilation; }
+    const std::vector<int64_t> &getDilation() const { return dilation_; }
 
-    const std::vector<int64_t> &getPad() const { return _pad; }
+    const std::vector<int64_t> &getPad() const { return pad_; }
 
-    int getCeilMode() const { return _ceil_mode; }
+    int getCeilMode() const { return ceil_mode_; }
 
     void printAttr() {
         DLOG(INFO) << "  AtemMaxPool2dAttr";
-        DLOG(INFO) << "  Kernel size are  " << _kernel_size[0];
-        DLOG(INFO) << "                   " << _kernel_size[1];
-        DLOG(INFO) << "  Pad are          " << _pad[0];
-        DLOG(INFO) << "                   " << _pad[1];
-        DLOG(INFO) << "  Stride are       " << _stride[0];
-        DLOG(INFO) << "                   " << _stride[1];
-        DLOG(INFO) << "  Dilation are     " << _dilation[0];
-        DLOG(INFO) << "                   " << _dilation[1];
-        DLOG(INFO) << "  ceil_mode is     " << _ceil_mode;
+        DLOG(INFO) << "  Kernel size are  " << kernel_size_[0];
+        DLOG(INFO) << "                   " << kernel_size_[1];
+        DLOG(INFO) << "  Pad are          " << pad_[0];
+        DLOG(INFO) << "                   " << pad_[1];
+        DLOG(INFO) << "  Stride are       " << stride_[0];
+        DLOG(INFO) << "                   " << stride_[1];
+        DLOG(INFO) << "  Dilation are     " << dilation_[0];
+        DLOG(INFO) << "                   " << dilation_[1];
+        DLOG(INFO) << "  ceil_mode is     " << ceil_mode_;
     }
 
  private:
-    std::vector<int64_t> _kernel_size = {INT64_MIN, INT64_MIN};
+    std::vector<int64_t> kernel_size_ = {INT64_MIN, INT64_MIN};
 
-    std::vector<int64_t> _stride = {INT64_MIN, INT64_MIN};
+    std::vector<int64_t> stride_ = {INT64_MIN, INT64_MIN};
 
-    std::vector<int64_t> _pad = {INT64_MIN, INT64_MIN, INT64_MIN, INT64_MIN};
+    std::vector<int64_t> pad_ = {INT64_MIN, INT64_MIN, INT64_MIN, INT64_MIN};
 
-    std::vector<int64_t> _dilation = {INT64_MIN, INT64_MIN};
+    std::vector<int64_t> dilation_ = {INT64_MIN, INT64_MIN};
 
-    int _ceil_mode = INT32_MAX;
+    int ceil_mode_ = INT32_MAX;
 };
 
 } // namespace ir

@@ -16,11 +16,11 @@ class AtenEmbeddingLayer : public NNLayer {
 
     explicit AtenEmbeddingLayer(const AtenEmbeddingLayer &aten_embedding_layer) :
         NNLayer(aten_embedding_layer) {
-        this->_weights = aten_embedding_layer._weights;
-        this->_weights_shape = aten_embedding_layer._weights_shape;
-        this->_padding_idx = aten_embedding_layer._padding_idx;
-        this->_sparse = aten_embedding_layer._sparse;
-        this->_scale_grad_by_freq = aten_embedding_layer._scale_grad_by_freq;
+        this->weights_ = aten_embedding_layer.weights_;
+        this->weights_shape_ = aten_embedding_layer.weights_shape_;
+        this->padding_idx_ = aten_embedding_layer.padding_idx_;
+        this->sparse_ = aten_embedding_layer.sparse_;
+        this->scale_grad_by_freq_ = aten_embedding_layer.scale_grad_by_freq_;
     }
 
     virtual ~AtenEmbeddingLayer() {}
@@ -29,39 +29,39 @@ class AtenEmbeddingLayer : public NNLayer {
         return std::shared_ptr<AtenEmbeddingLayer>(new AtenEmbeddingLayer(*this));
     }
 
-    void setWeights(std::vector<at::Tensor> weights) { _weights = weights; }
+    void setWeights(std::vector<at::Tensor> weights) { weights_ = weights; }
 
-    std::vector<at::Tensor> getWeights() { return _weights; }
+    std::vector<at::Tensor> getWeights() { return weights_; }
 
-    void setWeightsShape(std::vector<int> weights_shape) { _weights_shape = weights_shape; }
+    void setWeightsShape(std::vector<int> weights_shape) { weights_shape_ = weights_shape; }
 
-    std::vector<int> getWeightsShape() { return _weights_shape; }
+    std::vector<int> getWeightsShape() { return weights_shape_; }
 
-    void setPaddingIdx(int64_t padding_idx) { _padding_idx = padding_idx; }
+    void setPaddingIdx(int64_t padding_idx) { padding_idx_ = padding_idx; }
 
-    int64_t getPaddingIdx() const { return _padding_idx; }
+    int64_t getPaddingIdx() const { return padding_idx_; }
 
-    void setScaleGrad(int scale_grad_by_freq) { _scale_grad_by_freq = scale_grad_by_freq; }
+    void setScaleGrad(int scale_grad_by_freq) { scale_grad_by_freq_ = scale_grad_by_freq; }
 
-    int getScaleGrad() const { return _scale_grad_by_freq; }
+    int getScaleGrad() const { return scale_grad_by_freq_; }
 
-    void setSparse(int sparse) { _sparse = sparse; }
+    void setSparse(int sparse) { sparse_ = sparse; }
 
-    int getSparse() const { return _sparse; }
+    int getSparse() const { return sparse_; }
 
     void printAttr() {
         DLOG(INFO) << "    AtenEmbeddingAttr      ";
-        DLOG(INFO) << "    padding_idx is         "<< _padding_idx;
-        DLOG(INFO) << "    scale_grad_by_freq is  "<< _scale_grad_by_freq;
-        DLOG(INFO) << "    sparse is              "<< _sparse;
+        DLOG(INFO) << "    padding_idx is         "<< padding_idx_;
+        DLOG(INFO) << "    scale_grad_by_freq is  "<< scale_grad_by_freq_;
+        DLOG(INFO) << "    sparse is              "<< sparse_;
     }
 
  private:
-    std::vector<at::Tensor> _weights;
-    std::vector<int> _weights_shape;
-    int64_t  _padding_idx       = INT64_MIN;
-    int     _scale_grad_by_freq = INT32_MAX;
-    int     _sparse             = INT32_MAX;
+    std::vector<at::Tensor> weights_;
+    std::vector<int> weights_shape_;
+    int64_t  padding_idx_       = INT64_MIN;
+    int     scale_grad_by_freq_ = INT32_MAX;
+    int     sparse_             = INT32_MAX;
 };
 
 } // namespace ir

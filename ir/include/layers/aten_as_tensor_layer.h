@@ -16,8 +16,8 @@ class AtenAsTensorLayer : public NNLayer {
 
     explicit AtenAsTensorLayer(const AtenAsTensorLayer& aten_as_tensor_layer) : 
         NNLayer(aten_as_tensor_layer) {
-        this->_dtype  = aten_as_tensor_layer._dtype;
-        this->_device = aten_as_tensor_layer._device;
+        this->dtype_  = aten_as_tensor_layer.dtype_;
+        this->device_ = aten_as_tensor_layer.device_;
     }
 
     virtual ~AtenAsTensorLayer() {}
@@ -26,23 +26,23 @@ class AtenAsTensorLayer : public NNLayer {
         return  std::shared_ptr<AtenAsTensorLayer>(new AtenAsTensorLayer(*this));
     }
 
-    void setDtype(int64_t dtype) { _dtype = dtype; }
+    void setDtype(int64_t dtype) { dtype_ = dtype; }
 
-    int64_t getDtype() const { return _dtype; }
+    int64_t getDtype() const { return dtype_; }
 
-    void setDevice(std::string device) { _device = device; }
+    void setDevice(std::string device) { device_ = device; }
 
-    std::string getDevice() const { return _device; }
+    std::string getDevice() const { return device_; }
 
     void printAttr() {
         DLOG(INFO) << "    AtenAsTensorAttr       ";
-        DLOG(INFO) << "    dtype is               " << _dtype;
-        DLOG(INFO) << "    device is              " << _device;
+        DLOG(INFO) << "    dtype is               " << dtype_;
+        DLOG(INFO) << "    device is              " << device_;
     }
 
  private:
-    int64_t _dtype      = INT64_MIN;
-    std::string _device = "";
+    int64_t dtype_      = INT64_MIN;
+    std::string device_ = "";
 };
 
 } // namespace ir

@@ -18,10 +18,10 @@ class AtenTopkLayer : public NNLayer {
 
     explicit AtenTopkLayer(const AtenTopkLayer& aten_topk_layer) :
         NNLayer(aten_topk_layer) {
-        this->_k       = aten_topk_layer._k;
-        this->_dim     = aten_topk_layer._dim;
-        this->_largest = aten_topk_layer._largest;
-        this->_sorted  = aten_topk_layer._sorted;
+        this->k_       = aten_topk_layer.k_;
+        this->dim_     = aten_topk_layer.dim_;
+        this->largest_ = aten_topk_layer.largest_;
+        this->sorted_  = aten_topk_layer.sorted_;
     }
 
     virtual ~AtenTopkLayer() {}
@@ -30,35 +30,35 @@ class AtenTopkLayer : public NNLayer {
         return  std::shared_ptr<AtenTopkLayer>(new AtenTopkLayer(*this));
     }
 
-    void setK(int k) { _k = k; }
+    void setK(int k) { k_ = k; }
 
-    int getK() { return _k; }
+    int getK() { return k_; }
 
-    void setDim(int dim) { _dim = dim; }
+    void setDim(int dim) { dim_ = dim; }
 
-    int getDim() { return _dim; }
+    int getDim() { return dim_; }
 
-    void setLargest(int largest) { _largest = largest; }
+    void setLargest(int largest) { largest_ = largest; }
 
-    int getLargest() { return _largest; }
+    int getLargest() { return largest_; }
 
-    void setSorted(int sorted) { _sorted = sorted; }
+    void setSorted(int sorted) { sorted_ = sorted; }
 
-    int getSorted() { return _sorted; }
+    int getSorted() { return sorted_; }
 
     void printAttr() {
         DLOG(INFO) << "    AtenTopkAttr    ";
-        DLOG(INFO) << "    k is            "<< _k;
-        DLOG(INFO) << "    dim is          "<< _dim;
-        DLOG(INFO) << "    largest is      "<< _largest;
-        DLOG(INFO) << "    sorted is       "<< _sorted;
+        DLOG(INFO) << "    k is            "<< k_;
+        DLOG(INFO) << "    dim is          "<< dim_;
+        DLOG(INFO) << "    largest is      "<< largest_;
+        DLOG(INFO) << "    sorted is       "<< sorted_;
     }
 
  private:
-    int _k       = INT32_MAX;
-    int _dim     = INT32_MAX;
-    int _largest = INT32_MAX;
-    int _sorted  = INT32_MAX;
+    int k_       = INT32_MAX;
+    int dim_     = INT32_MAX;
+    int largest_ = INT32_MAX;
+    int sorted_  = INT32_MAX;
 };
 
 }  // namespace ir

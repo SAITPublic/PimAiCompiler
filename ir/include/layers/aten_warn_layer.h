@@ -20,7 +20,7 @@ class AtenWarnLayer : public NNLayer {
 
     explicit AtenWarnLayer(const AtenWarnLayer& aten_warn_layer) :
         NNLayer(aten_warn_layer) {
-        this->_value = aten_warn_layer._value;
+        this->value_ = aten_warn_layer.value_;
     }
 
     virtual ~AtenWarnLayer() {}
@@ -29,17 +29,17 @@ class AtenWarnLayer : public NNLayer {
         return  std::shared_ptr<AtenWarnLayer>(new AtenWarnLayer(*this));
     }
 
-    void setValue(int value) { _value = value; }
+    void setValue(int value) { value_ = value; }
 
-    int getValue() const { return _value; }
+    int getValue() const { return value_; }
 
     void printAttr() {
         DLOG(INFO) << "      AtenWarnAttr     ";
-        DLOG(INFO) << "      value is         "<< _value;
+        DLOG(INFO) << "      value is         "<< value_;
     }
 
  private:
-    int _value = INT32_MAX;
+    int value_ = INT32_MAX;
 };
 
 }  // namespace ir
