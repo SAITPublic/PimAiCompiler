@@ -9,28 +9,15 @@
  */
 
 /**
- * @file.    common.hpp
- * @brief.   This file define primitive headers.
- * @details. This header includes standard includes
- * @version. 0.1.
+ * @file.    types.hpp
+ * @details. This header defines primitive types for NN compiler
  */
 
 #pragma once
 
-#include <algorithm>
-#include <cmath>
-#include <fstream>
-#include <iostream>
-#include <list>
-#include <map>
-#include <memory>
-#include <queue>
-#include <set>
-#include <sstream>
-#include <stack>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string>
-#include <tuple>
-#include <unordered_set>
-#include <vector>
+#include "common/include/common.hpp"
+
+enum class RetVal {
+    SUCCESS = 0,
+    FAILURE = 1,
+};
