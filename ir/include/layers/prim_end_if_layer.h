@@ -7,7 +7,6 @@ namespace nn_compiler
 {
 namespace ir
 {
-
 // def zeros(g, sizes, dtype, layout, device, pin_memory=False)
 
 class PrimEndIfLayer : public NNLayer
@@ -20,7 +19,8 @@ class PrimEndIfLayer : public NNLayer
      */
     PrimEndIfLayer(std::string name, LayerType type) : NNLayer(name, type) {}
 
-    explicit PrimEndIfLayer(const PrimEndIfLayer& prim_end_if_layer) : NNLayer(prim_end_if_layer) {
+    explicit PrimEndIfLayer(const PrimEndIfLayer& prim_end_if_layer) : NNLayer(prim_end_if_layer)
+    {
         goto_layer_ = prim_end_if_layer.goto_layer_;
         is_else_net_ = prim_end_if_layer.is_else_net_;
         if_layer_id_ = prim_end_if_layer.if_layer_id_;

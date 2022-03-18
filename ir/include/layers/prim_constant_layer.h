@@ -3,23 +3,23 @@
 #include "ir/include/layers/nn_layer.h"
 #include "ir/include/tensors/data_tensor.h"
 
-namespace nn_compiler {
-namespace ir {
-
-class PrimConstantLayer : public NNLayer {
- public:
+namespace nn_compiler
+{
+namespace ir
+{
+class PrimConstantLayer : public NNLayer
+{
+   public:
     /**
      * @brief PrimConstantLayer constructor
      * @param name the name of the layer
      * @param type the type of the layer
      */
 
-    PrimConstantLayer(std::string name, LayerType type)
-            : NNLayer(name, type) {
-    }
+    PrimConstantLayer(std::string name, LayerType type) : NNLayer(name, type) {}
 
-    explicit PrimConstantLayer(const PrimConstantLayer& constant_layer) :
-        NNLayer(constant_layer) {
+    explicit PrimConstantLayer(const PrimConstantLayer& constant_layer) : NNLayer(constant_layer)
+    {
         value_ = constant_layer.value_;
         ntype_ = constant_layer.ntype_;
         to_remove_ = constant_layer.to_remove_;
@@ -27,39 +27,26 @@ class PrimConstantLayer : public NNLayer {
 
     virtual ~PrimConstantLayer() {}
 
-    virtual std::shared_ptr<NNLayer> clone() {
-        return  std::shared_ptr<PrimConstantLayer>(new PrimConstantLayer(*this));
+    virtual std::shared_ptr<NNLayer> clone()
+    {
+        return std::shared_ptr<PrimConstantLayer>(new PrimConstantLayer(*this));
     }
 
-    void printAttr() {
-        DLOG(INFO) << "      PrimConstantAttr     ";
-    }
+    void printAttr() { DLOG(INFO) << "      PrimConstantAttr     "; }
 
-    void setAttr(std::shared_ptr<DTensor>  data) {
-        value_ = *data;
-    }
+    void setAttr(std::shared_ptr<DTensor> data) { value_ = *data; }
 
-    std::shared_ptr<DTensor> getAttr() {
-        return value_.clone();
-    }
+    std::shared_ptr<DTensor> getAttr() { return value_.clone(); }
 
-    void setNType(std::string& ntype) {
-        ntype_ = ntype;
-    }
+    void setNType(std::string& ntype) { ntype_ = ntype; }
 
-    std::string getNType() const {
-        return ntype_;
-    }
+    std::string getNType() const { return ntype_; }
 
-    void setToRemove(bool to_remove) {
-        to_remove_ = to_remove;
-    }
+    void setToRemove(bool to_remove) { to_remove_ = to_remove; }
 
-    bool getToRemove() {
-        return to_remove_;
-    }
+    bool getToRemove() { return to_remove_; }
 
- private:
+   private:
     // type : str/device/int/bool/float/Tensor/None/
     // use DTensor store all the type.
     DTensor value_;

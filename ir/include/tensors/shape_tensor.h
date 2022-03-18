@@ -18,7 +18,6 @@ namespace nn_compiler
 {
 namespace ir
 {
-
 class STensor
 {
    public:

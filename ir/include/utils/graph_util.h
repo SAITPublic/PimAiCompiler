@@ -9,7 +9,6 @@ namespace nn_compiler
 {
 namespace ir
 {
-
 bool isSingleValueType(DataType data_type);
 
 int32_t inferBitwidth(DataType type);

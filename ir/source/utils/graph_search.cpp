@@ -1,11 +1,12 @@
 #include "ir/include/utils/graph_search.h"
 
-namespace nn_compiler {
-namespace ir {
-
-std::vector<std::shared_ptr<ir::NNLayer>>
-searchPredecessor(const std::shared_ptr<ir::NNLayer> layer,
-                  const std::unique_ptr<ir::NNModel> &nn_model) {
+namespace nn_compiler
+{
+namespace ir
+{
+std::vector<std::shared_ptr<ir::NNLayer>> searchPredecessor(const std::shared_ptr<ir::NNLayer> layer,
+                                                            const std::unique_ptr<ir::NNModel> &nn_model)
+{
     std::vector<std::shared_ptr<ir::NNLayer>> vec;
     auto graphs = nn_model->getGraphs();
 
@@ -27,9 +28,9 @@ searchPredecessor(const std::shared_ptr<ir::NNLayer> layer,
     return vec;
 }
 
-std::vector<std::shared_ptr<ir::NNLayer>>
-searchPredecessor(const std::shared_ptr<ir::NNLayer> layer,
-                  const std::shared_ptr<ir::NNNetwork> graph) {
+std::vector<std::shared_ptr<ir::NNLayer>> searchPredecessor(const std::shared_ptr<ir::NNLayer> layer,
+                                                            const std::shared_ptr<ir::NNNetwork> graph)
+{
     std::vector<std::shared_ptr<ir::NNLayer>> vec;
     auto in_tensor_ids = layer->getInSTensorID();
     for (auto in_tensor_id : in_tensor_ids) {
@@ -47,9 +48,9 @@ searchPredecessor(const std::shared_ptr<ir::NNLayer> layer,
     return vec;
 }
 
-std::vector<std::shared_ptr<ir::NNLayer>>
-searchSuccessorLayerOnly(const std::shared_ptr<ir::NNLayer> layer,
-                         const std::shared_ptr<ir::NNNetwork> graph) {
+std::vector<std::shared_ptr<ir::NNLayer>> searchSuccessorLayerOnly(const std::shared_ptr<ir::NNLayer> layer,
+                                                                   const std::shared_ptr<ir::NNNetwork> graph)
+{
     std::vector<std::shared_ptr<ir::NNLayer>> ret;
 
     auto out_tensor_ids = layer->getOutSTensorID();
@@ -68,10 +69,10 @@ searchSuccessorLayerOnly(const std::shared_ptr<ir::NNLayer> layer,
     return ret;
 }
 
-std::map<std::shared_ptr<ir::NNLayer>, uint32_t >
-searchSuccessor(const std::shared_ptr<ir::NNLayer> layer,
-                const std::shared_ptr<ir::NNNetwork> graph) {
-std::map<std::shared_ptr<ir::NNLayer>, uint32_t > ret;
+std::map<std::shared_ptr<ir::NNLayer>, uint32_t> searchSuccessor(const std::shared_ptr<ir::NNLayer> layer,
+                                                                 const std::shared_ptr<ir::NNNetwork> graph)
+{
+    std::map<std::shared_ptr<ir::NNLayer>, uint32_t> ret;
 
     auto out_tensor_ids = layer->getOutSTensorID();
     for (auto out_tensor_id : out_tensor_ids) {
@@ -92,9 +93,9 @@ std::map<std::shared_ptr<ir::NNLayer>, uint32_t > ret;
     return ret;
 }
 
-std::map<std::shared_ptr<ir::NNLayer>, std::vector<uint32_t>>
-searchSuccessors(const std::shared_ptr<ir::NNLayer> layer,
-                 const std::shared_ptr<ir::NNNetwork> graph) {
+std::map<std::shared_ptr<ir::NNLayer>, std::vector<uint32_t>> searchSuccessors(
+    const std::shared_ptr<ir::NNLayer> layer, const std::shared_ptr<ir::NNNetwork> graph)
+{
     std::map<std::shared_ptr<ir::NNLayer>, std::vector<uint32_t>> ret;
 
     auto out_tensor_ids = layer->getOutSTensorID();
@@ -121,8 +122,8 @@ searchSuccessors(const std::shared_ptr<ir::NNLayer> layer,
     return ret;
 }
 
-std::shared_ptr<ir::NNLayer>
-searchLayerByOutID(uint32_t out_id, const std::shared_ptr<ir::NNNetwork> graph) {
+std::shared_ptr<ir::NNLayer> searchLayerByOutID(uint32_t out_id, const std::shared_ptr<ir::NNNetwork> graph)
+{
     for (auto cur_layer : graph->getLayers()) {
         auto cur_out_ids = cur_layer->getOutSTensorID();
         if (std::count(cur_out_ids.begin(), cur_out_ids.end(), out_id)) {

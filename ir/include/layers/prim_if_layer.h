@@ -6,7 +6,6 @@ namespace nn_compiler
 {
 namespace ir
 {
-
 // def zeros(g, sizes, dtype, layout, device, pin_memory=False)
 
 class PrimIfLayer : public NNLayer
@@ -17,9 +16,7 @@ class PrimIfLayer : public NNLayer
      * @param name the name of the layer
      * @param type the type of the layer
      */
-    PrimIfLayer(std::string name, LayerType type)
-            : NNLayer(name, type) {
-    }
+    PrimIfLayer(std::string name, LayerType type) : NNLayer(name, type) {}
 
     explicit PrimIfLayer(const PrimIfLayer& prim_if_layer) : NNLayer(prim_if_layer)
     {

@@ -2,28 +2,29 @@
 
 #include "ir/include/layers/nn_layer.h"
 
-namespace nn_compiler {
-namespace ir {
-
-class PrimLoopIndexLayer : public NNLayer {
- public:
+namespace nn_compiler
+{
+namespace ir
+{
+class PrimLoopIndexLayer : public NNLayer
+{
+   public:
     /**
      * @brief PrimLoopIndexLayer constructor
      * @param name the name of the layer
      * @param type the type of the layer
      */
-    PrimLoopIndexLayer(std::string name, LayerType type)
-            : NNLayer(name, type) {
-    }
+    PrimLoopIndexLayer(std::string name, LayerType type) : NNLayer(name, type) {}
 
-    explicit PrimLoopIndexLayer(const PrimLoopIndexLayer& prim_loop_index_layer) :
-        NNLayer(prim_loop_index_layer) {
+    explicit PrimLoopIndexLayer(const PrimLoopIndexLayer& prim_loop_index_layer) : NNLayer(prim_loop_index_layer)
+    {
         index_ = prim_loop_index_layer.index_;
     }
 
     virtual ~PrimLoopIndexLayer() {}
 
-    virtual std::shared_ptr<NNLayer> clone() {
+    virtual std::shared_ptr<NNLayer> clone()
+    {
         return std::shared_ptr<PrimLoopIndexLayer>(new PrimLoopIndexLayer(*this));
     }
 
@@ -31,11 +32,9 @@ class PrimLoopIndexLayer : public NNLayer {
 
     int64_t getIndex() { return index_; }
 
-    void printAttr() {
-        DLOG(INFO) << "     PrimLoopIndexAttr    ";
-    }
+    void printAttr() { DLOG(INFO) << "     PrimLoopIndexAttr    "; }
 
- private:
+   private:
     int64_t index_ = INT64_MIN;
 };
 

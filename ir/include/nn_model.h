@@ -18,23 +18,21 @@
 #include "ir/include/nn_network.h"
 #include "ir/include/tensors/torch_shape_tensor.h"
 
-namespace nn_compiler {
-namespace ir {
+namespace nn_compiler
+{
+namespace ir
+{
+class NNModel
+{
+   public:
+    NNModel() {}
 
-class NNModel {
- public:
-    NNModel() {
-    }
+    void appendGraph(const std::shared_ptr<NNNetwork> graph) { graphs_.push_back(graph); }
 
-    void appendGraph(const std::shared_ptr<NNNetwork> graph) {
-        graphs_.push_back(graph);
-    }
+    void removeGraphs() { graphs_.clear(); }
 
-    void removeGraphs() {
-        graphs_.clear();
-    }
-
-    void removeGraph(const std::string& graph_name) {
+    void removeGraph(const std::string& graph_name)
+    {
         for (auto iter = graphs_.begin(); iter != graphs_.end();) {
             if ((*iter)->getName() == graph_name) {
                 iter = graphs_.erase(iter);
@@ -44,27 +42,20 @@ class NNModel {
         }
     }
 
-    void reverseGraphs() {
-        std::reverse(graphs_.begin(), graphs_.end());
-    }
+    void reverseGraphs() { std::reverse(graphs_.begin(), graphs_.end()); }
 
-    std::vector<std::shared_ptr<NNNetwork>> getGraphs() {
-        return graphs_;
-    }
+    std::vector<std::shared_ptr<NNNetwork>> getGraphs() { return graphs_; }
 
-    void addTSSTensor(std::pair<uint32_t, std::shared_ptr<TSSTensor>> shape_tensor) {
+    void addTSSTensor(std::pair<uint32_t, std::shared_ptr<TSSTensor>> shape_tensor)
+    {
         shape_tensors_.insert(shape_tensor);
     }
 
-    void deleteTSSTensor(uint32_t shape_tensor_id) {
-        shape_tensors_.erase(shape_tensor_id);
-    }
+    void deleteTSSTensor(uint32_t shape_tensor_id) { shape_tensors_.erase(shape_tensor_id); }
 
-    std::map<uint32_t, std::shared_ptr<TSSTensor>> getTSSTensors() {
-        return shape_tensors_;
-    }
+    std::map<uint32_t, std::shared_ptr<TSSTensor>> getTSSTensors() { return shape_tensors_; }
 
- private:
+   private:
     std::vector<std::shared_ptr<NNNetwork>> graphs_;
 
     std::map<uint32_t, std::shared_ptr<TSSTensor>> shape_tensors_;

@@ -6,7 +6,6 @@ namespace nn_compiler
 {
 namespace ir
 {
-
 // def zeros(g, sizes, dtype, layout, device, pin_memory=False)
 
 class PrimEndLoopLayer : public NNLayer
@@ -19,7 +18,8 @@ class PrimEndLoopLayer : public NNLayer
      */
     PrimEndLoopLayer(std::string name, LayerType type) : NNLayer(name, type) {}
 
-    explicit PrimEndLoopLayer(const PrimEndLoopLayer& prim_end_loop_layer) : NNLayer(prim_end_loop_layer) {
+    explicit PrimEndLoopLayer(const PrimEndLoopLayer& prim_end_loop_layer) : NNLayer(prim_end_loop_layer)
+    {
         goto_layer_ = prim_end_loop_layer.goto_layer_;
     }
 

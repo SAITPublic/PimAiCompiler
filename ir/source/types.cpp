@@ -4,7 +4,8 @@ namespace nn_compiler
 {
 namespace ir
 {
-std::string convertLayerTypeToString(LayerType type) {
+std::string convertLayerTypeToString(LayerType type)
+{
     static std::unordered_map<LayerType, std::string> converter;
     converter.insert({LayerType::ATENADD, "aten::add"});
     converter.insert({LayerType::ATENADDMM, "aten::addmm"});

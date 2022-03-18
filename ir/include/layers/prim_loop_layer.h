@@ -6,7 +6,6 @@ namespace nn_compiler
 {
 namespace ir
 {
-
 class PrimLoopLayer : public NNLayer
 {
    public:
@@ -15,9 +14,7 @@ class PrimLoopLayer : public NNLayer
      * @param name the name of the layer
      * @param type the type of the layer
      */
-    PrimLoopLayer(std::string name, LayerType type)
-            : NNLayer(name, type) {
-    }
+    PrimLoopLayer(std::string name, LayerType type) : NNLayer(name, type) {}
 
     explicit PrimLoopLayer(const PrimLoopLayer& prim_loop_layer) : NNLayer(prim_loop_layer)
     {

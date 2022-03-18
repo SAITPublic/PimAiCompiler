@@ -1,11 +1,12 @@
-#include "ir/include/utils/graph_search.h"
 #include "ir/include/utils/graph_transform.h"
+#include "ir/include/utils/graph_search.h"
 
-
-namespace nn_compiler {
-namespace ir {
-
-void deleteLayer(std::shared_ptr<ir::NNNetwork> graph, std::shared_ptr<ir::NNLayer> layer) {
+namespace nn_compiler
+{
+namespace ir
+{
+void deleteLayer(std::shared_ptr<ir::NNNetwork> graph, std::shared_ptr<ir::NNLayer> layer)
+{
     auto cur_in_ids = layer->getInSTensorID();
     CHECK_EQ(cur_in_ids.size(), 1) << " not supported case";
 

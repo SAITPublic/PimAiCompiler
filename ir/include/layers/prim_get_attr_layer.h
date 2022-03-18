@@ -1,40 +1,36 @@
 #pragma once
 
-#include "ir/include/tensors/data_tensor.h"
 #include "ir/include/layers/nn_layer.h"
+#include "ir/include/tensors/data_tensor.h"
 
-namespace nn_compiler {
-namespace ir {
-
-class PrimGetAttrLayer : public NNLayer {
- public:
+namespace nn_compiler
+{
+namespace ir
+{
+class PrimGetAttrLayer : public NNLayer
+{
+   public:
     /**
      * @brief PrimGetAttrLayer constructor
      * @param name the name of the layer
      * @param type the type of the layer
      */
 
-    PrimGetAttrLayer(std::string name, LayerType type)
-            : NNLayer(name, type) {
-    }
+    PrimGetAttrLayer(std::string name, LayerType type) : NNLayer(name, type) {}
 
-    explicit PrimGetAttrLayer(const PrimGetAttrLayer& get_attr_layer) :
-        NNLayer(get_attr_layer) {
+    explicit PrimGetAttrLayer(const PrimGetAttrLayer& get_attr_layer) : NNLayer(get_attr_layer)
+    {
         this->values_ = get_attr_layer.values_;
-        this->ntype_  = get_attr_layer.ntype_;
+        this->ntype_ = get_attr_layer.ntype_;
     }
 
     virtual ~PrimGetAttrLayer() {}
 
-    virtual std::shared_ptr<NNLayer> clone() {
-        return std::shared_ptr<PrimGetAttrLayer>(new PrimGetAttrLayer(*this));
-    }
+    virtual std::shared_ptr<NNLayer> clone() { return std::shared_ptr<PrimGetAttrLayer>(new PrimGetAttrLayer(*this)); }
 
-    void printAttr() {
-        DLOG(INFO) << "      PrimGetAttrAttr     ";
-    }
+    void printAttr() { DLOG(INFO) << "      PrimGetAttrAttr     "; }
 
- private:
+   private:
     std::vector<std::shared_ptr<DTensor>> values_;
     std::string ntype_;
 };

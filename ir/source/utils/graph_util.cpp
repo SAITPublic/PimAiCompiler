@@ -2,17 +2,20 @@
 
 #include "ir/include/utils/graph_util.h"
 
-namespace nn_compiler {
-namespace ir {
-
-bool isSingleValueType(DataType data_type) {
+namespace nn_compiler
+{
+namespace ir
+{
+bool isSingleValueType(DataType data_type)
+{
     return (data_type == DataType::INT8 || data_type == DataType::UINT8 || data_type == DataType::INT16 ||
             data_type == DataType::UINT16 || data_type == DataType::INT32 || data_type == DataType::INT64 ||
             data_type == DataType::FLOAT16 || data_type == DataType::FLOAT32 || data_type == DataType::FLOAT64 ||
             data_type == DataType::BOOL);
 }
 
-int32_t inferBitwidth(DataType type) {
+int32_t inferBitwidth(DataType type)
+{
     int32_t bitwidth = 8;
     switch (type) {
         case DataType::INT8:
@@ -41,44 +44,46 @@ int32_t inferBitwidth(DataType type) {
     return bitwidth;
 }
 
-std::string ConvertDataType(const DataType previous_type) {
+std::string ConvertDataType(const DataType previous_type)
+{
     switch (previous_type) {
-        case INT8 :
+        case INT8:
             return "int8";
-        case UINT8 :
+        case UINT8:
             return "uint8";
-        case INT16 :
+        case INT16:
             return "int16";
-        case UINT16 :
+        case UINT16:
             return "uint16";
-        case INT32 :
+        case INT32:
             return "int32";
-        case INT64 :
+        case INT64:
             return "int64";
-        case FLOAT16 :
+        case FLOAT16:
             return "float16";
-        case FLOAT32 :
+        case FLOAT32:
             return "float32";
-        case FLOAT64 :
+        case FLOAT64:
             return "float64";
-        case BOOL :
+        case BOOL:
             return "bool";
-        case STRING :
+        case STRING:
             return "string";
-        case DEVICE :
+        case DEVICE:
             return "device";
-        case TENSOR :
+        case TENSOR:
             return "Tensor";
-        case NONE :
+        case NONE:
             return "None";
-        case LIST :
+        case LIST:
             return "List";
-        default :
+        default:
             return "undefined";
     }
 }
 
-DataType inferDataType(int32_t bitwidth, std::string data_type) {
+DataType inferDataType(int32_t bitwidth, std::string data_type)
+{
     if (bitwidth == 8 && data_type == "SIGNED") {
         return DataType::INT8;
     }
