@@ -92,7 +92,7 @@ void PipelineManager::load_and_run_rnnt()
                      << "size: " << item.sizes() << " dtype:" << item.dtype() << " device:" << item.device();
     }
     // Inference
-    runtime.inferenceModel(model, input_tensors, output_tensors, is_profiling_);
+    runtime.inferenceModel(input_tensors, output_tensors, is_profiling_);
 }
 
 void PipelineManager::load_and_run_gnmt()
@@ -135,7 +135,7 @@ void PipelineManager::load_and_run_gnmt()
                      << "size: " << item.sizes() << " dtype:" << item.dtype() << " device:" << item.device();
     }
     // Inference
-    runtime.inferenceModel(model, input_tensors, output_tensors, is_profiling_);
+    runtime.inferenceModel(input_tensors, output_tensors, is_profiling_);
 }
 
 void PipelineManager::load_and_run_hwr()
@@ -168,7 +168,7 @@ void PipelineManager::load_and_run_hwr()
                      << "size: " << item.sizes() << " dtype:" << item.dtype() << " device:" << item.device();
     }
     // Inference
-    runtime.inferenceModel(model, input_tensors, output_tensors, is_profiling_);
+    runtime.inferenceModel(input_tensors, output_tensors, is_profiling_);
     // check outputs
     TVComparator& tv_comp = TVComparator::getInstance();
     tv_comp.loadTV("./examples/runtime/resource/hwr/inputs/output_hwr_y_hat_128_1_98.bin", {128, 1, 98},

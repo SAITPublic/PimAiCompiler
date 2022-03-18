@@ -42,13 +42,12 @@ StreamExecutor::~StreamExecutor()
     miopenDestroy(handle_);
 }
 
-RetVal StreamExecutor::preProcess(std::unique_ptr<nn_compiler::ir::NNModel>& model)
+RetVal StreamExecutor::preProcess()
 {
     input_blob_ids_.clear();
     output_blob_ids_.clear();
 
-    auto graph = model->getGraphs()[0];
-    for (auto layer : graph->getLayers()) {
+    for (auto layer : graph_->getLayers()) {
         if (model_type_ == "GNMT" && layer->getType() == nn_compiler::ir::LayerType::ATENCAT) {
             auto cat_layer = std::static_pointer_cast<nn_compiler::ir::AtenCatLayer>(layer);
             auto options = at::TensorOptions().dtype(at::kHalf).device(at::kCUDA);
@@ -96,12 +95,10 @@ RetVal StreamExecutor::preProcess(std::unique_ptr<nn_compiler::ir::NNModel>& mod
     return RetVal::SUCCESS;
 }
 
-RetVal StreamExecutor::inferenceModel(std::unique_ptr<nn_compiler::ir::NNModel>& model,
-                                      const std::vector<torch::Tensor>& input_tensors,
+RetVal StreamExecutor::inferenceModel(const std::vector<torch::Tensor>& input_tensors,
                                       std::vector<torch::Tensor>& output_tensors)
 {
-    auto graph = model->getGraphs()[0];
-    auto layers = graph->getLayers();
+    auto layers = graph_->getLayers();
 
     // Set Input Tensors
     for (auto& in : input_tensors) {
@@ -151,14 +148,12 @@ RetVal StreamExecutor::inferenceModel(std::unique_ptr<nn_compiler::ir::NNModel>&
     return RetVal::SUCCESS;
 }
 
-RetVal StreamExecutor::inferenceModelwithProfiling(std::unique_ptr<nn_compiler::ir::NNModel>& model,
-                                                   const std::vector<torch::Tensor>& input_tensors,
+RetVal StreamExecutor::inferenceModelwithProfiling(const std::vector<torch::Tensor>& input_tensors,
                                                    std::vector<torch::Tensor>& output_tensors)
 {
     ProfileWriter::beginSession("start");
 
-    auto graph = model->getGraphs()[0];
-    auto layers = graph->getLayers();
+    auto layers = graph_->getLayers();
 
     // Set Input Tensors
     for (auto& in : input_tensors) {

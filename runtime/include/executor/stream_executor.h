@@ -33,13 +33,12 @@ class StreamExecutor
 
     ~StreamExecutor();
 
-    RetVal preProcess(std::unique_ptr<nn_compiler::ir::NNModel>& model);
+    RetVal preProcess();
 
-    RetVal inferenceModel(std::unique_ptr<nn_compiler::ir::NNModel>& model,
-                          const std::vector<torch::Tensor>& input_tensors, std::vector<torch::Tensor>& output_tensors);
+    RetVal inferenceModel(const std::vector<torch::Tensor>& input_tensors,
+                          std::vector<torch::Tensor>& output_tensors);
 
-    RetVal inferenceModelwithProfiling(std::unique_ptr<nn_compiler::ir::NNModel>& model,
-                                       const std::vector<torch::Tensor>& input_tensors,
+    RetVal inferenceModelwithProfiling(const std::vector<torch::Tensor>& input_tensors,
                                        std::vector<torch::Tensor>& output_tensors);
 
     void updateBlob(int64_t blob_id, DataType dtype, const torch::jit::IValue& iv);

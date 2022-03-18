@@ -19,14 +19,13 @@ NNRuntime::NNRuntime(std::unique_ptr<nn_compiler::ir::NNModel>& model, std::stri
     mbuilder_->preloadModel(model);
     executor_ = std::make_shared<StreamExecutor>(std::make_pair(model->getGraphs()[0], mbuilder_->getPreLoadedData()),
                                                  model_type_);
-    executor_->preProcess(model);
+    executor_->preProcess();
 
     rocblas_init();
     PimInitialize(RT_TYPE_HIP, PIM_FP16);
 }
 
-void NNRuntime::inferenceModel(std::unique_ptr<nn_compiler::ir::NNModel>& model,
-                               const std::vector<torch::Tensor>& input_tensors,
+void NNRuntime::inferenceModel(const std::vector<torch::Tensor>& input_tensors,
                                std::vector<torch::Tensor>& output_tensors, bool profiling)
 {
     DLOG(INFO) << "numInputs:" << input_tensors.size();
@@ -38,11 +37,11 @@ void NNRuntime::inferenceModel(std::unique_ptr<nn_compiler::ir::NNModel>& model,
     if (profiling) {
         // profiling result of the first running time is not accurate.
         for (int i = 0; i < 10; i++) {
-            status = executor_->inferenceModel(model, input_tensors, output_tensors);
+            status = executor_->inferenceModel(input_tensors, output_tensors);
         }
-        status = executor_->inferenceModelwithProfiling(model, input_tensors, output_tensors);
+        status = executor_->inferenceModelwithProfiling(input_tensors, output_tensors);
     } else {
-        status = executor_->inferenceModel(model, input_tensors, output_tensors);
+        status = executor_->inferenceModel(input_tensors, output_tensors);
     }
 
     if (status != RetVal::SUCCESS) {

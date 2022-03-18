@@ -27,7 +27,7 @@ PipelineManager::PipelineManager(const std::string& input_file_path, std::string
 std::vector<torch::Tensor> PipelineManager::inferenceModel(const std::vector<torch::Tensor>& input_tensors)
 {
     outputs.clear();
-    runtime->inferenceModel(model, input_tensors, outputs, is_profiling_);
+    runtime->inferenceModel(input_tensors, outputs, is_profiling_);
     return outputs;
 }
 

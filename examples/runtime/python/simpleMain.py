@@ -107,7 +107,7 @@ def test_gnmt_inference(input_file : str, src_file : str, src_length_file : str,
     src_length = torch.load(src_length_file).cuda()   # dtype=torch.long
     bos = torch.load(bos_file).cuda()   # dtype=torch.long
     # Init nncompiler
-    nncompiler = NNCompiler.PipelineManager(input_file, compile_level, model_type)
+    nncompiler = NNCompiler.PipelineManager(input_file, model_type)
         # warn-up
     _, _, _ = nncompiler.inferenceModel([src, src_length, bos])
     # Run and test
