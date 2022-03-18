@@ -3,7 +3,7 @@
 #include <unordered_map>
 #include <vector>
 
-#include "runtime/include/executor/prim_ops.h"
+#include "runtime/include/executor/op_executor/prim_ops.h"
 
 namespace nn_compiler
 {

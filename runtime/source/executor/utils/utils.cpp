@@ -3,7 +3,7 @@
 #include <string>
 #include <vector>
 
-#include "runtime/include/executor/utils.h"
+#include "runtime/include/executor/utils/utils.h"
 
 namespace nn_compiler
 {

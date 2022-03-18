@@ -3,7 +3,7 @@
 #include <stdexcept>
 #include <vector>
 
-#include "runtime/include/executor/prim_utils.h"
+#include "runtime/include/executor/utils/prim_utils.h"
 
 namespace fs = std::experimental::filesystem;
 

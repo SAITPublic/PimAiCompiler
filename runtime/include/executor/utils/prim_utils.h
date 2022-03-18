@@ -7,7 +7,7 @@
 
 #include "ir/include/tensors/data_tensor.h"
 #include "ir/include/types.h"
-#include "runtime/include/executor/utils.h"
+#include "runtime/include/executor/utils/utils.h"
 
 namespace nn_compiler
 {

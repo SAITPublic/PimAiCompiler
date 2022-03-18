@@ -1,5 +1,6 @@
-#include "runtime/include/executor/prim_ops_executor.h"
 #include "ir/include/layers/all_layers.h"
+
+#include "runtime/include/executor/op_executor/prim_ops_executor.h"
 
 namespace nn_compiler
 {

@@ -5,7 +5,7 @@
 #include <string>
 #include <unordered_map>
 #include <vector>
-#include "executor/prim_utils.h"
+#include "executor/utils/prim_utils.h"
 
 namespace fs = std::experimental::filesystem;
 

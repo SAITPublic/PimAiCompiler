@@ -12,7 +12,7 @@
 #include "ir/include/nn_network.h"
 #include "ir/include/types.h"
 #include "runtime/include/builder/model_builder.h"
-#include "runtime/include/executor/utils.h"
+#include "runtime/include/executor/utils/utils.h"
 
 namespace nn_compiler
 {

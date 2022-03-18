@@ -3,11 +3,11 @@
 
 #include "c10/hip/HIPFunctions.h"
 #include "ir/include/types.h"
-#include "runtime/include/executor/aten_ops_executor.h"
-#include "runtime/include/executor/prim_ops_executor.h"
-#include "runtime/include/executor/profiler.h"
+#include "runtime/include/executor/op_executor/aten_ops_executor.h"
+#include "runtime/include/executor/op_executor/prim_ops_executor.h"
 #include "runtime/include/executor/stream_executor.h"
-#include "runtime/include/executor/utils.h"
+#include "runtime/include/executor/utils/profiler.h"
+#include "runtime/include/executor/utils/utils.h"
 
 namespace nn_compiler
 {

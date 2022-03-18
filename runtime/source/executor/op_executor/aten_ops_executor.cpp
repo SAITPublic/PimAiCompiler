@@ -7,12 +7,12 @@
 #include "ir/include/types.h"
 #include "ir/include/common/utils.hpp"
 #include "ir/include/layers/all_layers.h"
-#include "runtime/include/executor/aten_ops_executor.h"
-#include "runtime/include/executor/aten_ops.h"
-#include "runtime/include/executor/custom_ops.hpp"
-#include "runtime/include/executor/prim_ops_executor.h"
+#include "runtime/include/executor/op_executor/aten_ops.h"
+#include "runtime/include/executor/op_executor/aten_ops_executor.h"
+#include "runtime/include/executor/op_executor/custom_ops.h"
+#include "runtime/include/executor/op_executor/prim_ops_executor.h"
 #include "runtime/include/executor/stream_executor.h"
-#include "runtime/include/executor/utils.h"
+#include "runtime/include/executor/utils/utils.h"
 #include "pim_runtime_api.h"
 #include "tv_tools.h"
 
@@ -573,6 +573,73 @@ void executorAtenAsTensor(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, Stre
     auto device = at::Device(str_device);
 
     auto output = atenAsTensor(in_tensor, dtype, device);
+    stream_executor.updateBlob(out_stensor_id[0], DataType::TENSOR, tensorToIValue(output));
+}
+
+void executorAtenBatchNorm2d(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
+{
+    DLOG(INFO) << "execute Aten BN2d node";
+
+    auto batch_norm_2d_layer = std::static_pointer_cast<nn_compiler::ir::AtenBatchNorm2dLayer>(layer);
+
+    auto in_stensor_id = layer->getInSTensorID();
+    auto out_stensor_id = layer->getOutSTensorID();
+
+    auto get_tensor = [&stream_executor](int id) {
+        auto blob = stream_executor.findBlob(id);
+        assert(blob.second.isTensor());
+        return blob.second.toTensor();
+    };
+    at::Tensor input = get_tensor(in_stensor_id[0]);
+    at::Tensor running_mean = get_tensor(in_stensor_id[1]);
+    at::Tensor running_var = get_tensor(in_stensor_id[2]);
+
+    auto weight_ids = batch_norm_2d_layer->getWeightIds();
+    auto bias_ids = batch_norm_2d_layer->getBiasIds();
+    assert(weight_ids.size() == 1 && bias_ids.size() == 1);
+    auto weight_iv = stream_executor.findBlob(weight_ids[0]).second;
+    assert(weight_iv.isTensor());
+    at::Tensor weight = weight_iv.toTensor();
+    auto bias_iv = stream_executor.findBlob(bias_ids[0]).second;
+    assert(bias_iv.isTensor());
+    at::Tensor bias = bias_iv.toTensor();
+
+    // Get input attrs
+    int training = batch_norm_2d_layer->getTraining();
+    double monentum = batch_norm_2d_layer->getMomentum();
+    double eps = batch_norm_2d_layer->getEps();
+    int cudnn_enabled = batch_norm_2d_layer->getCudnnEnabled();
+
+    int offest = 3;
+    if (nn_compiler::ir::isDefaultValue(training)) {
+        auto iv = stream_executor.findBlob(in_stensor_id[3]).second;
+        assert(iv.isInt());
+        training = static_cast<int>(iv.toInt());
+    }
+    if (nn_compiler::ir::isDefaultValue(monentum)) {
+        auto iv = stream_executor.findBlob(in_stensor_id[4]).second;
+        assert(iv.isDouble());
+        monentum = iv.toDouble();
+    }
+    if (nn_compiler::ir::isDefaultValue(eps)) {
+        auto iv = stream_executor.findBlob(in_stensor_id[5]).second;
+        assert(iv.isDouble());
+        eps = iv.toDouble();
+    }
+    if (nn_compiler::ir::isDefaultValue(cudnn_enabled)) {
+        auto iv = stream_executor.findBlob(in_stensor_id[6]).second;
+        assert(iv.isInt());
+        cudnn_enabled = static_cast<int>(iv.toInt());
+    }
+
+    if (training == 1) {
+        DLOG(FATAL) << "Currently, NNRuntime only support inference !";
+    }
+
+    // Call kernel
+    auto output = atenBatchNorm2d(input, weight, bias, running_mean, running_var, static_cast<bool>(training), monentum,
+                                  eps, static_cast<bool>(cudnn_enabled));
+    // save outputs
     stream_executor.updateBlob(out_stensor_id[0], DataType::TENSOR, tensorToIValue(output));
 }
 
@@ -4057,73 +4124,6 @@ void executorAtenZerosLike(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, Str
     }
 
     // update output
-    stream_executor.updateBlob(out_stensor_id[0], DataType::TENSOR, tensorToIValue(output));
-}
-
-void executorAtenBatchNorm2d(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
-{
-    DLOG(INFO) << "execute Aten BN2d node";
-
-    auto batch_norm_2d_layer = std::static_pointer_cast<nn_compiler::ir::AtenBatchNorm2dLayer>(layer);
-
-    auto in_stensor_id = layer->getInSTensorID();
-    auto out_stensor_id = layer->getOutSTensorID();
-
-    auto get_tensor = [&stream_executor](int id) {
-        auto blob = stream_executor.findBlob(id);
-        assert(blob.second.isTensor());
-        return blob.second.toTensor();
-    };
-    at::Tensor input = get_tensor(in_stensor_id[0]);
-    at::Tensor running_mean = get_tensor(in_stensor_id[1]);
-    at::Tensor running_var = get_tensor(in_stensor_id[2]);
-
-    auto weight_ids = batch_norm_2d_layer->getWeightIds();
-    auto bias_ids = batch_norm_2d_layer->getBiasIds();
-    assert(weight_ids.size() == 1 && bias_ids.size() == 1);
-    auto weight_iv = stream_executor.findBlob(weight_ids[0]).second;
-    assert(weight_iv.isTensor());
-    at::Tensor weight = weight_iv.toTensor();
-    auto bias_iv = stream_executor.findBlob(bias_ids[0]).second;
-    assert(bias_iv.isTensor());
-    at::Tensor bias = bias_iv.toTensor();
-
-    // Get input attrs
-    int training = batch_norm_2d_layer->getTraining();
-    double monentum = batch_norm_2d_layer->getMomentum();
-    double eps = batch_norm_2d_layer->getEps();
-    int cudnn_enabled = batch_norm_2d_layer->getCudnnEnabled();
-
-    int offest = 3;
-    if (nn_compiler::ir::isDefaultValue(training)) {
-        auto iv = stream_executor.findBlob(in_stensor_id[3]).second;
-        assert(iv.isInt());
-        training = static_cast<int>(iv.toInt());
-    }
-    if (nn_compiler::ir::isDefaultValue(monentum)) {
-        auto iv = stream_executor.findBlob(in_stensor_id[4]).second;
-        assert(iv.isDouble());
-        monentum = iv.toDouble();
-    }
-    if (nn_compiler::ir::isDefaultValue(eps)) {
-        auto iv = stream_executor.findBlob(in_stensor_id[5]).second;
-        assert(iv.isDouble());
-        eps = iv.toDouble();
-    }
-    if (nn_compiler::ir::isDefaultValue(cudnn_enabled)) {
-        auto iv = stream_executor.findBlob(in_stensor_id[6]).second;
-        assert(iv.isInt());
-        cudnn_enabled = static_cast<int>(iv.toInt());
-    }
-
-    if (training == 1) {
-        DLOG(FATAL) << "Currently, NNRuntime only support inference !";
-    }
-
-    // Call kernel
-    auto output = atenBatchNorm2d(input, weight, bias, running_mean, running_var, static_cast<bool>(training), monentum,
-                                  eps, static_cast<bool>(cudnn_enabled));
-    // save outputs
     stream_executor.updateBlob(out_stensor_id[0], DataType::TENSOR, tensorToIValue(output));
 }
 

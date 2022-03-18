@@ -1,7 +1,7 @@
 #include <iostream>
 
 #include "c10/hip/HIPFunctions.h"
-#include "runtime/include/executor/aten_ops.h"
+#include "runtime/include/executor/op_executor/aten_ops.h"
 
 namespace nn_compiler
 {
