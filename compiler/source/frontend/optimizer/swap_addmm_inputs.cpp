@@ -23,7 +23,7 @@ bool SwapAddmmInputs::fitCondition(std::unique_ptr<nn_compiler::ir::NNModel>& mo
         if (layer->getType() == nn_compiler::ir::LayerType::ATENADDMM) {
             auto predecessors = ir::searchPredecessor(layer, graph);
             // at least: bias, input, weight.
-            if (predecessors.size() > 3 && predecessors[2]->getType() == nn_compiler::ir::LayerType::PRIMCONSTANT) {
+            if (predecessors.size() >= 3 && predecessors[2]->getType() == nn_compiler::ir::LayerType::PRIMCONSTANT) {
                 layers_.push_back(layer);
             }
         }
