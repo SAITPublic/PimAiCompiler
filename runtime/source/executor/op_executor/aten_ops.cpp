@@ -1,7 +1,9 @@
 #include <iostream>
 
 #include "c10/hip/HIPFunctions.h"
+#include "pim_runtime_api.h"
 #include "runtime/include/executor/op_executor/aten_ops.h"
+#include "runtime/include/executor/utils/utils.h"
 
 namespace nn_compiler
 {
@@ -502,5 +504,262 @@ at::Tensor atenZeroslike(const at::Tensor &self, at::TensorOptions options,
 {
     return at::zeros_like(self, options, memory_format);
 }
+
+void customAtenAddmm(std::string act_type, at::Tensor &self_tensor, at::Tensor &mat1_tensor,
+                     at::Tensor &mat2_tensor, at::Scalar beta, at::Scalar alpha,
+                     torch::jit::IValue &output_iv)
+{
+    int dim_i0 = mat1_tensor.dim();
+    int dim_i1 = mat2_tensor.dim();
+    int dim_self = self_tensor.dim();
+    int i0_is_vector = 0;
+    int i1_is_vector = 0;
+
+    for (int i = 0; i < dim_i0; ++i) {
+        if (mat1_tensor.size(i) != 1) {
+            i0_is_vector += 1;
+        }
+    }
+
+    for (int i = 0; i < dim_i1; ++i) {
+        if (mat2_tensor.size(i) != 1) {
+            i1_is_vector += 1;
+        }
+    }
+
+    if (i0_is_vector == 1 && i1_is_vector != 1 && dim_i0 > 1) {
+        float alpha = 1.0f;
+        float beta = 0.0f;
+        bool relu = false;
+        int m = 1;
+        if (act_type == "aten::relu") {
+            relu = true;
+        }
+
+        if (!self_tensor.is_contiguous()) self_tensor = self_tensor.contiguous();
+        if (!mat1_tensor.is_contiguous()) mat1_tensor = mat1_tensor.contiguous();
+        if (!mat2_tensor.is_contiguous()) mat2_tensor = mat2_tensor.contiguous();
+
+        int n = mat2_tensor.size(dim_i1 - 1);
+        int k = mat2_tensor.size(dim_i1 - 2);
+
+        _Float16* b = (_Float16*)self_tensor.data_ptr();
+        _Float16* x = (_Float16*)mat1_tensor.data_ptr();
+        _Float16* A = (_Float16*)mat2_tensor.data_ptr();
+        auto options = at::TensorOptions().dtype(at::kHalf).device(at::kCUDA);
+        auto output_shape = mat1_tensor.sizes().vec();
+        output_shape[dim_i0 - 1] = n;
+        output_shape[dim_i0 - 2] = 1;
+        auto output = at::zeros(output_shape, options);
+        _Float16* y = (_Float16*)output.data_ptr();
+
+        PimDesc* pim_desc = PimCreateDesc(1, 1, n, k, PIM_FP16, OP_GEMV);
+        PimBo* dev_op0 = PimCreateBo(pim_desc, MEM_TYPE_DEVICE, GEMV_INPUT, x);
+        PimBo* dev_op1 = PimCreateBo(pim_desc, MEM_TYPE_DEVICE, GEMV_WEIGHT, A);
+        PimBo* dev_op2 = PimCreateBo(pim_desc, MEM_TYPE_DEVICE, GEMV_INPUT, b);
+        PimBo* dev_out = PimCreateBo(pim_desc, MEM_TYPE_DEVICE, GEMV_OUTPUT, y);
+
+        PimExecuteGemvAdd(dev_out, dev_op0, dev_op1, dev_op2, relu, nullptr);
+
+        PimDestroyBo(dev_op0);
+        PimDestroyBo(dev_op1);
+        PimDestroyBo(dev_op2);
+        PimDestroyBo(dev_out);
+        PimDestroyDesc(pim_desc);
+
+        output_iv = tensorToIValue(output);
+    } else if (i0_is_vector != 1 && i1_is_vector == 1 && dim_i1 > 1) {
+        bool relu = false;
+        if (act_type == "aten::relu") {
+            relu = true;
+        }
+
+        if (!self_tensor.is_contiguous()) self_tensor = self_tensor.contiguous();
+        if (!mat1_tensor.is_contiguous()) mat1_tensor = mat1_tensor.contiguous();
+        if (!mat2_tensor.is_contiguous()) mat2_tensor = mat2_tensor.contiguous();
+
+        int m = mat1_tensor.size(dim_i0 - 2);
+        int n = 1;
+        int k = mat1_tensor.size(dim_i0 - 1);
+
+        _Float16* b = (_Float16*)self_tensor.data_ptr();
+        _Float16* A = (_Float16*)mat1_tensor.data_ptr();
+        _Float16* x = (_Float16*)mat2_tensor.data_ptr();
+        auto options = at::TensorOptions().dtype(at::kHalf).device(at::kCUDA);
+        auto output_shape = mat2_tensor.sizes().vec();
+        output_shape[dim_i1 - 1] = 1;
+        output_shape[dim_i1 - 2] = m;
+        auto output = at::zeros(output_shape, options);
+        _Float16* y = (_Float16*)output.data_ptr();
+
+        PimDesc* pim_desc = PimCreateDesc(1, 1, m, k, PIM_FP16, OP_GEMV);
+        PimBo* dev_op0 = PimCreateBo(pim_desc, MEM_TYPE_DEVICE, GEMV_INPUT, x);
+        PimBo* dev_op1 = PimCreateBo(pim_desc, MEM_TYPE_DEVICE, GEMV_WEIGHT_T, A);
+        PimBo* dev_op2 = PimCreateBo(pim_desc, MEM_TYPE_DEVICE, GEMV_OUTPUT, b);
+        PimBo* dev_out = PimCreateBo(pim_desc, MEM_TYPE_DEVICE, GEMV_OUTPUT, y);
+
+        PimExecuteGemvAdd(dev_out, dev_op0, dev_op1, dev_op2, relu, nullptr);
+
+        PimDestroyBo(dev_op0);
+        PimDestroyBo(dev_op1);
+        PimDestroyBo(dev_op2);
+        PimDestroyBo(dev_out);
+        PimDestroyDesc(pim_desc);
+
+        output_iv = tensorToIValue(output);
+    } else if (dim_self == 1) {
+        self_tensor = self_tensor.unsqueeze(1);
+        self_tensor = self_tensor.repeat({1, mat2_tensor.size(dim_i1 - 1)});
+
+        if (dim_i1 != 2) {
+            mat2_tensor = mat2_tensor.squeeze(0);
+        }
+
+        auto output = atenAddmm(self_tensor, mat1_tensor, mat2_tensor, beta, alpha);
+        // update output
+        for (int i = 0; i < dim_i1 - 2; ++i) {
+            output = output.unsqueeze(0);
+        }
+        output_iv = tensorToIValue(output);
+    } else {
+        auto output = atenAddmm(self_tensor, mat1_tensor, mat2_tensor, beta, alpha);
+        output_iv = tensorToIValue(output);
+    }
+}
+
+void customAtenMatmul(at::Tensor &self_tensor, at::Tensor &other_tensor, torch::jit::IValue &output_iv)
+{
+    int dim_i0 = self_tensor.dim();
+    int dim_i1 = other_tensor.dim();
+    int i0_is_vector = 0;
+    int i1_is_vector = 0;
+
+    for (int i = 0; i < dim_i0; ++i) {
+        if (self_tensor.size(i) != 1) {
+            i0_is_vector += 1;
+        }
+    }
+
+    for (int i = 0; i < dim_i1; ++i) {
+        if (other_tensor.size(i) != 1) {
+            i1_is_vector += 1;
+        }
+    }
+    if (i0_is_vector == 1 && i1_is_vector != 1) {
+        if (!self_tensor.is_contiguous()) self_tensor = self_tensor.contiguous();
+        if (!other_tensor.is_contiguous()) other_tensor = other_tensor.contiguous();
+
+        int n = other_tensor.size(dim_i1 - 1);
+        int k = other_tensor.size(dim_i1 - 2);
+
+        _Float16* x = (_Float16*)self_tensor.data_ptr();
+        _Float16* A = (_Float16*)other_tensor.data_ptr();
+        auto options = at::TensorOptions().dtype(at::kHalf).device(at::kCUDA);
+        auto output_shape = self_tensor.sizes().vec();
+        if (dim_i1 > dim_i0) {
+            output_shape = other_tensor.sizes().vec();
+            output_shape[dim_i1 - 1] = n;
+            output_shape[dim_i1 - 2] = 1;
+        } else {
+            output_shape[dim_i0 - 1] = n;
+            output_shape[dim_i0 - 2] = 1;
+        }
+        auto output = at::zeros(output_shape, options);
+        _Float16* y = (_Float16*)output.data_ptr();
+
+        PimDesc* pim_desc = PimCreateDesc(1, 1, n, k, PIM_FP16, OP_GEMV);
+        PimBo* dev_op0 = PimCreateBo(pim_desc, MEM_TYPE_DEVICE, GEMV_INPUT, x);
+        PimBo* dev_op1 = PimCreateBo(pim_desc, MEM_TYPE_DEVICE, GEMV_WEIGHT, A);
+        PimBo* dev_out = PimCreateBo(pim_desc, MEM_TYPE_DEVICE, GEMV_OUTPUT, y);
+
+        PimExecuteGemv(dev_out, dev_op0, dev_op1, nullptr);
+
+        PimDestroyBo(dev_op0);
+        PimDestroyBo(dev_op1);
+        PimDestroyBo(dev_out);
+        PimDestroyDesc(pim_desc);
+
+        output_iv = tensorToIValue(output);
+    } else if (i0_is_vector != 1 && i1_is_vector == 1) {
+        if (!self_tensor.is_contiguous()) self_tensor = self_tensor.contiguous();
+        if (!other_tensor.is_contiguous()) other_tensor = other_tensor.contiguous();
+
+        int m = self_tensor.size(dim_i0 - 2);
+        int n = 1;
+        int k = self_tensor.size(dim_i0 - 1);
+
+        _Float16* A = (_Float16*)self_tensor.data_ptr();
+        _Float16* x = (_Float16*)other_tensor.data_ptr();
+        auto options = at::TensorOptions().dtype(at::kHalf).device(at::kCUDA);
+        auto output_shape = other_tensor.sizes().vec();
+
+        if (dim_i0 > dim_i1) {
+            output_shape = self_tensor.sizes().vec();
+            output_shape[dim_i0 - 2] = m;
+            output_shape.pop_back();
+        } else {
+            output_shape[dim_i1 - 1] = 1;
+            output_shape[dim_i1 - 2] = m;
+        }
+        auto output = at::zeros(output_shape, options);
+        _Float16* y = (_Float16*)output.data_ptr();
+
+        PimDesc* pim_desc = PimCreateDesc(1, 1, m, k, PIM_FP16, OP_GEMV);
+        PimBo* dev_op0 = PimCreateBo(pim_desc, MEM_TYPE_DEVICE, GEMV_INPUT, x);
+        PimBo* dev_op1 = PimCreateBo(pim_desc, MEM_TYPE_DEVICE, GEMV_WEIGHT_T, A);
+        PimBo* dev_out = PimCreateBo(pim_desc, MEM_TYPE_DEVICE, GEMV_OUTPUT, y);
+
+        PimExecuteGemv(dev_out, dev_op0, dev_op1, nullptr);
+
+        PimDestroyBo(dev_op0);
+        PimDestroyBo(dev_op1);
+        PimDestroyBo(dev_out);
+        PimDestroyDesc(pim_desc);
+
+        output_iv = tensorToIValue(output);
+    } else if (i0_is_vector == 1 && i1_is_vector == 1) {
+        if (!self_tensor.is_contiguous()) self_tensor = self_tensor.contiguous();
+        if (!other_tensor.is_contiguous()) other_tensor = other_tensor.contiguous();
+
+        int m = 1;
+        int n = 1;
+        int k = self_tensor.size(dim_i0 - 1);
+
+        _Float16* A = (_Float16*)self_tensor.data_ptr();
+        _Float16* x = (_Float16*)other_tensor.data_ptr();
+        auto options = at::TensorOptions().dtype(at::kHalf).device(at::kCUDA);
+        auto output_shape = other_tensor.sizes().vec();
+
+        if (dim_i0 > dim_i1) {
+            output_shape = self_tensor.sizes().vec();
+            output_shape[dim_i0 - 1] = 1;
+            output_shape[dim_i0 - 2] = m;
+        } else {
+            output_shape[dim_i1 - 1] = 1;
+            output_shape[dim_i1 - 2] = m;
+        }
+
+        auto output = at::zeros(output_shape, options);
+        _Float16* y = (_Float16*)output.data_ptr();
+
+        PimDesc* pim_desc = PimCreateDesc(1, 1, k, m, PIM_FP16, OP_GEMV);
+        PimBo* dev_op0 = PimCreateBo(pim_desc, MEM_TYPE_DEVICE, GEMV_INPUT, x);
+        PimBo* dev_op1 = PimCreateBo(pim_desc, MEM_TYPE_DEVICE, GEMV_WEIGHT_T, A);
+        PimBo* dev_out = PimCreateBo(pim_desc, MEM_TYPE_DEVICE, GEMV_OUTPUT, y);
+
+        PimExecuteGemv(dev_out, dev_op0, dev_op1, nullptr);
+
+        PimDestroyBo(dev_op0);
+        PimDestroyBo(dev_op1);
+        PimDestroyBo(dev_out);
+        PimDestroyDesc(pim_desc);
+
+        output_iv = tensorToIValue(output);
+    } else {
+        auto output = atenMatmul(self_tensor, other_tensor);
+        output_iv = tensorToIValue(output);
+    }
+}
+
 }  // namespace runtime
 }  // namespace nn_compiler

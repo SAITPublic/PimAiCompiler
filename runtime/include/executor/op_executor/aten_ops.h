@@ -2,6 +2,9 @@
 
 #ifndef NNCOMPILER_ATEN_OP_H
 #define NNCOMPILER_ATEN_OP_H
+
+#include <torch/script.h>
+
 #include "ATen/ATen.h"
 
 namespace nn_compiler
@@ -349,6 +352,13 @@ at::Tensor atenZeros(at::IntArrayRef size, at::TensorOptions options = {});
 
 at::Tensor atenZeroslike(const at::Tensor &self, at::TensorOptions options = {},
                          c10::optional<at::MemoryFormat> memory_format = c10::nullopt);
+
+void customAtenAddmm(std::string act_type, at::Tensor &self_tensor, at::Tensor &mat1_tensor,
+                     at::Tensor &mat2_tensor, at::Scalar beta, at::Scalar alpha,
+                     torch::jit::IValue &output_iv);
+
+void customAtenMatmul(at::Tensor &self_tensor, at::Tensor &other_tensor, torch::jit::IValue &output_iv);
+
 }  // namespace runtime
 }  // namespace nn_compiler
 
