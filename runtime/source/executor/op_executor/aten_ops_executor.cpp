@@ -132,7 +132,7 @@ void executorAtenAddmm(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamE
     auto addmm_layer = std::static_pointer_cast<nn_compiler::ir::AtenAddmmLayer>(layer);
     auto act_type = addmm_layer->get_act_type();
 
-    // TODO choose the corresponding kernel when activation type is aten::none, aten::relu, aten::max
+    // TODO(SRCX): choose the corresponding kernel when activation type is aten::none, aten::relu, aten::max
     auto in_stensor_id = layer->getInSTensorID();
     auto out_stensor_id = layer->getOutSTensorID();
 
@@ -140,16 +140,25 @@ void executorAtenAddmm(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamE
     torch::jit::IValue iv_self = stream_executor.findBlob(in_stensor_id[0]).second;
     torch::jit::IValue iv_mat1 = stream_executor.findBlob(in_stensor_id[1]).second;
     torch::jit::IValue iv_mat2 = stream_executor.findBlob(in_stensor_id[2]).second;
-    torch::jit::IValue iv_beta = stream_executor.findBlob(in_stensor_id[3]).second;
-    torch::jit::IValue iv_alpha = stream_executor.findBlob(in_stensor_id[4]).second;
-    assert(iv_self.isTensor() && iv_mat1.isTensor() && iv_mat2.isTensor());
-    auto self_tensor = iv_self.toTensor();
+    assert(iv_mat1.isTensor() && iv_mat2.isTensor());
     auto mat1_tensor = iv_mat1.toTensor();
     auto mat2_tensor = iv_mat2.toTensor();
 
-    torch::jit::IValue output;
-    customAtenAddmm(act_type, self_tensor, mat1_tensor, mat2_tensor, iv_beta.toScalar(), iv_alpha.toScalar(), output);
+    int alpha = 1, beta = 1;
+    if (in_stensor_id.size() == 5) {
+        torch::jit::IValue iv_beta = stream_executor.findBlob(in_stensor_id[3]).second;
+        torch::jit::IValue iv_alpha = stream_executor.findBlob(in_stensor_id[4]).second;
+        beta = iv_beta.toInt();
+        alpha = iv_alpha.toInt();
+    }
 
+    torch::jit::IValue output;
+    if (iv_self.isNone()) {
+        customAtenMatmul(mat1_tensor, mat2_tensor, output);
+    } else {
+        auto self_tensor = iv_self.toTensor();
+        customAtenAddmm(act_type, self_tensor, mat1_tensor, mat2_tensor, beta, alpha, output);
+    }
     stream_executor.updateBlob(out_stensor_id[0], DataType::TENSOR, output);
 }
 

@@ -160,8 +160,6 @@ void RemoveCatForAddmm::reorganize_graph(std::unique_ptr<nn_compiler::ir::NNMode
         model->addTSSTensor(std::make_pair(constant_out_stensor2->getID(), constant_out_stensor2));
         new_constant_layer2->addOutSTensorID(constant_out_stensor2->getID());
         new_addmm_layer->addInSTensorID(constant_out_stensor2->getID());
-        new_addmm_layer->addInSTensorID(addmm_layer->getInSTensorID()[3]);
-        new_addmm_layer->addInSTensorID(addmm_layer->getInSTensorID()[4]);
 
         // update output of second addmm Op
         for (auto block_output : block_outputs) {

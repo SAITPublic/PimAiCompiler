@@ -38,8 +38,6 @@ class SwapAddmmInputs : public Pass {
     std::vector<std::shared_ptr<nn_compiler::ir::NNLayer>> layers_;
 
     ConstantParser constant_parser_;
-
-    void transpose_for_constant(std::shared_ptr<nn_compiler::ir::NNLayer>& layer);
 };
 
 }  // namespace frontend

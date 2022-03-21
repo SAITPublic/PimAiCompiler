@@ -55,9 +55,6 @@ void SwapAddmmInputs::run(std::unique_ptr<nn_compiler::ir::NNModel>& model) {
         transpose_layer_for_input->addOutSTensorID(new_stensor1->getID());
         layer->renewInSTensorID(1, new_stensor1->getID());
 
-        // Transpose weight data
-        transpose_for_constant(predecessors[2]);
-
         // swap input order of addmm
         auto in_stensor_ids = layer->getInSTensorID();
         layer->renewInSTensorID(1, in_stensor_ids[2]);
@@ -84,26 +81,6 @@ void SwapAddmmInputs::run(std::unique_ptr<nn_compiler::ir::NNModel>& model) {
     }
 }
 
-void SwapAddmmInputs::transpose_for_constant(std::shared_ptr<nn_compiler::ir::NNLayer>& layer) {
-    auto constant_layer = std::dynamic_pointer_cast<nn_compiler::ir::PrimConstantLayer>(layer);
-    auto dtensor = constant_layer->getAttr();
-    auto height = dtensor->getTensorShape().getHeight();
-    auto width = dtensor->getTensorShape().getWidth();
-    auto matrix = constant_parser_.parse<half_float::half>(dtensor);
-
-    std::vector<half_float::half> matrix_t_flat;
-    for (auto i = 0; i < width; i ++) {
-        for (auto j = 0; j < height; j ++) {
-            matrix_t_flat.push_back(matrix[j][i]);
-        }
-    }
-
-    dtensor->setData(matrix_t_flat.data(), matrix_t_flat.size() * sizeof(half_float::half));
-
-    dtensor->setTensorShape(nn_compiler::ir::STensor(0, 0, width, height));
-    dtensor->setStride({0, 0, 0, 0});  // changes at here make dtensor always contiguous
-    constant_layer->setAttr(dtensor);
-}
 }  // namespace frontend
 }  // namespace nn_compiler
 

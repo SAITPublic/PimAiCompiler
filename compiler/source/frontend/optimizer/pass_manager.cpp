@@ -54,8 +54,9 @@ void PassManager::runPasses(std::unique_ptr<nn_compiler::ir::NNModel>& model)
     remove_set_attr_layers->add(remove_get_attr_layers);
     remove_get_attr_layers->add(decompose_linear);
     decompose_linear->add(remove_if_with_addmm);
-    remove_if_with_addmm->add(remove_cat_for_addmm);
-    remove_cat_for_addmm->add(swap_addmm_inputs);
+    remove_if_with_addmm->add(swap_addmm_inputs);
+    // TODO(SRCX): Fix remove_cat_for_addmm for torch-1.10 models.
+    //remove_cat_for_addmm->add(swap_addmm_inputs);
     swap_addmm_inputs->add(swap_matmul_inputs);
     swap_matmul_inputs->add(fuse_act);
 

@@ -62,8 +62,7 @@ void executePrimConstant(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, Strea
         std::vector<int64_t> input_shape = getDataShapeFromSTensor(shape_);
         std::vector<int64_t> stride = getDataShapeFromVector(stride_);
 
-        // TODO(SRCX): add gnmt optimization
-        if (stream_executor.model_type_ == "GNMT" && constant_layer->getOutSTensorID()[0] == 3) {
+        if (stream_executor.model_type_ == "GNMT" && constant_layer->getOutSTensorID()[0] == 4) {
             std::vector<int64_t> reorder_shape(input_shape);
 
             int align_m = 32;
