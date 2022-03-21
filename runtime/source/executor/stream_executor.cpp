@@ -13,13 +13,13 @@ namespace nn_compiler
 {
 namespace runtime
 {
-StreamExecutor::StreamExecutor(std::pair<std::shared_ptr<nn_compiler::ir::NNNetwork>, blob_store_type> model,
+StreamExecutor::StreamExecutor(std::pair<std::shared_ptr<ir::NNNetwork>, blob_store_type> model,
                                std::string model_type)
 {
     this->graph_ = model.first;
     this->global_blobs_ = model.second;
-
-    model_type_ = model_type;
+    this->undefined_data_ = std::make_pair(ir::DataType::UNDEFINED, intToIValue(0));
+    this->setModelType(model_type);
 
     miopenCreate(&handle_);
     miopenCreateTensorDescriptor(&input_tensor_);
@@ -48,30 +48,30 @@ RetVal StreamExecutor::preProcess()
     output_blob_ids_.clear();
 
     for (auto layer : graph_->getLayers()) {
-        if (model_type_ == "GNMT" && layer->getType() == nn_compiler::ir::LayerType::ATENCAT) {
-            auto cat_layer = std::static_pointer_cast<nn_compiler::ir::AtenCatLayer>(layer);
+        if (model_type_ == "GNMT" && layer->getType() == ir::LayerType::ATENCAT) {
+            auto cat_layer = std::static_pointer_cast<ir::AtenCatLayer>(layer);
             auto options = at::TensorOptions().dtype(at::kHalf).device(at::kCUDA);
             auto mem_blob_id = cat_layer->getMemLayerId();
             if (mem_blob_id != -1) {
                 // memory cat_s
                 auto cat_mem_s0 = at::zeros({1, 1, 2048}, options);
-                this->global_blobs_.insert({mem_blob_id, {DataType::TENSOR, tensorToIValue(cat_mem_s0)}});
+                this->global_blobs_.insert({mem_blob_id, {ir::DataType::TENSOR, tensorToIValue(cat_mem_s0)}});
             } else {
                 // memory cat_f
                 int cat_f = 22222;
                 cat_layer->setMemLayerId(cat_f);
                 auto cat_mem = at::empty({8, 1, 1024}, options);
-                this->global_blobs_.insert({cat_f, {DataType::TENSOR, tensorToIValue(cat_mem)}});
+                this->global_blobs_.insert({cat_f, {ir::DataType::TENSOR, tensorToIValue(cat_mem)}});
             }
         }
 
-        if (layer->getType() == nn_compiler::ir::LayerType::PRIMINPUT) {
+        if (layer->getType() == ir::LayerType::PRIMINPUT) {
             auto out_stensor_ids = layer->getOutSTensorID();
             input_blob_ids_.push_back(out_stensor_ids[0]);
-        } else if (layer->getType() == nn_compiler::ir::LayerType::PRIMOUTPUT) {
+        } else if (layer->getType() == ir::LayerType::PRIMOUTPUT) {
             auto in_stensor_ids = layer->getInSTensorID();
             output_blob_ids_.push_back(in_stensor_ids[0]);
-        } else if (layer->getType() == nn_compiler::ir::LayerType::PRIMCONSTANT) {
+        } else if (layer->getType() == ir::LayerType::PRIMCONSTANT) {
             // to speed up, runtime only load Constant data once, all constants are reused
             // in every inference forward
             op_executor::executePrimConstant(layer, *this);
@@ -112,10 +112,10 @@ RetVal StreamExecutor::inferenceModel(const std::vector<torch::Tensor>& input_te
     int cursor_end = layers.size() - output_blob_ids_.size();
 
     // control_op will move cursor by itself
-    auto is_control_op = [](nn_compiler::ir::LayerType type) {
-        return (type == nn_compiler::ir::LayerType::PRIMIF || type == nn_compiler::ir::LayerType::PRIMENDIF ||
-                type == nn_compiler::ir::LayerType::PRIMLOOP || type == nn_compiler::ir::LayerType::PRIMENDLOOP ||
-                type == nn_compiler::ir::LayerType::PRIMBLOCK);
+    auto is_control_op = [](ir::LayerType type) {
+        return (type == ir::LayerType::PRIMIF || type == ir::LayerType::PRIMENDIF ||
+                type == ir::LayerType::PRIMLOOP || type == ir::LayerType::PRIMENDLOOP ||
+                type == ir::LayerType::PRIMBLOCK);
     };
 
     // Execute Graph
@@ -125,7 +125,7 @@ RetVal StreamExecutor::inferenceModel(const std::vector<torch::Tensor>& input_te
         DLOG(INFO) << "Layer id:" << layer->getID() << " name: " << layer->getName()
                    << " type: " << convertLayerTypeToString(layer_type);
 
-        if (layer_type == nn_compiler::ir::LayerType::PRIMCONSTANT) {
+        if (layer_type == ir::LayerType::PRIMCONSTANT) {
             // skip PrimConstant, constant are pre-loaded
             cursor_++;
             continue;
@@ -167,10 +167,10 @@ RetVal StreamExecutor::inferenceModelwithProfiling(const std::vector<torch::Tens
     int cursor_end = layers.size() - output_blob_ids_.size();
 
     // control_op will move cursor by itself
-    auto is_control_op = [](nn_compiler::ir::LayerType type) {
-        return (type == nn_compiler::ir::LayerType::PRIMIF || type == nn_compiler::ir::LayerType::PRIMENDIF ||
-                type == nn_compiler::ir::LayerType::PRIMLOOP || type == nn_compiler::ir::LayerType::PRIMENDLOOP ||
-                type == nn_compiler::ir::LayerType::PRIMBLOCK);
+    auto is_control_op = [](ir::LayerType type) {
+        return (type == ir::LayerType::PRIMIF || type == ir::LayerType::PRIMENDIF ||
+                type == ir::LayerType::PRIMLOOP || type == ir::LayerType::PRIMENDLOOP ||
+                type == ir::LayerType::PRIMBLOCK);
     };
 
     // Execute Graph
@@ -181,7 +181,7 @@ RetVal StreamExecutor::inferenceModelwithProfiling(const std::vector<torch::Tens
         DLOG(INFO) << "Layer id:" << layer->getID() << " name: " << layer->getName()
                    << " type: " << convertLayerTypeToString(layer_type);
 
-        if (layer_type == nn_compiler::ir::LayerType::PRIMCONSTANT) {
+        if (layer_type == ir::LayerType::PRIMCONSTANT) {
             // skip PrimConstant, constant are pre-loaded
             cursor_++;
             continue;
@@ -223,13 +223,15 @@ void StreamExecutor::updateBlob(int64_t blob_id, DataType dtype, const torch::ji
 std::pair<DataType, torch::jit::IValue>& StreamExecutor::findBlob(int64_t blob_id)
 {
     auto it = global_blobs_.find(blob_id);
-    assert(it != this->global_blobs_.end());
+    if (it == this->global_blobs_.end()) {
+        return undefined_data_;
+    }
     return it->second;
 }
 
 bool StreamExecutor::checkValidBlobID(int64_t blob_id) { return (global_blobs_.find(blob_id) != global_blobs_.end()); }
 
-OpExecutorFn StreamExecutor::findOpExecutor(nn_compiler::ir::LayerType& type)
+OpExecutorFn StreamExecutor::findOpExecutor(ir::LayerType& type)
 {
     auto it = global_op_register_.find(type);
     if (it == global_op_register_.end()) {
@@ -249,7 +251,7 @@ void StreamExecutor::setInputTensors(const std::vector<torch::Tensor>& input_ten
     // Set the input tensors to placeholder, assume all inputs & outputs are Tensor type
     int k = 0;
     for (auto id : input_blob_ids_) {
-        updateBlob(id, DataType::TENSOR, tensorToIValue(input_tensors.at(k++)));
+        updateBlob(id, ir::DataType::TENSOR, tensorToIValue(input_tensors.at(k++)));
     }
 }
 
@@ -330,7 +332,7 @@ void StreamExecutor::getOutputTensors(std::vector<torch::Tensor>& output_tensors
     }
 }
 
-const std::shared_ptr<nn_compiler::ir::NNNetwork> StreamExecutor::getGraph() { return this->graph_; }
+const std::shared_ptr<ir::NNNetwork> StreamExecutor::getGraph() { return this->graph_; }
 
 void StreamExecutor::registerOp()
 {

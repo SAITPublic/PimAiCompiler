@@ -4,6 +4,8 @@
 #include "pim_runtime_api.h"
 #include "ut_utils.h"
 
+using namespace nn_compiler::runtime::op_executor;
+
 TEST(NNCompilerUnitTest, customGemvTest)
 {
     float alpha = 1.0f;

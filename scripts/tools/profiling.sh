@@ -13,7 +13,6 @@ function usage () {
 
         --ir(-i)                input ir file name
         --model_type(-m)        model type: RNNT/GNMT/HWR
-        --compile_level(-l)     compile level. Possible values: 0 (frontend->middlend->backend), 1 (middlend->backend), 2 (backend)"
 }
 
 ARGS=""

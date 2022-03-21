@@ -85,15 +85,15 @@ void executeAtenAdd(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExec
                 input2_layer->getType() == nn_compiler::ir::LayerType::ATENLSTM1 &&
                 std::static_pointer_cast<nn_compiler::ir::AtenLSTM1Layer>(input1_layer)->getCustomOptNumber() == 2 &&
                 std::static_pointer_cast<nn_compiler::ir::AtenLSTM1Layer>(input2_layer)->getCustomOptNumber() == 1;
-            if (stream_executor.model_type_ == "GNMT" && add_opt_flag) {
+            if (stream_executor.getModelType() == "GNMT" && add_opt_flag) {
                 auto out1_layer = stream_executor.getGraph()->getLayerByPosition((layer->getNextLayerIDs())[0]);
                 auto out1_out1_layer =
                     stream_executor.getGraph()->getLayerByPosition((out1_layer->getNextLayerIDs())[0]);
                 int cat_mem_id =
                     std::static_pointer_cast<nn_compiler::ir::AtenCatLayer>(out1_out1_layer)->getMemLayerId();
-                auto it = stream_executor.global_blobs_.find(cat_mem_id);
                 auto options = at::TensorOptions().dtype(at::kHalf).device(at::kCUDA);
-                tmp = torch::from_blob((_Float16*)(it->second.second.toTensor().data_ptr()), {1, 1, 1024}, options);
+                tmp = torch::from_blob((_Float16*)(stream_executor.findBlob(cat_mem_id).second.toTensor().data_ptr()),
+                                       {1, 1, 1024}, options);
                 C = (_Float16*)tmp.data_ptr();
             }
 
@@ -562,7 +562,7 @@ void executeAtenBmm(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExec
     assert(iv_self.isTensor() && iv_other.isTensor());
 
     at::Tensor tmp0, tmp1, tmp2;
-    if (stream_executor.model_type_ == "GNMT") {
+    if (stream_executor.getModelType() == "GNMT") {
         auto out2_layer = stream_executor.getGraph()->getLayerByPosition((layer->getNextLayerIDs())[1]);
         auto out2_out1_layer = stream_executor.getGraph()->getLayerByPosition((out2_layer->getNextLayerIDs())[0]);
         auto out2_out2_layer = stream_executor.getGraph()->getLayerByPosition((out2_layer->getNextLayerIDs())[1]);
@@ -576,17 +576,17 @@ void executeAtenBmm(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExec
         // auto end_if_node = op_node.getOutEdge(1).getOutNode();
         int64_t cat_mem_id =
             std::static_pointer_cast<nn_compiler::ir::AtenCatLayer>(out2_out1_out1_layer)->getMemLayerId();
-        auto it = stream_executor.global_blobs_.find(cat_mem_id);
         auto options = at::TensorOptions().dtype(at::kHalf).device(at::kCUDA);
-        tmp0 = torch::from_blob((_Float16*)(it->second.second.toTensor().data_ptr()) + 1024, {1, 1, 1024}, options);
+        tmp0 = torch::from_blob((_Float16*)(stream_executor.findBlob(cat_mem_id).second.toTensor().data_ptr()) + 1024,
+                                {1, 1, 1024}, options);
 
         cat_mem_id = std::static_pointer_cast<nn_compiler::ir::AtenCatLayer>(out2_out2_out1_layer)->getMemLayerId();
-        it = stream_executor.global_blobs_.find(cat_mem_id);
-        tmp1 = torch::from_blob((_Float16*)(it->second.second.toTensor().data_ptr()) + 1024, {1, 1, 1024}, options);
+        tmp1 = torch::from_blob((_Float16*)(stream_executor.findBlob(cat_mem_id).second.toTensor().data_ptr()) + 1024,
+                                {1, 1, 1024}, options);
 
         cat_mem_id = std::static_pointer_cast<nn_compiler::ir::AtenCatLayer>(out2_out3_out1_layer)->getMemLayerId();
-        it = stream_executor.global_blobs_.find(cat_mem_id);
-        tmp2 = torch::from_blob((_Float16*)(it->second.second.toTensor().data_ptr()) + 1024, {1, 1, 1024}, options);
+        tmp2 = torch::from_blob((_Float16*)(stream_executor.findBlob(cat_mem_id).second.toTensor().data_ptr()) + 1024,
+                                {1, 1, 1024}, options);
     }
 
     auto self_tensor = iv_self.toTensor();
@@ -613,18 +613,18 @@ void executeAtenBmm(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExec
     auto output = at::zeros(output_shape, options);
     _Float16* y = (_Float16*)output.data_ptr();
 
-    if (stream_executor.model_type_ == "GNMT") {
+    if (stream_executor.getModelType() == "GNMT") {
         y = (_Float16*)tmp0.data_ptr();
     }
 
     rocblas_bmm_template_xAy(nullptr, x, A, y, m, n, k);
-    if (stream_executor.model_type_ == "GNMT") {
+    if (stream_executor.getModelType() == "GNMT") {
         atenCopy_(tmp1, tmp0, c10::attr::non_blocking);
         atenCopy_(tmp2, tmp0, c10::attr::non_blocking);
     }
 
     // update output
-    if (stream_executor.model_type_ == "GNMT") {
+    if (stream_executor.getModelType() == "GNMT") {
         stream_executor.updateBlob(out_stensor_id[0], DataType::TENSOR, tensorToIValue(tmp0));
     } else {
         stream_executor.updateBlob(out_stensor_id[0], DataType::TENSOR, tensorToIValue(output));
@@ -668,18 +668,17 @@ void executeAtenCat(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExec
     auto input1_layer = stream_executor.getGraph()->getLayerByPosition((layer->getPreLayerIDs())[0]);
     auto in_input1_stensor_id = input1_layer->getInSTensorID();
 
-    if (stream_executor.model_type_ == "GNMT" && in_input1_stensor_id.size() == 0) {
+    if (stream_executor.getModelType() == "GNMT" && in_input1_stensor_id.size() == 0) {
         int cat_mem_id = cat_layer->getMemLayerId();
-        auto it = stream_executor.global_blobs_.find(cat_mem_id);
-        auto output = it->second.second.toTensor().clone();
+        auto output = stream_executor.findBlob(cat_mem_id).second.toTensor().clone();
         stream_executor.updateBlob(out_stensor_id[0], DataType::TENSOR, tensorToIValue(output));
         return;
     }
 
     int cat_mem_id = cat_layer->getMemLayerId();
-    auto it = stream_executor.global_blobs_.find(cat_mem_id);
-    if (stream_executor.model_type_ == "GNMT" && it != stream_executor.global_blobs_.end()) {
-        auto output = it->second.second;
+    if (stream_executor.getModelType() == "GNMT" &&
+        stream_executor.findBlob(cat_mem_id).first != ir::DataType::UNDEFINED) {
+        auto output = stream_executor.findBlob(cat_mem_id).second;
         stream_executor.updateBlob(out_stensor_id[0], DataType::TENSOR, output);
         return;
     }
@@ -1378,7 +1377,7 @@ void executeAtenGetItem(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, Stream
 
     auto output = atenGetItem(self_list, idx);
     // update output
-    stream_executor.releation_blob_ids_map_.insert({out_stensor_id[0], {in_stensor_id[0], idx}});
+    stream_executor.insertInRelationBlobIDsMap(out_stensor_id[0], in_stensor_id[0], idx);
     stream_executor.updateBlob(out_stensor_id[0], DataType::IVALUE, output);
 }
 
@@ -1611,7 +1610,7 @@ void executeAtenLen(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExec
         output = atenLen(iv.toList());
         auto input1_layer = stream_executor.getGraph()->getLayerByPosition((layer->getPreLayerIDs())[0]);
         auto out1_layer = stream_executor.getGraph()->getLayerByPosition((layer->getNextLayerIDs())[0]);
-        if (stream_executor.model_type_ == "GNMT" &&
+        if (stream_executor.getModelType() == "GNMT" &&
             input1_layer->getType() == nn_compiler::ir::LayerType::PRIMVARIABLE && iv.toList().size() == 4) {
             int next_node_id = std::static_pointer_cast<nn_compiler::ir::PrimLoopLayer>(out1_layer)->getGotoLayer() - 1;
             stream_executor.setCursor(next_node_id);
@@ -1860,8 +1859,9 @@ void executeAtenLSTM1(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamEx
         if (!static_cast<bool>(batch_first)) input = input.transpose(0, 1);
         void *in_dev, *hx_dev, *out_dev, *wei_dev, *cx_dev, *workspace_dev, *hy_dev, *cy_dev;
 
-        stream_executor.input_tensors_.clear();
-        stream_executor.output_tensors_.clear();
+        auto lstm_tensor = stream_executor.getMiopenLstmTensors();
+        lstm_tensor.input_tensors_->clear();
+        lstm_tensor.output_tensors_->clear();
 
         int batch_size = 1;
         int in_dim = input.dim();
@@ -1879,43 +1879,43 @@ void executeAtenLSTM1(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamEx
         int dims = 2;
         for (int i = 0; i < seq_len; i++) {
             std::array<int, 2> in_lens = {in_len[0], in_len.back()};
-            miopenCreateTensorDescriptor(&stream_executor.input_tensor_);
-            miopenSetTensorDescriptor(stream_executor.input_tensor_, miopenHalf, dims, in_lens.data(), nullptr);
-            stream_executor.input_tensors_.push_back(stream_executor.input_tensor_);
+            miopenCreateTensorDescriptor(lstm_tensor.input_tensor_);
+            miopenSetTensorDescriptor(*(lstm_tensor.input_tensor_), miopenHalf, dims, in_lens.data(), nullptr);
+            lstm_tensor.input_tensors_->push_back(*(lstm_tensor.input_tensor_));
 
             std::array<int, 2> out_lens = {{in_len[0], out_len[0]}};
-            miopenCreateTensorDescriptor(&stream_executor.output_tensor_);
-            miopenSetTensorDescriptor(stream_executor.output_tensor_, miopenHalf, dims, out_lens.data(), nullptr);
-            stream_executor.output_tensors_.push_back(stream_executor.output_tensor_);
+            miopenCreateTensorDescriptor(lstm_tensor.output_tensor_);
+            miopenSetTensorDescriptor(*(lstm_tensor.output_tensor_), miopenHalf, dims, out_lens.data(), nullptr);
+            lstm_tensor.output_tensors_->push_back(*(lstm_tensor.output_tensor_));
         }
         std::array<int, 3> hid_lens = {{hid_len[0], in_len[0], hid_len[1]}};
-        miopenSetTensorDescriptor(stream_executor.hidden_tensor_, miopenHalf, 3, hid_lens.data(), nullptr);
+        miopenSetTensorDescriptor(*(lstm_tensor.hidden_tensor_), miopenHalf, 3, hid_lens.data(), nullptr);
 
         miopenRNNMode_t mode = miopenRNNMode_t::miopenLSTM;
-        ;
+
         miopenRNNBiasMode_t biasMode = static_cast<bool>(has_biases) ? miopenRNNwithBias : miopenRNNNoBias;
         miopenRNNDirectionMode_t directionMode = bidirectional_int == 2 ? miopenRNNbidirection : miopenRNNunidirection;
         miopenRNNInputMode_t inMode = miopenRNNlinear;
         miopenRNNAlgo_t algo = miopenRNNdefault;
 
-        miopenSetRNNDescriptor(stream_executor.rnn_desc_, hidden_size, num_layers, inMode, directionMode, mode,
+        miopenSetRNNDescriptor(stream_executor.getMIOpenRNNDesc(), hidden_size, num_layers, inMode, directionMode, mode,
                                biasMode, algo, miopenHalf);
-        miopenGetRNNParamsDescriptor(stream_executor.handle_, stream_executor.rnn_desc_, stream_executor.input_tensor_,
-                                     stream_executor.weight_tensor_, miopenHalf);
+        miopenGetRNNParamsDescriptor(stream_executor.getMIOpenHandle(), stream_executor.getMIOpenRNNDesc(),
+                                     *(lstm_tensor.input_tensor_), *(lstm_tensor.weight_tensor_), miopenHalf);
         size_t workspace_size;
-        miopenGetRNNWorkspaceSize(stream_executor.handle_, stream_executor.rnn_desc_, seq_len,
-                                  stream_executor.input_tensors_.data(), &workspace_size);
+        miopenTensorDescriptor_t* inputs_ptr = (*(lstm_tensor.input_tensors_)).data();
+        miopenGetRNNWorkspaceSize(stream_executor.getMIOpenHandle(), stream_executor.getMIOpenRNNDesc(), seq_len,
+                                  inputs_ptr, &workspace_size);
         auto workspace = at::empty(workspace_size, input.options().dtype(at::kByte));
 
         int datasize = 2;  // miopenHalf
         in_dev = input.data_ptr();
 
         hash_id += 10000;  // avert id conflict
-        auto it = stream_executor.global_blobs_.find(hash_id);
-        if (it == stream_executor.global_blobs_.end()) {
+        if (stream_executor.findBlob(hash_id).first == ir::DataType::UNDEFINED) {
             size_t weight_size = 0;
-            miopenGetRNNParamsSize(stream_executor.handle_, stream_executor.rnn_desc_, stream_executor.input_tensor_,
-                                   &weight_size, miopenHalf);
+            miopenGetRNNParamsSize(stream_executor.getMIOpenHandle(), stream_executor.getMIOpenRNNDesc(),
+                                   *(lstm_tensor.input_tensor_), &weight_size, miopenHalf);
             auto weight_buf = at::empty(weight_size / datasize, input.options());
             int expected_weight_size =
                 hidden_size * 4 * (input_size + hidden_size + 2) * bidirectional_int +
@@ -2048,25 +2048,24 @@ void executeAtenLSTM1(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamEx
             wei_dev = weight_buf.data_ptr();
             stream_executor.updateBlob(hash_id, DataType::TENSOR, tensorToIValue(weight_buf));
         } else {
-            wei_dev = it->second.second.toTensor().data_ptr();
+            wei_dev = stream_executor.findBlob(hash_id).second.toTensor().data_ptr();
         }
         in_dev = input.data_ptr();
         hx_dev = hx_list_tensor_vector[0].data_ptr();
         cx_dev = hx_list_tensor_vector[1].data_ptr();
         workspace_dev = workspace.data_ptr();
 
-        auto it0 = stream_executor.global_blobs_.find(out_stensor_id[0]);
-
-        if (stream_executor.model_type_ == "GNMT" && it0 != stream_executor.global_blobs_.end() && seq_len == 1) {
-            out_dev = it0->second.second.toTensor().data_ptr();
-            hy_dev = stream_executor.global_blobs_.find(out_stensor_id[1])->second.second.toTensor().data_ptr();
-            cy_dev = stream_executor.global_blobs_.find(out_stensor_id[2])->second.second.toTensor().data_ptr();
-            miopenRNNForwardInference(stream_executor.handle_, stream_executor.rnn_desc_, seq_len,
-                                      stream_executor.input_tensors_.data(), in_dev, stream_executor.hidden_tensor_,
-                                      hx_dev, stream_executor.hidden_tensor_, cx_dev, stream_executor.weight_tensor_,
-                                      wei_dev, stream_executor.output_tensors_.data(), out_dev,
-                                      stream_executor.hidden_tensor_, hy_dev, stream_executor.hidden_tensor_, cy_dev,
-                                      workspace_dev, workspace_size);
+        miopenTensorDescriptor_t* outputs_ptr = (*(lstm_tensor.output_tensors_)).data();
+        if (stream_executor.getModelType() == "GNMT" &&
+            stream_executor.findBlob(out_stensor_id[0]).first != ir::DataType::UNDEFINED && seq_len == 1) {
+            out_dev = stream_executor.findBlob(out_stensor_id[0]).second.toTensor().data_ptr();
+            hy_dev = stream_executor.findBlob(out_stensor_id[1]).second.toTensor().data_ptr();
+            cy_dev = stream_executor.findBlob(out_stensor_id[2]).second.toTensor().data_ptr();
+            miopenRNNForwardInference(stream_executor.getMIOpenHandle(), stream_executor.getMIOpenRNNDesc(), seq_len,
+                                      inputs_ptr, in_dev, *(lstm_tensor.hidden_tensor_), hx_dev,
+                                      *(lstm_tensor.hidden_tensor_), cx_dev, *(lstm_tensor.weight_tensor_), wei_dev,
+                                      outputs_ptr, out_dev, *(lstm_tensor.hidden_tensor_), hy_dev,
+                                      *(lstm_tensor.hidden_tensor_), cy_dev, workspace_dev, workspace_size);
         } else {
             auto output = at::empty({in_len[0], seq_len, out_len[0]}, input.options());
             out_dev = output.data_ptr();
@@ -2080,10 +2079,9 @@ void executeAtenLSTM1(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamEx
                 hy_dev = hy.data_ptr();
                 cy_dev = cy.data_ptr();
 
-                if (stream_executor.model_type_ == "GNMT" && lstm1_layer->getMatchCustomOpt()) {
+                if (stream_executor.getModelType() == "GNMT" && lstm1_layer->getMatchCustomOpt()) {
                     int cat_f = 22222;
-                    auto cat = stream_executor.global_blobs_.find(cat_f);
-                    auto cat_mem = cat->second.second.toTensor();
+                    auto cat_mem = stream_executor.findBlob(cat_f).second.toTensor();
 
                     if (lstm1_layer->getCustomOptNumber() == 0) {
                         hy = torch::from_blob((_Float16*)(cat_mem.data_ptr()), {1, 1, 1024}, options);
@@ -2106,36 +2104,33 @@ void executeAtenLSTM1(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamEx
                         hy_dev = hy.data_ptr();
                         cy_dev = cy.data_ptr();
                     }
-                    if (stream_executor.model_type_ == "GNMT" && lstm1_layer->getCustomOptNumber() == 0) {
+                    if (stream_executor.getModelType() == "GNMT" && lstm1_layer->getCustomOptNumber() == 0) {
                         auto out4_layer = stream_executor.getGraph()->getLayerByPosition((layer->getNextLayerIDs())[3]);
                         auto out4_out1_layer =
                             stream_executor.getGraph()->getLayerByPosition((out4_layer->getNextLayerIDs())[0]);
                         int64_t cat_mem_id =
                             std::static_pointer_cast<nn_compiler::ir::AtenCatLayer>(out4_out1_layer)->getMemLayerId();
-                        auto it = stream_executor.global_blobs_.find(cat_mem_id);
                         auto options = at::TensorOptions().dtype(at::kHalf).device(at::kCUDA);
-                        auto cat_mem = it->second.second.toTensor();
+                        auto cat_mem = stream_executor.findBlob(cat_mem_id).second.toTensor();
                         output = torch::from_blob((_Float16*)(cat_mem.data_ptr()), {1, 1, 1024}, options);
                     }
-                    if (stream_executor.model_type_ == "GNMT" && lstm1_layer->getCustomOptNumber() == 1) {
+                    if (stream_executor.getModelType() == "GNMT" && lstm1_layer->getCustomOptNumber() == 1) {
                         auto out1_layer = stream_executor.getGraph()->getLayerByPosition((layer->getNextLayerIDs())[0]);
                         auto out1_out1_layer =
                             stream_executor.getGraph()->getLayerByPosition((out1_layer->getNextLayerIDs())[0]);
                         int64_t cat_mem_id =
                             std::static_pointer_cast<nn_compiler::ir::AtenCatLayer>(out1_out1_layer)->getMemLayerId();
-                        auto it = stream_executor.global_blobs_.find(cat_mem_id);
                         auto options = at::TensorOptions().dtype(at::kHalf).device(at::kCUDA);
-                        auto cat_mem = it->second.second.toTensor();
+                        auto cat_mem = stream_executor.findBlob(cat_mem_id).second.toTensor();
                         output = torch::from_blob((_Float16*)(cat_mem.data_ptr()), {1, 1, 1024}, options);
                     }
                 }
             }
-            miopenRNNForwardInference(stream_executor.handle_, stream_executor.rnn_desc_, seq_len,
-                                      stream_executor.input_tensors_.data(), in_dev, stream_executor.hidden_tensor_,
-                                      hx_dev, stream_executor.hidden_tensor_, cx_dev, stream_executor.weight_tensor_,
-                                      wei_dev, stream_executor.output_tensors_.data(), out_dev,
-                                      stream_executor.hidden_tensor_, hy_dev, stream_executor.hidden_tensor_, cy_dev,
-                                      workspace_dev, workspace_size);
+            miopenRNNForwardInference(stream_executor.getMIOpenHandle(), stream_executor.getMIOpenRNNDesc(), seq_len,
+                                      inputs_ptr, in_dev, *(lstm_tensor.hidden_tensor_), hx_dev,
+                                      *(lstm_tensor.hidden_tensor_), cx_dev, *(lstm_tensor.weight_tensor_), wei_dev,
+                                      outputs_ptr, out_dev, *(lstm_tensor.hidden_tensor_), hy_dev,
+                                      *(lstm_tensor.hidden_tensor_), cy_dev, workspace_dev, workspace_size);
 
             if (!static_cast<bool>(batch_first)) output = output.transpose(0, 1);
             stream_executor.updateBlob(out_stensor_id[0], DataType::TENSOR, tensorToIValue(output));
@@ -2272,8 +2267,9 @@ void executeAtenLSTM2(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamEx
     {
         if (!input.is_contiguous()) input = input.contiguous();
         void *in_dev, *hx_dev, *out_dev, *wei_dev, *cx_dev, *workspace_dev, *hy_dev, *cy_dev;
-        stream_executor.input_tensors_.clear();
-        stream_executor.output_tensors_.clear();
+        auto lstm_tensor = stream_executor.getMiopenLstmTensors();
+        lstm_tensor.input_tensors_->clear();
+        lstm_tensor.output_tensors_->clear();
 
         int batch_size = 1;
         int in_dim = input.dim();
@@ -2291,17 +2287,17 @@ void executeAtenLSTM2(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamEx
         int dims = 2;
         for (int i = 0; i < seq_len; i++) {
             std::array<int, 2> in_lens = {in_len[0], in_len.back()};
-            miopenCreateTensorDescriptor(&stream_executor.input_tensor_);
-            miopenSetTensorDescriptor(stream_executor.input_tensor_, miopenHalf, dims, in_lens.data(), nullptr);
-            stream_executor.input_tensors_.push_back(stream_executor.input_tensor_);
+            miopenCreateTensorDescriptor(lstm_tensor.input_tensor_);
+            miopenSetTensorDescriptor(*(lstm_tensor.input_tensor_), miopenHalf, dims, in_lens.data(), nullptr);
+            lstm_tensor.input_tensors_->push_back(*(lstm_tensor.input_tensor_));
 
             std::array<int, 2> out_lens = {{in_len[0], out_len[0]}};
-            miopenCreateTensorDescriptor(&stream_executor.output_tensor_);
-            miopenSetTensorDescriptor(stream_executor.output_tensor_, miopenHalf, dims, out_lens.data(), nullptr);
-            stream_executor.output_tensors_.push_back(stream_executor.output_tensor_);
+            miopenCreateTensorDescriptor(lstm_tensor.output_tensor_);
+            miopenSetTensorDescriptor(*(lstm_tensor.output_tensor_), miopenHalf, dims, out_lens.data(), nullptr);
+            lstm_tensor.output_tensors_->push_back(*(lstm_tensor.output_tensor_));
         }
         std::array<int, 3> hid_lens = {{hid_len[0], in_len[0], hid_len[1]}};
-        miopenSetTensorDescriptor(stream_executor.hidden_tensor_, miopenHalf, 3, hid_lens.data(), nullptr);
+        miopenSetTensorDescriptor(*(lstm_tensor.hidden_tensor_), miopenHalf, 3, hid_lens.data(), nullptr);
 
         miopenRNNMode_t mode = miopenRNNMode_t::miopenLSTM;
         ;
@@ -2310,24 +2306,25 @@ void executeAtenLSTM2(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamEx
         miopenRNNInputMode_t inMode = miopenRNNlinear;
         miopenRNNAlgo_t algo = miopenRNNdefault;
 
-        miopenSetRNNDescriptor(stream_executor.rnn_desc_, hidden_size, num_layers, inMode, directionMode, mode,
+        miopenSetRNNDescriptor(stream_executor.getMIOpenRNNDesc(), hidden_size, num_layers, inMode, directionMode, mode,
                                biasMode, algo, miopenHalf);
-        miopenGetRNNParamsDescriptor(stream_executor.handle_, stream_executor.rnn_desc_, stream_executor.input_tensor_,
-                                     stream_executor.weight_tensor_, miopenHalf);
+        miopenGetRNNParamsDescriptor(stream_executor.getMIOpenHandle(), stream_executor.getMIOpenRNNDesc(),
+                                     *(lstm_tensor.input_tensor_), *(lstm_tensor.weight_tensor_), miopenHalf);
         size_t workspace_size;
-        miopenGetRNNWorkspaceSize(stream_executor.handle_, stream_executor.rnn_desc_, seq_len,
-                                  stream_executor.input_tensors_.data(), &workspace_size);
+
+        miopenTensorDescriptor_t* inputs_ptr = (*(lstm_tensor.input_tensors_)).data();
+        miopenGetRNNWorkspaceSize(stream_executor.getMIOpenHandle(), stream_executor.getMIOpenRNNDesc(), seq_len,
+                                  inputs_ptr, &workspace_size);
         auto workspace = at::empty(workspace_size, input.options().dtype(at::kByte));
 
         int datasize = 2;  // miopenHalf
         in_dev = input.data_ptr();
 
         hash_id += 10000;  // avert id conflict
-        auto it = stream_executor.global_blobs_.find(hash_id);
-        if (it == stream_executor.global_blobs_.end()) {
+        if (stream_executor.findBlob(hash_id).first == ir::DataType::UNDEFINED) {
             size_t weight_size = 0;
-            miopenGetRNNParamsSize(stream_executor.handle_, stream_executor.rnn_desc_, stream_executor.input_tensor_,
-                                   &weight_size, miopenHalf);
+            miopenGetRNNParamsSize(stream_executor.getMIOpenHandle(), stream_executor.getMIOpenRNNDesc(),
+                                   *(lstm_tensor.input_tensor_), &weight_size, miopenHalf);
             auto weight_buf = at::empty(weight_size / datasize, input.options());
             int expected_weight_size =
                 hidden_size * 4 * (input_size + hidden_size + 2) * bidirectional_int +
@@ -2459,25 +2456,24 @@ void executeAtenLSTM2(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamEx
             wei_dev = weight_buf.data_ptr();
             stream_executor.updateBlob(hash_id, DataType::TENSOR, tensorToIValue(weight_buf));
         } else {
-            wei_dev = it->second.second.toTensor().data_ptr();
+            wei_dev = stream_executor.findBlob(hash_id).second.toTensor().data_ptr();
         }
         in_dev = input.data_ptr();
         hx_dev = hx_list_tensor_vector[0].data_ptr();
         cx_dev = hx_list_tensor_vector[1].data_ptr();
         workspace_dev = workspace.data_ptr();
-        auto it0 = stream_executor.global_blobs_.find(out_stensor_id[0]);
 
-        if (stream_executor.model_type_ == "GNMT" && it0 != stream_executor.global_blobs_.end() && seq_len == 1) {
-            out_dev = it0->second.second.toTensor().data_ptr();
-            hy_dev = stream_executor.global_blobs_.find(out_stensor_id[1])->second.second.toTensor().data_ptr();
-            cy_dev = stream_executor.global_blobs_.find(out_stensor_id[2])->second.second.toTensor().data_ptr();
-            miopenRNNForwardInference(stream_executor.handle_, stream_executor.rnn_desc_, seq_len,
-                                      stream_executor.input_tensors_.data(), in_dev, stream_executor.hidden_tensor_,
-                                      hx_dev, stream_executor.hidden_tensor_, cx_dev, stream_executor.weight_tensor_,
-                                      wei_dev, stream_executor.output_tensors_.data(), out_dev,
-                                      stream_executor.hidden_tensor_, hy_dev, stream_executor.hidden_tensor_, cy_dev,
-                                      workspace_dev, workspace_size);
-
+        miopenTensorDescriptor_t* outputs_ptr = (*(lstm_tensor.output_tensors_)).data();
+        if (stream_executor.getModelType() == "GNMT" &&
+            stream_executor.findBlob(out_stensor_id[0]).first != ir::DataType::UNDEFINED && seq_len == 1) {
+            out_dev = stream_executor.findBlob(out_stensor_id[0]).second.toTensor().data_ptr();
+            hy_dev = stream_executor.findBlob(out_stensor_id[1]).second.toTensor().data_ptr();
+            cy_dev = stream_executor.findBlob(out_stensor_id[2]).second.toTensor().data_ptr();
+            miopenRNNForwardInference(stream_executor.getMIOpenHandle(), stream_executor.getMIOpenRNNDesc(), seq_len,
+                                      inputs_ptr, in_dev, *(lstm_tensor.hidden_tensor_), hx_dev,
+                                      *(lstm_tensor.hidden_tensor_), cx_dev, *(lstm_tensor.weight_tensor_), wei_dev,
+                                      outputs_ptr, out_dev, *(lstm_tensor.hidden_tensor_), hy_dev,
+                                      *(lstm_tensor.hidden_tensor_), cy_dev, workspace_dev, workspace_size);
         } else {
             auto output = at::empty({seq_len, out_len[0]}, input.options());
             out_dev = output.data_ptr();
@@ -2491,12 +2487,12 @@ void executeAtenLSTM2(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamEx
                 hy_dev = hy.data_ptr();
                 cy_dev = cy.data_ptr();
             }
-            miopenRNNForwardInference(stream_executor.handle_, stream_executor.rnn_desc_, seq_len,
-                                      stream_executor.input_tensors_.data(), in_dev, stream_executor.hidden_tensor_,
-                                      hx_dev, stream_executor.hidden_tensor_, cx_dev, stream_executor.weight_tensor_,
-                                      wei_dev, stream_executor.output_tensors_.data(), out_dev,
-                                      stream_executor.hidden_tensor_, hy_dev, stream_executor.hidden_tensor_, cy_dev,
-                                      workspace_dev, workspace_size);
+
+            miopenRNNForwardInference(stream_executor.getMIOpenHandle(), stream_executor.getMIOpenRNNDesc(), seq_len,
+                                      inputs_ptr, in_dev, *(lstm_tensor.hidden_tensor_), hx_dev,
+                                      *(lstm_tensor.hidden_tensor_), cx_dev, *(lstm_tensor.weight_tensor_), wei_dev,
+                                      outputs_ptr, out_dev, *(lstm_tensor.hidden_tensor_), hy_dev,
+                                      *(lstm_tensor.hidden_tensor_), cy_dev, workspace_dev, workspace_size);
 
             stream_executor.updateBlob(out_stensor_id[0], DataType::TENSOR, tensorToIValue(output));
             stream_executor.updateBlob(out_stensor_id[1], DataType::TENSOR, tensorToIValue(hy));
@@ -2568,9 +2564,7 @@ void executeAtenMaskedFill(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, Str
     stream_executor.updateBlob(out_stensor_id[0], DataType::TENSOR, tensorToIValue(output));
     bool is_inplace = mask_fill_layer->getIsInplace();
     if (is_inplace) {
-        auto releation_blob_id = stream_executor.releation_blob_ids_map_.find(in_stensor_id[0]);
-        assert(releation_blob_id != stream_executor.releation_blob_ids_map_.end());
-        auto ori_id = releation_blob_id->second.first;
+        auto ori_id = stream_executor.findInRelationBlobIDsMap(in_stensor_id[0]).first;
         stream_executor.updateBlob(ori_id, DataType::TENSOR, tensorToIValue(output));
     }
 }
@@ -3788,10 +3782,9 @@ void executeAtenUnsqueeze(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, Stre
     at::Tensor output = atenUnsqueeze(tensor, dim);
     // If Unsqueeze op is in-place op, it need change origin data
     if (is_inplace) {
-        auto releation_blob_id = stream_executor.releation_blob_ids_map_.find(in_stensor_id[0]);
-        assert(releation_blob_id != stream_executor.releation_blob_ids_map_.end());
-        auto list_blob_id = releation_blob_id->second.first;
-        auto in_list_pos = releation_blob_id->second.second;
+        auto releation_blob_ids = stream_executor.findInRelationBlobIDsMap(in_stensor_id[0]);
+        auto list_blob_id = releation_blob_ids.first;
+        auto in_list_pos = releation_blob_ids.second;
 
         auto list_blob_iv = stream_executor.findBlob(list_blob_id).second;
         std::vector<torch::IValue> inputs;

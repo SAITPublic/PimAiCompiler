@@ -64,7 +64,7 @@ void executePrimConstant(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, Strea
         std::vector<int64_t> input_shape = getDataShapeFromSTensor(shape_);
         std::vector<int64_t> stride = getDataShapeFromVector(stride_);
 
-        if (stream_executor.model_type_ == "GNMT" && constant_layer->getOutSTensorID()[0] == 4) {
+        if (stream_executor.getModelType() == "GNMT" && constant_layer->getOutSTensorID()[0] == 4) {
             std::vector<int64_t> reorder_shape(input_shape);
 
             int align_m = 32;
@@ -164,7 +164,7 @@ void executePrimData(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExe
     torch::Tensor tensor_value = primData(tensor);
     // update output
     auto out_stensor_id = layer->getOutSTensorID()[0];
-    stream_executor.releation_blob_ids_map_.insert({out_stensor_id, {in_stensor_ids[0], -1}});
+    stream_executor.insertInRelationBlobIDsMap(out_stensor_id, in_stensor_ids[0], -1);
     stream_executor.updateBlob(out_stensor_id, DataType::TENSOR, tensorToIValue(tensor_value));
 }
 
@@ -727,8 +727,8 @@ void executePrimBlock(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamEx
             stream_executor.updateBlob(end_loop_out_stensor_ids.at(i), in_blob.first, in_blob.second);
         }
         // Jump to End Loop'next
-        int64_t temp_cond = stream_executor.loop_condition_stack_.top();
-        stream_executor.loop_condition_stack_.pop();
+        int64_t temp_cond = stream_executor.getTopOfLoopConditionStack();
+        stream_executor.popOfLoopConditionStack();
         auto loop_op_layer = stream_executor.getGraph()->getLayerByPosition(loop_layer_id);
         auto loop_layer = std::static_pointer_cast<nn_compiler::ir::PrimLoopLayer>(loop_op_layer);
         loop_layer->setCond(temp_cond);
@@ -771,20 +771,20 @@ void executePrimLoop(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExe
 
     // ref: torch_jit Loop: https://github.com/pytorch/pytorch/blob/master/torch/csrc/jit/OVERVIEW.md#loops
     int64_t loop_cond = loop_layer->getCond();
-    stream_executor.loop_condition_stack_.push(loop_cond);
+    stream_executor.pushInLoopConditionStack(loop_cond);
     int64_t max_trip_cnt = loop_layer->getTripCount();
 
-    int edge_id = 0;
+    int in_id = 0;
     auto in_stensor_ids = layer->getInSTensorID();
     auto out_stensor_ids = layer->getOutSTensorID();
     // check default
     if (nn_compiler::ir::isDefaultValue(max_trip_cnt)) {
         // Get from loop's input[0]
-        max_trip_cnt = stream_executor.findBlob(in_stensor_ids[edge_id++]).second.toInt();
+        max_trip_cnt = stream_executor.findBlob(in_stensor_ids[in_id++]).second.toInt();
     }
     if (nn_compiler::ir::isDefaultValue(loop_cond)) {
         // Get from loop's input[1]
-        loop_cond = stream_executor.findBlob(in_stensor_ids[edge_id++]).second.toInt();
+        loop_cond = stream_executor.findBlob(in_stensor_ids[in_id++]).second.toInt();
     }
 
     // loop_layer.id + 1 ---> loopIndex_layer
@@ -806,11 +806,9 @@ void executePrimLoop(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExe
     // the Loop's input maybe empty
     // loopHasExtraInputs(loop_node)
     if (loopHasExtraInputs(loop_layer)) {
-        // assert(in_stensor_ids.size() == out_stensor_ids.size() + 1);
         for (int i = 0; i < out_stensor_ids.size(); i++) {
-            int64_t in_id = in_stensor_ids.at(i + edge_id);
+            auto in_blob = stream_executor.findBlob(in_stensor_ids.at(i + in_id));
             int64_t out_id = out_stensor_ids.at(i);
-            auto in_blob = stream_executor.findBlob(in_id);
             stream_executor.updateBlob(out_id, in_blob.first, in_blob.second);
         }
     }

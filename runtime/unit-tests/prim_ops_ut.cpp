@@ -10,6 +10,7 @@
 
 using std::vector;
 using namespace nn_compiler::runtime;
+using namespace nn_compiler::runtime::op_executor;
 
 TEST(NNCompilerUnitTest, primDeviceOpTest)
 {

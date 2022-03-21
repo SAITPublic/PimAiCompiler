@@ -17,7 +17,7 @@
 using namespace torch;
 using namespace at;
 using namespace c10;
-using namespace nn_compiler::runtime;
+using namespace nn_compiler::runtime::op_executor;
 
 #define ASSERT_EQUAL(t1, t2) ASSERT_TRUE(t1.equal(t2));
 
