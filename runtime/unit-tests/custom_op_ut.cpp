@@ -4,7 +4,6 @@
 #include "pim_runtime_api.h"
 #include "ut_utils.h"
 
-
 TEST(NNCompilerUnitTest, customGemvTest)
 {
     float alpha = 1.0f;
@@ -54,7 +53,6 @@ TEST(NNCompilerUnitTest, customGemvTest)
         auto output_torch = at::matmul(self, other);
         ASSERT_ALLCLOSE_TOLERANCES(output.cpu(), output_torch.cpu(), 1e-3, 1e-5);
     }
-
 }
 
 TEST(NNCompilerUnitTest, pimCustomGemvTest)
@@ -134,5 +132,4 @@ TEST(NNCompilerUnitTest, pimCustomGemvTest)
         auto output_torch = at::matmul(self, other);
         ASSERT_ALLCLOSE_TOLERANCES(output.cpu(), output_torch.cpu(), 1e-3, 1e-5);
     }
-
 }

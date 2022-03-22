@@ -24,7 +24,7 @@ using namespace nn_compiler::runtime;
 // ------ ATen Op ------ //
 // only the ops implemented by ourselves need to test, and ops implemented by pytorch do not need to test.
 
-TEST(NNCompilerUnitTest, catOpTest)
+TEST(NNCompilerUnitTest, atenCatOpTest)
 {
     // result = concat(split(result, dim(n/c/h/w)), dim(n/c/h/w))
     int shape_h = 3;
@@ -37,7 +37,7 @@ TEST(NNCompilerUnitTest, catOpTest)
     ASSERT_EQUAL(t, r);
 }
 
-TEST(NNCompilerUnitTest, copyOpTest)
+TEST(NNCompilerUnitTest, atenCopyOpTest)
 {
     bool non_blocking = false;
     int n = 100;
@@ -59,7 +59,7 @@ TEST(NNCompilerUnitTest, copyOpTest)
     ASSERT_EQUAL(r, g);
 }
 
-TEST(NNCompilerUnitTest, deriveOpTest)
+TEST(NNCompilerUnitTest, atenDeriveOpTest)
 {
     // r = start + index * step
     int64_t start = 10;
@@ -70,7 +70,7 @@ TEST(NNCompilerUnitTest, deriveOpTest)
     EXPECT_TRUE(t == r);
 }
 
-TEST(NNCompilerUnitTest, getItemOpTest)
+TEST(NNCompilerUnitTest, atenGetItemOpTest)
 {
 #define LIST_CONSTRUCT_TEST(name)  \
     std::vector<torch::IValue> iv; \
@@ -94,7 +94,7 @@ TEST(NNCompilerUnitTest, getItemOpTest)
     }
 }
 
-TEST(NNCompilerUnitTest, appendAndLenOpTest)
+TEST(NNCompilerUnitTest, atenAppendAndLenOpTest)
 {
 #define LIST_CONSTRUCT_TEST(name)  \
     std::vector<torch::IValue> iv; \
@@ -122,7 +122,7 @@ TEST(NNCompilerUnitTest, appendAndLenOpTest)
     EXPECT_TRUE(rt == 5);
 }
 
-TEST(NNCompilerUnitTest, dimOpTest)
+TEST(NNCompilerUnitTest, atenDimOpTest)
 {
     int n = 10;
     int m = 9;
@@ -131,7 +131,7 @@ TEST(NNCompilerUnitTest, dimOpTest)
     EXPECT_TRUE(r == 2);
 }
 
-TEST(NNCompilerUnitTest, intOpTest)
+TEST(NNCompilerUnitTest, atenIntOpTest)
 {
     int n = 1;
     int m = 1;
@@ -149,7 +149,7 @@ TEST(NNCompilerUnitTest, intOpTest)
     EXPECT_TRUE(r == n);
 }
 
-TEST(NNCompilerUnitTest, formatOpTest)
+TEST(NNCompilerUnitTest, atenFormatOpTest)
 {
     std::string t("{}abc{}");
     std::string d("d");
@@ -158,7 +158,7 @@ TEST(NNCompilerUnitTest, formatOpTest)
     EXPECT_TRUE(r == "dabc__");
 }
 
-TEST(NNCompilerUnitTest, listOpTest)
+TEST(NNCompilerUnitTest, atenListOpTest)
 {
     std::string t("abc");
     std::string data[3] = {"a", "b", "c"};
