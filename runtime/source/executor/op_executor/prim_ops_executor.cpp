@@ -6,6 +6,8 @@ namespace nn_compiler
 {
 namespace runtime
 {
+namespace op_executor
+{
 void executePrimConstant(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
     DLOG(INFO) << "execute PrimConstant";
@@ -865,6 +867,6 @@ void executePrimEndLoop(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, Stream
                                    end_loop_input_blob.second);
     }
 }
-
+}  // namespace op_executor
 }  // namespace runtime
 }  // namespace nn_compiler

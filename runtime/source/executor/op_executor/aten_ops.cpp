@@ -9,6 +9,8 @@ namespace nn_compiler
 {
 namespace runtime
 {
+namespace op_executor
+{
 at::Tensor atenAdd(const at::Tensor &self, const at::Scalar &other, const at::Scalar &alpha)
 {
     return at::add(self, other, alpha);
@@ -744,5 +746,6 @@ void customAtenMatmul(at::Tensor &self_tensor, at::Tensor &other_tensor, torch::
     }
 }
 
+}  // namespace op_executor
 }  // namespace runtime
 }  // namespace nn_compiler

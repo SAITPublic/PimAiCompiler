@@ -59,7 +59,7 @@ int NNRuntime::rocblas_init(void)
     int K = 4096;
     auto l_gpu = at::randn({M, K}, at::kCUDA);
     auto r_gpu = at::randn({K, N}, at::kCUDA);
-    auto result = atenMatmul(l_gpu, r_gpu);
+    auto result = op_executor::atenMatmul(l_gpu, r_gpu);
     at::hip::device_synchronize();
 
     return 0;

@@ -13,6 +13,8 @@ namespace nn_compiler
 {
 namespace runtime
 {
+namespace op_executor
+{
 torch::Tensor primData(const torch::Tensor& input_tensor);
 
 c10::Device primDevice(const torch::Tensor& input_tensor);
@@ -73,6 +75,7 @@ torch::IValue primUninitialized();
 
 at::IValue primVariable(std::string ntype, std::vector<torch::IValue> inputs);
 
+}  // namespace op_executor
 }  // namespace runtime
 }  // namespace nn_compiler
 

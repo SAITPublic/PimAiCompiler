@@ -20,7 +20,9 @@ namespace nn_compiler
 {
 namespace runtime
 {
-void executorAtenAdd(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
+namespace op_executor
+{
+void executeAtenAdd(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
     DLOG(INFO) << "execute Aten Add node";
 
@@ -126,9 +128,9 @@ void executorAtenAdd(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExe
     } else {
         DLOG(FATAL) << "Unsupported input type for aten::add";
     }
-}  // executorAtenAdd
+}  // executeAtenAdd
 
-void executorAtenAddmm(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
+void executeAtenAddmm(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
     DLOG(INFO) << "execute Aten Addmm node";
 
@@ -165,7 +167,7 @@ void executorAtenAddmm(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamE
     stream_executor.updateBlob(out_stensor_id[0], DataType::TENSOR, output);
 }
 
-void executorAtenAnd(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
+void executeAtenAnd(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
     DLOG(INFO) << "execute Aten And node";
 
@@ -192,7 +194,7 @@ void executorAtenAnd(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExe
     stream_executor.updateBlob(out_stensor_id[0], DataType::BOOL, boolToIValue(output));
 }
 
-void executorAtenAny(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
+void executeAtenAny(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
     DLOG(INFO) << "execute Aten Any node";
 
@@ -208,7 +210,7 @@ void executorAtenAny(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExe
     stream_executor.updateBlob(out_stensor_id[0], DataType::TENSOR, torch::jit::IValue(output));
 }
 
-void executorAtenAppend(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
+void executeAtenAppend(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
     DLOG(INFO) << "execute Aten Append node";
 
@@ -228,7 +230,7 @@ void executorAtenAppend(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, Stream
     stream_executor.updateBlob(out_stensor_id[0], DataType::LIST, listToIValue(list));
 }
 
-void executorAtenArange1(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
+void executeAtenArange1(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
     DLOG(INFO) << "execute Aten Arange1 node";
 
@@ -289,7 +291,7 @@ void executorAtenArange1(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, Strea
     stream_executor.updateBlob(out_stensor_id[0], DataType::TENSOR, tensorToIValue(output));
 }
 
-void executorAtenArange2(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
+void executeAtenArange2(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
     DLOG(INFO) << "execute Aten Arange2 node";
 
@@ -356,7 +358,7 @@ void executorAtenArange2(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, Strea
     stream_executor.updateBlob(out_stensor_id[0], DataType::TENSOR, tensorToIValue(output));
 }
 
-void executorAtenArange3(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
+void executeAtenArange3(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
     DLOG(INFO) << "execute Aten Arange3 node";
 
@@ -429,7 +431,7 @@ void executorAtenArange3(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, Strea
     stream_executor.updateBlob(out_stensor_id[0], DataType::TENSOR, tensorToIValue(output));
 }
 
-void executorAtenAsTensor(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
+void executeAtenAsTensor(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
     DLOG(INFO) << "execute Aten AsTensor node";
 
@@ -466,7 +468,7 @@ void executorAtenAsTensor(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, Stre
     stream_executor.updateBlob(out_stensor_id[0], DataType::TENSOR, tensorToIValue(output));
 }
 
-void executorAtenBatchNorm2d(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
+void executeAtenBatchNorm2d(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
     DLOG(INFO) << "execute Aten BN2d node";
 
@@ -533,7 +535,7 @@ void executorAtenBatchNorm2d(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, S
     stream_executor.updateBlob(out_stensor_id[0], DataType::TENSOR, tensorToIValue(output));
 }
 
-void executorAtenBitwiseNot(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
+void executeAtenBitwiseNot(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
     DLOG(INFO) << "execute Aten BitwiseNot node";
     auto in_stensor_id = layer->getInSTensorID();
@@ -548,7 +550,7 @@ void executorAtenBitwiseNot(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, St
     stream_executor.updateBlob(out_stensor_id[0], DataType::TENSOR, torch::jit::IValue(output));
 }
 
-void executorAtenBmm(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
+void executeAtenBmm(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
     DLOG(INFO) << "execute Aten Bmm node";
     auto in_stensor_id = layer->getInSTensorID();
@@ -629,7 +631,7 @@ void executorAtenBmm(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExe
     }
 }
 
-void executorAtenBool(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
+void executeAtenBool(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
     DLOG(INFO) << "execute Aten Bool node";
     auto in_stensor_id = layer->getInSTensorID();
@@ -652,7 +654,7 @@ void executorAtenBool(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamEx
     stream_executor.updateBlob(out_stensor_id[0], DataType::BOOL, boolToIValue(output));
 }
 
-void executorAtenCat(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
+void executeAtenCat(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
     DLOG(INFO) << "execute Aten Cat node";
 
@@ -702,7 +704,7 @@ void executorAtenCat(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExe
     stream_executor.updateBlob(out_stensor_id[0], DataType::TENSOR, tensorToIValue(output));
 }
 
-void executorAtenCeil(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
+void executeAtenCeil(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
     DLOG(INFO) << "execute Aten Ceil node";
     auto in_stensor_id = layer->getInSTensorID();
@@ -718,7 +720,7 @@ void executorAtenCeil(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamEx
     stream_executor.updateBlob(out_stensor_id[0], DataType::TENSOR, torch::jit::IValue(output));
 }
 
-void executorAtenChunk(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
+void executeAtenChunk(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
     DLOG(INFO) << "execute Aten Chunk node";
 
@@ -748,7 +750,7 @@ void executorAtenChunk(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamE
     stream_executor.updateBlob(out_stensor_id[0], DataType::LIST, vectorToIValue(output));
 }
 
-void executorAtenClamp(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
+void executeAtenClamp(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
     DLOG(INFO) << "execute Aten Clamp node";
 
@@ -778,7 +780,7 @@ void executorAtenClamp(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamE
     stream_executor.updateBlob(out_stensor_id[0], DataType::TENSOR, tensorToIValue(output));
 }
 
-void executorAtenClear(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
+void executeAtenClear(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
     DLOG(INFO) << "execute Aten Clear node";
     auto in_stensor_id = layer->getInSTensorID();
@@ -791,7 +793,7 @@ void executorAtenClear(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamE
     stream_executor.updateBlob(in_stensor_id[0], DataType::LIST, torch::jit::IValue(self_list));
 }
 
-void executorAtenContiguous(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
+void executeAtenContiguous(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
     DLOG(INFO) << "execute Aten Contiguous node";
 
@@ -815,7 +817,7 @@ void executorAtenContiguous(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, St
     stream_executor.updateBlob(out_stensor_id[0], DataType::TENSOR, tensorToIValue(output));
 }
 
-void executorAtenConv2d(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
+void executeAtenConv2d(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
     DLOG(INFO) << "execute Aten Conv2d node";
 
@@ -853,7 +855,7 @@ void executorAtenConv2d(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, Stream
     stream_executor.updateBlob(out_stensor_id[0], DataType::TENSOR, tensorToIValue(output));
 }
 
-void executorAtenCopy(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
+void executeAtenCopy(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
     DLOG(INFO) << "execute Aten Copy node";
 
@@ -878,7 +880,7 @@ void executorAtenCopy(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamEx
     stream_executor.updateBlob(out_stensor_id[0], DataType::TENSOR, torch::jit::IValue(output));
 }
 
-void executorAtenCpu(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
+void executeAtenCpu(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
     DLOG(INFO) << "execute Aten Cpu node";
 
@@ -894,7 +896,7 @@ void executorAtenCpu(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExe
     stream_executor.updateBlob(out_stensor_id[0], DataType::TENSOR, tensorToIValue(output));
 }
 
-void executorAtenCuda(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
+void executeAtenCuda(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
     DLOG(INFO) << "execute Aten Cuda node";
 
@@ -910,7 +912,7 @@ void executorAtenCuda(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamEx
     stream_executor.updateBlob(out_stensor_id[0], DataType::TENSOR, tensorToIValue(output));
 }
 
-void executorAtenDeriveIndex(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
+void executeAtenDeriveIndex(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
     DLOG(INFO) << "execute Aten derive_index node";
 
@@ -942,7 +944,7 @@ void executorAtenDeriveIndex(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, S
     stream_executor.updateBlob(out_stensor_id[0], DataType::INT64, scalarToIValue(output));
 }
 
-void executorAtenDim(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
+void executeAtenDim(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
     DLOG(INFO) << "execute Aten Dim node";
 
@@ -960,7 +962,7 @@ void executorAtenDim(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExe
     stream_executor.updateBlob(out_stensor_id[0], DataType::INT64, intToIValue(output));
 }
 
-void executorAtenDiv(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
+void executeAtenDiv(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
     DLOG(INFO) << "execute Aten Div node";
 
@@ -992,7 +994,7 @@ void executorAtenDiv(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExe
     }
 }
 
-void executorAtenDropout(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
+void executeAtenDropout(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
     DLOG(INFO) << "execute Aten Dropout node";
 
@@ -1024,7 +1026,7 @@ void executorAtenDropout(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, Strea
     stream_executor.updateBlob(out_stensor_id[0], DataType::TENSOR, tensorToIValue(output));
 }
 
-void executorAtenEmbedding(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
+void executeAtenEmbedding(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
     DLOG(INFO) << "execute Aten Embedding node";
 
@@ -1081,7 +1083,7 @@ void executorAtenEmbedding(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, Str
     }
 }
 
-void executorAtenEq(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
+void executeAtenEq(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
     DLOG(INFO) << "execute Aten Eq node";
 
@@ -1120,7 +1122,7 @@ void executorAtenEq(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExec
     }
 }
 
-void executorAtenEqual(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
+void executeAtenEqual(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
     DLOG(INFO) << "execute Aten Equal node";
 
@@ -1139,7 +1141,7 @@ void executorAtenEqual(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamE
     stream_executor.updateBlob(out_stensor_id[0], DataType::BOOL, boolToIValue(output));
 }
 
-void executorAtenExpand(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
+void executeAtenExpand(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
     DLOG(INFO) << "execute Aten Expand node";
 
@@ -1170,7 +1172,7 @@ void executorAtenExpand(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, Stream
     stream_executor.updateBlob(out_stensor_id[0], DataType::TENSOR, tensorToIValue(output));
 }
 
-void executorAtenFill(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
+void executeAtenFill(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
     DLOG(INFO) << "execute Aten Fill node";
 
@@ -1200,7 +1202,7 @@ void executorAtenFill(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamEx
     }
 }
 
-void executorAtenFloorDivide(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
+void executeAtenFloorDivide(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
     DLOG(INFO) << "execute Aten FloorDivide node";
 
@@ -1228,7 +1230,7 @@ void executorAtenFloorDivide(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, S
     }
 }
 
-void executorAtenFormat(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
+void executeAtenFormat(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
     DLOG(INFO) << "execute Aten Format node";
 
@@ -1289,7 +1291,7 @@ void executorAtenFormat(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, Stream
     }
 }
 
-void executorAtenGather(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
+void executeAtenGather(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
     DLOG(INFO) << "execute Aten Gather node";
 
@@ -1326,7 +1328,7 @@ void executorAtenGather(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, Stream
     stream_executor.updateBlob(out_stensor_id[0], DataType::TENSOR, tensorToIValue(output));
 }
 
-void executorAtenGe(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
+void executeAtenGe(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
     DLOG(INFO) << "execute Aten Ge node";
 
@@ -1354,7 +1356,7 @@ void executorAtenGe(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExec
     }
 }
 
-void executorAtenGetItem(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
+void executeAtenGetItem(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
     DLOG(INFO) << "execute Aten GetItem node";
 
@@ -1380,7 +1382,7 @@ void executorAtenGetItem(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, Strea
     stream_executor.updateBlob(out_stensor_id[0], DataType::IVALUE, output);
 }
 
-void executorAtenGt(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
+void executeAtenGt(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
     DLOG(INFO) << "execute Aten Gt node";
 
@@ -1413,7 +1415,7 @@ void executorAtenGt(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExec
     }
 }
 
-void executorAtenIndex(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
+void executeAtenIndex(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
     DLOG(INFO) << "execute Aten Index node";
 
@@ -1437,7 +1439,7 @@ void executorAtenIndex(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamE
     stream_executor.updateBlob(out_stensor_id[0], DataType::TENSOR, tensorToIValue(output));
 }
 
-void executorAtenIndexPut(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
+void executeAtenIndexPut(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
     DLOG(INFO) << "execute Aten IndexPut node";
 
@@ -1476,7 +1478,7 @@ void executorAtenIndexPut(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, Stre
     stream_executor.updateBlob(in_stensor_id[0], DataType::TENSOR, tensorToIValue(output));  // in-place op
 }
 
-void executorAtenIndexSelect(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
+void executeAtenIndexSelect(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
     DLOG(INFO) << "execute Aten IndexSelect node";
 
@@ -1506,7 +1508,7 @@ void executorAtenIndexSelect(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, S
     stream_executor.updateBlob(out_stensor_id[0], DataType::TENSOR, tensorToIValue(output));
 }
 
-void executorAtenInt(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
+void executeAtenInt(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
     DLOG(INFO) << "execute Aten Int node";
 
@@ -1529,7 +1531,7 @@ void executorAtenInt(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExe
     stream_executor.updateBlob(out_stensor_id[0], DataType::INT64, scalarToIValue(output));
 }
 
-void executorAtenIs(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
+void executeAtenIs(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
     DLOG(INFO) << "execute Aten Is node";
 
@@ -1546,7 +1548,7 @@ void executorAtenIs(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExec
     stream_executor.updateBlob(out_stensor_id[0], DataType::BOOL, boolToIValue(output));
 }
 
-void executorAtenItem(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
+void executeAtenItem(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
     DLOG(INFO) << "execute Aten Item node";
 
@@ -1566,7 +1568,7 @@ void executorAtenItem(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamEx
     stream_executor.updateBlob(out_stensor_id[0], output_dtype, torch::jit::IValue(output));
 }
 
-void executorAtenLeakyRelu(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
+void executeAtenLeakyRelu(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
     DLOG(INFO) << "execute Aten LeakyRelu node";
 
@@ -1592,7 +1594,7 @@ void executorAtenLeakyRelu(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, Str
     stream_executor.updateBlob(out_stensor_id[0], DataType::TENSOR, tensorToIValue(output));
 }
 
-void executorAtenLen(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
+void executeAtenLen(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
     DLOG(INFO) << "execute Aten Len node";
 
@@ -1624,7 +1626,7 @@ void executorAtenLen(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExe
     stream_executor.updateBlob(out_stensor_id[0], DataType::INT64, intToIValue(output));
 }
 
-void executorAtenLinear(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
+void executeAtenLinear(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
     DLOG(INFO) << "execute Aten Linear node";
 
@@ -1656,7 +1658,7 @@ void executorAtenLinear(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, Stream
     stream_executor.updateBlob(out_stensor_id[0], DataType::TENSOR, tensorToIValue(output));
 }
 
-void executorAtenList(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
+void executeAtenList(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
     DLOG(INFO) << "execute Aten List node";
 
@@ -1671,7 +1673,7 @@ void executorAtenList(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamEx
     stream_executor.updateBlob(out_stensor_id[0], DataType::LIST, listToIValue(output));
 }
 
-void executorAtenLog(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
+void executeAtenLog(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
     DLOG(INFO) << "execute Aten Log node";
 
@@ -1687,7 +1689,7 @@ void executorAtenLog(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExe
     stream_executor.updateBlob(out_stensor_id[0], DataType::TENSOR, tensorToIValue(output));
 }
 
-void executorAtenLogSoftmax(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
+void executeAtenLogSoftmax(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
     DLOG(INFO) << "execute Aten LogSoftmax node";
 
@@ -1730,7 +1732,7 @@ void executorAtenLogSoftmax(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, St
     stream_executor.updateBlob(out_stensor_id[0], DataType::TENSOR, tensorToIValue(output));
 }
 
-void executorAtenLSTM1(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
+void executeAtenLSTM1(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
     DLOG(INFO) << "execute Aten LSTM1 node";
 
@@ -2143,7 +2145,7 @@ void executorAtenLSTM1(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamE
     }
 }
 
-void executorAtenLSTM2(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
+void executeAtenLSTM2(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
     DLOG(INFO) << "execute Aten LSTM2 node";
 
@@ -2503,7 +2505,7 @@ void executorAtenLSTM2(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamE
     }
 }
 
-void executorAtenLt(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
+void executeAtenLt(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
     DLOG(INFO) << "execute Aten Lt node";
 
@@ -2534,7 +2536,7 @@ void executorAtenLt(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExec
     }
 }
 
-void executorAtenMaskedFill(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
+void executeAtenMaskedFill(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
     DLOG(INFO) << "execute Aten MaskedFill node";
 
@@ -2573,7 +2575,7 @@ void executorAtenMaskedFill(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, St
     }
 }
 
-void executorAtenMaskedSelect(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
+void executeAtenMaskedSelect(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
     DLOG(INFO) << "execute Aten MaskedSelect node";
 
@@ -2592,7 +2594,7 @@ void executorAtenMaskedSelect(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, 
     stream_executor.updateBlob(out_stensor_id[0], DataType::TENSOR, tensorToIValue(output));
 }
 
-void executorAtenMatmul(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
+void executeAtenMatmul(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
     DLOG(INFO) << "execute Aten Matmul node";
 
@@ -2611,7 +2613,7 @@ void executorAtenMatmul(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, Stream
     stream_executor.updateBlob(out_stensor_id[0], DataType::TENSOR, output);
 }
 
-void executorAtenMax(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
+void executeAtenMax(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
     DLOG(INFO) << "execute Aten Max node";
 
@@ -2681,7 +2683,7 @@ void executorAtenMax(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExe
     }
 }
 
-void executorAtenMaxPool2d(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
+void executeAtenMaxPool2d(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
     DLOG(INFO) << "execute Aten MaxPool2d node";
 
@@ -2776,7 +2778,7 @@ void executorAtenMaxPool2d(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, Str
     stream_executor.updateBlob(out_stensor_id[0], DataType::TENSOR, tensorToIValue(output));
 }
 
-void executorAtenMin(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
+void executeAtenMin(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
     DLOG(INFO) << "execute Aten Min node";
 
@@ -2827,7 +2829,7 @@ void executorAtenMin(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExe
     stream_executor.updateBlob(out_stensor_id[1], DataType::TENSOR, tensorToIValue(std::get<1>(output)));
 }
 
-void executorAtenMul(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
+void executeAtenMul(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
     DLOG(INFO) << "execute Aten Mul node";
 
@@ -2868,7 +2870,7 @@ void executorAtenMul(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExe
     }
 }
 
-void executorAtenNe(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
+void executeAtenNe(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
     DLOG(INFO) << "execute Aten Ne node";
 
@@ -2913,7 +2915,7 @@ void executorAtenNe(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExec
     }
 }
 
-void executorAtenNeg(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
+void executeAtenNeg(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
     DLOG(INFO) << "execute Aten Neg node";
 
@@ -2942,7 +2944,7 @@ void executorAtenNeg(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExe
     }
 }
 
-void executorAtenNorm(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
+void executeAtenNorm(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
     DLOG(INFO) << "execute Aten Norm node";
 
@@ -2966,7 +2968,7 @@ void executorAtenNorm(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamEx
     stream_executor.updateBlob(out_stensor_id[0], DataType::TENSOR, tensorToIValue(output));
 }
 
-void executorAtenNot(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
+void executeAtenNot(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
     DLOG(INFO) << "execute Aten Not node";
 
@@ -2987,7 +2989,7 @@ void executorAtenNot(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExe
     }
 }
 
-void executorAtenOnes(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
+void executeAtenOnes(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
     DLOG(INFO) << "execute Aten Ones node";
 
@@ -3047,7 +3049,7 @@ void executorAtenOnes(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamEx
     stream_executor.updateBlob(out_stensor_id[0], DataType::TENSOR, tensorToIValue(output));
 }
 
-void executorAtenPackPaddedSequence(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
+void executeAtenPackPaddedSequence(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
     DLOG(INFO) << "execute Aten PackPaddedSequence node";
 
@@ -3077,7 +3079,7 @@ void executorAtenPackPaddedSequence(std::shared_ptr<nn_compiler::ir::NNLayer>& l
     stream_executor.updateBlob(out_stensor_id[1], DataType::TENSOR, tensorToIValue(std::get<1>(output)));
 }
 
-void executorAtenPadPackedSequence(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
+void executeAtenPadPackedSequence(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
     DLOG(INFO) << "execute Aten PadPackedSequence node";
 
@@ -3123,7 +3125,7 @@ void executorAtenPadPackedSequence(std::shared_ptr<nn_compiler::ir::NNLayer>& la
     stream_executor.updateBlob(out_stensor_id[1], DataType::TENSOR, tensorToIValue(std::get<1>(output)));
 }
 
-void executorAtenPow(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
+void executeAtenPow(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
     DLOG(INFO) << "execute Aten Pow node";
 
@@ -3157,7 +3159,7 @@ void executorAtenPow(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExe
     }
 }
 
-void executorAtenRelu(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
+void executeAtenRelu(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
     DLOG(INFO) << "execute Aten Relu node";
 
@@ -3174,7 +3176,7 @@ void executorAtenRelu(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamEx
     stream_executor.updateBlob(out_stensor_id[0], DataType::TENSOR, tensorToIValue(output));
 }
 
-void executorAtenReshape(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
+void executeAtenReshape(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
     DLOG(INFO) << "execute Aten Reshape node";
 
@@ -3203,7 +3205,7 @@ void executorAtenReshape(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, Strea
     stream_executor.updateBlob(out_stensor_id[0], DataType::TENSOR, tensorToIValue(output_tensor));
 }
 
-void executorAtenSelect(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
+void executeAtenSelect(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
     DLOG(INFO) << "execute Aten Select node";
 
@@ -3235,7 +3237,7 @@ void executorAtenSelect(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, Stream
     stream_executor.updateBlob(out_stensor_id[0], DataType::TENSOR, tensorToIValue(output));
 }
 
-void executorAtenSetItem(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
+void executeAtenSetItem(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
     DLOG(INFO) << "execute Aten SetItem node";
 
@@ -3264,7 +3266,7 @@ void executorAtenSetItem(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, Strea
     stream_executor.updateBlob(in_stensor_id[0], DataType::LIST, listToIValue(output));
 }
 
-void executorAtenSize(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
+void executeAtenSize(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
     DLOG(INFO) << "execute Aten Size node";
 
@@ -3293,7 +3295,7 @@ void executorAtenSize(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamEx
     }
 }
 
-void executorAtenSlice(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
+void executeAtenSlice(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
     DLOG(INFO) << "execute Aten Slice node";
 
@@ -3339,7 +3341,7 @@ void executorAtenSlice(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamE
     stream_executor.updateBlob(out_stensor_id[0], DataType::TENSOR, tensorToIValue(output));
 }
 
-void executorAtenSoftmax(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
+void executeAtenSoftmax(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
     DLOG(INFO) << "execute Aten Softmax node";
 
@@ -3375,7 +3377,7 @@ void executorAtenSoftmax(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, Strea
     stream_executor.updateBlob(out_stensor_id[0], DataType::TENSOR, tensorToIValue(output));
 }
 
-void executorAtenSqueeze(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
+void executeAtenSqueeze(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
     DLOG(INFO) << "execute Aten Squeeze node";
 
@@ -3400,7 +3402,7 @@ void executorAtenSqueeze(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, Strea
     stream_executor.updateBlob(out_stensor_id[0], DataType::TENSOR, tensorToIValue(output));
 }
 
-void executorAtenSub(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
+void executeAtenSub(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
     DLOG(INFO) << "execute Aten Sub node";
 
@@ -3439,7 +3441,7 @@ void executorAtenSub(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExe
     }
 }
 
-void executorAtenSum(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
+void executeAtenSum(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
     DLOG(INFO) << "execute Aten Sum node";
 
@@ -3485,7 +3487,7 @@ void executorAtenSum(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExe
     stream_executor.updateBlob(out_stensor_id[0], DataType::TENSOR, tensorToIValue(output));
 }
 
-void executorAtenTanh(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
+void executeAtenTanh(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
     DLOG(INFO) << "execute Aten Tanh node";
 
@@ -3500,7 +3502,7 @@ void executorAtenTanh(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamEx
     stream_executor.updateBlob(out_stensor_id[0], DataType::TENSOR, tensorToIValue(output));
 }
 
-void executorAtenTensor(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
+void executeAtenTensor(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
     DLOG(INFO) << "execute Aten Tensor node";
 
@@ -3561,7 +3563,7 @@ void executorAtenTensor(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, Stream
     stream_executor.updateBlob(out_stensor_id[0], DataType::TENSOR, tensorToIValue(output));
 }
 
-void executorAtenTo1(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
+void executeAtenTo1(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
     DLOG(INFO) << "execute Aten To1 node";
 
@@ -3624,7 +3626,7 @@ void executorAtenTo1(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExe
     }
 }
 
-void executorAtenTo2(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
+void executeAtenTo2(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
     DLOG(INFO) << "execute Aten To2 node";
 
@@ -3683,7 +3685,7 @@ void executorAtenTo2(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExe
     }
 }
 
-void executorAtenTopk(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
+void executeAtenTopk(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
     DLOG(INFO) << "execute Aten Topk node";
 
@@ -3732,7 +3734,7 @@ void executorAtenTopk(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamEx
     stream_executor.updateBlob(out_stensor_id[1], DataType::TENSOR, tensorToIValue(std::get<1>(output)));
 }
 
-void executorAtenTranspose(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
+void executeAtenTranspose(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
     DLOG(INFO) << "execute Aten Transpose node";
 
@@ -3763,7 +3765,7 @@ void executorAtenTranspose(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, Str
     stream_executor.updateBlob(out_stensor_id[0], DataType::TENSOR, tensorToIValue(output));
 }
 
-void executorAtenUnsqueeze(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
+void executeAtenUnsqueeze(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
     DLOG(INFO) << "execute Aten Unsqueeze node";
 
@@ -3809,7 +3811,7 @@ void executorAtenUnsqueeze(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, Str
     }
 }
 
-void executorAtenView(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
+void executeAtenView(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
     DLOG(INFO) << "execute Aten View node";
 
@@ -3829,7 +3831,7 @@ void executorAtenView(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamEx
     stream_executor.updateBlob(out_stensor_id[0], DataType::TENSOR, tensorToIValue(output));
 }
 
-void executorAtenWarn(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
+void executeAtenWarn(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
     DLOG(INFO) << "execute AtenWarn node";
 
@@ -3841,7 +3843,7 @@ void executorAtenWarn(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamEx
     atenWarn(iv.toString()->string());
 }
 
-void executorAtenZeros(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
+void executeAtenZeros(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
     DLOG(INFO) << "execute Aten Zeros node";
 
@@ -3880,7 +3882,7 @@ void executorAtenZeros(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamE
     stream_executor.updateBlob(out_stensor_id[0], DataType::TENSOR, tensorToIValue(output));
 }
 
-void executorAtenZerosLike(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
+void executeAtenZerosLike(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
     DLOG(INFO) << "execute Aten ZerosLike node";
 
@@ -3926,5 +3928,6 @@ void executorAtenZerosLike(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, Str
     stream_executor.updateBlob(out_stensor_id[0], DataType::TENSOR, tensorToIValue(output));
 }
 
+}  // namespace op_executor
 }  // namespace runtime
 }  // namespace nn_compiler

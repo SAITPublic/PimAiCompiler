@@ -9,6 +9,8 @@ namespace nn_compiler
 {
 namespace runtime
 {
+namespace op_executor
+{
 torch::Tensor primData(const torch::Tensor& input_tensor)
 {
     auto ret = torch::autograd::Variable(input_tensor).variable_data();
@@ -212,5 +214,6 @@ at::IValue primVariable(std::string ntype, std::vector<torch::IValue> inputs)
     return iv.at(0);
 }
 
+}  // namespace op_executor
 }  // namespace runtime
 }  // namespace nn_compiler

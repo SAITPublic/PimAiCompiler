@@ -11,6 +11,8 @@ namespace nn_compiler
 {
 namespace runtime
 {
+namespace op_executor
+{
 at::Tensor atenAdd(const at::Tensor &self, const at::Scalar &other, const at::Scalar &alpha = 1);
 
 at::Tensor atenAdd(const at::Tensor &self, const at::Tensor &other, const at::Scalar &alpha = 1);
@@ -358,6 +360,7 @@ void customAtenAddmm(std::string act_type, at::Tensor &self_tensor, at::Tensor &
 
 void customAtenMatmul(at::Tensor &self_tensor, at::Tensor &other_tensor, torch::jit::IValue &output_iv);
 
+}  // namespace op_executor
 }  // namespace runtime
 }  // namespace nn_compiler
 

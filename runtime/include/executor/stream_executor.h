@@ -70,6 +70,7 @@ class StreamExecutor
 
     // Global input & output vars
     blob_store_type global_blobs_;
+
     // Op Register
     std::unordered_map<nn_compiler::ir::LayerType, OpExecutorFn> global_op_register_;
 

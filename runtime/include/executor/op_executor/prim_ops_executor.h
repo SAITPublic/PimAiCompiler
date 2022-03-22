@@ -12,6 +12,8 @@ namespace nn_compiler
 {
 namespace runtime
 {
+namespace op_executor
+{
 void executePrimBlock(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor);
 void executePrimConstant(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor);
 void executePrimData(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor);
@@ -35,5 +37,6 @@ void executePrimLoop(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExe
 void executePrimEndLoop(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor);
 void executePrimVariable(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor);
 
+}  // namespace op_executor
 }  // namespace runtime
 }  // namespace nn_compiler

@@ -9,6 +9,12 @@
 #include "hip/hip_fp16.h"
 #include "hip/hip_runtime.h"
 
+namespace nn_compiler
+{
+namespace runtime
+{
+namespace op_executor
+{
 struct rocblas_reduce_sum {
     template <typename T>
     __forceinline__ __device__ void operator()(T &__restrict__ a, const T &__restrict__ b)
@@ -447,5 +453,9 @@ void rocblas_bmm_template_xAy(hipStream_t p_stream, const V *x, const V *A, W *y
                        A,  // kxn
                        y);
 }
+
+}  // namespace op_executor
+}  // namespace runtime
+}  // namespace nn_compiler
 
 #endif  // __CUSTOM_OPS__
