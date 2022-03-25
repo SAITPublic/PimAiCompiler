@@ -114,9 +114,13 @@ make_install_fn()
 
 uninstall_fn()
 {
+    sudo rm -f ${ROCM_PATH}/lib/libnncompiler.so
+    sudo rm -f ${ROCM_PATH}/lib/libfrontend.so
     sudo rm -f ${ROCM_PATH}/lib/libnn_runtime.so
-    sudo rm -f ${ROCM_PATH}/lib/Nnrt.cpython-36m-x86_64-linux-gnu.so
+    sudo rm -f ${ROCM_PATH}/lib/libmiddlend.so
     sudo rm -f ${ROCM_PATH}/lib/libir.so
+    sudo rm -f ${ROCM_PATH}/lib/NNCompiler.cpython-36m-x86_64-linux-gnu.so
+    sudo rm -f ${ROCM_PATH}/lib/libpipeline_manager_py.so
     sudo rm -f ${ROCM_PATH}/include/nn_runtime.h
 }
 
