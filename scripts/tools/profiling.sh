@@ -11,8 +11,8 @@ function usage () {
 
         <command>               <argument>
 
-        --ir(-i)                input ir file name
-        --model_type(-m)        model type: RNNT/GNMT/HWR
+        --input(-i)             input file name
+        --model_type(-m)        model type: RNNT/GNMT/HWR"
 }
 
 ARGS=""
@@ -42,7 +42,7 @@ do
     esac
 done
 
-ARGS="$ARGS -p"
+ARGS="$ARGS -p 1"
 
 if [[ $IR == "" ]]
 then
@@ -50,7 +50,7 @@ then
     exit 1
 elif [[ ! -e $IR ]]
 then
-    echo "input IR does not exist"
+    echo "input file does not exist"
     exit 1
 fi
 

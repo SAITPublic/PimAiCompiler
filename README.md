@@ -61,7 +61,9 @@ General Options:
 
 [unit test]
 ```
-$ ./build/runtime/unit-tests/NnrtUnitTest
+$ ./build/runtime/unit-tests/NNCompilerAtenOpUnitTest
+$ ./build/runtime/unit-tests/NNCompilerCustomOpUnitTest
+$ ./build/runtime/unit-tests/NNCompilerPrimOpUnitTest
 ```
 [C++ API test]
 ```
