@@ -1,6 +1,6 @@
 #include <string>
 
-#include "compiler/include/middlend/optimizer/control_layer_execution.h"
+#include "compiler/include/middlend/optimizer/stream_execution/control_layer_execution.h"
 #include "ir/include/tensors/data_tensor.h"
 #include "ir/include/types.h"
 #include "ir/include/utils/graph_util.h"

@@ -1,7 +1,7 @@
 #include <set>
 #include <vector>
 
-#include "compiler/include/middlend/optimizer/lstm_labeling.h"
+#include "compiler/include/middlend/optimizer/memory_allocation/lstm_labeling.h"
 #include "ir/include/nn_model.h"
 #include "ir/include/nn_network.h"
 #include "ir/include/types.h"

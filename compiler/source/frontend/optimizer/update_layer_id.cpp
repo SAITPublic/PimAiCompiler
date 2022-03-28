@@ -1,12 +1,12 @@
 #include <string>
 
-#include "compiler/include/middlend/optimizer/update_layer_id.h"
+#include "compiler/include/frontend/optimizer/update_layer_id.h"
 #include "ir/include/tensors/data_tensor.h"
 #include "ir/include/utils/graph_util.h"
 
 namespace nn_compiler
 {
-namespace middlend
+namespace frontend
 {
 UpdateLayerId::UpdateLayerId() {}
 
@@ -38,5 +38,5 @@ void UpdateLayerId::run(std::unique_ptr<nn_compiler::ir::NNModel>& model)
     }
 }
 
-}  // namespace middlend
+}  // namespace frontend
 }  // namespace nn_compiler
