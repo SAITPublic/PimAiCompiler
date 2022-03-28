@@ -1,7 +1,7 @@
 #include "compiler/include/frontend/optimizer/pass_manager.h"
 
 #include "compiler/include/frontend/optimizer/construct_list.h"
-#include "compiler/include/frontend/optimizer/decompose_linear.h"
+#include "compiler/include/frontend/optimizer/convert_linear_to_addmm.h"
 #include "compiler/include/frontend/optimizer/fuse_activation.h"
 #include "compiler/include/frontend/optimizer/remake_dtensor_of_prim_variable.h"
 #include "compiler/include/frontend/optimizer/remove_cat_for_addmm.h"
@@ -35,7 +35,7 @@ void PassManager::runPasses(std::unique_ptr<nn_compiler::ir::NNModel>& model)
     auto remove_dropout_layers = std::make_shared<RemoveDropoutLayers>();
     auto remove_set_attr_layers = std::make_shared<RemoveSetAttrLayers>();
     auto remove_get_attr_layers = std::make_shared<RemoveGetAttrLayers>();
-    auto decompose_linear = std::make_shared<DecomposeLinear>();
+    auto convert_linear_to_addmm = std::make_shared<ConvertLinearToAddmm>();
     auto remove_if_with_addmm = std::make_shared<RemoveIfWithAddmm>();
     auto remove_cat_for_addmm = std::make_shared<RemoveCatForAddmm>();
     auto swap_addmm_inputs = std::make_shared<SwapAddmmInputs>();
@@ -52,8 +52,8 @@ void PassManager::runPasses(std::unique_ptr<nn_compiler::ir::NNModel>& model)
     remove_constant_layers->add(remove_dropout_layers);
     remove_dropout_layers->add(remove_set_attr_layers);
     remove_set_attr_layers->add(remove_get_attr_layers);
-    remove_get_attr_layers->add(decompose_linear);
-    decompose_linear->add(remove_if_with_addmm);
+    remove_get_attr_layers->add(convert_linear_to_addmm);
+    convert_linear_to_addmm->add(remove_if_with_addmm);
     remove_if_with_addmm->add(swap_addmm_inputs);
     // TODO(SRCX): Fix remove_cat_for_addmm for torch-1.10 models.
     //remove_cat_for_addmm->add(swap_addmm_inputs);

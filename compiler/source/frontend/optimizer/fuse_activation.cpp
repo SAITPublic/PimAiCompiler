@@ -44,9 +44,9 @@ bool FuseActivation::fitCondition(std::unique_ptr<nn_compiler::ir::NNModel>& mod
             std::string type = convertLayerTypeToString(cur_layer->getType());
             if (feasibleParasiteType(type)) {
                 auto predecessors = ir::searchPredecessor(cur_layer, graph);
-                auto successors = ir::searchPredecessor(predecessors[0], graph);
-
-                if (predecessors.empty() || !dependCheck(graph, predecessors[0], successors[0])) {
+                assert(predecessors.size() > 0);
+                auto pre_of_predecessor = ir::searchPredecessor(predecessors[0], graph);
+                if (predecessors.empty() || !dependCheck(graph, predecessors[0], pre_of_predecessor[0])) {
                     continue;
                 }
 

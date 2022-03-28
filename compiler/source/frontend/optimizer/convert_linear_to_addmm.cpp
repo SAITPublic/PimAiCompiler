@@ -1,13 +1,13 @@
-#include "compiler/include/frontend/optimizer/decompose_linear.h"
+#include "compiler/include/frontend/optimizer/convert_linear_to_addmm.h"
 #include "ir/include/utils/graph_util.h"
 
 namespace nn_compiler
 {
 namespace frontend
 {
-DecomposeLinear::DecomposeLinear() {}
+ConvertLinearToAddmm::ConvertLinearToAddmm() {}
 
-bool DecomposeLinear::fitCondition(std::unique_ptr<nn_compiler::ir::NNModel>& model)
+bool ConvertLinearToAddmm::fitCondition(std::unique_ptr<nn_compiler::ir::NNModel>& model)
 {
     auto graphs = model->getGraphs();
     for (auto graph : graphs) {
@@ -21,9 +21,9 @@ bool DecomposeLinear::fitCondition(std::unique_ptr<nn_compiler::ir::NNModel>& mo
     return (linear_layers_.size() != 0);
 }
 
-void DecomposeLinear::run(std::unique_ptr<nn_compiler::ir::NNModel>& model)
+void ConvertLinearToAddmm::run(std::unique_ptr<nn_compiler::ir::NNModel>& model)
 {
-    DLOG(INFO) << "DecomposeLinear::run is called.";
+    DLOG(INFO) << "ConvertLinearToAddmm::run is called.";
 
     // there will be only one graph after take_in_body_net pass.
     auto graph = model->getGraphs()[0];
@@ -34,7 +34,7 @@ void DecomposeLinear::run(std::unique_ptr<nn_compiler::ir::NNModel>& model)
         assert(in_stensor_ids.size() == 3);  // input, weight, bias
 
         auto type = nn_compiler::ir::LayerType::ATENADDMM;
-        auto name = "decomposed_addmm_of_" + layer->getName();
+        auto name = "converted_addmm_of_" + layer->getName();
         auto new_addmm_layer = std::make_shared<nn_compiler::ir::AtenAddmmLayer>(name, type);
         // TODO(SRCX): can we determine addmm or (matmul + add) at frontend?
         // aten::linear(input, weight, bias) -> aten::addmm(bias, input, weight, ,)
