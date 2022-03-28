@@ -47,7 +47,6 @@ namespace frontend
  *                structure 2
  *
  */
-
 class RemoveCatForAddmm : public Pass
 {
    public:

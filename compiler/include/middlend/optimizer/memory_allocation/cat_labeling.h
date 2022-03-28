@@ -10,6 +10,15 @@ namespace nn_compiler
 {
 namespace middlend
 {
+/** @Details:
+ *  Set relative attributes of aten::cat layers for custom optmization pattern:
+ *
+ *           |             |
+ *      aten::lstm1    aten::bmm
+ *             \         /
+ *              aten::cat
+ *                  |
+ **/
 class CatLabeling : public Pass
 {
    public:

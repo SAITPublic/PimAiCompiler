@@ -10,6 +10,17 @@ namespace nn_compiler
 {
 namespace middlend
 {
+/** @Details:
+ *  Set relative attributes of aten::LSTM1 layers for custom optmization pattern:
+ *
+ *                 |
+ *            aten::lstm1
+ *                 |
+ *         prim::tuple_construct
+ *                 |
+ *            aten::append
+ *                 |
+ **/
 class LstmLabeling : public Pass
 {
    public:

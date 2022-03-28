@@ -23,7 +23,6 @@ namespace frontend
  *
  *     structure 1                                              sturcture 2
  **/
-
 class SwapAddmmInputs : public Pass
 {
    public:

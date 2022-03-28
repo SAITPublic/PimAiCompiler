@@ -22,7 +22,6 @@ namespace frontend
  *    a computation op (e.g. aten::len)
  *            |
  ***/
-
 class RemoveGetAttrLayers : public Pass
 {
    public:

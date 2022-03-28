@@ -7,6 +7,12 @@ namespace nn_compiler
 {
 namespace frontend
 {
+/** @Details:
+ *  A prim::Variable is able to store a vetor of DTensors. However, only when DTensors are tensor type
+ *  that the vector is needed. When DTensors are stored for only one value (Int/Float/Bool), it is possible
+ *  to convert the vector of DTensors to a single DTensor which is stored at index zero of the vector.
+ *  For example, [[1], [2], [3], [4]] -> [1, 2, 3, 4], where a pair of square brackets stands for a DTensor.
+ **/
 class RemakeDTensorOfPrimVariable : public Pass
 {
    public:

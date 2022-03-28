@@ -6,6 +6,9 @@ namespace nn_compiler
 {
 namespace frontend
 {
+/** @Details:
+ *  Remove unnecessary dropout layers as they do nothing at inference time.
+ **/
 class RemoveDropoutLayers : public Pass
 {
    public:

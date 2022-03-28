@@ -36,7 +36,6 @@ void ConvertLinearToAddmm::run(std::unique_ptr<nn_compiler::ir::NNModel>& model)
         auto type = nn_compiler::ir::LayerType::ATENADDMM;
         auto name = "converted_addmm_of_" + layer->getName();
         auto new_addmm_layer = std::make_shared<nn_compiler::ir::AtenAddmmLayer>(name, type);
-        // TODO(SRCX): can we determine addmm or (matmul + add) at frontend?
         // aten::linear(input, weight, bias) -> aten::addmm(bias, input, weight, ,)
         std::vector<uint32_t> in_ids_of_addmm = {in_stensor_ids[2], in_stensor_ids[0], in_stensor_ids[1]};
         new_addmm_layer->setInSTensorID(in_ids_of_addmm);

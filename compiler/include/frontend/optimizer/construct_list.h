@@ -6,6 +6,10 @@ namespace nn_compiler
 {
 namespace frontend
 {
+/** @Details:
+ *  If inputs of a prim::ListConstrcut are all constants, it is possible to do the work of prim::ListConstruct
+ *  directly in frontend. The constructed value will be stored in a prim::Variable layer.
+ **/
 class ConstructList : public Pass
 {
    public:

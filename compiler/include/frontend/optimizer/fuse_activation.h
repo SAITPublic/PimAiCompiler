@@ -6,6 +6,18 @@ namespace nn_compiler
 {
 namespace frontend
 {
+/** @Details:
+ *  Fuse activation layers to its predecessor addmm layer, as the computation of activation could
+ *  be done in addmm layer directly.
+ *
+ *         |
+ *   aten::addmm (no activation)               |
+ *         |                               aten::addmm (with relu)
+ *   aten::transpose           ---->           |
+ *         |                             aten::transpose
+ *     aten::relu                              |
+ *         |
+ **/
 class FuseActivation : public Pass
 {
    public:

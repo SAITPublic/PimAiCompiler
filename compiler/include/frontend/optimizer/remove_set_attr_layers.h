@@ -30,7 +30,6 @@ namespace frontend
  *  remove them in later pass together.
  *
  ***/
-
 class RemoveSetAttrLayers : public Pass
 {
    public:

@@ -8,6 +8,11 @@ namespace nn_compiler
 {
 namespace frontend
 {
+/** @Details:
+ *  Most constants are used for store attribute values of layers.
+ *  If it is possible, set attribute value into layers and then remove constant layers (in the next
+ *  remove_constant_layers pass), in order to simplify the graph and make following optimization more clear.
+ **/
 class SetAttribute : public Pass
 {
    public:

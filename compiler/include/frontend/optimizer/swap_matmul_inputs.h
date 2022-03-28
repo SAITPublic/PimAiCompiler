@@ -22,7 +22,6 @@ namespace frontend
  *       aten::add                                                          aten::add
  *           |                                                                  |
  **/
-
 class SwapMatmulInputs : public Pass
 {
    public:

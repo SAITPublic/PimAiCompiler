@@ -6,6 +6,9 @@ namespace nn_compiler
 {
 namespace frontend
 {
+/** @Details:
+ *  Remove unnecessary constant layers to simplify the graph.
+ **/
 class RemoveConstantLayers : public Pass
 {
    public:

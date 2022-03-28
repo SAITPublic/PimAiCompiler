@@ -7,6 +7,22 @@ namespace nn_compiler
 {
 namespace frontend
 {
+/** @Details:
+ *  Convert aten::linear to aten::addmm, to enable PIM acceleartion and custom GEMV computation.
+ *           
+ *             |
+ *          prim::If
+ *        /          \                                |
+ *   aten::addmm   aten::matmul                       |
+ *       |            |             ----->       aten::addmm   
+ *       |         aten::add                          |
+ *        \          /                                |
+ *         prim::EndIf
+ *              |
+ *
+ *  structure of aten::linear
+ *
+ **/
 class ConvertLinearToAddmm : public Pass
 {
    public:
