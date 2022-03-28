@@ -13,10 +13,50 @@ namespace middlend
 {
 CatLabeling::CatLabeling() {}
 
-bool CatLabeling::fitCondition(std::unique_ptr<nn_compiler::ir::NNModel>& model) { return true; }
+bool CatLabeling::fitCondition(std::unique_ptr<nn_compiler::ir::NNModel>& model)
+{
+    auto graph = model->getGraphs()[0];
+    for (auto layer : graph->getLayers()) {
+        if (layer->getType() == ir::LayerType::ATENBMM) {
+            getOffspring(target_cat_ids_bmm_, graph, layer, ir::LayerType::ATENCAT, 3);
+        } else if (layer->getType() == ir::LayerType::ATENLSTM1 &&
+                   std::dynamic_pointer_cast<ir::AtenLSTM1Layer>(layer)->getMatchCustomOpt()) {
+            getOffspring(target_cat_ids_lstm_, graph, layer, ir::LayerType::ATENCAT, 3);
+        }
+    }
 
-void getOffspring(std::vector<int64_t>& res, std::shared_ptr<nn_compiler::ir::NNNetwork> graph,
-                  std::shared_ptr<nn_compiler::ir::NNLayer> layer, ir::LayerType targetLayerType, int level)
+    return (target_cat_ids_bmm_.size() != 0 && target_cat_ids_lstm_.size() != 0);
+}
+
+void CatLabeling::run(std::unique_ptr<nn_compiler::ir::NNModel>& model)
+{
+    auto graph = model->getGraphs()[0];
+    std::vector<int64_t> target_cat_ids;
+
+    for (auto cat_bmm : target_cat_ids_bmm_) {
+        if (std::find(target_cat_ids_lstm_.begin(), target_cat_ids_lstm_.end(), cat_bmm) !=
+            target_cat_ids_lstm_.end()) {
+            target_cat_ids.emplace_back(cat_bmm);
+        }
+    }
+
+    for (auto cat_id : target_cat_ids) {
+        if (graph->getLayerByID(cat_id)) {
+            auto cat_layer = std::dynamic_pointer_cast<ir::AtenCatLayer>(graph->getLayerByID(cat_id));
+            auto cat_in_layer_id = cat_layer->getInSTensorID()[0];
+            for (auto cat_in_layer : graph->getLayers()) {
+                if (cat_in_layer->getID() == cat_in_layer_id) {
+                    cat_layer->setMemLayerId(cat_in_layer->getID() * 10);
+                    break;
+                }
+            }
+        }
+    }
+}
+
+void CatLabeling::getOffspring(std::vector<int64_t>& res, std::shared_ptr<nn_compiler::ir::NNNetwork> graph,
+                               std::shared_ptr<nn_compiler::ir::NNLayer> layer, ir::LayerType targetLayerType,
+                               int level)
 {
     if (level == 0 || layer->getOutSTensorID().size() == 0) {
         return;
@@ -30,48 +70,6 @@ void getOffspring(std::vector<int64_t>& res, std::shared_ptr<nn_compiler::ir::NN
             res.emplace_back(out_layer->getID());
         }
         getOffspring(res, graph, out_layer, targetLayerType, next_level);
-    }
-}
-
-void CatLabeling::run(std::unique_ptr<nn_compiler::ir::NNModel>& model)
-{
-    std::vector<int64_t> target_cat_ids_bmm;
-    std::vector<int64_t> target_cat_ids_lstm;
-    std::vector<int64_t> target_cat_ids;
-
-    auto graphs = model->getGraphs();
-    for (auto graph : graphs) {
-        for (auto layer : graph->getLayers()) {
-            if (layer->getType() == ir::LayerType::ATENBMM) {
-                getOffspring(target_cat_ids_bmm, graph, layer, ir::LayerType::ATENCAT, 3);
-            } else if (layer->getType() == ir::LayerType::ATENLSTM1 &&
-                       std::dynamic_pointer_cast<ir::AtenLSTM1Layer>(layer)->getMatchCustomOpt()) {
-                getOffspring(target_cat_ids_lstm, graph, layer, ir::LayerType::ATENCAT, 3);
-            }
-        }
-    }
-
-    for (auto cat_bmm : target_cat_ids_bmm) {
-        if (std::find(target_cat_ids_lstm.begin(), target_cat_ids_lstm.end(), cat_bmm) != target_cat_ids_lstm.end()) {
-            target_cat_ids.emplace_back(cat_bmm);
-        }
-    }
-
-    for (auto cat_id : target_cat_ids) {
-        auto graphs = model->getGraphs();
-        for (auto graph : graphs) {
-            if (graph->getLayerByID(cat_id)) {
-                auto cat_layer = std::dynamic_pointer_cast<ir::AtenCatLayer>(graph->getLayerByID(cat_id));
-                auto cat_in_layer_id = cat_layer->getInSTensorID()[0];
-                for (auto cat_in_layer : graph->getLayers()) {
-                    if (cat_in_layer->getID() == cat_in_layer_id) {
-                        cat_layer->setMemLayerId(cat_in_layer->getID() * 10);
-                        break;
-                    }
-                }
-                break;
-            }
-        }
     }
 }
 

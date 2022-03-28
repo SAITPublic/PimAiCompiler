@@ -23,6 +23,13 @@ class CatLabeling : public Pass
 
    private:
     std::vector<std::shared_ptr<nn_compiler::ir::NNLayer>> cat_labeling_layers_;
+
+    std::vector<int64_t> target_cat_ids_bmm_;
+
+    std::vector<int64_t> target_cat_ids_lstm_;
+
+    void getOffspring(std::vector<int64_t>& res, std::shared_ptr<nn_compiler::ir::NNNetwork> graph,
+                      std::shared_ptr<nn_compiler::ir::NNLayer> layer, ir::LayerType targetLayerType, int level);
 };  // class CatLabeling
 
 }  // namespace middlend
