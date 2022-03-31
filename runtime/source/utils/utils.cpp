@@ -3,7 +3,7 @@
 #include <stdexcept>
 #include <vector>
 
-#include "runtime/include/executor/utils/prim_utils.h"
+#include "utils/utils.h"
 
 namespace fs = std::experimental::filesystem;
 
@@ -11,15 +11,8 @@ namespace nn_compiler
 {
 namespace runtime
 {
-torch::jit::IValue pop(std::vector<torch::jit::IValue>& stack)
+namespace utils
 {
-    auto r = std::move(stack.back());
-    stack.pop_back();
-    return r;
-}
-
-void drop(std::vector<torch::jit::IValue>& stack, size_t n) { stack.erase(stack.end() - n, stack.end()); }
-
 /**
  * @brief Create a PyTorch Tensor
  *
@@ -166,5 +159,6 @@ torch::jit::IValue convertVaraibleData2IValve(uint8_t* ptr, DataType d_type)
     return iv;
 }
 
+}  // namespace utils
 }  // namespace runtime
 }  // namespace nn_compiler

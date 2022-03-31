@@ -2,6 +2,10 @@
 
 #include <torch/script.h>
 
+#include <exception>
+#include <stack>
+#include <vector>
+
 #include "ir/include/layers/nn_layer.h"
 #include "ir/include/types.h"
 
@@ -9,7 +13,10 @@ namespace nn_compiler
 {
 namespace runtime
 {
+namespace utils
+{
 using namespace nn_compiler::ir;
+
 torch::jit::IValue boolToIValue(const bool& value);
 template <typename T>
 torch::jit::IValue scalarToIValue(const T& scalar)
@@ -138,5 +145,34 @@ std::vector<int64_t> getUniqueOutStensorIds(std::shared_ptr<nn_compiler::ir::NNL
 
 std::vector<int64_t> getDataShapeFromVector(const std::vector<int64_t>& value);
 
+class NNRuntimeException : std::exception
+{
+    using std::exception::what;
+
+   public:
+    explicit NNRuntimeException(std::string msg) { this->msg = msg; }
+    const char* what() { return msg.c_str(); }
+
+   private:
+    std::string msg;
+};
+
+torch::jit::IValue pop(std::vector<torch::jit::IValue>& stack);
+
+void drop(std::vector<torch::jit::IValue>& stack, size_t n);
+
+template <typename Type>
+static inline void push_one(std::vector<torch::jit::IValue>& stack, Type&& arg)
+{
+    stack.emplace_back(std::forward<Type>(arg));
+}
+
+template <typename... Types>
+void push(std::vector<torch::jit::IValue>& stack, Types&&... args)
+{
+    (void)std::initializer_list<int>{(push_one(stack, std::forward<Types>(args)), 0)...};
+}
+
+}  // namespace utils
 }  // namespace runtime
 }  // namespace nn_compiler

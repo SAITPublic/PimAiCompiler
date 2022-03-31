@@ -7,13 +7,13 @@
 #include <string>
 #include <vector>
 
+#include "builder/model_builder.h"
 #include "common/include/types.hpp"
+#include "executor/utils/utils.h"
 #include "ir/include/layers/all_layers.h"
 #include "ir/include/nn_model.h"
 #include "ir/include/nn_network.h"
 #include "ir/include/types.h"
-#include "runtime/include/builder/model_builder.h"
-#include "runtime/include/executor/utils/utils.h"
 
 namespace nn_compiler
 {

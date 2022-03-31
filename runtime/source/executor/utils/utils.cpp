@@ -1,13 +1,16 @@
 #include <torch/script.h>
 #include <ostream>
+#include <stdexcept>
 #include <string>
 #include <vector>
 
-#include "runtime/include/executor/utils/utils.h"
+#include "executor/utils/utils.h"
 
 namespace nn_compiler
 {
 namespace runtime
+{
+namespace utils
 {
 torch::jit::IValue deviceToIValue(const c10::Device& device) { return torch::jit::IValue(device); }
 
@@ -270,5 +273,15 @@ std::vector<int64_t> getDataShapeFromVector(const std::vector<int64_t>& value)
     return value_;
 }
 
+torch::jit::IValue pop(std::vector<torch::jit::IValue>& stack)
+{
+    auto r = std::move(stack.back());
+    stack.pop_back();
+    return r;
+}
+
+void drop(std::vector<torch::jit::IValue>& stack, size_t n) { stack.erase(stack.end() - n, stack.end()); }
+
+}  // namespace utils
 }  // namespace runtime
 }  // namespace nn_compiler

@@ -2,12 +2,14 @@
 #include <torch/script.h>
 
 #include "c10/hip/HIPFunctions.h"
+#include "executor/op_executor/aten_ops_executor.h"
+#include "executor/op_executor/prim_ops_executor.h"
+#include "executor/stream_executor.h"
+#include "executor/utils/profiler.h"
+#include "executor/utils/utils.h"
 #include "ir/include/types.h"
-#include "runtime/include/executor/op_executor/aten_ops_executor.h"
-#include "runtime/include/executor/op_executor/prim_ops_executor.h"
-#include "runtime/include/executor/stream_executor.h"
-#include "runtime/include/executor/utils/profiler.h"
-#include "runtime/include/executor/utils/utils.h"
+
+using namespace nn_compiler::runtime::utils;
 
 namespace nn_compiler
 {

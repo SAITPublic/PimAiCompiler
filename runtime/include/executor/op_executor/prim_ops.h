@@ -7,7 +7,7 @@
 #include <unordered_map>
 #include <vector>
 
-#include "runtime/include/executor/utils/prim_utils.h"
+#include "executor/utils/utils.h"
 
 namespace nn_compiler
 {

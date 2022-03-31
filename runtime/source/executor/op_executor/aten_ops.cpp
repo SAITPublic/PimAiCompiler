@@ -1,9 +1,11 @@
 #include <iostream>
 
 #include "c10/hip/HIPFunctions.h"
+#include "executor/op_executor/aten_ops.h"
+#include "executor/utils/utils.h"
 #include "pim_runtime_api.h"
-#include "runtime/include/executor/op_executor/aten_ops.h"
-#include "runtime/include/executor/utils/utils.h"
+
+using namespace nn_compiler::runtime::utils;
 
 namespace nn_compiler
 {

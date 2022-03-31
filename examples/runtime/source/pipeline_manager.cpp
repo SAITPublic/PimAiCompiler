@@ -8,14 +8,15 @@
 
 #include "compiler/include/nn_compiler.hpp"
 #include "ir/include/nn_model.h"
-#include "runtime/include/executor/utils/prim_utils.h"
 #include "runtime/include/nn_runtime.h"
-#include "runtime/include/tv_tools.h"
+#include "runtime/include/utils/tv_tools.h"
+#include "runtime/include/utils/utils.h"
 
 #include "pipeline_manager.hpp"
 
 using namespace nn_compiler::compiler;
 using namespace nn_compiler::runtime;
+using namespace nn_compiler::runtime::utils;
 namespace fs = std::experimental::filesystem;
 
 namespace examples

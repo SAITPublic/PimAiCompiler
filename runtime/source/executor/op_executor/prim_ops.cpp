@@ -3,7 +3,7 @@
 #include <unordered_map>
 #include <vector>
 
-#include "runtime/include/executor/op_executor/prim_ops.h"
+#include "executor/op_executor/prim_ops.h"
 
 namespace nn_compiler
 {
@@ -50,8 +50,8 @@ void primListConstruct(std::vector<torch::IValue>& stack, size_t num_inputs, at:
     for (size_t i = stack.size() - num_inputs; i < stack.size(); ++i) {
         vals.emplace_back(std::move(stack[i]));
     }
-    drop(stack, num_inputs);
-    push(stack, std::move(vals));
+    utils::drop(stack, num_inputs);
+    utils::push(stack, std::move(vals));
 }
 
 void primListConstruct(std::vector<torch::IValue>& stack)
@@ -62,8 +62,8 @@ void primListConstruct(std::vector<torch::IValue>& stack)
         for (uint32_t idx = 0; idx < stack.size(); idx++) {
             items.emplace_back(stack.at(idx).toTuple());
         }
-        drop(stack, stack.size());
-        push(stack, std::move(items));
+        utils::drop(stack, stack.size());
+        utils::push(stack, std::move(items));
     } else {
         DLOG(FATAL) << "primListConstruct element type do not support!";
     }
@@ -71,7 +71,7 @@ void primListConstruct(std::vector<torch::IValue>& stack)
 
 void primListUnpack(std::vector<torch::IValue>& stack, size_t num_outputs)
 {
-    auto list = pop(stack).toList();
+    auto list = utils::pop(stack).toList();
     assert(list.size() == num_outputs);
     // insert the unpakced data
     stack.insert(stack.end(), list.begin(), list.end());
@@ -79,7 +79,7 @@ void primListUnpack(std::vector<torch::IValue>& stack, size_t num_outputs)
 
 void primRaiseException(std::string msg)
 {
-    NNRuntimeException exception(msg);
+    utils::NNRuntimeException exception(msg);
     DLOG(INFO) << exception.what();
     throw exception;
 }
@@ -91,8 +91,8 @@ void primTupleConstruct(std::vector<torch::IValue>& stack, size_t num_inputs)
 {
     std::vector<torch::jit::IValue> elems{std::make_move_iterator(stack.end() - num_inputs),
                                           std::make_move_iterator(stack.end())};
-    drop(stack, num_inputs);
-    push(stack, c10::ivalue::Tuple::create(std::move(elems)));
+    utils::drop(stack, num_inputs);
+    utils::push(stack, c10::ivalue::Tuple::create(std::move(elems)));
 }
 
 torch::IValue primTupleIndex(const std::vector<torch::IValue>& inputs, int64_t index)
@@ -169,7 +169,7 @@ at::IValue primVariable(std::string ntype, std::vector<torch::IValue> inputs)
                 // make temp_iv to tuple or list(the ivalue type in temp_iv must be not list or tuple)
                 if (ntype_stack.top() == "List") {
                     ntype_stack.pop();
-                    list_type = inferTypeFromDataType(inferDataType(temp_iv.at(0)));
+                    list_type = utils::inferTypeFromDataType(utils::inferDataType(temp_iv.at(0)));
                     primListConstruct(temp_iv, temp_iv.size(), list_type);  // list_type is what
                     iv.push_back(temp_iv.at(0));
                     temp_iv.clear();

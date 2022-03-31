@@ -13,11 +13,13 @@
 
 #include "executor/op_executor/aten_ops.h"
 #include "glog/logging.h"
+#include "utils/utils.h"
 
 using namespace torch;
 using namespace at;
 using namespace c10;
 using namespace nn_compiler::runtime::op_executor;
+using namespace nn_compiler::runtime::utils;
 
 #define ASSERT_EQUAL(t1, t2) ASSERT_TRUE(t1.equal(t2));
 

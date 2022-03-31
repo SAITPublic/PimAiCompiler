@@ -4,12 +4,13 @@
 #include <vector>
 
 #include "executor/op_executor/prim_ops.h"
-#include "executor/utils/prim_utils.h"
 #include "glog/logging.h"
 #include "ut_utils.h"
+#include "utils/utils.h"
 
 using std::vector;
 using namespace nn_compiler::runtime;
+using namespace nn_compiler::runtime::utils;
 using namespace nn_compiler::runtime::op_executor;
 
 TEST(NNCompilerUnitTest, primDeviceOpTest)

@@ -5,7 +5,7 @@
 #include <string>
 #include <unordered_map>
 #include <vector>
-#include "executor/utils/prim_utils.h"
+#include "utils/utils.h"
 
 namespace fs = std::experimental::filesystem;
 
@@ -66,7 +66,7 @@ class TVComparator
     void loadTV(const std::string& file, const std::vector<int64_t>& shape, DataType dtype,
                 const std::string& ans_key_name)
     {
-        auto tensor = loadTensor(file, shape, dtype);
+        auto tensor = utils::loadTensor(file, shape, dtype);
         tv_.insert({ans_key_name, tensor});
     }
 
