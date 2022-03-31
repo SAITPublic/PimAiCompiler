@@ -13,8 +13,7 @@ namespace nn_compiler
 {
 namespace runtime
 {
-StreamExecutor::StreamExecutor(std::pair<std::shared_ptr<ir::NNNetwork>, blob_store_type> model,
-                               std::string model_type)
+StreamExecutor::StreamExecutor(std::pair<std::shared_ptr<ir::NNNetwork>, blob_store_type> model, std::string model_type)
 {
     this->graph_ = model.first;
     this->global_blobs_ = model.second;
@@ -113,9 +112,8 @@ RetVal StreamExecutor::inferenceModel(const std::vector<torch::Tensor>& input_te
 
     // control_op will move cursor by itself
     auto is_control_op = [](ir::LayerType type) {
-        return (type == ir::LayerType::PRIMIF || type == ir::LayerType::PRIMENDIF ||
-                type == ir::LayerType::PRIMLOOP || type == ir::LayerType::PRIMENDLOOP ||
-                type == ir::LayerType::PRIMBLOCK);
+        return (type == ir::LayerType::PRIMIF || type == ir::LayerType::PRIMENDIF || type == ir::LayerType::PRIMLOOP ||
+                type == ir::LayerType::PRIMENDLOOP || type == ir::LayerType::PRIMBLOCK);
     };
 
     // Execute Graph
@@ -168,9 +166,8 @@ RetVal StreamExecutor::inferenceModelwithProfiling(const std::vector<torch::Tens
 
     // control_op will move cursor by itself
     auto is_control_op = [](ir::LayerType type) {
-        return (type == ir::LayerType::PRIMIF || type == ir::LayerType::PRIMENDIF ||
-                type == ir::LayerType::PRIMLOOP || type == ir::LayerType::PRIMENDLOOP ||
-                type == ir::LayerType::PRIMBLOCK);
+        return (type == ir::LayerType::PRIMIF || type == ir::LayerType::PRIMENDIF || type == ir::LayerType::PRIMLOOP ||
+                type == ir::LayerType::PRIMENDLOOP || type == ir::LayerType::PRIMBLOCK);
     };
 
     // Execute Graph
@@ -403,8 +400,7 @@ void StreamExecutor::registerOp()
     this->global_op_register_.insert({ir::LayerType::ATENONES, op_executor::executeAtenOnes});
     this->global_op_register_.insert(
         {ir::LayerType::ATENPACKPADDEDSEQUENCE, op_executor::executeAtenPackPaddedSequence});
-    this->global_op_register_.insert(
-        {ir::LayerType::ATENPADPACKEDSEQUENCE, op_executor::executeAtenPadPackedSequence});
+    this->global_op_register_.insert({ir::LayerType::ATENPADPACKEDSEQUENCE, op_executor::executeAtenPadPackedSequence});
     this->global_op_register_.insert({ir::LayerType::ATENPOW, op_executor::executeAtenPow});
     this->global_op_register_.insert({ir::LayerType::ATENRELU, op_executor::executeAtenRelu});
     this->global_op_register_.insert({ir::LayerType::ATENRESHAPE, op_executor::executeAtenReshape});

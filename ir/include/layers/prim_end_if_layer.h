@@ -36,12 +36,18 @@ class PrimEndIfLayer : public NNLayer
     bool getIsElseNet() const { return is_else_net_; }
     int64_t getIfLayerId() const { return if_layer_id_; }
 
-    void printAttr() { DLOG(INFO) << "PrimEndIf Attr  "; }
+    void printAttr()
+    {
+        DLOG(INFO) << "    PrimEndIf Attr  ";
+        DLOG(INFO) << "    goto_layer      " << goto_layer_;
+        DLOG(INFO) << "    is_else_net     " << is_else_net_;
+        DLOG(INFO) << "    if_layer_id     " << if_layer_id_;
+    }
 
    private:
-    int64_t goto_layer_;
+    int64_t goto_layer_ = INT64_MIN;
     bool is_else_net_ = false;
-    int64_t if_layer_id_;
+    int64_t if_layer_id_ = INT64_MIN;
 };
 
 }  // namespace ir

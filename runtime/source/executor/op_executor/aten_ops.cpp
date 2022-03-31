@@ -490,9 +490,8 @@ at::Tensor atenZeroslike(const at::Tensor &self, at::TensorOptions options,
     return at::zeros_like(self, options, memory_format);
 }
 
-void customAtenAddmm(std::string act_type, at::Tensor &self_tensor, at::Tensor &mat1_tensor,
-                     at::Tensor &mat2_tensor, at::Scalar beta, at::Scalar alpha,
-                     torch::jit::IValue &output_iv)
+void customAtenAddmm(std::string act_type, at::Tensor &self_tensor, at::Tensor &mat1_tensor, at::Tensor &mat2_tensor,
+                     at::Scalar beta, at::Scalar alpha, torch::jit::IValue &output_iv)
 {
     int dim_i0 = mat1_tensor.dim();
     int dim_i1 = mat2_tensor.dim();
@@ -528,21 +527,21 @@ void customAtenAddmm(std::string act_type, at::Tensor &self_tensor, at::Tensor &
         int n = mat2_tensor.size(dim_i1 - 1);
         int k = mat2_tensor.size(dim_i1 - 2);
 
-        _Float16* b = (_Float16*)self_tensor.data_ptr();
-        _Float16* x = (_Float16*)mat1_tensor.data_ptr();
-        _Float16* A = (_Float16*)mat2_tensor.data_ptr();
+        _Float16 *b = (_Float16 *)self_tensor.data_ptr();
+        _Float16 *x = (_Float16 *)mat1_tensor.data_ptr();
+        _Float16 *A = (_Float16 *)mat2_tensor.data_ptr();
         auto options = at::TensorOptions().dtype(at::kHalf).device(at::kCUDA);
         auto output_shape = mat1_tensor.sizes().vec();
         output_shape[dim_i0 - 1] = n;
         output_shape[dim_i0 - 2] = 1;
         auto output = at::zeros(output_shape, options);
-        _Float16* y = (_Float16*)output.data_ptr();
+        _Float16 *y = (_Float16 *)output.data_ptr();
 
-        PimDesc* pim_desc = PimCreateDesc(1, 1, n, k, PIM_FP16, OP_GEMV);
-        PimBo* dev_op0 = PimCreateBo(pim_desc, MEM_TYPE_DEVICE, GEMV_INPUT, x);
-        PimBo* dev_op1 = PimCreateBo(pim_desc, MEM_TYPE_DEVICE, GEMV_WEIGHT, A);
-        PimBo* dev_op2 = PimCreateBo(pim_desc, MEM_TYPE_DEVICE, GEMV_INPUT, b);
-        PimBo* dev_out = PimCreateBo(pim_desc, MEM_TYPE_DEVICE, GEMV_OUTPUT, y);
+        PimDesc *pim_desc = PimCreateDesc(1, 1, n, k, PIM_FP16, OP_GEMV);
+        PimBo *dev_op0 = PimCreateBo(pim_desc, MEM_TYPE_DEVICE, GEMV_INPUT, x);
+        PimBo *dev_op1 = PimCreateBo(pim_desc, MEM_TYPE_DEVICE, GEMV_WEIGHT, A);
+        PimBo *dev_op2 = PimCreateBo(pim_desc, MEM_TYPE_DEVICE, GEMV_INPUT, b);
+        PimBo *dev_out = PimCreateBo(pim_desc, MEM_TYPE_DEVICE, GEMV_OUTPUT, y);
 
         PimExecuteGemvAdd(dev_out, dev_op0, dev_op1, dev_op2, relu, nullptr);
 
@@ -567,21 +566,21 @@ void customAtenAddmm(std::string act_type, at::Tensor &self_tensor, at::Tensor &
         int n = 1;
         int k = mat1_tensor.size(dim_i0 - 1);
 
-        _Float16* b = (_Float16*)self_tensor.data_ptr();
-        _Float16* A = (_Float16*)mat1_tensor.data_ptr();
-        _Float16* x = (_Float16*)mat2_tensor.data_ptr();
+        _Float16 *b = (_Float16 *)self_tensor.data_ptr();
+        _Float16 *A = (_Float16 *)mat1_tensor.data_ptr();
+        _Float16 *x = (_Float16 *)mat2_tensor.data_ptr();
         auto options = at::TensorOptions().dtype(at::kHalf).device(at::kCUDA);
         auto output_shape = mat2_tensor.sizes().vec();
         output_shape[dim_i1 - 1] = 1;
         output_shape[dim_i1 - 2] = m;
         auto output = at::zeros(output_shape, options);
-        _Float16* y = (_Float16*)output.data_ptr();
+        _Float16 *y = (_Float16 *)output.data_ptr();
 
-        PimDesc* pim_desc = PimCreateDesc(1, 1, m, k, PIM_FP16, OP_GEMV);
-        PimBo* dev_op0 = PimCreateBo(pim_desc, MEM_TYPE_DEVICE, GEMV_INPUT, x);
-        PimBo* dev_op1 = PimCreateBo(pim_desc, MEM_TYPE_DEVICE, GEMV_WEIGHT_T, A);
-        PimBo* dev_op2 = PimCreateBo(pim_desc, MEM_TYPE_DEVICE, GEMV_OUTPUT, b);
-        PimBo* dev_out = PimCreateBo(pim_desc, MEM_TYPE_DEVICE, GEMV_OUTPUT, y);
+        PimDesc *pim_desc = PimCreateDesc(1, 1, m, k, PIM_FP16, OP_GEMV);
+        PimBo *dev_op0 = PimCreateBo(pim_desc, MEM_TYPE_DEVICE, GEMV_INPUT, x);
+        PimBo *dev_op1 = PimCreateBo(pim_desc, MEM_TYPE_DEVICE, GEMV_WEIGHT_T, A);
+        PimBo *dev_op2 = PimCreateBo(pim_desc, MEM_TYPE_DEVICE, GEMV_OUTPUT, b);
+        PimBo *dev_out = PimCreateBo(pim_desc, MEM_TYPE_DEVICE, GEMV_OUTPUT, y);
 
         PimExecuteGemvAdd(dev_out, dev_op0, dev_op1, dev_op2, relu, nullptr);
 
@@ -637,8 +636,8 @@ void customAtenMatmul(at::Tensor &self_tensor, at::Tensor &other_tensor, torch::
         int n = other_tensor.size(dim_i1 - 1);
         int k = other_tensor.size(dim_i1 - 2);
 
-        _Float16* x = (_Float16*)self_tensor.data_ptr();
-        _Float16* A = (_Float16*)other_tensor.data_ptr();
+        _Float16 *x = (_Float16 *)self_tensor.data_ptr();
+        _Float16 *A = (_Float16 *)other_tensor.data_ptr();
         auto options = at::TensorOptions().dtype(at::kHalf).device(at::kCUDA);
         auto output_shape = self_tensor.sizes().vec();
         if (dim_i1 > dim_i0) {
@@ -650,12 +649,12 @@ void customAtenMatmul(at::Tensor &self_tensor, at::Tensor &other_tensor, torch::
             output_shape[dim_i0 - 2] = 1;
         }
         auto output = at::zeros(output_shape, options);
-        _Float16* y = (_Float16*)output.data_ptr();
+        _Float16 *y = (_Float16 *)output.data_ptr();
 
-        PimDesc* pim_desc = PimCreateDesc(1, 1, n, k, PIM_FP16, OP_GEMV);
-        PimBo* dev_op0 = PimCreateBo(pim_desc, MEM_TYPE_DEVICE, GEMV_INPUT, x);
-        PimBo* dev_op1 = PimCreateBo(pim_desc, MEM_TYPE_DEVICE, GEMV_WEIGHT, A);
-        PimBo* dev_out = PimCreateBo(pim_desc, MEM_TYPE_DEVICE, GEMV_OUTPUT, y);
+        PimDesc *pim_desc = PimCreateDesc(1, 1, n, k, PIM_FP16, OP_GEMV);
+        PimBo *dev_op0 = PimCreateBo(pim_desc, MEM_TYPE_DEVICE, GEMV_INPUT, x);
+        PimBo *dev_op1 = PimCreateBo(pim_desc, MEM_TYPE_DEVICE, GEMV_WEIGHT, A);
+        PimBo *dev_out = PimCreateBo(pim_desc, MEM_TYPE_DEVICE, GEMV_OUTPUT, y);
 
         PimExecuteGemv(dev_out, dev_op0, dev_op1, nullptr);
 
@@ -673,8 +672,8 @@ void customAtenMatmul(at::Tensor &self_tensor, at::Tensor &other_tensor, torch::
         int n = 1;
         int k = self_tensor.size(dim_i0 - 1);
 
-        _Float16* A = (_Float16*)self_tensor.data_ptr();
-        _Float16* x = (_Float16*)other_tensor.data_ptr();
+        _Float16 *A = (_Float16 *)self_tensor.data_ptr();
+        _Float16 *x = (_Float16 *)other_tensor.data_ptr();
         auto options = at::TensorOptions().dtype(at::kHalf).device(at::kCUDA);
         auto output_shape = other_tensor.sizes().vec();
 
@@ -687,12 +686,12 @@ void customAtenMatmul(at::Tensor &self_tensor, at::Tensor &other_tensor, torch::
             output_shape[dim_i1 - 2] = m;
         }
         auto output = at::zeros(output_shape, options);
-        _Float16* y = (_Float16*)output.data_ptr();
+        _Float16 *y = (_Float16 *)output.data_ptr();
 
-        PimDesc* pim_desc = PimCreateDesc(1, 1, m, k, PIM_FP16, OP_GEMV);
-        PimBo* dev_op0 = PimCreateBo(pim_desc, MEM_TYPE_DEVICE, GEMV_INPUT, x);
-        PimBo* dev_op1 = PimCreateBo(pim_desc, MEM_TYPE_DEVICE, GEMV_WEIGHT_T, A);
-        PimBo* dev_out = PimCreateBo(pim_desc, MEM_TYPE_DEVICE, GEMV_OUTPUT, y);
+        PimDesc *pim_desc = PimCreateDesc(1, 1, m, k, PIM_FP16, OP_GEMV);
+        PimBo *dev_op0 = PimCreateBo(pim_desc, MEM_TYPE_DEVICE, GEMV_INPUT, x);
+        PimBo *dev_op1 = PimCreateBo(pim_desc, MEM_TYPE_DEVICE, GEMV_WEIGHT_T, A);
+        PimBo *dev_out = PimCreateBo(pim_desc, MEM_TYPE_DEVICE, GEMV_OUTPUT, y);
 
         PimExecuteGemv(dev_out, dev_op0, dev_op1, nullptr);
 
@@ -710,8 +709,8 @@ void customAtenMatmul(at::Tensor &self_tensor, at::Tensor &other_tensor, torch::
         int n = 1;
         int k = self_tensor.size(dim_i0 - 1);
 
-        _Float16* A = (_Float16*)self_tensor.data_ptr();
-        _Float16* x = (_Float16*)other_tensor.data_ptr();
+        _Float16 *A = (_Float16 *)self_tensor.data_ptr();
+        _Float16 *x = (_Float16 *)other_tensor.data_ptr();
         auto options = at::TensorOptions().dtype(at::kHalf).device(at::kCUDA);
         auto output_shape = other_tensor.sizes().vec();
 
@@ -725,12 +724,12 @@ void customAtenMatmul(at::Tensor &self_tensor, at::Tensor &other_tensor, torch::
         }
 
         auto output = at::zeros(output_shape, options);
-        _Float16* y = (_Float16*)output.data_ptr();
+        _Float16 *y = (_Float16 *)output.data_ptr();
 
-        PimDesc* pim_desc = PimCreateDesc(1, 1, k, m, PIM_FP16, OP_GEMV);
-        PimBo* dev_op0 = PimCreateBo(pim_desc, MEM_TYPE_DEVICE, GEMV_INPUT, x);
-        PimBo* dev_op1 = PimCreateBo(pim_desc, MEM_TYPE_DEVICE, GEMV_WEIGHT_T, A);
-        PimBo* dev_out = PimCreateBo(pim_desc, MEM_TYPE_DEVICE, GEMV_OUTPUT, y);
+        PimDesc *pim_desc = PimCreateDesc(1, 1, k, m, PIM_FP16, OP_GEMV);
+        PimBo *dev_op0 = PimCreateBo(pim_desc, MEM_TYPE_DEVICE, GEMV_INPUT, x);
+        PimBo *dev_op1 = PimCreateBo(pim_desc, MEM_TYPE_DEVICE, GEMV_WEIGHT_T, A);
+        PimBo *dev_out = PimCreateBo(pim_desc, MEM_TYPE_DEVICE, GEMV_OUTPUT, y);
 
         PimExecuteGemv(dev_out, dev_op0, dev_op1, nullptr);
 

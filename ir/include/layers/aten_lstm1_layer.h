@@ -40,31 +40,29 @@ class AtenLSTM1Layer : public NNLayer
         this->weight_ids_ = aten_lstm1_layer.weight_ids_;
         this->bias_ids_ = aten_lstm1_layer.bias_ids_;
         this->setAttr(aten_lstm1_layer.has_biases_, aten_lstm1_layer.num_layers_, aten_lstm1_layer.dropout_,
-                      aten_lstm1_layer.train_, aten_lstm1_layer.bidirectional_, aten_lstm1_layer.batch_first_);
+                      aten_lstm1_layer.train_, aten_lstm1_layer.bidirectional_, aten_lstm1_layer.batch_first_,
+                      aten_lstm1_layer.match_custom_opt_, aten_lstm1_layer.custom_opt_number_);
     }
 
     virtual ~AtenLSTM1Layer() {}
 
     virtual std::shared_ptr<NNLayer> clone() { return std::shared_ptr<AtenLSTM1Layer>(new AtenLSTM1Layer(*this)); }
 
-    void setMatchCustomOpt(bool match_custom_opt) { match_custom_opt_ = match_custom_opt; }
-    void setCustomOptNumber(int custom_opt_number) { custom_opt_number_ = custom_opt_number; }
-
-    bool getMatchCustomOpt() { return match_custom_opt_; }
-    int getCustomOptNumber() { return custom_opt_number_; }
-
     void printAttr()
     {
         DLOG(INFO) << "     AtenLSTM1Attr   ";
-        DLOG(INFO) << "     has_biases is    " << this->has_biases_;
-        DLOG(INFO) << "     num_layers is    " << this->num_layers_;
-        DLOG(INFO) << "     dropout is       " << this->dropout_;
-        DLOG(INFO) << "     bidirectional is " << this->bidirectional_;
-        DLOG(INFO) << "     train is         " << this->train_;
-        DLOG(INFO) << "     batch_first is   " << this->batch_first_;
+        DLOG(INFO) << "     has_biases is        " << this->has_biases_;
+        DLOG(INFO) << "     num_layers is        " << this->num_layers_;
+        DLOG(INFO) << "     dropout is           " << this->dropout_;
+        DLOG(INFO) << "     bidirectional is     " << this->bidirectional_;
+        DLOG(INFO) << "     train is             " << this->train_;
+        DLOG(INFO) << "     batch_first is       " << this->batch_first_;
+        DLOG(INFO) << "     match_custom_opt is  " << this->match_custom_opt_;
+        DLOG(INFO) << "     custom_opt_number is " << this->custom_opt_number_;
     }
 
-    void setAttr(int has_biases, int64_t num_layers, double dropout, int train, int bidirectional, int batch_first)
+    void setAttr(int has_biases, int64_t num_layers, double dropout, int train, int bidirectional, int batch_first,
+                 bool match_custom_opt, int custom_opt_number)
     {
         this->has_biases_ = has_biases;
         this->num_layers_ = num_layers;
@@ -72,6 +70,8 @@ class AtenLSTM1Layer : public NNLayer
         this->train_ = train;
         this->bidirectional_ = bidirectional;
         this->batch_first_ = batch_first;
+        this->match_custom_opt_ = match_custom_opt;
+        this->custom_opt_number_ = custom_opt_number;
     }
 
     std::vector<at::Tensor> getWeights() { return this->weights_; }
@@ -114,6 +114,14 @@ class AtenLSTM1Layer : public NNLayer
 
     void setBatchFirst(int batch_first) { this->batch_first_ = batch_first; }
 
+    bool getMatchCustomOpt() { return match_custom_opt_; }
+
+    void setMatchCustomOpt(bool match_custom_opt) { match_custom_opt_ = match_custom_opt; }
+
+    int getCustomOptNumber() { return custom_opt_number_; }
+
+    void setCustomOptNumber(int custom_opt_number) { custom_opt_number_ = custom_opt_number; }
+
     struct AtenLSTM1LayerAttr {
         int has_biases;
         int64_t num_layers;
@@ -121,6 +129,8 @@ class AtenLSTM1Layer : public NNLayer
         int train;
         int bidirectional;
         int batch_first;
+        bool match_custom_opt;
+        int custom_opt_number;
     };
 
     AtenLSTM1LayerAttr getAttr()
@@ -132,6 +142,8 @@ class AtenLSTM1Layer : public NNLayer
         attrs.train = this->train_;
         attrs.bidirectional = this->bidirectional_;
         attrs.batch_first = this->batch_first_;
+        attrs.match_custom_opt = this->match_custom_opt_;
+        attrs.custom_opt_number = this->custom_opt_number_;
         return attrs;
     }
 
@@ -150,8 +162,8 @@ class AtenLSTM1Layer : public NNLayer
     std::vector<int64_t> bias_ids_;
 
     int lstm_type_ = 0;
-    bool match_custom_opt_;
-    int custom_opt_number_;
+    bool match_custom_opt_ = false;
+    int custom_opt_number_ = 0;
 };
 }  // namespace ir
 }  // namespace nn_compiler

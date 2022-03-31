@@ -50,6 +50,7 @@ class PrimLoopLayer : public NNLayer
         DLOG(INFO) << "     body_net        " << body_net_;
         DLOG(INFO) << "     trip_count      " << trip_count_;
         DLOG(INFO) << "     cond            " << cond_;
+        DLOG(INFO) << "     goto_layer      " << goto_layer_;
     }
 
    private:
@@ -57,7 +58,7 @@ class PrimLoopLayer : public NNLayer
     int64_t cond_ = INT64_MIN;
     std::string body_net_;
 
-    int64_t goto_layer_;
+    int64_t goto_layer_ = INT64_MIN;
 };
 
 }  // namespace ir

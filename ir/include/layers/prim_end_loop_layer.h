@@ -31,8 +31,14 @@ class PrimEndLoopLayer : public NNLayer
 
     int64_t getGotoLayer() const { return goto_layer_; }
 
+    void printAttr()
+    {
+        DLOG(INFO) << "     PrimEndLoopAttr    ";
+        DLOG(INFO) << "     goto_layer      " << goto_layer_;
+    }
+
    private:
-    int64_t goto_layer_;
+    int64_t goto_layer_ = INT64_MIN;
 };
 
 }  // namespace ir

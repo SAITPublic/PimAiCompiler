@@ -9,12 +9,12 @@ namespace frontend
 {
 /** @Details:
  *  Convert aten::linear to aten::addmm, to enable PIM acceleartion and custom GEMV computation.
- *           
+ *
  *             |
  *          prim::If
  *        /          \                                |
  *   aten::addmm   aten::matmul                       |
- *       |            |             ----->       aten::addmm   
+ *       |            |             ----->       aten::addmm
  *       |         aten::add                          |
  *        \          /                                |
  *         prim::EndIf

@@ -44,15 +44,16 @@ class PrimIfLayer : public NNLayer
     void printAttr()
     {
         DLOG(INFO) << "    PrimIfAttr        ";
-        DLOG(INFO) << "    Then net is       " << then_net_;
-        DLOG(INFO) << "    Else net is       " << else_net_;
+        DLOG(INFO) << "    Then net is                   " << then_net_;
+        DLOG(INFO) << "    Else net is                   " << else_net_;
+        DLOG(INFO) << "    Id of Else net start layer is " << else_net_start_layer_;
     }
 
    private:
     std::string then_net_;
     std::string else_net_;
 
-    int64_t else_net_start_layer_;
+    int64_t else_net_start_layer_ = INT64_MIN;
 };
 
 }  // namespace ir

@@ -15,6 +15,8 @@
 
 #pragma once
 
+#include <stdio.h>
+#include <stdlib.h>
 #include <algorithm>
 #include <cmath>
 #include <fstream>
@@ -26,8 +28,6 @@
 #include <set>
 #include <sstream>
 #include <stack>
-#include <stdio.h>
-#include <stdlib.h>
 #include <string>
 #include <tuple>
 #include <unordered_set>
