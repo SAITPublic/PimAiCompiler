@@ -17,7 +17,7 @@ bool SwapAddmmInputs::fitCondition(std::unique_ptr<nn_compiler::ir::NNModel>& mo
     auto graph = model->getGraphs()[0];
     for (auto layer : graph->getLayers()) {
         if (layer->getType() == nn_compiler::ir::LayerType::ATENADDMM) {
-            auto predecessors = ir::searchPredecessor(layer, graph);
+            auto predecessors = ir::utils::searchPredecessor(layer, graph);
             // at least: bias, input, weight.
             if (predecessors.size() >= 3 && predecessors[2]->getType() == nn_compiler::ir::LayerType::PRIMCONSTANT) {
                 layers_.push_back(layer);
@@ -32,7 +32,7 @@ void SwapAddmmInputs::run(std::unique_ptr<nn_compiler::ir::NNModel>& model)
     DLOG(INFO) << "SwapAddmmInputs::run is called.";
     auto graph = model->getGraphs()[0];
     for (auto layer : layers_) {
-        auto predecessors = ir::searchPredecessor(layer, graph);
+        auto predecessors = ir::utils::searchPredecessor(layer, graph);
 
         // create transpose layer and insert for addmm's input
         auto transpose_layer_for_input =

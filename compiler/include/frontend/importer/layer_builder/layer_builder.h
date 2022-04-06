@@ -19,24 +19,12 @@ class LayerBuilder
 
     virtual std::shared_ptr<ir::NNLayer> buildLayer(const torch::jit::Node* node_ref) = 0;
 
-    virtual std::shared_ptr<ir::DTensor> getKernel(const torch::jit::Node* node_ref,
-                                                   const torch::jit::Module* torchscript_model)
-    {
-        return nullptr;
-    }
-
-    virtual std::shared_ptr<ir::DTensor> getBias(const torch::jit::Node* node_ref,
-                                                 const torch::jit::Module* torchscript_model)
-    {
-        return nullptr;
-    }
-
     std::shared_ptr<AttrParser> parser() { return attr_parser_; }
 
     virtual ~LayerBuilder() = default;
 
    private:
-    std::shared_ptr<AttrParser> attr_parser_;
+    std::shared_ptr<AttrParser> attr_parser_ = nullptr;
 };
 
 class AtenAddBuilder : public LayerBuilder
@@ -1202,16 +1190,6 @@ class LayerBuilders
             DLOG(INFO) << "layer type " << layer_type << " is unsupport.";
         }
         return layer_builders_[layer_type];
-    }
-
-    virtual std::pair<std::string, std::shared_ptr<ir::DTensor>> getKernel(torch::jit::Module& torchscript_model)
-    {
-        return std::make_pair("", nullptr);
-    }
-
-    virtual std::pair<std::string, std::shared_ptr<ir::DTensor>> getBias(torch::jit::Module& torchscript_model)
-    {
-        return std::make_pair("", nullptr);
     }
 
     ~LayerBuilders() { this->layer_builders_.clear(); }

@@ -15,14 +15,14 @@ bool RemoveCatForAddmm::fitCondition(std::unique_ptr<nn_compiler::ir::NNModel>& 
     auto graph = model->getGraphs()[0];
     for (auto layer : graph->getLayers()) {
         if (layer->getType() == nn_compiler::ir::LayerType::PRIMLISTCONSTRUCT) {
-            auto predecessors = ir::searchPredecessor(layer, graph);
+            auto predecessors = ir::utils::searchPredecessor(layer, graph);
             if (predecessors.size() != 2) {
                 continue;
             }
-            auto successors = ir::searchSuccessorLayerOnly(layer, graph);
+            auto successors = ir::utils::searchSuccessorLayerOnly(layer, graph);
             if (successors.size() == 1 && successors[0]->getType() == nn_compiler::ir::LayerType::ATENCAT) {
                 auto cat_layer = successors[0];
-                auto successors_of_cat = ir::searchSuccessorLayerOnly(cat_layer, graph);
+                auto successors_of_cat = ir::utils::searchSuccessorLayerOnly(cat_layer, graph);
                 if (successors_of_cat.size() == 1 &&
                     successors_of_cat[0]->getType() == nn_compiler::ir::LayerType::ATENADDMM) {
                     auto addmm_layer = successors_of_cat[0];
@@ -44,7 +44,7 @@ void RemoveCatForAddmm::run(std::unique_ptr<nn_compiler::ir::NNModel>& model)
 
     for (auto layer_set : layers_) {
         auto addmm_layer = layer_set[2];
-        auto addmm_predecessors = ir::searchPredecessor(addmm_layer, graph);
+        auto addmm_predecessors = ir::utils::searchPredecessor(addmm_layer, graph);
         auto old_weight = addmm_predecessors[2];
         auto new_weights =
             create_new_constants(std::dynamic_pointer_cast<nn_compiler::ir::PrimConstantLayer>(old_weight));
@@ -124,8 +124,8 @@ void RemoveCatForAddmm::reorganize_graph(std::unique_ptr<nn_compiler::ir::NNMode
         graph->deleteLayer(cat_layer->getID());
 
         auto addmm_layer = layer_set[2];
-        auto block_inputs = ir::searchPredecessor(list_construct_layer, graph);
-        auto block_outputs = ir::searchSuccessors(addmm_layer, graph);
+        auto block_inputs = ir::utils::searchPredecessor(list_construct_layer, graph);
+        auto block_outputs = ir::utils::searchSuccessors(addmm_layer, graph);
         assert(block_inputs.size() == 2);
 
         // update first addmm Op

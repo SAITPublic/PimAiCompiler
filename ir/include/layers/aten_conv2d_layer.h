@@ -36,35 +36,35 @@ class AtenConv2dLayer : public NNLayer
 
     virtual std::shared_ptr<NNLayer> clone() { return std::shared_ptr<AtenConv2dLayer>(new AtenConv2dLayer(*this)); }
 
-    std::vector<at::Tensor> getWeights() { return this->weights_; }
-
     void setWeights(const std::vector<at::Tensor> &weights) { weights_ = weights; }
-
-    std::vector<at::Tensor> getBiases() { return this->bias_; }
 
     void setBiases(const std::vector<at::Tensor> &bias) { bias_ = bias; }
 
-    std::vector<int64_t> getWeightIds() { return weight_ids_; }
-
     void setWeightIds(const std::vector<int64_t> &weight_ids) { weight_ids_ = weight_ids; }
-
-    std::vector<int64_t> getBiasIds() { return bias_ids_; }
 
     void setBiasIds(const std::vector<int64_t> &bias_ids) { bias_ids_ = bias_ids; }
 
     void setStride(const std::vector<int64_t> &stride) { stride_ = stride; }
 
-    const std::vector<int64_t> getStride() const { return stride_; }
-
     void setPadding(const std::vector<int64_t> &padding) { padding_ = padding; }
-
-    const std::vector<int64_t> getPadding() const { return padding_; }
 
     void setDialation(const std::vector<int64_t> &dialation) { dialation_ = dialation; }
 
-    const std::vector<int64_t> getDialation() const { return dialation_; }
-
     void setGroups(int64_t groups) { groups_ = groups; }
+
+    std::vector<at::Tensor> getWeights() { return this->weights_; }
+
+    std::vector<at::Tensor> getBiases() { return this->bias_; }
+
+    std::vector<int64_t> getWeightIds() { return weight_ids_; }
+
+    std::vector<int64_t> getBiasIds() { return bias_ids_; }
+
+    const std::vector<int64_t> getStride() const { return stride_; }
+
+    const std::vector<int64_t> getPadding() const { return padding_; }
+
+    const std::vector<int64_t> getDialation() const { return dialation_; }
 
     int64_t getGroups() const { return groups_; }
 

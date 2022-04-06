@@ -6,6 +6,8 @@ namespace nn_compiler
 {
 namespace ir
 {
+namespace utils
+{
 bool isSingleValueType(DataType data_type)
 {
     return (data_type == DataType::INT8 || data_type == DataType::UINT8 || data_type == DataType::INT16 ||
@@ -108,5 +110,6 @@ DataType inferDataType(int32_t bitwidth, std::string data_type)
     return DataType ::UNDEFINED;
 }
 
+}  // namespace utils
 }  // namespace ir
 }  // namespace nn_compiler

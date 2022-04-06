@@ -38,6 +38,59 @@ at::Tensor AttrParser::getTensorAttr(const torch::jit::Node* node, c10::Symbol s
     return node->t(symbol);
 }
 
+std::pair<std::vector<at::Tensor>, std::vector<at::Tensor> > AttrParser::getGeneralWeightAndBias(
+    const torch::jit::Node* node)
+{
+    // get weights
+    auto weight_node = node->inputs()[1]->node();
+    assert(weight_node->kind() == c10::prim::Constant);
+    assert(weight_node->hasAttribute(c10::attr::value));
+    auto weight_tensor = weight_node->t(c10::attr::value);
+    std::vector<at::Tensor> weight_vec;
+    weight_vec.push_back(weight_tensor);
+    // get bias
+    auto bias_node = node->inputs()[2]->node();
+    assert(bias_node->kind() == c10::prim::Constant);
+    assert(bias_node->hasAttribute(c10::attr::value));
+    auto bias_tensor = bias_node->t(c10::attr::value);
+    std::vector<at::Tensor> bias_vec;
+    bias_vec.push_back(bias_tensor);
+
+    return std::make_pair(weight_vec, bias_vec);
+}
+
+std::pair<std::vector<at::Tensor>, std::vector<at::Tensor> > AttrParser::getLstmWeightAndBias(
+    const torch::jit::Node* node)
+{
+    // the learnable parameter of aten::lstm contains 8 or 12 tensors,
+    // they are all prim::Constant and these tensors are input to prim::ListConstrcut
+    // which returns a tensor[], instead of to unpack these tensor from tensor[].
+    // We firstly get the previous prim::ListConstruct Node and then get all the inputs
+    // of prim::ListConstruct
+    std::vector<at::Tensor> weight_vec;
+    std::vector<at::Tensor> bias_vec;
+    // get the prim::ListConstruct
+    auto list_construct = node->inputs()[3]->node();
+    if (list_construct->kind() != c10::prim::ListConstruct) {
+        list_construct = node->inputs()[2]->node();
+    }
+    // get each input of prim::ListConstruct
+    for (auto item : list_construct->inputs()) {
+        auto constant_node = item->node();
+        assert(constant_node->kind() == c10::prim::Constant);
+        assert(constant_node->hasAttribute(c10::attr::value));
+        // get the at::Tensor from prim::Constant
+        auto torch_tensor = constant_node->t(c10::attr::value);
+        if (torch_tensor.dim() == 1) {
+            bias_vec.push_back(torch_tensor);
+        } else {
+            weight_vec.push_back(torch_tensor);
+        }
+    }
+
+    return std::make_pair(weight_vec, bias_vec);
+}
+
 void ptTensor2DTensor(at::Tensor torch_tensor, std::shared_ptr<DTensor> d_tensor)
 {
     c10::ScalarType dtype = torch_tensor.scalar_type();

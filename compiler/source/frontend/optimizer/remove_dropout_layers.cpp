@@ -36,7 +36,7 @@ void RemoveDropoutLayers::run(std::unique_ptr<nn_compiler::ir::NNModel>& model)
         */
         auto old_stensor_id = layer->getOutSTensorID()[0];
         auto new_stensor_id = layer->getInSTensorID()[0];
-        auto successors = ir::searchSuccessors(layer, graph);
+        auto successors = ir::utils::searchSuccessors(layer, graph);
         for (auto successor : successors) {
             for (auto idx : successor.second) {
                 (successor.first)->renewInSTensorID(idx, new_stensor_id);

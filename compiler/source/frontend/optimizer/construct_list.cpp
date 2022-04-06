@@ -25,7 +25,7 @@ bool ConstructList::fitCondition(std::unique_ptr<nn_compiler::ir::NNModel>& mode
     for (auto graph : graphs) {
         for (auto layer : graph->getLayers()) {
             if (layer->getType() == nn_compiler::ir::LayerType::PRIMLISTCONSTRUCT) {
-                auto predecessors = ir::searchPredecessor(layer, graph);
+                auto predecessors = ir::utils::searchPredecessor(layer, graph);
                 bool all_constant = true;
                 for (unsigned int idx = 0; idx < predecessors.size(); idx++) {
                     // An extra connection has been added between prim::If and the first Op of its then/else body.
@@ -87,8 +87,8 @@ void ConstructList::run(std::unique_ptr<nn_compiler::ir::NNModel>& model)
         auto list_construct_layer = process_layer_and_dtensor.first;
         auto dtensor_vec = process_layer_and_dtensor.second;
 
-        auto predecessors = ir::searchPredecessor(list_construct_layer, graph);
-        auto successors = ir::searchSuccessor(list_construct_layer, graph);
+        auto predecessors = ir::utils::searchPredecessor(list_construct_layer, graph);
+        auto successors = ir::utils::searchSuccessor(list_construct_layer, graph);
 
         // Store info
         auto layer_id = list_construct_layer->getID();
@@ -104,7 +104,7 @@ void ConstructList::run(std::unique_ptr<nn_compiler::ir::NNModel>& model)
             }
 
             auto constant_layer = std::dynamic_pointer_cast<nn_compiler::ir::PrimConstantLayer>(predecessors[idx]);
-            auto successors_of_constant_layer = ir::searchSuccessor(predecessors[idx], graph);
+            auto successors_of_constant_layer = ir::utils::searchSuccessor(predecessors[idx], graph);
             if (successors_of_constant_layer.size() == 1) {
                 // This constant only used for prim::ListConstruct. Can be removed.
                 constant_layer->setToRemove(true);

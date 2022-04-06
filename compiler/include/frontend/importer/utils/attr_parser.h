@@ -23,6 +23,10 @@ class AttrParser
 
     at::Tensor getTensorAttr(const torch::jit::Node* node, c10::Symbol symbol);
 
+    std::pair<std::vector<at::Tensor>, std::vector<at::Tensor> > getGeneralWeightAndBias(const torch::jit::Node* node);
+
+    std::pair<std::vector<at::Tensor>, std::vector<at::Tensor> > getLstmWeightAndBias(const torch::jit::Node* node);
+
     ~AttrParser() = default;
 };
 

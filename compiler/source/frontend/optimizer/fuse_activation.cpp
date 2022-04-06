@@ -18,7 +18,7 @@ bool FuseActivation::fitCondition(std::unique_ptr<nn_compiler::ir::NNModel>& mod
             return false;
         }
 
-        auto successors = ir::searchSuccessor(predecessor, network);
+        auto successors = ir::utils::searchSuccessor(predecessor, network);
         if (successors.size() > 1) {
             DLOG(INFO) << "failed to satisfy with fusion dependency";
             return false;
@@ -29,7 +29,7 @@ bool FuseActivation::fitCondition(std::unique_ptr<nn_compiler::ir::NNModel>& mod
                 DLOG(INFO) << "The predecessor of transpose layer is not addmm layer.";
                 return false;
             }
-            auto successors = ir::searchSuccessor(successor, network);
+            auto successors = ir::utils::searchSuccessor(successor, network);
             if (successors.size() > 1) {
                 DLOG(INFO) << "failed to satisfy with fusion dependency";
                 return false;
@@ -43,9 +43,9 @@ bool FuseActivation::fitCondition(std::unique_ptr<nn_compiler::ir::NNModel>& mod
         for (auto cur_layer : graph->getLayers()) {
             std::string type = convertLayerTypeToString(cur_layer->getType());
             if (feasibleParasiteType(type)) {
-                auto predecessors = ir::searchPredecessor(cur_layer, graph);
+                auto predecessors = ir::utils::searchPredecessor(cur_layer, graph);
                 assert(predecessors.size() > 0);
-                auto pre_of_predecessor = ir::searchPredecessor(predecessors[0], graph);
+                auto pre_of_predecessor = ir::utils::searchPredecessor(predecessors[0], graph);
                 if (predecessors.empty() || !dependCheck(graph, predecessors[0], pre_of_predecessor[0])) {
                     continue;
                 }
@@ -68,8 +68,8 @@ void FuseActivation::run(std::unique_ptr<nn_compiler::ir::NNModel>& model)
     for (auto cur_layer : layers_) {
         std::string type = convertLayerTypeToString(cur_layer->getType());
         if (feasibleParasiteType(type)) {
-            auto predecessors = ir::searchPredecessor(cur_layer, graph);
-            auto successors = ir::searchPredecessor(predecessors[0], graph);
+            auto predecessors = ir::utils::searchPredecessor(cur_layer, graph);
+            auto successors = ir::utils::searchPredecessor(predecessors[0], graph);
 
             auto out_ids = cur_layer->getOutSTensorID();
             auto in_ids = cur_layer->getInSTensorID();

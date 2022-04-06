@@ -16,7 +16,7 @@ bool SwapMatmulInputs::fitCondition(std::unique_ptr<nn_compiler::ir::NNModel>& m
     auto graph = model->getGraphs()[0];
     for (auto layer : graph->getLayers()) {
         if (layer->getType() == nn_compiler::ir::LayerType::ATENMATMUL) {
-            auto predecessors = ir::searchPredecessor(layer, graph);
+            auto predecessors = ir::utils::searchPredecessor(layer, graph);
             if (predecessors.size() == 2 && predecessors[1]->getType() == nn_compiler::ir::LayerType::PRIMCONSTANT) {
                 auto constant_layer = std::dynamic_pointer_cast<nn_compiler::ir::PrimConstantLayer>(predecessors[1]);
                 auto dtensor = constant_layer->getAttr();
@@ -44,7 +44,7 @@ void SwapMatmulInputs::run(std::unique_ptr<nn_compiler::ir::NNModel>& model)
     DLOG(INFO) << "SwapMatmulInputs::run is called.";
     auto graph = model->getGraphs()[0];
     for (auto layer : layers_) {
-        auto predecessors = ir::searchPredecessor(layer, graph);
+        auto predecessors = ir::utils::searchPredecessor(layer, graph);
         assert(predecessors.size() == 2);
         // create transpose layer and insert for matmul's input
         auto transpose_layer_for_input =

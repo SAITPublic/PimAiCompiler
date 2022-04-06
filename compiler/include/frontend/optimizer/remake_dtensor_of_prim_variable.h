@@ -16,7 +16,7 @@ namespace frontend
 class RemakeDTensorOfPrimVariable : public Pass
 {
    public:
-    RemakeDTensorOfPrimVariable() { helper_ = std::make_shared<AttributeHelper>(); }
+    RemakeDTensorOfPrimVariable() { helper_ = std::make_shared<optimizer_utils::AttributeHelper>(); }
 
     bool fitCondition(std::unique_ptr<nn_compiler::ir::NNModel>& model);
 
@@ -27,7 +27,7 @@ class RemakeDTensorOfPrimVariable : public Pass
    private:
     std::vector<std::shared_ptr<nn_compiler::ir::NNLayer>> variable_layers_;
 
-    std::shared_ptr<AttributeHelper> helper_ = nullptr;
+    std::shared_ptr<optimizer_utils::AttributeHelper> helper_ = nullptr;
 
     /** @ Details: check the data of a prim::Variable is used to set attribute or input for other layers.
      *  @ Return:

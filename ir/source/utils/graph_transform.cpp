@@ -5,6 +5,8 @@ namespace nn_compiler
 {
 namespace ir
 {
+namespace utils
+{
 void deleteLayer(std::shared_ptr<ir::NNNetwork> graph, std::shared_ptr<ir::NNLayer> layer)
 {
     auto cur_in_ids = layer->getInSTensorID();
@@ -25,5 +27,6 @@ void deleteLayer(std::shared_ptr<ir::NNNetwork> graph, std::shared_ptr<ir::NNLay
     graph->deleteLayer(layer->getID());
 }
 
+}  // namespace utils
 }  // namespace ir
 }  // namespace nn_compiler

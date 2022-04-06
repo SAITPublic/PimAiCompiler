@@ -7,7 +7,7 @@ namespace nn_compiler
 namespace frontend
 {
 /** @Details:
- *  There are multiple subgraphs in a GModel after model builder phase of frontend importer.
+ *  There are multiple subgraphs in a NNModel after model builder phase of frontend importer.
  *  Many Ops are connected across different subgraphs, which makes the whole graph complicated,
  *  and difficult for optimization. So this pass is designed to reorgonize all subgraphs to one main graph.
  **/

@@ -64,7 +64,7 @@ void SetAttribute::doProcess(const std::shared_ptr<nn_compiler::ir::NNLayer> &la
                              const std::shared_ptr<nn_compiler::ir::NNNetwork> &graph,
                              std::shared_ptr<nn_compiler::ir::DTensor> &data, bool &remove_layer)
 {
-    auto consumers = ir::searchSuccessors(layer, graph);
+    auto consumers = ir::utils::searchSuccessors(layer, graph);
     for (auto consumer : consumers) {
         for (auto inID : consumer.second) {
             std::pair<const std::shared_ptr<nn_compiler::ir::NNLayer>, unsigned int> layer_inID(consumer.first, inID);

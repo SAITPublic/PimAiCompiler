@@ -17,34 +17,9 @@ std::shared_ptr<ir::NNLayer> AtenLSTM2Builder::buildLayer(const torch::jit::Node
 
     aten_lstm2_layer_ = std::make_shared<ir::AtenLSTM2Layer>(name, type);
 
-    // the learnable parameter of aten::lstm contains 8 or 12 tensors in RNNT
-    // model, they are all prim::Constant these tensors are input to
-    // prim::ListConstrcut and return a tensor[], instead of to unpack these
-    // tensor from tensor[], we firstly get the previous prim::ListConstruct Node
-    // and then get all the inputs of prim::ListConstruct
-    std::vector<at::Tensor> weight_vec;
-    std::vector<at::Tensor> bias_vec;
-    // get the prim::ListConstruct
-    auto list_construct = node_ref->inputs()[3]->node();
-    if (list_construct->kind() != c10::prim::ListConstruct) {
-        list_construct = node_ref->inputs()[2]->node();
-    }
-    // get each input of prim::ListConstruct
-    for (auto item : list_construct->inputs()) {
-        auto constant_node = item->node();
-        assert(constant_node->kind() == c10::prim::Constant);
-        assert(constant_node->hasAttribute(c10::attr::value));
-        // get the at::Tensor from prim::Constant
-        auto torch_tensor = constant_node->t(c10::attr::value);
-        if (torch_tensor.dim() == 1) {
-            bias_vec.push_back(torch_tensor);
-        } else {
-            weight_vec.push_back(torch_tensor);
-        }
-    }
-
-    aten_lstm2_layer_->setWeights(weight_vec);
-    aten_lstm2_layer_->setBiases(bias_vec);
+    auto weight_bias = parser()->getLstmWeightAndBias(node_ref);
+    aten_lstm2_layer_->setWeights(weight_bias.first);
+    aten_lstm2_layer_->setBiases(weight_bias.second);
 
     const auto& layer = std::dynamic_pointer_cast<ir::NNLayer>(aten_lstm2_layer_);
     return layer;

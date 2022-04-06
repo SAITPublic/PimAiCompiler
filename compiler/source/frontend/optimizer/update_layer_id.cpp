@@ -24,8 +24,8 @@ void UpdateLayerId::run(std::unique_ptr<nn_compiler::ir::NNModel>& model)
 
     // update layer's pre_layer_ids & next_layer_ids
     for (auto layer : graph->getLayers()) {
-        auto predecessors = nn_compiler::ir::searchPredecessor(layer, graph);
-        auto successors = nn_compiler::ir::searchSuccessorLayerOnly(layer, graph);
+        auto predecessors = nn_compiler::ir::utils::searchPredecessor(layer, graph);
+        auto successors = nn_compiler::ir::utils::searchSuccessorLayerOnly(layer, graph);
         std::vector<uint32_t> pre_layer_ids, next_layer_ids;
         for (auto predecessor : predecessors) {
             pre_layer_ids.push_back(predecessor->getID());

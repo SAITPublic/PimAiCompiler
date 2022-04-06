@@ -35,35 +35,35 @@ class AtenBatchNorm2dLayer : public NNLayer
 
     std::vector<at::Tensor> getWeights() { return this->weights_; }
 
-    void setWeights(const std::vector<at::Tensor>& weights) { weights_ = weights; }
-
     std::vector<at::Tensor> getBiases() { return this->bias_; }
-
-    void setBiases(const std::vector<at::Tensor>& bias) { bias_ = bias; }
 
     std::vector<int64_t> getWeightIds() { return weight_ids_; }
 
-    void setWeightIds(const std::vector<int64_t>& weight_ids) { weight_ids_ = weight_ids; }
-
     std::vector<int64_t> getBiasIds() { return bias_ids_; }
+
+    int getTraining() { return training_; }
+
+    double getMomentum() { return momentum_; }
+
+    double getEps() { return eps_; }
+
+    int getCudnnEnabled() { return cudnn_enabled_; }
+
+    void setWeights(const std::vector<at::Tensor>& weights) { weights_ = weights; }
+
+    void setBiases(const std::vector<at::Tensor>& bias) { bias_ = bias; }
+
+    void setWeightIds(const std::vector<int64_t>& weight_ids) { weight_ids_ = weight_ids; }
 
     void setBiasIds(const std::vector<int64_t>& bias_ids) { bias_ids_ = bias_ids; }
 
     void setTraining(int training) { training_ = training; }
 
-    int getTraining() { return training_; }
-
     void setMomentum(double momentum) { momentum_ = momentum; }
-
-    double getMomentum() { return momentum_; }
 
     void setEps(double eps) { eps_ = eps; }
 
-    double getEps() { return eps_; }
-
     void setCudnnEnabled(int cudnn_enabled) { cudnn_enabled_ = cudnn_enabled; }
-
-    int getCudnnEnabled() { return cudnn_enabled_; }
 
     void printAttr()
     {

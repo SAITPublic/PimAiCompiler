@@ -61,7 +61,7 @@ void RemoveIfWithAddmm::run(std::unique_ptr<nn_compiler::ir::NNModel> &model)
         auto new_id = addmm_layer->getOutSTensorID()[0];  // always only one output from aten::addmm
 
         auto end_if_layer = layers[layer_idx + 5];  // prim::EndIf of matmul + add
-        auto successors = ir::searchSuccessors(end_if_layer, graph);
+        auto successors = ir::utils::searchSuccessors(end_if_layer, graph);
         for (auto successor : successors) {
             auto in_ID_idx = successor.second;
             for (auto idx = 0; idx < in_ID_idx.size(); idx++) {
@@ -79,10 +79,10 @@ void RemoveIfWithAddmm::getDeleteLayers(std::shared_ptr<nn_compiler::ir::NNNetwo
                                         std::shared_ptr<nn_compiler::ir::NNLayer> layer,
                                         std::vector<std::shared_ptr<nn_compiler::ir::NNLayer>> &delete_layers)
 {
-    if ((ir::searchSuccessors(layer, graph)).size() == 1) {
+    if ((ir::utils::searchSuccessors(layer, graph)).size() == 1) {
         // the compute result of layer is only used by this if branch
         delete_layers.push_back(layer);
-        auto predecessors = ir::searchPredecessor(layer, graph);
+        auto predecessors = ir::utils::searchPredecessor(layer, graph);
         for (auto predecessor : predecessors) {
             getDeleteLayers(graph, predecessor, delete_layers);
         }

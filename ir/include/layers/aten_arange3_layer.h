@@ -31,33 +31,33 @@ class AtenArange3Layer : public NNLayer
 
     virtual std::shared_ptr<NNLayer> clone() { return std::shared_ptr<AtenArange3Layer>(new AtenArange3Layer(*this)); }
 
-    void setStart(int64_t start) { start_ = start; }
-
     int64_t getStart() const { return start_; }
 
-    void setEnd(int64_t end) { end_ = end; }
+    void setStart(int64_t start) { start_ = start; }
 
     int64_t getEnd() const { return end_; }
 
-    void setStep(int64_t step) { step_ = step; }
+    void setEnd(int64_t end) { end_ = end; }
 
     int64_t getStep() const { return step_; }
 
-    void setDtype(int64_t dtype) { dtype_ = dtype; }
+    void setStep(int64_t step) { step_ = step; }
 
     int64_t getDtype() const { return dtype_; }
 
-    void setLayout(int64_t layout) { layout_ = layout; }
+    void setDtype(int64_t dtype) { dtype_ = dtype; }
 
     int64_t getLayout() const { return layout_; }
 
-    void setDevice(std::string device) { device_ = device; }
+    void setLayout(int64_t layout) { layout_ = layout; }
 
     std::string getDevice() const { return device_; }
 
-    void setPinMemory(int pin_memory) { pin_memory_ = pin_memory; }
+    void setDevice(std::string device) { device_ = device; }
 
     int getPinMemory() const { return pin_memory_; }
+
+    void setPinMemory(int pin_memory) { pin_memory_ = pin_memory; }
 
     void printAttr()
     {

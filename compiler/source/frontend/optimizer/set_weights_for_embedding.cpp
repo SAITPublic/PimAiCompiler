@@ -30,7 +30,7 @@ void SetWeightsForEmbedding::run(std::unique_ptr<nn_compiler::ir::NNModel>& grap
 
     for (auto layer : layers_) {
         auto cur_layer = std::dynamic_pointer_cast<nn_compiler::ir::AtenEmbeddingLayer>(layer);
-        auto predecessors = ir::searchPredecessor(layer, graph);
+        auto predecessors = ir::utils::searchPredecessor(layer, graph);
         assert(predecessors.size() > 0);
         if (predecessors[0]->getType() == nn_compiler::ir::LayerType::PRIMCONSTANT) {
             auto constant_g_layer = predecessors[0];
@@ -64,7 +64,7 @@ void SetWeightsForEmbedding::run(std::unique_ptr<nn_compiler::ir::NNModel>& grap
             }
             cur_layer->setWeights(weights);
 
-            auto successors_of_constant = ir::searchSuccessor(constant_g_layer, graph);
+            auto successors_of_constant = ir::utils::searchSuccessor(constant_g_layer, graph);
             if (successors_of_constant.size() == 1) {  // a constant only for embedding weight
                 cur_layer->deleteInSTensorID(idx);
                 graph->deleteLayer(constant_layer->getID());

@@ -31,21 +31,21 @@ class AtenArange1Layer : public NNLayer
 
     void setEnd(int64_t end) { end_ = end; }
 
-    int64_t getEnd() const { return end_; }
-
     void setDtype(int64_t dtype) { dtype_ = dtype; }
-
-    int64_t getDtype() const { return dtype_; }
 
     void setLayout(int64_t layout) { layout_ = layout; }
 
-    int64_t getLayout() const { return layout_; }
-
     void setDevice(std::string device) { device_ = device; }
 
-    std::string getDevice() const { return device_; }
-
     void setPinMemory(int pin_memory) { pin_memory_ = pin_memory; }
+
+    int64_t getEnd() const { return end_; }
+
+    int64_t getDtype() const { return dtype_; }
+
+    int64_t getLayout() const { return layout_; }
+
+    std::string getDevice() const { return device_; }
 
     int getPinMemory() const { return pin_memory_; }
 

@@ -27,6 +27,9 @@ class ModelBuilder
 
     void importModuleAttributes(std::shared_ptr<torch::jit::Module> torch_model);
 
+    std::shared_ptr<ir::NNLayer> createLayer(std::shared_ptr<frontend::LayerBuilder> builder,
+                                             const torch::jit::Node* node, std::unique_ptr<ir::NNModel>& nn_model);
+
     uint32_t getUniqueBlockId();
 
     uint32_t getUniqueTensorId(std::unique_ptr<ir::NNModel>& nn_model);

@@ -16,7 +16,7 @@ namespace frontend
 class SetAttribute : public Pass
 {
    public:
-    SetAttribute() { helper_ = std::make_shared<AttributeHelper>(); }
+    SetAttribute() { helper_ = std::make_shared<optimizer_utils::AttributeHelper>(); }
 
     bool fitCondition(std::unique_ptr<nn_compiler::ir::NNModel> &model);
 
@@ -35,7 +35,7 @@ class SetAttribute : public Pass
 
     std::vector<std::shared_ptr<nn_compiler::ir::NNLayer>> variable_layers_;
 
-    std::shared_ptr<AttributeHelper> helper_ = nullptr;
+    std::shared_ptr<optimizer_utils::AttributeHelper> helper_ = nullptr;
 
     /**
      * @breif elements of edge_remove_helper is a mapping between:

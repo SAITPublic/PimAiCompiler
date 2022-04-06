@@ -74,53 +74,53 @@ class AtenLSTM1Layer : public NNLayer
         this->custom_opt_number_ = custom_opt_number;
     }
 
-    std::vector<at::Tensor> getWeights() { return this->weights_; }
-
     void setWeights(const std::vector<at::Tensor> &weights) { this->weights_ = weights; }
 
-    std::vector<at::Tensor> getBiases() { return this->biases_; }
+    std::vector<at::Tensor> getWeights() { return this->weights_; }
 
     void setBiases(const std::vector<at::Tensor> &biases) { this->biases_ = biases; }
 
-    std::vector<int64_t> getWeightIds() { return weight_ids_; }
+    std::vector<at::Tensor> getBiases() { return this->biases_; }
 
     void setWeightIds(const std::vector<int64_t> &weight_ids) { weight_ids_ = weight_ids; }
 
-    std::vector<int64_t> getBiasIds() { return bias_ids_; }
+    std::vector<int64_t> getWeightIds() { return weight_ids_; }
 
     void setBiasIds(const std::vector<int64_t> &bias_ids) { bias_ids_ = bias_ids; }
 
-    int getHasBiases() { return this->has_biases_; }
+    std::vector<int64_t> getBiasIds() { return bias_ids_; }
 
     void setHasBiases(int has_biases) { this->has_biases_ = has_biases; }
 
-    int64_t getNumLayers() { return this->num_layers_; }
+    int getHasBiases() { return this->has_biases_; }
 
     void setNumLayers(int64_t num_layers) { this->num_layers_ = num_layers; }
 
-    double getDropout() { return dropout_; }
+    int64_t getNumLayers() { return this->num_layers_; }
 
     void setDropout(double dropout) { this->dropout_ = dropout; }
 
-    int getTrain() { return this->train_; }
+    double getDropout() { return dropout_; }
 
     void setTrain(int train) { this->train_ = train; }
 
-    int getBidirectional() { return this->bidirectional_; }
+    int getTrain() { return this->train_; }
 
     void setBidirectional(int bidirectional) { this->bidirectional_ = bidirectional; }
 
-    int getBatchFirst() { return this->batch_first_; }
+    int getBidirectional() { return this->bidirectional_; }
 
     void setBatchFirst(int batch_first) { this->batch_first_ = batch_first; }
 
-    bool getMatchCustomOpt() { return match_custom_opt_; }
+    int getBatchFirst() { return this->batch_first_; }
 
     void setMatchCustomOpt(bool match_custom_opt) { match_custom_opt_ = match_custom_opt; }
 
-    int getCustomOptNumber() { return custom_opt_number_; }
+    bool getMatchCustomOpt() { return match_custom_opt_; }
 
     void setCustomOptNumber(int custom_opt_number) { custom_opt_number_ = custom_opt_number; }
+
+    int getCustomOptNumber() { return custom_opt_number_; }
 
     struct AtenLSTM1LayerAttr {
         int has_biases;

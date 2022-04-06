@@ -8,6 +8,8 @@ namespace nn_compiler
 {
 namespace ir
 {
+namespace utils
+{
 void printGraphModel(std::unique_ptr<ir::NNModel>& nn_model)
 {
     std::string tab = "    ";
@@ -63,5 +65,6 @@ void printGraphModel(std::unique_ptr<ir::NNModel>& nn_model)
     }
 }
 
+}  // namespace utils
 }  // namespace ir
 }  // namespace nn_compiler

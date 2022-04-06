@@ -4,6 +4,8 @@ namespace nn_compiler
 {
 namespace ir
 {
+namespace utils
+{
 std::vector<std::shared_ptr<ir::NNLayer>> searchPredecessor(const std::shared_ptr<ir::NNLayer> layer,
                                                             const std::unique_ptr<ir::NNModel> &nn_model)
 {
@@ -133,5 +135,6 @@ std::shared_ptr<ir::NNLayer> searchLayerByOutID(uint32_t out_id, const std::shar
     return nullptr;
 }
 
+}  // namespace utils
 }  // namespace ir
 }  // namespace nn_compiler
