@@ -12,8 +12,6 @@
 #include "executor/utils/utils.h"
 #include "ir/include/layers/all_layers.h"
 #include "ir/include/nn_model.h"
-#include "ir/include/nn_network.h"
-#include "ir/include/types.h"
 
 namespace nn_compiler
 {

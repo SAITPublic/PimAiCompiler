@@ -1,4 +1,4 @@
-#include "importer/layer_builder/layer_builder.h"
+#include "frontend/importer/layer_builder/layer_builder.h"
 #include "ir/include/tensors/data_tensor.h"
 
 using nn_compiler::ir::DTensor;

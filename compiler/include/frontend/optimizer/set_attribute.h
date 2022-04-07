@@ -1,8 +1,7 @@
 #pragma once
 
-#include "compiler/include/common/pass.hpp"
-#include "compiler/include/frontend/optimizer/utils/attribute_helper.h"
-#include "ir/include/nn_network.h"
+#include "common/pass.hpp"
+#include "frontend/optimizer/utils/attribute_helper.h"
 
 namespace nn_compiler
 {

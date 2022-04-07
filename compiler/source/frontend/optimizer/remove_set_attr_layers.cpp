@@ -1,4 +1,4 @@
-#include "compiler/include/frontend/optimizer/remove_set_attr_layers.h"
+#include "frontend/optimizer/remove_set_attr_layers.h"
 #include "ir/include/utils/graph_util.h"
 
 namespace nn_compiler

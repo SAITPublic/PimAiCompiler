@@ -44,16 +44,11 @@ add_library(NNCompiler MODULE nn_runtime_py.cpp)
 set(TORCH_INSTALL_PREFIX "${LIBTORCH_DIR}")
 find_library(TORCH_PYTHON_LIBRARY torch_python PATHS "${TORCH_INSTALL_PREFIX}/lib")
 
-# for debug
-# message(STATUS ${TORCH_LIBRARIES})
-# message(STATUS ${TORCH_PYTHON_LIBRARY})
-
 target_include_directories(NNCompiler PRIVATE ${TORCH_INCLUDE_DIRS})
 target_link_libraries(NNCompiler PRIVATE pipeline_manager_py pybind11::module pybind11::lto ${TORCH_LIBRARIES} ${TORCH_PYTHON_LIBRARY})
 set_property(TARGET NNCompiler PROPERTY CXX_STANDARD 17)
 
-
 pybind11_extension(NNCompiler)
 pybind11_strip(NNCompiler)
 
-install ( TARGETS NNCompiler LIBRARY DESTINATION ${ROCM_PATH}/lib/)
+install(TARGETS NNCompiler LIBRARY DESTINATION ${ROCM_PATH}/lib/)

@@ -1,5 +1,3 @@
-#include "ir/include/layers/all_layers.h"
-
 #include "executor/op_executor/prim_ops_executor.h"
 
 using namespace nn_compiler::runtime::utils;
@@ -51,9 +49,9 @@ void executePrimConstant(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, Strea
         iv = scalarToIValue<double>(*(double*)ptr);
         dtype = DataType::FLOAT64;
     } else if (ntype == "Tensor") {
-        auto shape_ = constant_layer_attr->getTensorShape();
+        auto shape = constant_layer_attr->getTensorShape();
         auto bit_width = constant_layer_attr->getBitWidth();
-        auto stride_ = constant_layer_attr->getStride();
+        auto stride_vec = constant_layer_attr->getStride();
         auto scalar_type = DataType::NONE;
         if (bit_width == 16) {
             scalar_type = DataType::FLOAT16;
@@ -63,8 +61,8 @@ void executePrimConstant(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, Strea
             DLOG(FATAL) << "PrimConstant Error, unsupport data type when create Tensor!";
         }
 
-        std::vector<int64_t> input_shape = getDataShapeFromSTensor(shape_);
-        std::vector<int64_t> stride = getDataShapeFromVector(stride_);
+        std::vector<int64_t> input_shape = getDataShapeFromSTensor(shape);
+        std::vector<int64_t> stride = getDataShapeFromVector(stride_vec);
 
         if (stream_executor.getModelType() == "GNMT" && constant_layer->getOutSTensorID()[0] == 4) {
             std::vector<int64_t> reorder_shape(input_shape);
@@ -563,9 +561,9 @@ void executePrimVariable(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, Strea
             auto t_dtensor = variable_attrs.at(i);
             auto d_type = t_dtensor->getDataType();
             auto tensor_shape = t_dtensor->getTensorShape();
-            auto stride_ = t_dtensor->getStride();
+            auto stride_vec = t_dtensor->getStride();
             auto shape = getDataShapeFromSTensor(tensor_shape);
-            auto stride = getDataShapeFromVector(stride_);
+            auto stride = getDataShapeFromVector(stride_vec);
             auto cur_data = *(t_dtensor->getData<uint8_t>());
             uint8_t* ptr = const_cast<uint8_t*>(cur_data.data());
             if (size != 1) {
@@ -600,9 +598,9 @@ void executePrimVariable(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, Strea
         auto t_dtensor = variable_attrs.at(0);
         auto d_type = t_dtensor->getDataType();
         auto tensor_shape = t_dtensor->getTensorShape();
-        auto stride_ = t_dtensor->getStride();
+        auto stride_vec = t_dtensor->getStride();
         auto shape = getDataShapeFromSTensor(tensor_shape);
-        auto stride = getDataShapeFromVector(stride_);
+        auto stride = getDataShapeFromVector(stride_vec);
 
         auto cur_data = *(t_dtensor->getData<uint8_t>());
         uint8_t* ptr = const_cast<uint8_t*>(cur_data.data());

@@ -1,4 +1,4 @@
-#include "compiler/include/frontend/optimizer/remake_dtensor_of_prim_variable.h"
+#include "frontend/optimizer/remake_dtensor_of_prim_variable.h"
 #include "ir/include/utils/graph_util.h"
 
 namespace nn_compiler

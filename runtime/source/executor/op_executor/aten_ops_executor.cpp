@@ -2,19 +2,11 @@
 #include <vector>
 
 #include "c10/hip/HIPFunctions.h"
-#include "executor/op_executor/aten_ops.h"
 #include "executor/op_executor/aten_ops_executor.h"
 #include "executor/op_executor/custom_ops.h"
 #include "executor/op_executor/prim_ops_executor.h"
 #include "executor/stream_executor.h"
-#include "executor/utils/utils.h"
-#include "ir/include/common/utils.hpp"
-#include "ir/include/layers/all_layers.h"
-#include "ir/include/nn_model.h"
-#include "ir/include/nn_network.h"
-#include "ir/include/types.h"
 #include "pim_runtime_api.h"
-#include "utils/tv_tools.h"
 #include "utils/utils.h"
 
 using namespace nn_compiler::runtime::utils;

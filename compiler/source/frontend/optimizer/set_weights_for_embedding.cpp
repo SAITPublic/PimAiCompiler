@@ -1,6 +1,6 @@
 #include <torch/script.h>
 
-#include "compiler/include/frontend/optimizer/set_weights_for_embedding.h"
+#include "frontend/optimizer/set_weights_for_embedding.h"
 #include "ir/include/utils/graph_util.h"
 
 namespace nn_compiler

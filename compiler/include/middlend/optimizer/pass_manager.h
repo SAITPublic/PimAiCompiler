@@ -1,7 +1,6 @@
 #pragma once
 
-#include "compiler/include/common/pass.hpp"
-#include "ir/include/nn_model.h"
+#include "common/pass.hpp"
 
 namespace nn_compiler
 {

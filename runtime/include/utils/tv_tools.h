@@ -13,6 +13,8 @@ namespace nn_compiler
 {
 namespace runtime
 {
+namespace utils
+{
 #define SPLITE_LINE "================================================"
 
 static std::string showTensorInfo(const torch::Tensor& tensor)
@@ -171,5 +173,6 @@ class TVComparator
 #define TV_COMPARE_TENSOR(input_tensor, ans_key_name, print_tensor)
 #endif  // TV_ENABLE
 
+}  // namespace utils
 }  // namespace runtime
 }  // namespace nn_compiler

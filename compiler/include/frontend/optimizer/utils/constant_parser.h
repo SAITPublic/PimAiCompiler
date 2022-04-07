@@ -2,17 +2,19 @@
 
 #include "half.hpp"
 
-#include "ir/include/nn_network.h"
+#include "ir/include/nn_model.h"
 #include "ir/include/utils/graph_util.h"
 
 namespace nn_compiler
 {
 namespace frontend
 {
+namespace optimizer_utils
+{
 class ConstantParser
 {
    public:
-    ConstantParser();
+    ConstantParser() = default;
 
     template <typename T>
     std::vector<std::vector<T>> parse(const std::shared_ptr<nn_compiler::ir::DTensor>& dtensor)
@@ -56,5 +58,6 @@ class ConstantParser
     }
 };
 
+}  // namespace optimizer_utils
 }  // namespace frontend
 }  // namespace nn_compiler

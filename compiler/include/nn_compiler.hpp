@@ -10,8 +10,8 @@
 
 #pragma once
 
-#include "compiler/include/frontend/frontend_driver.hpp"
-#include "compiler/include/middlend/middlend_driver.hpp"
+#include "frontend/frontend_driver.hpp"
+#include "middlend/middlend_driver.hpp"
 
 namespace nn_compiler
 {

@@ -1,7 +1,4 @@
-#include <string>
-
-#include "compiler/include/frontend/optimizer/update_layer_id.h"
-#include "ir/include/tensors/data_tensor.h"
+#include "frontend/optimizer/update_layer_id.h"
 #include "ir/include/utils/graph_util.h"
 
 namespace nn_compiler

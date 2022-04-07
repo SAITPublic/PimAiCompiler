@@ -1,5 +1,4 @@
-#include "importer/layer_builder/layer_builder.h"
-#include "ir/include/tensors/data_tensor.h"
+#include "frontend/importer/layer_builder/layer_builder.h"
 
 namespace nn_compiler
 {

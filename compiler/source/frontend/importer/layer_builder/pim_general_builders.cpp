@@ -1,6 +1,4 @@
-#include "importer/layer_builder/layer_builder.h"
-#include "ir/include/tensors/data_tensor.h"
-#include "ir/include/types.h"
+#include "frontend/importer/layer_builder/layer_builder.h"
 
 #define DECLARE_TORCH_OP_BUILDER(op_name, type_name, layer_name)                                \
     namespace nn_compiler                                                                       \

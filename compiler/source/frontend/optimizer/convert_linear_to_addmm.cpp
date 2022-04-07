@@ -1,4 +1,4 @@
-#include "compiler/include/frontend/optimizer/convert_linear_to_addmm.h"
+#include "frontend/optimizer/convert_linear_to_addmm.h"
 #include "ir/include/utils/graph_util.h"
 
 namespace nn_compiler

@@ -1,6 +1,4 @@
-#include <string>
-
-#include "compiler/include/frontend/optimizer/set_attribute.h"
+#include "frontend/optimizer/set_attribute.h"
 #include "ir/include/utils/graph_util.h"
 
 namespace nn_compiler

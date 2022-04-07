@@ -1,7 +1,4 @@
-#include <string>
-#include <utility>
-
-#include "compiler/include/frontend/optimizer/swap_matmul_inputs.h"
+#include "frontend/optimizer/swap_matmul_inputs.h"
 #include "ir/include/utils/graph_util.h"
 
 namespace nn_compiler

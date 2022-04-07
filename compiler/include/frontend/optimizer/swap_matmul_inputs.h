@@ -1,10 +1,8 @@
 #pragma once
 
-#include "compiler/include/common/pass.hpp"
-#include "compiler/include/frontend/optimizer/utils/constant_parser.h"
-
+#include "common/pass.hpp"
+#include "frontend/optimizer/utils/constant_parser.h"
 #include "half.hpp"
-#include "ir/include/nn_network.h"
 
 namespace nn_compiler
 {
@@ -36,7 +34,7 @@ class SwapMatmulInputs : public Pass
    private:
     std::vector<std::shared_ptr<nn_compiler::ir::NNLayer>> layers_;
 
-    ConstantParser constant_parser_;
+    optimizer_utils::ConstantParser constant_parser_;
 };
 
 }  // namespace frontend

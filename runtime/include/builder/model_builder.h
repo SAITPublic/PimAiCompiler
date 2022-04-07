@@ -3,7 +3,10 @@
 #include <torch/script.h>
 
 #include "common/include/types.hpp"
+#include "half.hpp"
+#include "ir/include/layers/all_layers.h"
 #include "ir/include/nn_model.h"
+#include "ir/include/tensors/data_tensor.h"
 #include "ir/include/types.h"
 
 namespace nn_compiler

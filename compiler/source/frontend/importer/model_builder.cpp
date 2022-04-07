@@ -1,7 +1,7 @@
 #include <set>
 
-#include "importer/model_builder.h"
-#include "ir/include/utils/graph_print.h"
+#include "frontend/importer/model_builder.h"
+#include "ir/include/utils/graph_util.h"
 
 namespace nn_compiler
 {

@@ -1,9 +1,6 @@
 #pragma once
 
-#include "importer/layer_builder/layer_builder.h"
-#include "ir/include/layers/nn_layer.h"
-#include "ir/include/nn_model.h"
-#include "ir/include/nn_network.h"
+#include "frontend/importer/layer_builder/layer_builder.h"
 
 namespace nn_compiler
 {

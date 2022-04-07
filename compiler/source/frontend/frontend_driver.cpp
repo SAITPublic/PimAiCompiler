@@ -1,7 +1,6 @@
 #include <experimental/filesystem>
 
-#include "compiler/include/frontend/frontend_driver.hpp"
-#include "compiler/include/frontend/optimizer/pass_manager.h"
+#include "frontend/frontend_driver.hpp"
 
 namespace nn_compiler
 {

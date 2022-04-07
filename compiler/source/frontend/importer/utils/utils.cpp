@@ -1,5 +1,5 @@
 
-#include "importer/utils/utils.h"
+#include "frontend/importer/utils/utils.h"
 
 namespace nn_compiler
 {

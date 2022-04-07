@@ -1,6 +1,4 @@
-#include <string>
-
-#include "compiler/include/frontend/optimizer/remove_if_with_addmm.h"
+#include "frontend/optimizer/remove_if_with_addmm.h"
 #include "ir/include/utils/graph_util.h"
 
 namespace nn_compiler

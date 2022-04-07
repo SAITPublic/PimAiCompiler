@@ -1,6 +1,5 @@
 #pragma once
 
-#include "ir/include/types.h"
 #include "ir/include/utils/graph_print.h"
 #include "ir/include/utils/graph_search.h"
 #include "ir/include/utils/graph_transform.h"

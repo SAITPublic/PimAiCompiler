@@ -6,8 +6,6 @@
 #include "executor/op_executor/prim_ops_executor.h"
 #include "executor/stream_executor.h"
 #include "executor/utils/profiler.h"
-#include "executor/utils/utils.h"
-#include "ir/include/types.h"
 
 using namespace nn_compiler::runtime::utils;
 

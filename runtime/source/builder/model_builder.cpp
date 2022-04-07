@@ -1,7 +1,4 @@
 #include "builder/model_builder.h"
-#include "half.hpp"
-#include "ir/include/layers/all_layers.h"
-#include "ir/include/tensors/data_tensor.h"
 
 namespace nn_compiler
 {

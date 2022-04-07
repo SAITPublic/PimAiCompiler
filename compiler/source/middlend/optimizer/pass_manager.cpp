@@ -1,7 +1,8 @@
-#include "compiler/include/middlend/optimizer/pass_manager.h"
-#include "compiler/include/middlend/optimizer/memory_allocation/cat_labeling.h"
-#include "compiler/include/middlend/optimizer/memory_allocation/lstm_labeling.h"
-#include "compiler/include/middlend/optimizer/stream_execution/control_layer_execution.h"
+#include "middlend/optimizer/pass_manager.h"
+
+#include "middlend/optimizer/memory_allocation/cat_labeling.h"
+#include "middlend/optimizer/memory_allocation/lstm_labeling.h"
+#include "middlend/optimizer/stream_execution/control_layer_execution.h"
 
 namespace nn_compiler
 {

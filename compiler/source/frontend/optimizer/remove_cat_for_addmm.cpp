@@ -1,7 +1,4 @@
-#include <string>
-
-#include "compiler/include/frontend/optimizer/remove_cat_for_addmm.h"
-#include "ir/include/utils/graph_search.h"
+#include "frontend/optimizer/remove_cat_for_addmm.h"
 #include "ir/include/utils/graph_util.h"
 
 namespace nn_compiler

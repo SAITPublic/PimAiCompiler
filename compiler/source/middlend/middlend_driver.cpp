@@ -1,8 +1,8 @@
 #include <cstdio>
 #include <cstdlib>
 
-#include "compiler/include/middlend/middlend_driver.hpp"
-#include "compiler/include/middlend/optimizer/pass_manager.h"
+#include "middlend/middlend_driver.hpp"
+#include "middlend/optimizer/pass_manager.h"
 
 namespace nn_compiler
 {

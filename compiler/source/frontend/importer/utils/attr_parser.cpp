@@ -1,5 +1,5 @@
 
-#include "importer/utils/attr_parser.h"
+#include "frontend/importer/utils/attr_parser.h"
 
 using nn_compiler::ir::DTensor;
 using nn_compiler::ir::STensor;

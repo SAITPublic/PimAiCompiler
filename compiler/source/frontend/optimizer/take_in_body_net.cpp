@@ -1,7 +1,4 @@
-#include <string>
-
-#include "compiler/include/frontend/optimizer/take_in_body_net.h"
-#include "ir/include/types.h"
+#include "frontend/optimizer/take_in_body_net.h"
 #include "ir/include/utils/graph_util.h"
 
 namespace nn_compiler
