@@ -7,7 +7,7 @@ namespace ir
 {
 namespace utils
 {
-void deleteLayer(std::shared_ptr<ir::NNNetwork> graph, std::shared_ptr<ir::NNLayer> layer)
+void deleteLayer(std::shared_ptr<ir::NNGraph> graph, std::shared_ptr<ir::NNLayer> layer)
 {
     auto cur_in_ids = layer->getInSTensorID();
     CHECK_EQ(cur_in_ids.size(), 1) << " not supported case";

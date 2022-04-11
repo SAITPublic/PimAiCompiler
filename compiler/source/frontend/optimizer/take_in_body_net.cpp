@@ -45,10 +45,10 @@ void TakeInBodyNet::take_in_if_body(std::unique_ptr<nn_compiler::ir::NNModel>& m
     DLOG(INFO) << "Take in if body net start.";
     auto graphs = model->getGraphs();
     for (auto layer_pair : prim_if_layers_) {
-        std::shared_ptr<nn_compiler::ir::NNNetwork> main_graph = layer_pair.second;
+        std::shared_ptr<nn_compiler::ir::NNGraph> main_graph = layer_pair.second;
         auto layer = layer_pair.first;
         auto prim_if_layer = std::dynamic_pointer_cast<nn_compiler::ir::PrimIfLayer>(layer);
-        std::shared_ptr<nn_compiler::ir::NNNetwork> then_net = nullptr, else_net = nullptr;
+        std::shared_ptr<nn_compiler::ir::NNGraph> then_net = nullptr, else_net = nullptr;
         for (auto graph : graphs) {
             if (graph->getName() == prim_if_layer->getThenNet()) {
                 if (then_net != nullptr) {
@@ -65,7 +65,7 @@ void TakeInBodyNet::take_in_if_body(std::unique_ptr<nn_compiler::ir::NNModel>& m
         if (then_net == nullptr || else_net == nullptr) {
             DLOG(FATAL) << (then_net == nullptr ? "then" : "else") << " branch of prim::If missed.";
         }
-        std::vector<std::shared_ptr<nn_compiler::ir::NNNetwork>> if_nets = {then_net, else_net};
+        std::vector<std::shared_ptr<nn_compiler::ir::NNGraph>> if_nets = {then_net, else_net};
         std::vector<uint32_t> if_layer_out_tensor_ids = layer->getOutSTensorID();
         std::vector<uint32_t> if_end_in_id;
         std::vector<uint32_t> if_layer_out_id;
@@ -119,10 +119,10 @@ void TakeInBodyNet::take_in_loop_body(std::unique_ptr<nn_compiler::ir::NNModel>&
     prim_loop_layers_.clear();
     fitLoopCondition(model);
     for (auto layer_pair : prim_loop_layers_) {
-        std::shared_ptr<nn_compiler::ir::NNNetwork> main_graph = layer_pair.second;
+        std::shared_ptr<nn_compiler::ir::NNGraph> main_graph = layer_pair.second;
         auto layer = layer_pair.first;
         auto prim_loop_layer = std::dynamic_pointer_cast<nn_compiler::ir::PrimLoopLayer>(layer);
-        std::shared_ptr<nn_compiler::ir::NNNetwork> body_net = nullptr;
+        std::shared_ptr<nn_compiler::ir::NNGraph> body_net = nullptr;
         for (auto graph : graphs) {
             if (graph->getName() == prim_loop_layer->getBodyNet()) {
                 if (body_net != nullptr) {

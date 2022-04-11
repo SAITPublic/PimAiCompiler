@@ -51,7 +51,7 @@ void CatLabeling::run(std::unique_ptr<nn_compiler::ir::NNModel>& model)
     }
 }
 
-void CatLabeling::getOffspring(std::vector<int64_t>& res, std::shared_ptr<nn_compiler::ir::NNNetwork> graph,
+void CatLabeling::getOffspring(std::vector<int64_t>& res, std::shared_ptr<nn_compiler::ir::NNGraph> graph,
                                std::shared_ptr<nn_compiler::ir::NNLayer> layer, ir::LayerType targetLayerType,
                                int level)
 {

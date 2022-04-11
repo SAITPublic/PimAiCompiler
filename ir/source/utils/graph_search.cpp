@@ -31,7 +31,7 @@ std::vector<std::shared_ptr<ir::NNLayer>> searchPredecessor(const std::shared_pt
 }
 
 std::vector<std::shared_ptr<ir::NNLayer>> searchPredecessor(const std::shared_ptr<ir::NNLayer> layer,
-                                                            const std::shared_ptr<ir::NNNetwork> graph)
+                                                            const std::shared_ptr<ir::NNGraph> graph)
 {
     std::vector<std::shared_ptr<ir::NNLayer>> vec;
     auto in_tensor_ids = layer->getInSTensorID();
@@ -51,7 +51,7 @@ std::vector<std::shared_ptr<ir::NNLayer>> searchPredecessor(const std::shared_pt
 }
 
 std::vector<std::shared_ptr<ir::NNLayer>> searchSuccessorLayerOnly(const std::shared_ptr<ir::NNLayer> layer,
-                                                                   const std::shared_ptr<ir::NNNetwork> graph)
+                                                                   const std::shared_ptr<ir::NNGraph> graph)
 {
     std::vector<std::shared_ptr<ir::NNLayer>> ret;
 
@@ -72,7 +72,7 @@ std::vector<std::shared_ptr<ir::NNLayer>> searchSuccessorLayerOnly(const std::sh
 }
 
 std::map<std::shared_ptr<ir::NNLayer>, uint32_t> searchSuccessor(const std::shared_ptr<ir::NNLayer> layer,
-                                                                 const std::shared_ptr<ir::NNNetwork> graph)
+                                                                 const std::shared_ptr<ir::NNGraph> graph)
 {
     std::map<std::shared_ptr<ir::NNLayer>, uint32_t> ret;
 
@@ -96,7 +96,7 @@ std::map<std::shared_ptr<ir::NNLayer>, uint32_t> searchSuccessor(const std::shar
 }
 
 std::map<std::shared_ptr<ir::NNLayer>, std::vector<uint32_t>> searchSuccessors(
-    const std::shared_ptr<ir::NNLayer> layer, const std::shared_ptr<ir::NNNetwork> graph)
+    const std::shared_ptr<ir::NNLayer> layer, const std::shared_ptr<ir::NNGraph> graph)
 {
     std::map<std::shared_ptr<ir::NNLayer>, std::vector<uint32_t>> ret;
 
@@ -124,7 +124,7 @@ std::map<std::shared_ptr<ir::NNLayer>, std::vector<uint32_t>> searchSuccessors(
     return ret;
 }
 
-std::shared_ptr<ir::NNLayer> searchLayerByOutID(uint32_t out_id, const std::shared_ptr<ir::NNNetwork> graph)
+std::shared_ptr<ir::NNLayer> searchLayerByOutID(uint32_t out_id, const std::shared_ptr<ir::NNGraph> graph)
 {
     for (auto cur_layer : graph->getLayers()) {
         auto cur_out_ids = cur_layer->getOutSTensorID();

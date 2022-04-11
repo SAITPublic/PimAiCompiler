@@ -16,7 +16,7 @@ class ModelBuilder
    private:
     std::shared_ptr<torch::jit::Module> parseTorchScript(const std::string& torch_model);
 
-    void torchToNNNnetwork(std::unique_ptr<ir::NNModel>& nn_model, std::shared_ptr<torch::jit::Module>& torch_model);
+    void torchToNNGraph(std::unique_ptr<ir::NNModel>& nn_model, std::shared_ptr<torch::jit::Module>& torch_model);
 
     template <typename T>
     void importTorchScriptMethodBlock(std::unique_ptr<ir::NNModel>& nn_model, const std::string& name,
@@ -39,7 +39,7 @@ class ModelBuilder
 
     std::map<uint32_t, std::pair<std::vector<std::string>, std::string>> shape_tensors_;
 
-    std::map<std::string, std::shared_ptr<ir::NNNetwork>> networks_;
+    std::map<std::string, std::shared_ptr<ir::NNGraph>> graphs_;
 
     std::map<std::string, torch::jit::IValue> module_attributes_;
 

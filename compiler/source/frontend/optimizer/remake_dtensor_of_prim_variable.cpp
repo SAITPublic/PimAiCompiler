@@ -6,7 +6,7 @@ namespace nn_compiler
 namespace frontend
 {
 bool RemakeDTensorOfPrimVariable::checkVariableUsage(const std::shared_ptr<nn_compiler::ir::NNLayer>& layer,
-                                                     const std::shared_ptr<nn_compiler::ir::NNNetwork>& graph,
+                                                     const std::shared_ptr<nn_compiler::ir::NNGraph>& graph,
                                                      const std::shared_ptr<nn_compiler::ir::DTensor>& data)
 {
     auto consumers = ir::utils::searchSuccessors(layer, graph);

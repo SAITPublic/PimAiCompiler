@@ -15,7 +15,7 @@
 #include <string>
 #include <vector>
 
-#include "ir/include/nn_network.h"
+#include "ir/include/nn_graph.h"
 #include "ir/include/tensors/torch_shape_tensor.h"
 
 namespace nn_compiler
@@ -27,7 +27,7 @@ class NNModel
    public:
     NNModel() {}
 
-    void appendGraph(const std::shared_ptr<NNNetwork> graph) { graphs_.push_back(graph); }
+    void appendGraph(const std::shared_ptr<NNGraph> graph) { graphs_.push_back(graph); }
 
     void removeGraphs() { graphs_.clear(); }
 
@@ -44,7 +44,7 @@ class NNModel
 
     void reverseGraphs() { std::reverse(graphs_.begin(), graphs_.end()); }
 
-    std::vector<std::shared_ptr<NNNetwork>> getGraphs() { return graphs_; }
+    std::vector<std::shared_ptr<NNGraph>> getGraphs() { return graphs_; }
 
     void addTSSTensor(std::pair<uint32_t, std::shared_ptr<TSSTensor>> shape_tensor)
     {
@@ -56,7 +56,7 @@ class NNModel
     std::map<uint32_t, std::shared_ptr<TSSTensor>> getTSSTensors() { return shape_tensors_; }
 
    private:
-    std::vector<std::shared_ptr<NNNetwork>> graphs_;
+    std::vector<std::shared_ptr<NNGraph>> graphs_;
 
     std::map<uint32_t, std::shared_ptr<TSSTensor>> shape_tensors_;
 };

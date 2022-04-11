@@ -9,7 +9,7 @@ FuseActivation::FuseActivation() {}
 
 bool FuseActivation::fitCondition(std::unique_ptr<nn_compiler::ir::NNModel>& model)
 {
-    auto dependCheck = [&](const std::shared_ptr<nn_compiler::ir::NNNetwork> network,
+    auto dependCheck = [&](const std::shared_ptr<nn_compiler::ir::NNGraph> network,
                            const std::shared_ptr<nn_compiler::ir::NNLayer> predecessor,
                            const std::shared_ptr<nn_compiler::ir::NNLayer> successor) {
         std::string predecessor_type = convertLayerTypeToString(predecessor->getType());

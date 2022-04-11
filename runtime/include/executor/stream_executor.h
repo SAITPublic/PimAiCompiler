@@ -25,7 +25,7 @@ class StreamExecutor
    public:
     typedef std::unordered_map<int64_t, std::pair<ir::DataType, torch::jit::IValue>> blob_store_type;
 
-    StreamExecutor(std::pair<std::shared_ptr<ir::NNNetwork>, blob_store_type> model, std::string model_type);
+    StreamExecutor(std::pair<std::shared_ptr<ir::NNGraph>, blob_store_type> model, std::string model_type);
 
     ~StreamExecutor();
 
@@ -50,7 +50,7 @@ class StreamExecutor
 
     void getOutputTensors(std::vector<torch::Tensor>& output_tensors);
 
-    const std::shared_ptr<ir::NNNetwork> getGraph();
+    const std::shared_ptr<ir::NNGraph> getGraph();
 
     std::vector<torch::Tensor> iValueParser(torch::jit::IValue& iv);
 
@@ -109,7 +109,7 @@ class StreamExecutor
     }
 
    private:
-    std::shared_ptr<ir::NNNetwork> graph_;
+    std::shared_ptr<ir::NNGraph> graph_;
 
     // Global input & output vars
     blob_store_type global_blobs_;

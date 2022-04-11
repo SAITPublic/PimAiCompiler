@@ -8,7 +8,7 @@ namespace ir
 {
 namespace utils
 {
-void deleteLayer(std::shared_ptr<ir::NNNetwork> graph, std::shared_ptr<ir::NNLayer> layer);
+void deleteLayer(std::shared_ptr<ir::NNGraph> graph, std::shared_ptr<ir::NNLayer> layer);
 
 }  // namespace utils
 }  // namespace ir

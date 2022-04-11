@@ -33,7 +33,7 @@ class CatLabeling : public Pass
 
     std::vector<int64_t> target_cat_ids_lstm_;
 
-    void getOffspring(std::vector<int64_t>& res, std::shared_ptr<nn_compiler::ir::NNNetwork> graph,
+    void getOffspring(std::vector<int64_t>& res, std::shared_ptr<nn_compiler::ir::NNGraph> graph,
                       std::shared_ptr<nn_compiler::ir::NNLayer> layer, ir::LayerType targetLayerType, int level);
 };  // class CatLabeling
 

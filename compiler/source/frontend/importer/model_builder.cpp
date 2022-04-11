@@ -10,8 +10,8 @@ namespace frontend
 void ModelBuilder::build(std::unique_ptr<ir::NNModel>& nn_model, const std::string& torch_model_path)
 {
     torch_model_ = parseTorchScript(torch_model_path);
-    // convert torch node to nn-network layer
-    torchToNNNnetwork(nn_model, torch_model_);
+    // convert torch node to nn-graph layer
+    torchToNNGraph(nn_model, torch_model_);
 
     ir::utils::printGraphModel(nn_model);
     return;
@@ -186,9 +186,9 @@ template <typename T>
 void ModelBuilder::importTorchScriptMethodBlock(std::unique_ptr<ir::NNModel>& nn_model, const std::string& name,
                                                 const T& method_block, bool is_main_graph)
 {
-    std::shared_ptr<ir::NNNetwork> network = std::make_shared<ir::NNNetwork>();
-    network->setName(name);
-    // set network inputs
+    std::shared_ptr<ir::NNGraph> graph = std::make_shared<ir::NNGraph>();
+    graph->setName(name);
+    // set graph inputs
     for (auto input : method_block->inputs()) {
         if (input->type()->is_module()) {
             continue;
@@ -200,10 +200,10 @@ void ModelBuilder::importTorchScriptMethodBlock(std::unique_ptr<ir::NNModel>& nn
             shape_tensor->setFeaturemapType(convertTorchScriptType(input->type()));
             shape_tensor->setReprType(input->type()->repr_str());
             value_tensor_map_.emplace(input, tensor_id);
-            network->addGraphInTensorID(tensor_id);
+            graph->addGraphInTensorID(tensor_id);
         } else {
             // get and set
-            network->addGraphInTensorID(value_tensor_map_[input]);
+            graph->addGraphInTensorID(value_tensor_map_[input]);
         }
         // Add input layer (only for main graph)
         if (is_main_graph) {
@@ -213,7 +213,7 @@ void ModelBuilder::importTorchScriptMethodBlock(std::unique_ptr<ir::NNModel>& nn
             layer->setName(convertLayerTypeToString(layer->getType()) + "_" + std::to_string(layer->getID()));
             layer->addOutSTensorID(value_tensor_map_[input]);
 
-            network->addLayer(layer);
+            graph->addLayer(layer);
         }
     }
 
@@ -232,7 +232,7 @@ void ModelBuilder::importTorchScriptMethodBlock(std::unique_ptr<ir::NNModel>& nn
                 if (builder != nullptr) {
                     auto layer = createLayer(builder, node, nn_model);
 
-                    // Add two NNNetworks(ThenNet, ElseNet) for then/else blocks.
+                    // Add two NNGraphs(ThenNet, ElseNet) for then/else blocks.
                     auto then_block = node->blocks()[0];
                     std::string then_block_name = name + "_" + std::to_string(getUniqueBlockId());
                     importTorchScriptMethodBlock(nn_model, then_block_name, then_block);
@@ -241,21 +241,21 @@ void ModelBuilder::importTorchScriptMethodBlock(std::unique_ptr<ir::NNModel>& nn
                     std::string else_block_name = name + "_" + std::to_string(getUniqueBlockId());
                     importTorchScriptMethodBlock(nn_model, else_block_name, else_block);
 
-                    // If builder will use two NNNetworks as atrributes (ThenNet, ElseNet)
+                    // If builder will use two NNGraphs as atrributes (ThenNet, ElseNet)
                     auto if_layer = std::dynamic_pointer_cast<nn_compiler::ir::PrimIfLayer>(layer);
                     if_layer->setThenNet(then_block_name);
                     if_layer->setElseNet(else_block_name);
 
-                    // Add layer to network
-                    network->addLayer(layer);
+                    // Add layer to graph
+                    graph->addLayer(layer);
                 }
                 break;
             }
             case c10::prim::Loop: {
                 auto builder = this->layer_builders_.get("prim::Loop");
                 if (builder != nullptr) {
-                    // Add a NNNetwork for the body of loop
-                    // Loop builder will use NNNetwork as an atrribute
+                    // Add a NNGraph for the body of loop
+                    // Loop builder will use NNGraph as an atrribute
                     auto body_block = node->blocks()[0];
                     std::string body_block_name = name + "_" + std::to_string(getUniqueBlockId());
                     importTorchScriptMethodBlock(nn_model, body_block_name, body_block);
@@ -264,8 +264,8 @@ void ModelBuilder::importTorchScriptMethodBlock(std::unique_ptr<ir::NNModel>& nn
                     auto loop_layer = std::dynamic_pointer_cast<nn_compiler::ir::PrimLoopLayer>(layer);
                     loop_layer->setBodyNet(body_block_name);
 
-                    // Add layer to network
-                    network->addLayer(layer);
+                    // Add layer to graph
+                    graph->addLayer(layer);
                 }
                 break;
             }
@@ -297,7 +297,7 @@ void ModelBuilder::importTorchScriptMethodBlock(std::unique_ptr<ir::NNModel>& nn
                             shape_tensor->setReprType(variable_layer->getNType());
                             variable_layer->addOutSTensorID(node_output_id);
                             attr_layer_map.emplace(attrMap_key, variable_layer);
-                            network->addLayer(variable_layer);
+                            graph->addLayer(variable_layer);
                         }
                     }
                 }
@@ -336,7 +336,7 @@ void ModelBuilder::importTorchScriptMethodBlock(std::unique_ptr<ir::NNModel>& nn
                             set_attr_layer->addOutSTensorID(value_tensor_map_[node_output]);
                         }
                     }
-                    network->addLayer(set_attr_layer);
+                    graph->addLayer(set_attr_layer);
                 }
                 break;
             }
@@ -378,7 +378,7 @@ void ModelBuilder::importTorchScriptMethodBlock(std::unique_ptr<ir::NNModel>& nn
                                 }
                             }
                             attr_layer_map.emplace(attrMap_key, variable_layer);
-                            network->addLayer(variable_layer);
+                            graph->addLayer(variable_layer);
                         }
                     }
 
@@ -412,7 +412,7 @@ void ModelBuilder::importTorchScriptMethodBlock(std::unique_ptr<ir::NNModel>& nn
                                 get_attr_layer->addOutSTensorID(value_tensor_map_[node_output]);
                             }
                         }
-                        network->addLayer(get_attr_layer);
+                        graph->addLayer(get_attr_layer);
                     }
                 }
                 break;
@@ -431,7 +431,7 @@ void ModelBuilder::importTorchScriptMethodBlock(std::unique_ptr<ir::NNModel>& nn
                 }
 
                 if (builder != nullptr) {
-                    network->addLayer(createLayer(builder, node, nn_model));
+                    graph->addLayer(createLayer(builder, node, nn_model));
                 } else {
                     DLOG(FATAL) << kind.toQualString() << " layer builder not found.";
                 }
@@ -452,7 +452,7 @@ void ModelBuilder::importTorchScriptMethodBlock(std::unique_ptr<ir::NNModel>& nn
                 }
 
                 if (builder != nullptr) {
-                    network->addLayer(createLayer(builder, node, nn_model));
+                    graph->addLayer(createLayer(builder, node, nn_model));
                 } else {
                     DLOG(FATAL) << kind.toQualString() << " layer builder not found.";
                 }
@@ -471,7 +471,7 @@ void ModelBuilder::importTorchScriptMethodBlock(std::unique_ptr<ir::NNModel>& nn
                 }
 
                 if (builder != nullptr) {
-                    network->addLayer(createLayer(builder, node, nn_model));
+                    graph->addLayer(createLayer(builder, node, nn_model));
                 } else {
                     DLOG(FATAL) << kind.toQualString() << " layer builder not found.";
                 }
@@ -482,7 +482,7 @@ void ModelBuilder::importTorchScriptMethodBlock(std::unique_ptr<ir::NNModel>& nn
                 if (builder != nullptr) {
                     auto layer = createLayer(builder, node, nn_model);
                     isInplaceNode(std::string(kind.toQualString()), layer);
-                    network->addLayer(layer);
+                    graph->addLayer(layer);
                 } else {
                     // Must be error, ensure each Op has its LayerBuilder
                     DLOG(FATAL) << kind.toQualString() << " layer builder not found.";
@@ -492,7 +492,7 @@ void ModelBuilder::importTorchScriptMethodBlock(std::unique_ptr<ir::NNModel>& nn
         }
     }
 
-    // set network outputs
+    // set graph outputs
     for (auto output : method_block->outputs()) {
         if (value_tensor_map_.find(output) == value_tensor_map_.end()) {
             int output_id = getUniqueTensorId(nn_model);
@@ -500,9 +500,9 @@ void ModelBuilder::importTorchScriptMethodBlock(std::unique_ptr<ir::NNModel>& nn
             shape_tensor->setFeaturemapType(convertTorchScriptType(output->type()));
             shape_tensor->setReprType(output->type()->repr_str());
             value_tensor_map_.emplace(output, output_id);
-            network->addGraphOutTensorID(output_id);
+            graph->addGraphOutTensorID(output_id);
         } else {
-            network->addGraphOutTensorID(value_tensor_map_[output]);
+            graph->addGraphOutTensorID(value_tensor_map_[output]);
         }
         // Add output layer (only for main graph)
         if (is_main_graph) {
@@ -512,11 +512,11 @@ void ModelBuilder::importTorchScriptMethodBlock(std::unique_ptr<ir::NNModel>& nn
             layer->setName(convertLayerTypeToString(layer->getType()) + "_" + std::to_string(layer->getID()));
             layer->addInSTensorID(value_tensor_map_[output]);
 
-            network->addLayer(layer);
+            graph->addLayer(layer);
         }
     }
-    nn_model->appendGraph(network);
-    networks_.emplace(name, network);
+    nn_model->appendGraph(graph);
+    graphs_.emplace(name, graph);
     return;
 }
 
@@ -560,8 +560,8 @@ std::shared_ptr<ir::NNLayer> ModelBuilder::createLayer(std::shared_ptr<frontend:
     return layer;
 }
 
-void ModelBuilder::torchToNNNnetwork(std::unique_ptr<ir::NNModel>& nn_model,
-                                     std::shared_ptr<torch::jit::Module>& torch_model)
+void ModelBuilder::torchToNNGraph(std::unique_ptr<ir::NNModel>& nn_model,
+                                  std::shared_ptr<torch::jit::Module>& torch_model)
 {
     // Get and map all module attributes
     importModuleAttributes(torch_model);

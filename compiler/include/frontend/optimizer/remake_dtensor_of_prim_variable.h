@@ -35,7 +35,7 @@ class RemakeDTensorOfPrimVariable : public Pass
      *       false: used as input of other layers.
      **/
     bool checkVariableUsage(const std::shared_ptr<nn_compiler::ir::NNLayer>& layer,
-                            const std::shared_ptr<nn_compiler::ir::NNNetwork>& graph,
+                            const std::shared_ptr<nn_compiler::ir::NNGraph>& graph,
                             const std::shared_ptr<nn_compiler::ir::DTensor>& data);
 
     template <typename T>

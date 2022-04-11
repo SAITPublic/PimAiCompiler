@@ -13,7 +13,7 @@ namespace nn_compiler
 {
 namespace runtime
 {
-StreamExecutor::StreamExecutor(std::pair<std::shared_ptr<ir::NNNetwork>, blob_store_type> model, std::string model_type)
+StreamExecutor::StreamExecutor(std::pair<std::shared_ptr<ir::NNGraph>, blob_store_type> model, std::string model_type)
 {
     this->graph_ = model.first;
     this->global_blobs_ = model.second;
@@ -329,7 +329,7 @@ void StreamExecutor::getOutputTensors(std::vector<torch::Tensor>& output_tensors
     }
 }
 
-const std::shared_ptr<ir::NNNetwork> StreamExecutor::getGraph() { return this->graph_; }
+const std::shared_ptr<ir::NNGraph> StreamExecutor::getGraph() { return this->graph_; }
 
 void StreamExecutor::registerOp()
 {

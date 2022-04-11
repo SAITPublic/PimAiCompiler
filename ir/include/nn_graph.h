@@ -23,12 +23,12 @@ namespace nn_compiler
 {
 namespace ir
 {
-class NNNetwork
+class NNGraph
 {
    public:
-    NNNetwork() {}
+    NNGraph() {}
 
-    explicit NNNetwork(const std::shared_ptr<NNNetwork>& network)
+    explicit NNGraph(const std::shared_ptr<NNGraph>& network)
     {
         name_ = network->getName();
         layers_ = network->getLayers();
@@ -129,7 +129,7 @@ class NNNetwork
         }
     }
 
-    ~NNNetwork() = default;
+    ~NNGraph() = default;
 
    private:
     std::string name_;

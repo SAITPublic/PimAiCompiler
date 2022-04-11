@@ -27,10 +27,10 @@ class TakeInBodyNet : public Pass
     ~TakeInBodyNet() = default;
 
    private:
-    std::vector<std::pair<std::shared_ptr<nn_compiler::ir::NNLayer>, std::shared_ptr<nn_compiler::ir::NNNetwork>>>
+    std::vector<std::pair<std::shared_ptr<nn_compiler::ir::NNLayer>, std::shared_ptr<nn_compiler::ir::NNGraph>>>
         prim_if_layers_;
 
-    std::vector<std::pair<std::shared_ptr<nn_compiler::ir::NNLayer>, std::shared_ptr<nn_compiler::ir::NNNetwork>>>
+    std::vector<std::pair<std::shared_ptr<nn_compiler::ir::NNLayer>, std::shared_ptr<nn_compiler::ir::NNGraph>>>
         prim_loop_layers_;
 
     void take_in_if_body(std::unique_ptr<nn_compiler::ir::NNModel>& model);

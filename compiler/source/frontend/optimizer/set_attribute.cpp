@@ -59,7 +59,7 @@ void SetAttribute::run(std::unique_ptr<nn_compiler::ir::NNModel> &model)
 }
 
 void SetAttribute::doProcess(const std::shared_ptr<nn_compiler::ir::NNLayer> &layer,
-                             const std::shared_ptr<nn_compiler::ir::NNNetwork> &graph,
+                             const std::shared_ptr<nn_compiler::ir::NNGraph> &graph,
                              std::shared_ptr<nn_compiler::ir::DTensor> &data, bool &remove_layer)
 {
     auto consumers = ir::utils::searchSuccessors(layer, graph);
