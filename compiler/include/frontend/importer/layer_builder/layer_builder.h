@@ -188,6 +188,15 @@ class AtenClearBuilder : public LayerBuilder
     std::shared_ptr<ir::AtenClearLayer> aten_clear_layer_;
 };
 
+class AtenCloneBuilder : public LayerBuilder
+{
+   public:
+    std::shared_ptr<ir::NNLayer> buildLayer(const torch::jit::Node* node_ref);
+
+   private:
+    std::shared_ptr<ir::AtenCloneLayer> aten_clone_layer_;
+};
+
 class AtenContiguousBuilder : public LayerBuilder
 {
    public:
@@ -240,6 +249,15 @@ class AtenDeriveIndexBuilder : public LayerBuilder
 
    private:
     std::shared_ptr<ir::AtenDeriveIndexLayer> aten_derive_index_layer_;
+};
+
+class AtenDetachBuilder : public LayerBuilder
+{
+   public:
+    std::shared_ptr<ir::NNLayer> buildLayer(const torch::jit::Node* node_ref);
+
+   private:
+    std::shared_ptr<ir::AtenDetachLayer> aten_detach_layer_;
 };
 
 class AtenDimBuilder : public LayerBuilder
@@ -420,6 +438,15 @@ class AtenItemBuilder : public LayerBuilder
 
    private:
     std::shared_ptr<ir::AtenItemLayer> aten_item_layer_;
+};
+
+class AtenLayerNormBuilder : public LayerBuilder
+{
+   public:
+    std::shared_ptr<ir::NNLayer> buildLayer(const torch::jit::Node* node_ref);
+
+   private:
+    std::shared_ptr<ir::AtenLayerNormLayer> aten_layer_norm_layer_;
 };
 
 class AtenLeakyReluBuilder : public LayerBuilder
@@ -1078,11 +1105,13 @@ class LayerBuilders
         layer_builders_["aten::chunk"] = std::make_shared<AtenChunkBuilder>();
         layer_builders_["aten::clamp"] = std::make_shared<AtenClampBuilder>();
         layer_builders_["aten::clear"] = std::make_shared<AtenClearBuilder>();
+        layer_builders_["aten::clone"] = std::make_shared<AtenCloneBuilder>();
         layer_builders_["aten::contiguous"] = std::make_shared<AtenContiguousBuilder>();
         layer_builders_["aten::conv2d"] = std::make_shared<AtenConv2dBuilder>();
         layer_builders_["aten::copy_"] = std::make_shared<AtenCopyBuilder>();
         layer_builders_["aten::cpu"] = std::make_shared<AtenCpuBuilder>();
         layer_builders_["aten::cuda"] = std::make_shared<AtenCudaBuilder>();
+        layer_builders_["aten::detach"] = std::make_shared<AtenDetachBuilder>();
         layer_builders_["aten::dim"] = std::make_shared<AtenDimBuilder>();
         layer_builders_["aten::div"] = std::make_shared<AtenDivBuilder>();
         layer_builders_["aten::div_"] = std::make_shared<AtenDivBuilder>();
@@ -1104,6 +1133,7 @@ class LayerBuilders
         layer_builders_["aten::index_select"] = std::make_shared<AtenIndexSelectBuilder>();
         layer_builders_["aten::Int"] = std::make_shared<AtenIntBuilder>();
         layer_builders_["aten::item"] = std::make_shared<AtenItemBuilder>();
+        layer_builders_["aten::layer_norm"] = std::make_shared<AtenLayerNormBuilder>();
         layer_builders_["aten::leaky_relu"] = std::make_shared<AtenLeakyReluBuilder>();
         layer_builders_["aten::len"] = std::make_shared<AtenLenBuilder>();
         layer_builders_["aten::linear"] = std::make_shared<AtenLinearBuilder>();

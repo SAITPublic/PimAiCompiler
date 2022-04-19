@@ -43,18 +43,18 @@ std::pair<std::vector<at::Tensor>, std::vector<at::Tensor> > AttrParser::getGene
 {
     // get weights
     auto weight_node = node->inputs()[1]->node();
-    assert(weight_node->kind() == c10::prim::Constant);
-    assert(weight_node->hasAttribute(c10::attr::value));
-    auto weight_tensor = weight_node->t(c10::attr::value);
     std::vector<at::Tensor> weight_vec;
-    weight_vec.push_back(weight_tensor);
+    if (weight_node->kind() == c10::prim::Constant && weight_node->hasAttribute(c10::attr::value)) {
+        auto weight_tensor = weight_node->t(c10::attr::value);
+        weight_vec.push_back(weight_tensor);
+    }
     // get bias
     auto bias_node = node->inputs()[2]->node();
-    assert(bias_node->kind() == c10::prim::Constant);
-    assert(bias_node->hasAttribute(c10::attr::value));
-    auto bias_tensor = bias_node->t(c10::attr::value);
     std::vector<at::Tensor> bias_vec;
-    bias_vec.push_back(bias_tensor);
+    if (bias_node->kind() == c10::prim::Constant && bias_node->hasAttribute(c10::attr::value)) {
+        auto bias_tensor = bias_node->t(c10::attr::value);
+        bias_vec.push_back(bias_tensor);
+    }
 
     return std::make_pair(weight_vec, bias_vec);
 }

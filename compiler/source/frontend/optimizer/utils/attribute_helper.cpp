@@ -280,6 +280,24 @@ bool putAttributeInAtenClamp(layer_inID_type& layer_inID, dtensor_ptr_type& d_te
     return true;
 }
 
+bool putAttributeInAtenClone(layer_inID_type& layer_inID, dtensor_ptr_type& d_tensor)
+{
+    auto cur_layer = std::dynamic_pointer_cast<ir::AtenCloneLayer>(layer_inID.first);
+    auto idx = layer_inID.second;
+
+    // e.g. Tensor = aten::clone(tensor, %memory_format)
+    // tensor is input, %memory_format is attrivute:memory_format.
+    if (idx == 0) {
+        DLOG(INFO) << "prim::Constant attempts to set into the input of layer: " << layer_inID.first->getName();
+        return false;
+    } else if (idx == 1) {
+        cur_layer->setMemoryFormat(getValueFromConstant<int>(d_tensor, cur_layer->getType(), "memory_format"));
+    } else {
+        DLOG(FATAL) << "Incorrect data from prim::Constant";
+    }
+    return true;
+}
+
 bool putAttributeInAtenContiguous(layer_inID_type& layer_inID, dtensor_ptr_type& d_tensor)
 {
     auto cur_layer = std::dynamic_pointer_cast<ir::AtenContiguousLayer>(layer_inID.first);
@@ -507,6 +525,36 @@ bool putAttributeInAtenIndexSelect(layer_inID_type& layer_inID, dtensor_ptr_type
         return false;
     } else if (idx == 1) {
         cur_layer->setDim(getValueFromConstant<int>(d_tensor, cur_layer->getType(), "dim"));
+    } else {
+        DLOG(FATAL) << "Incorrect data from prim::Constant";
+    }
+    return true;
+}
+
+bool putAttributeInAtenLayerNorm(layer_inID_type& layer_inID, dtensor_ptr_type& d_tensor)
+{
+    auto cur_layer = std::dynamic_pointer_cast<ir::AtenLayerNormLayer>(layer_inID.first);
+    auto idx = layer_inID.second;
+    auto layer_type = cur_layer->getType();
+
+    // e.g.  %enc_output.23 : Tensor = aten::layer_norm
+    //           (%54, %3317, %self.model.encoder.layer_norm.weight, %self.model.encoder.layer_norm.bias, %6, %18)
+    // %54 is input, %3317 is normalized_shape, 
+    // %self.model.encoder.layer_norm.weight is weight,  %self.model.encoder.layer_norm.bias is bias,
+    // %6 is eps, %18 is cudnn_enable
+    if (idx == 0) {
+        DLOG(INFO) << "prim::Constant attempts to set into the input of layer: " << layer_inID.first->getName();
+        return false;
+    } else if (idx == 1) {
+        cur_layer->setNormalizedShape(getVectorFromConstant<int>(d_tensor, layer_type, "normalized_shape"));
+    } else if (idx == 2) {
+        DLOG(INFO) << "weights of aten::layer_norm have been set in layer builder stage";
+    } else if (idx == 3) {
+        DLOG(INFO) << "bias of aten::layer_norm have been set in layer builder stage";
+    } else if (idx == 4) {
+        cur_layer->setEps(getValueFromConstant<float>(d_tensor, layer_type, "eps"));
+    } else if (idx == 5) {
+        cur_layer->setCudnnEnable(getValueFromConstant<int>(d_tensor, layer_type, "cudnn_enable"));
     } else {
         DLOG(FATAL) << "Incorrect data from prim::Constant";
     }
@@ -1189,6 +1237,7 @@ AttributeHelper::AttributeHelper()
     type_to_function_["aten::cat"] = &putAttributeInAtenCat;
     type_to_function_["aten::chunk"] = &putAttributeInAtenChunk;
     type_to_function_["aten::clamp"] = &putAttributeInAtenClamp;
+    type_to_function_["aten::clone"] = &putAttributeInAtenClone;
     type_to_function_["aten::contiguous"] = &putAttributeInAtenContiguous;
     type_to_function_["aten::conv2d"] = &putAttributeInAtenConv2d;
     type_to_function_["aten::__derive_index"] = &putAttributeInAtenDeriveIndex;
@@ -1201,6 +1250,7 @@ AttributeHelper::AttributeHelper()
     type_to_function_["aten::__getitem__"] = &putAttributeInAtenGetItem;
     type_to_function_["aten::index_put_"] = &putAttributeInAtenIndexPut;
     type_to_function_["aten::index_select"] = &putAttributeInAtenIndexSelect;
+    type_to_function_["aten::layer_norm"] = &putAttributeInAtenLayerNorm;
     type_to_function_["aten::leaky_relu"] = &putAttributeInAtenLeakyRelu;
     type_to_function_["aten::log_softmax"] = &putAttributeInAtenLogSoftmax;
     type_to_function_["aten::lstm1"] = &putAttributeInAtenLstm1;

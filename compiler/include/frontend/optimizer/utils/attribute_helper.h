@@ -30,6 +30,8 @@ bool putAttributeInAtenChunk(layer_inID_type& layer_inID, dtensor_ptr_type& d_te
 
 bool putAttributeInAtenClamp(layer_inID_type& layer_inID, dtensor_ptr_type& d_tensor);
 
+bool putAttributeInAtenClone(layer_inID_type& layer_inID, dtensor_ptr_type& d_tensor);
+
 bool putAttributeInAtenContiguous(layer_inID_type& layer_inID, dtensor_ptr_type& d_tensor);
 
 bool putAttributeInAtenConv2d(layer_inID_type& layer_inID, dtensor_ptr_type& d_tensor);
@@ -51,6 +53,8 @@ bool putAttributeInAtenGetItem(layer_inID_type& layer_inID, dtensor_ptr_type& d_
 bool putAttributeInAtenIndexPut(layer_inID_type& layer_inID, dtensor_ptr_type& d_tensor);
 
 bool putAttributeInAtenIndexSelect(layer_inID_type& layer_inID, dtensor_ptr_type& d_tensor);
+
+bool putAttributeInAtenLayerNorm(layer_inID_type& layer_inID, dtensor_ptr_type& d_tensor);
 
 bool putAttributeInAtenLeakyRelu(layer_inID_type& layer_inID, dtensor_ptr_type& d_tensor);
 
