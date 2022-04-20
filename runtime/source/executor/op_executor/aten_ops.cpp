@@ -88,6 +88,11 @@ at::Tensor atenClamp(const at::Tensor &self, const at::Scalar &min, const at::Sc
     return at::clamp(self, min, max);
 }
 
+at::Tensor atenClone(const at::Tensor &self, c10::optional<at::MemoryFormat> memory_format)
+{
+    return at::clone(self, memory_format);
+}
+
 at::Tensor atenContiguous(const at::Tensor &self, at::MemoryFormat memory_format)
 {
     return at::native::contiguous(self, memory_format);
@@ -109,6 +114,8 @@ at::Tensor atenCpu(const at::Tensor &self) { return self.cpu(); }
 at::Tensor atenCuda(const at::Tensor &self) { return self.cuda(); }
 
 int64_t atenDeriveIndex(int64_t index, int64_t start, int64_t step) { return start + index * step; }
+
+at::Tensor atenDetach(const at::Tensor &self) { return at::detach(self); }
 
 int64_t atenDim(const at::Tensor &tensor) { return tensor.dim(); }
 
@@ -225,6 +232,20 @@ int64_t atenInt(const at::IValue &scalar)
 bool atenIs(const at::IValue &self, const at::IValue &other) { return self.is(other); }
 
 at::Scalar atenItem(const at::Tensor &self) { return at::native::item(self); }
+
+at::Tensor atenLayerNorm(const at::Tensor &input, at::IntArrayRef normalized_shape,
+                         const c10::optional<at::Tensor> &weight, const c10::optional<at::Tensor> &bias, double eps,
+                         bool cudnn_enable)
+{
+    return at::layer_norm(input, normalized_shape, weight, bias, eps, cudnn_enable);
+}
+
+std::tuple<at::Tensor, at::Tensor, at::Tensor> atenLayerNorm(const at::Tensor &input, at::IntArrayRef normalized_shape,
+                                                             const c10::optional<at::Tensor> &weight,
+                                                             const c10::optional<at::Tensor> &bias, double eps)
+{
+    return at::native_layer_norm(input, normalized_shape, weight, bias, eps);
+}
 
 at::Tensor atenLeakyRelu(const at::Tensor &self, at::Scalar negative_slope)
 {

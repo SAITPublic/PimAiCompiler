@@ -539,20 +539,20 @@ bool putAttributeInAtenLayerNorm(layer_inID_type& layer_inID, dtensor_ptr_type& 
 
     // e.g.  %enc_output.23 : Tensor = aten::layer_norm
     //           (%54, %3317, %self.model.encoder.layer_norm.weight, %self.model.encoder.layer_norm.bias, %6, %18)
-    // %54 is input, %3317 is normalized_shape, 
+    // %54 is input, %3317 is normalized_shape,
     // %self.model.encoder.layer_norm.weight is weight,  %self.model.encoder.layer_norm.bias is bias,
     // %6 is eps, %18 is cudnn_enable
     if (idx == 0) {
         DLOG(INFO) << "prim::Constant attempts to set into the input of layer: " << layer_inID.first->getName();
         return false;
     } else if (idx == 1) {
-        cur_layer->setNormalizedShape(getVectorFromConstant<int>(d_tensor, layer_type, "normalized_shape"));
+        cur_layer->setNormalizedShape(getVectorFromConstant<int64_t>(d_tensor, layer_type, "normalized_shape"));
     } else if (idx == 2) {
         DLOG(INFO) << "weights of aten::layer_norm have been set in layer builder stage";
     } else if (idx == 3) {
         DLOG(INFO) << "bias of aten::layer_norm have been set in layer builder stage";
     } else if (idx == 4) {
-        cur_layer->setEps(getValueFromConstant<float>(d_tensor, layer_type, "eps"));
+        cur_layer->setEps(getValueFromConstant<double>(d_tensor, layer_type, "eps"));
     } else if (idx == 5) {
         cur_layer->setCudnnEnable(getValueFromConstant<int>(d_tensor, layer_type, "cudnn_enable"));
     } else {

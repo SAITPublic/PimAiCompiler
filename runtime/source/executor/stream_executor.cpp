@@ -351,12 +351,14 @@ void StreamExecutor::registerOp()
     this->global_op_register_.insert({ir::LayerType::ATENCHUNK, op_executor::executeAtenChunk});
     this->global_op_register_.insert({ir::LayerType::ATENCLAMP, op_executor::executeAtenClamp});
     this->global_op_register_.insert({ir::LayerType::ATENCLEAR, op_executor::executeAtenClear});
+    this->global_op_register_.insert({ir::LayerType::ATENCLONE, op_executor::executeAtenClone});
     this->global_op_register_.insert({ir::LayerType::ATENCONTIGUOUS, op_executor::executeAtenContiguous});
     this->global_op_register_.insert({ir::LayerType::ATENCONV2D, op_executor::executeAtenConv2d});
     this->global_op_register_.insert({ir::LayerType::ATENCOPY, op_executor::executeAtenCopy});
     this->global_op_register_.insert({ir::LayerType::ATENCPU, op_executor::executeAtenCpu});
     this->global_op_register_.insert({ir::LayerType::ATENCUDA, op_executor::executeAtenCuda});
     this->global_op_register_.insert({ir::LayerType::ATENDERIVEINDEX, op_executor::executeAtenDeriveIndex});
+    this->global_op_register_.insert({ir::LayerType::ATENDETACH, op_executor::executeAtenDetach});
     this->global_op_register_.insert({ir::LayerType::ATENDIM, op_executor::executeAtenDim});
     this->global_op_register_.insert({ir::LayerType::ATENDIV, op_executor::executeAtenDiv});
     this->global_op_register_.insert({ir::LayerType::ATENDROPOUT, op_executor::executeAtenDropout});
@@ -377,6 +379,7 @@ void StreamExecutor::registerOp()
     this->global_op_register_.insert({ir::LayerType::ATENINT, op_executor::executeAtenInt});
     this->global_op_register_.insert({ir::LayerType::ATENITEM, op_executor::executeAtenItem});
     this->global_op_register_.insert({ir::LayerType::ATENIS, op_executor::executeAtenIs});
+    this->global_op_register_.insert({ir::LayerType::ATENLAYERNORM, op_executor::executeAtenLayerNorm});
     this->global_op_register_.insert({ir::LayerType::ATENLEAKYRELU, op_executor::executeAtenLeakyRelu});
     this->global_op_register_.insert({ir::LayerType::ATENLEN, op_executor::executeAtenLen});
     this->global_op_register_.insert({ir::LayerType::ATENLINEAR, op_executor::executeAtenLinear});

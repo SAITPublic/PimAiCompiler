@@ -69,6 +69,8 @@ void atenClear(at::List<T> &list)
     list.clear();
 }
 
+at::Tensor atenClone(const at::Tensor &self, c10::optional<at::MemoryFormat> memory_format = c10::nullopt);
+
 at::Tensor atenContiguous(const at::Tensor &self, at::MemoryFormat memory_format);
 
 at::Tensor atenConv2d(const at::Tensor &input, const at::Tensor &weight, const at::Tensor &bias, at::IntArrayRef stride,
@@ -81,6 +83,8 @@ at::Tensor atenCpu(const at::Tensor &self);
 at::Tensor atenCuda(const at::Tensor &self);
 
 int64_t atenDeriveIndex(int64_t index, int64_t start, int64_t step);
+
+at::Tensor atenDetach(const at::Tensor &self);
 
 int64_t atenDim(const at::Tensor &tensor);
 
@@ -176,6 +180,14 @@ int64_t atenInt(const at::IValue &scalar);
 bool atenIs(const at::IValue &self, const at::IValue &other);
 
 at::Scalar atenItem(const at::Tensor &self);
+
+at::Tensor atenLayerNorm(const at::Tensor &input, at::IntArrayRef normalized_shape,
+                         const c10::optional<at::Tensor> &weight = {}, const c10::optional<at::Tensor> &bias = {},
+                         double eps = 1e-05, bool cudnn_enable = true);
+
+std::tuple<at::Tensor, at::Tensor, at::Tensor> atenLayerNorm(const at::Tensor &input, at::IntArrayRef normalized_shape,
+                                                             const c10::optional<at::Tensor> &weight,
+                                                             const c10::optional<at::Tensor> &bias, double eps);
 
 at::Tensor atenLeakyRelu(const at::Tensor &self, at::Scalar negative_slope);
 

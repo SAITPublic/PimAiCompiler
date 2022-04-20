@@ -26,13 +26,13 @@ class AtenLayerNormLayer : public NNLayer
         return std::shared_ptr<AtenLayerNormLayer>(new AtenLayerNormLayer(*this));
     }
 
-    void setNormalizedShape(std::vector<int> normalized_shape) { normalized_shape_ = normalized_shape; }
+    void setNormalizedShape(std::vector<int64_t> normalized_shape) { normalized_shape_ = normalized_shape; }
 
-    std::vector<int> getNormalizedShape() const { return normalized_shape_; }
+    std::vector<int64_t> getNormalizedShape() const { return normalized_shape_; }
 
-    void setEps(float eps) { eps_ = eps; }
+    void setEps(double eps) { eps_ = eps; }
 
-    float getEps() const { return eps_; }
+    double getEps() const { return eps_; }
 
     void setCudnnEnable(int cudnn_enable) { cudnn_enable_ = cudnn_enable; }
 
@@ -63,8 +63,8 @@ class AtenLayerNormLayer : public NNLayer
     }
 
    private:
-    std::vector<int> normalized_shape_;
-    float eps_ = FLT_MAX;
+    std::vector<int64_t> normalized_shape_;
+    double eps_ = DBL_MAX;
     int cudnn_enable_ = INT32_MAX;
 
     std::vector<at::Tensor> weights_;

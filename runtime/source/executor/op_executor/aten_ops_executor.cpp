@@ -787,6 +787,28 @@ void executeAtenClear(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamEx
     stream_executor.updateBlob(in_stensor_id[0], DataType::LIST, torch::jit::IValue(self_list));
 }
 
+void executeAtenClone(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
+{
+    DLOG(INFO) << "execute Aten Clone node";
+    auto clone_layer = std::static_pointer_cast<nn_compiler::ir::AtenCloneLayer>(layer);
+    auto in_stensor_id = layer->getInSTensorID();
+    auto out_stensor_id = layer->getOutSTensorID();
+
+    torch::jit::IValue iv_self = stream_executor.findBlob(in_stensor_id[0]).second;
+    assert(iv_self.isTensor());
+    at::Tensor self_tensor = iv_self.toTensor();
+
+    auto memory_format = clone_layer->getMemoryFormat();
+    if (nn_compiler::ir::isDefaultValue(memory_format)) {
+        auto iv = stream_executor.findBlob(in_stensor_id[1]).second;
+        memory_format = static_cast<int>(iv.toInt());
+    }
+
+    auto output = atenClone(self_tensor, getMemoryFormat(memory_format));
+    // update output
+    stream_executor.updateBlob(out_stensor_id[0], DataType::TENSOR, tensorToIValue(output));
+}
+
 void executeAtenContiguous(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
     DLOG(INFO) << "execute Aten Contiguous node";
@@ -936,6 +958,21 @@ void executeAtenDeriveIndex(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, St
 
     auto output = atenDeriveIndex(index, start, step);
     stream_executor.updateBlob(out_stensor_id[0], DataType::INT64, scalarToIValue(output));
+}
+
+void executeAtenDetach(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
+{
+    DLOG(INFO) << "execute Aten Detach node";
+
+    auto in_stensor_id = layer->getInSTensorID();
+    auto out_stensor_id = layer->getOutSTensorID();
+
+    torch::jit::IValue iv_tensor = stream_executor.findBlob(in_stensor_id[0]).second;
+    assert(iv_tensor.isTensor());
+    at::Tensor self_tensor = iv_tensor.toTensor();
+    auto output = atenDetach(self_tensor);
+    // update output
+    stream_executor.updateBlob(out_stensor_id[0], DataType::TENSOR, tensorToIValue(output));
 }
 
 void executeAtenDim(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
@@ -1560,6 +1597,52 @@ void executeAtenItem(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExe
 
     // update output
     stream_executor.updateBlob(out_stensor_id[0], output_dtype, torch::jit::IValue(output));
+}
+
+void executeAtenLayerNorm(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
+{
+    DLOG(INFO) << "execute Aten LayerNorm node";
+
+    auto layer_norm_layer = std::static_pointer_cast<nn_compiler::ir::AtenLayerNormLayer>(layer);
+
+    auto in_stensor_id = layer->getInSTensorID();
+    auto out_stensor_id = layer->getOutSTensorID();
+    auto in_id = 0;
+
+    torch::jit::IValue iv_tensor = stream_executor.findBlob(in_stensor_id[in_id++]).second;
+    assert(iv_tensor.isTensor());
+    auto tensor = iv_tensor.toTensor();
+
+    auto normalized_shape = layer_norm_layer->getNormalizedShape();
+    assert(normalized_shape.size() != 0);
+
+    auto weight_ids = layer_norm_layer->getWeightIds();
+    auto bias_ids = layer_norm_layer->getBiasIds();
+    assert(weight_ids.size() == 1 && bias_ids.size() == 1);
+    auto weight_iv = stream_executor.findBlob(weight_ids[0]).second;
+    auto bias_iv = stream_executor.findBlob(bias_ids[0]).second;
+    assert(weight_iv.isTensor() && bias_iv.isTensor());
+    at::Tensor weight = weight_iv.toTensor();
+    at::Tensor bias = bias_iv.toTensor();
+
+    auto eps = layer_norm_layer->getEps();
+    if (nn_compiler::ir::isDefaultValue(eps)) {
+        auto data_iv = stream_executor.findBlob(in_stensor_id[in_id++]).second;
+        assert(data_iv.isDouble());
+        eps = data_iv.toDouble();
+    }
+    auto cudnn_enable = layer_norm_layer->getCudnnEnable();
+    if (nn_compiler::ir::isDefaultValue(cudnn_enable)) {
+        auto data_iv = stream_executor.findBlob(in_stensor_id[in_id++]).second;
+        assert(data_iv.isInt());
+        cudnn_enable = static_cast<int>(data_iv.toInt());
+    }
+
+    at::Tensor output =
+        atenLayerNorm(tensor, at::IntArrayRef(normalized_shape), weight, bias, eps, static_cast<bool>(cudnn_enable));
+
+    // update output
+    stream_executor.updateBlob(out_stensor_id[0], DataType::TENSOR, tensorToIValue(output));
 }
 
 void executeAtenLeakyRelu(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)

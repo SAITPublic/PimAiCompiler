@@ -25,12 +25,14 @@ std::string convertLayerTypeToString(LayerType type)
     converter.insert({LayerType::ATENCHUNK, "aten::chunk"});
     converter.insert({LayerType::ATENCLAMP, "aten::clamp"});
     converter.insert({LayerType::ATENCLEAR, "aten::clear"});
+    converter.insert({LayerType::ATENCLONE, "aten::clone"});
     converter.insert({LayerType::ATENCONTIGUOUS, "aten::contiguous"});
     converter.insert({LayerType::ATENCONV2D, "aten::conv2d"});
     converter.insert({LayerType::ATENCOPY, "aten::copy_"});
     converter.insert({LayerType::ATENCPU, "aten::cpu"});
     converter.insert({LayerType::ATENCUDA, "aten::cuda"});
     converter.insert({LayerType::ATENDERIVEINDEX, "aten::__derive_index"});
+    converter.insert({LayerType::ATENDETACH, "aten::detach"});
     converter.insert({LayerType::ATENDIM, "aten::dim"});
     converter.insert({LayerType::ATENDIV, "aten::div"});
     converter.insert({LayerType::ATENDROPOUT, "aten::dropout"});
@@ -51,6 +53,7 @@ std::string convertLayerTypeToString(LayerType type)
     converter.insert({LayerType::ATENINT, "aten::Int"});
     converter.insert({LayerType::ATENITEM, "aten::item"});
     converter.insert({LayerType::ATENIS, "aten::__is__"});
+    converter.insert({LayerType::ATENLAYERNORM, "aten::layer_norm"});
     converter.insert({LayerType::ATENLEAKYRELU, "aten::leaky_relu"});
     converter.insert({LayerType::ATENLEN, "aten::len"});
     converter.insert({LayerType::ATENLINEAR, "aten::linear"});

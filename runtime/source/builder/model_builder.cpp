@@ -58,6 +58,11 @@ RetVal ModelBuilder::preloadModel(std::unique_ptr<nn_compiler::ir::NNModel>& mod
                 auto ids = this->loadWeightAndBias(linear_layer->getWeights(), linear_layer->getBiases());
                 linear_layer->setWeightIds(ids.first);
                 linear_layer->setBiasIds(ids.second);
+            } else if (type == nn_compiler::ir::LayerType::ATENLAYERNORM) {
+                auto layer_norm_layer = std::dynamic_pointer_cast<ir::AtenLayerNormLayer>(layer);
+                auto ids = this->loadWeightAndBias(layer_norm_layer->getWeights(), layer_norm_layer->getBiases());
+                layer_norm_layer->setWeightIds(ids.first);
+                layer_norm_layer->setBiasIds(ids.second);
             }
         }
     }
