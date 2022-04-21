@@ -377,6 +377,7 @@ void StreamExecutor::registerOp()
     this->global_op_register_.insert({ir::LayerType::ATENINDEXPUT, op_executor::executeAtenIndexPut});
     this->global_op_register_.insert({ir::LayerType::ATENINDEXSELECT, op_executor::executeAtenIndexSelect});
     this->global_op_register_.insert({ir::LayerType::ATENINT, op_executor::executeAtenInt});
+    this->global_op_register_.insert({ir::LayerType::ATENINTIMPLICIT, op_executor::executeAtenIntImplicit});
     this->global_op_register_.insert({ir::LayerType::ATENITEM, op_executor::executeAtenItem});
     this->global_op_register_.insert({ir::LayerType::ATENIS, op_executor::executeAtenIs});
     this->global_op_register_.insert({ir::LayerType::ATENLAYERNORM, op_executor::executeAtenLayerNorm});
@@ -442,6 +443,7 @@ void StreamExecutor::registerOp()
     this->global_op_register_.insert({LayerType::PRIMLISTUNPACK, op_executor::executePrimListUnpack});
     this->global_op_register_.insert({LayerType::PRIMRAISEEXCEPTION, op_executor::executePrimRaiseException});
     this->global_op_register_.insert({LayerType::PRIMSETATTR, op_executor::executePrimSetAttr});
+    this->global_op_register_.insert({LayerType::PRIMTOLIST, op_executor::executePrimToList});
     this->global_op_register_.insert({LayerType::PRIMTUPLECONSTRUCT, op_executor::executePrimTupleConstruct});
     this->global_op_register_.insert({LayerType::PRIMTUPLEINDEX, op_executor::executePrimTupleIndex});
     this->global_op_register_.insert({LayerType::PRIMTUPLEUNPACK, op_executor::executePrimTupleUnpack});

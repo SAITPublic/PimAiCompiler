@@ -50,16 +50,8 @@ void executePrimConstant(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, Strea
         dtype = DataType::FLOAT64;
     } else if (ntype == "Tensor") {
         auto shape = constant_layer_attr->getTensorShape();
-        auto bit_width = constant_layer_attr->getBitWidth();
         auto stride_vec = constant_layer_attr->getStride();
-        auto scalar_type = DataType::NONE;
-        if (bit_width == 16) {
-            scalar_type = DataType::FLOAT16;
-        } else if (bit_width == 32) {
-            scalar_type = DataType::FLOAT32;
-        } else {
-            DLOG(FATAL) << "PrimConstant Error, unsupport data type when create Tensor!";
-        }
+        auto scalar_type = constant_layer_attr->getDataType();
 
         std::vector<int64_t> input_shape = getDataShapeFromSTensor(shape);
         std::vector<int64_t> stride = getDataShapeFromVector(stride_vec);
@@ -413,6 +405,54 @@ void executePrimSetAttr(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, Stream
     auto type = stream_executor.findBlob(in_stensor_ids[1]).first;
     torch::jit::IValue iv = stream_executor.findBlob(in_stensor_ids[1]).second;
     stream_executor.updateBlob(in_stensor_ids[0], type, iv);
+}
+
+// Refer to pytroch code: torch/csrc/jit/runtime/register_prim_ops.cpp
+void executePrimToList(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
+{
+    DLOG(INFO) << "execute PrimToList";
+
+    auto to_list_layer = std::static_pointer_cast<nn_compiler::ir::PrimToListLayer>(layer);
+
+    auto in_stensor_id = layer->getInSTensorID();
+    auto out_stensor_id = layer->getOutSTensorID();
+    int in_id = 0;
+
+    // Find the input blob
+    torch::jit::IValue iv_self = stream_executor.findBlob(in_stensor_id[in_id++]).second;
+    assert(iv_self.isTensor());
+    auto self_tensor = iv_self.toTensor();
+
+    auto dim = to_list_layer->getDim();
+    if (nn_compiler::ir::isDefaultValue(dim)) {
+        auto dim_iv = stream_executor.findBlob(in_stensor_id[in_id++]).second;
+        assert(dim_iv.isInt());
+        dim = dim_iv.toInt();
+    }
+    assert(dim == self_tensor.dim());
+    auto element_type = to_list_layer->getElementType();
+    if (nn_compiler::ir::isDefaultValue(element_type)) {
+        auto element_type_iv = stream_executor.findBlob(in_stensor_id[in_id++]).second;
+        assert(element_type_iv.isInt());
+        element_type = element_type_iv.toInt();
+    }
+    assert(element_type < 2);
+
+    auto data_ptr = self_tensor.data_ptr();
+    int num_elements = self_tensor.numel();
+    if (element_type == 0) {
+        std::vector<int64_t> data_arr;
+        data_arr.resize(num_elements * sizeof(int64_t));
+        memcpy(data_arr.data(), data_ptr, num_elements * sizeof(int64_t));
+        stream_executor.updateBlob(out_stensor_id[0], DataType::LIST, torch::jit::IValue(data_arr));
+    } else if (element_type == 1) {
+        std::vector<double> data_arr;
+        data_arr.resize(num_elements * sizeof(double));
+        memcpy(data_arr.data(), data_ptr, num_elements * sizeof(double));
+        stream_executor.updateBlob(out_stensor_id[0], DataType::LIST, torch::jit::IValue(data_arr));
+    } else {
+        DLOG(FATAL) << "Unsupported element type for prim::tolist";
+    }
 }
 
 void executePrimTupleConstruct(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)

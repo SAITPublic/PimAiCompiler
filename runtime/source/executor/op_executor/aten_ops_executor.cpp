@@ -1562,6 +1562,22 @@ void executeAtenInt(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExec
     stream_executor.updateBlob(out_stensor_id[0], DataType::INT64, scalarToIValue(output));
 }
 
+void executeAtenIntImplicit(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
+{
+    DLOG(INFO) << "execute Aten Int Implicit node";
+
+    auto in_stensor_id = layer->getInSTensorID();
+    auto out_stensor_id = layer->getOutSTensorID();
+
+    torch::jit::IValue iv_self = stream_executor.findBlob(in_stensor_id[0]).second;
+    assert(iv_self.isTensor());
+    auto self_tensor = iv_self.toTensor();
+    auto output = atenIntImplicit(self_tensor);
+
+    // update output
+    stream_executor.updateBlob(out_stensor_id[0], DataType::INT64, intToIValue(output));
+}
+
 void executeAtenIs(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
     DLOG(INFO) << "execute Aten Is node";

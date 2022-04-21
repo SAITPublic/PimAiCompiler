@@ -62,5 +62,6 @@
 #include "ir/include/layers/prim_if_layer.h"
 #include "ir/include/layers/prim_loop_index_layer.h"
 #include "ir/include/layers/prim_loop_layer.h"
+#include "ir/include/layers/prim_to_list_layer.h"
 #include "ir/include/layers/prim_tuple_index_layer.h"
 #include "ir/include/layers/prim_variable_layer.h"

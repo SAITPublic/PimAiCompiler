@@ -108,6 +108,8 @@ bool putAttributeInAtenWarn(layer_inID_type& layer_inID, dtensor_ptr_type& d_ten
 
 bool putAttributeInPrimLoop(layer_inID_type& layer_inID, dtensor_ptr_type& d_tensor);
 
+bool putAttributeInPrimToList(layer_inID_type& layer_inID, dtensor_ptr_type& d_tensor);
+
 bool putAttributeInPrimTupleIndex(layer_inID_type& layer_inID, dtensor_ptr_type& d_tensor);
 
 template <typename T>

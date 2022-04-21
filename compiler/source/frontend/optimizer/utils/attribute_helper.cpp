@@ -1193,6 +1193,26 @@ bool putAttributeInPrimLoop(layer_inID_type& layer_inID, dtensor_ptr_type& d_ten
     return true;
 }
 
+bool putAttributeInPrimToList(layer_inID_type& layer_inID, dtensor_ptr_type& d_tensor)
+{
+    auto cur_layer = std::dynamic_pointer_cast<ir::PrimToListLayer>(layer_inID.first);
+    auto idx = layer_inID.second;
+
+    // e.g. %2584 : int[] = prim::tolist(%2583, %self.src_pad_idx, %ans_idx.1)
+    // %2583 is input,  %self.src_pad_idx is attribute: element_type, %ans_idx.1 is attribute: dim.
+    if (idx == 0) {
+        DLOG(INFO) << "prim::Constant attempts to set into the input of layer: " << layer_inID.first->getName();
+        return false;
+    } else if (idx == 1) {
+        cur_layer->setDim(getValueFromConstant<int64_t>(d_tensor, cur_layer->getType(), "dim"));
+    } else if (idx == 2) {
+        cur_layer->setElementType(getValueFromConstant<int64_t>(d_tensor, cur_layer->getType(), "element_type"));
+    } else {
+        DLOG(FATAL) << "Incorrect data from prim::Constant";
+    }
+    return true;
+}
+
 bool putAttributeInPrimTupleIndex(layer_inID_type& layer_inID, dtensor_ptr_type& d_tensor)
 {
     auto cur_layer = std::dynamic_pointer_cast<ir::PrimTupleIndexLayer>(layer_inID.first);
@@ -1278,6 +1298,7 @@ AttributeHelper::AttributeHelper()
     type_to_function_["aten::unsqueeze_"] = &putAttributeInAtenUnsqueeze;
     type_to_function_["aten::warn"] = &putAttributeInAtenWarn;
     type_to_function_["prim::Loop"] = &putAttributeInPrimLoop;
+    type_to_function_["prim::tolist"] = &putAttributeInPrimToList;
     type_to_function_["prim::TupleIndex"] = &putAttributeInPrimTupleIndex;
 }
 

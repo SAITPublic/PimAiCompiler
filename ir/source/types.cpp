@@ -51,6 +51,7 @@ std::string convertLayerTypeToString(LayerType type)
     converter.insert({LayerType::ATENINDEXPUT, "aten::index_put_"});
     converter.insert({LayerType::ATENINDEXSELECT, "aten::index_select"});
     converter.insert({LayerType::ATENINT, "aten::Int"});
+    converter.insert({LayerType::ATENINTIMPLICIT, "aten::IntImplicit"});
     converter.insert({LayerType::ATENITEM, "aten::item"});
     converter.insert({LayerType::ATENIS, "aten::__is__"});
     converter.insert({LayerType::ATENLAYERNORM, "aten::layer_norm"});
@@ -118,6 +119,7 @@ std::string convertLayerTypeToString(LayerType type)
     converter.insert({LayerType::PRIMOUTPUT, "prim::Output"});
     converter.insert({LayerType::PRIMRAISEEXCEPTION, "prim::RaiseException"});
     converter.insert({LayerType::PRIMSETATTR, "prim::SetAttr"});
+    converter.insert({LayerType::PRIMTOLIST, "prim::tolist"});
     converter.insert({LayerType::PRIMTUPLECONSTRUCT, "prim::TupleConstruct"});
     converter.insert({LayerType::PRIMTUPLEINDEX, "prim::TupleIndex"});
     converter.insert({LayerType::PRIMTUPLEUNPACK, "prim::TupleUnpack"});

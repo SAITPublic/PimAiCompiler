@@ -177,6 +177,8 @@ int64_t atenInt(const float &f);
 
 int64_t atenInt(const at::IValue &scalar);
 
+int64_t atenIntImplicit(const at::Tensor &a);
+
 bool atenIs(const at::IValue &self, const at::IValue &other);
 
 at::Scalar atenItem(const at::Tensor &self);

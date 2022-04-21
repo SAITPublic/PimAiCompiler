@@ -422,6 +422,15 @@ class AtenIntBuilder : public LayerBuilder
     std::shared_ptr<ir::AtenIntLayer> aten_int_layer_;
 };
 
+class AtenIntImplicitBuilder : public LayerBuilder
+{
+   public:
+    std::shared_ptr<ir::NNLayer> buildLayer(const torch::jit::Node* node_ref);
+
+   private:
+    std::shared_ptr<ir::AtenIntImplicitLayer> aten_int_implicit_layer_;
+};
+
 class AtenIsBuilder : public LayerBuilder
 {
    public:
@@ -1017,6 +1026,15 @@ class PrimSetAttrBuilder : public LayerBuilder
     std::shared_ptr<ir::PrimSetAttrLayer> prim_set_attr_layer_;
 };
 
+class PrimToListBuilder : public LayerBuilder
+{
+   public:
+    std::shared_ptr<ir::NNLayer> buildLayer(const torch::jit::Node* node_ref);
+
+   private:
+    std::shared_ptr<ir::PrimToListLayer> prim_to_list_layer_;
+};
+
 class PrimTupleConstructBuilder : public LayerBuilder
 {
    public:
@@ -1132,6 +1150,7 @@ class LayerBuilders
         layer_builders_["aten::index_put_"] = std::make_shared<AtenIndexPutBuilder>();
         layer_builders_["aten::index_select"] = std::make_shared<AtenIndexSelectBuilder>();
         layer_builders_["aten::Int"] = std::make_shared<AtenIntBuilder>();
+        layer_builders_["aten::IntImplicit"] = std::make_shared<AtenIntImplicitBuilder>();
         layer_builders_["aten::item"] = std::make_shared<AtenItemBuilder>();
         layer_builders_["aten::layer_norm"] = std::make_shared<AtenLayerNormBuilder>();
         layer_builders_["aten::leaky_relu"] = std::make_shared<AtenLeakyReluBuilder>();
@@ -1204,6 +1223,7 @@ class LayerBuilders
         layer_builders_["prim::Output"] = std::make_shared<PrimOutputBuilder>();
         layer_builders_["prim::RaiseException"] = std::make_shared<PrimRaiseExceptionBuilder>();
         layer_builders_["prim::SetAttr"] = std::make_shared<PrimSetAttrBuilder>();
+        layer_builders_["prim::tolist"] = std::make_shared<PrimToListBuilder>();
         layer_builders_["prim::TupleConstruct"] = std::make_shared<PrimTupleConstructBuilder>();
         layer_builders_["prim::TupleIndex"] = std::make_shared<PrimTupleIndexBuilder>();
         layer_builders_["prim::TupleUnpack"] = std::make_shared<PrimTupleUnpackBuilder>();

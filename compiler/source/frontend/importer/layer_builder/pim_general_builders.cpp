@@ -61,6 +61,7 @@ DECLARE_TORCH_OP_BUILDER(AtenIndex, nn_compiler::ir::LayerType::ATENINDEX, aten_
 DECLARE_TORCH_OP_BUILDER(AtenIndexPut, nn_compiler::ir::LayerType::ATENINDEXPUT, aten_index_put_layer_)
 DECLARE_TORCH_OP_BUILDER(AtenIndexSelect, nn_compiler::ir::LayerType::ATENINDEXSELECT, aten_index_select_layer_)
 DECLARE_TORCH_OP_BUILDER(AtenInt, nn_compiler::ir::LayerType::ATENINT, aten_int_layer_)
+DECLARE_TORCH_OP_BUILDER(AtenIntImplicit, nn_compiler::ir::LayerType::ATENINTIMPLICIT, aten_int_implicit_layer_)
 DECLARE_TORCH_OP_BUILDER(AtenIs, nn_compiler::ir::LayerType::ATENIS, aten_is_layer_)
 DECLARE_TORCH_OP_BUILDER(AtenItem, nn_compiler::ir::LayerType::ATENITEM, aten_item_layer_)
 DECLARE_TORCH_OP_BUILDER(AtenLeakyRelu, nn_compiler::ir::LayerType::ATENLEAKYRELU, aten_leaky_relu_layer_)
@@ -125,6 +126,7 @@ DECLARE_TORCH_OP_BUILDER(PrimOutput, nn_compiler::ir::LayerType::PRIMOUTPUT, pri
 DECLARE_TORCH_OP_BUILDER(PrimRaiseException, nn_compiler::ir::LayerType::PRIMRAISEEXCEPTION,
                          prim_raise_exception_layer_)
 DECLARE_TORCH_OP_BUILDER(PrimSetAttr, nn_compiler::ir::LayerType::PRIMSETATTR, prim_set_attr_layer_)
+DECLARE_TORCH_OP_BUILDER(PrimToList, nn_compiler::ir::LayerType::PRIMTOLIST, prim_to_list_layer_)
 DECLARE_TORCH_OP_BUILDER(PrimTupleConstruct, nn_compiler::ir::LayerType::PRIMTUPLECONSTRUCT,
                          prim_tuple_construct_layer_)
 DECLARE_TORCH_OP_BUILDER(PrimTupleIndex, nn_compiler::ir::LayerType::PRIMTUPLEINDEX, prim_tuple_index_layer_)

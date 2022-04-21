@@ -229,6 +229,8 @@ int64_t atenInt(const at::IValue &scalar)
     }
 }
 
+int64_t atenIntImplicit(const at::Tensor &a) { return a.item<int64_t>(); }
+
 bool atenIs(const at::IValue &self, const at::IValue &other) { return self.is(other); }
 
 at::Scalar atenItem(const at::Tensor &self) { return at::native::item(self); }
