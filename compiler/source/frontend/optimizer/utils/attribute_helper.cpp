@@ -1139,6 +1139,22 @@ bool putAttributeInAtenTranspose(layer_inID_type& layer_inID, dtensor_ptr_type& 
     return true;
 }
 
+bool putAttributeInAtenTriu(layer_inID_type& layer_inID, dtensor_ptr_type& d_tensor)
+{
+    auto cur_layer = std::dynamic_pointer_cast<ir::AtenTriuLayer>(layer_inID.first);
+    auto idx = layer_inID.second;
+
+    if (idx == 0) {
+        DLOG(INFO) << "prim::Constant attempts to set into the input of layer: " << layer_inID.first->getName();
+        return false;
+    } else if (idx == 1) {
+        cur_layer->setDiagonal(getValueFromConstant<int64_t>(d_tensor, cur_layer->getType(), "Diagonal"));
+    }  else {
+        DLOG(FATAL) << "Incorrect data from prim::Constant";
+    }
+    return true;
+}
+
 bool putAttributeInAtenUnsqueeze(layer_inID_type& layer_inID, dtensor_ptr_type& d_tensor)
 {
     auto cur_layer = std::dynamic_pointer_cast<ir::AtenUnsqueezeLayer>(layer_inID.first);
@@ -1294,6 +1310,7 @@ AttributeHelper::AttributeHelper()
     type_to_function_["aten::to2"] = &putAttributeInAtenTo2;
     type_to_function_["aten::topk"] = &putAttributeInAtenTopk;
     type_to_function_["aten::transpose"] = &putAttributeInAtenTranspose;
+    type_to_function_["aten::triu"] = &putAttributeInAtenTriu;
     type_to_function_["aten::unsqueeze"] = &putAttributeInAtenUnsqueeze;
     type_to_function_["aten::unsqueeze_"] = &putAttributeInAtenUnsqueeze;
     type_to_function_["aten::warn"] = &putAttributeInAtenWarn;

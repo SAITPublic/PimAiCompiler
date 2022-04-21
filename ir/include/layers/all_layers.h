@@ -51,6 +51,7 @@
 #include "ir/include/layers/aten_to2_layer.h"
 #include "ir/include/layers/aten_topk_layer.h"
 #include "ir/include/layers/aten_transpose_layer.h"
+#include "ir/include/layers/aten_triu_layer.h"
 #include "ir/include/layers/aten_unsqueeze_layer.h"
 #include "ir/include/layers/aten_warn_layer.h"
 

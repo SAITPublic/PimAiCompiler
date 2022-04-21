@@ -691,6 +691,25 @@ class AtenReshapeBuilder : public LayerBuilder
    private:
     std::shared_ptr<ir::AtenReshapeLayer> aten_reshape_layer_;
 };
+
+class AtenRemainderBuilder : public LayerBuilder
+{
+   public:
+    std::shared_ptr<ir::NNLayer> buildLayer(const torch::jit::Node* node_ref);
+
+   private:
+    std::shared_ptr<ir::AtenRemainderLayer> aten_remainder_layer_;
+};
+
+class AtenRepeatBuilder : public LayerBuilder
+{
+   public:
+    std::shared_ptr<ir::NNLayer> buildLayer(const torch::jit::Node* node_ref);
+
+   private:
+    std::shared_ptr<ir::AtenRepeatLayer> aten_repeat_layer_;
+};
+
 class AtenSelectBuilder : public LayerBuilder
 {
    public:
@@ -770,6 +789,15 @@ class AtenTanhBuilder : public LayerBuilder
 
    private:
     std::shared_ptr<ir::AtenTanhLayer> aten_tanh_layer_;
+};
+
+class AtenTriuBuilder : public LayerBuilder
+{
+   public:
+    std::shared_ptr<ir::NNLayer> buildLayer(const torch::jit::Node* node_ref);
+
+   private:
+    std::shared_ptr<ir::AtenTriuLayer> aten_triu_layer_;
 };
 
 class AtenTensorBuilder : public LayerBuilder
@@ -1181,6 +1209,8 @@ class LayerBuilders
         layer_builders_["aten::pow"] = std::make_shared<AtenPowBuilder>();
         layer_builders_["aten::relu"] = std::make_shared<AtenReluBuilder>();
         layer_builders_["aten::reshape"] = std::make_shared<AtenReshapeBuilder>();
+        layer_builders_["aten::remainder"] = std::make_shared<AtenRemainderBuilder>();
+        layer_builders_["aten::repeat"] = std::make_shared<AtenRepeatBuilder>();
         layer_builders_["aten::select"] = std::make_shared<AtenSelectBuilder>();
         layer_builders_["aten::squeeze"] = std::make_shared<AtenSqueezeBuilder>();
         layer_builders_["aten::_set_item"] = std::make_shared<AtenSetItemBuilder>();
@@ -1195,6 +1225,7 @@ class LayerBuilders
         layer_builders_["aten::to2"] = std::make_shared<AtenTo2Builder>();
         layer_builders_["aten::topk"] = std::make_shared<AtenTopkBuilder>();
         layer_builders_["aten::transpose"] = std::make_shared<AtenTransposeBuilder>();
+        layer_builders_["aten::triu"] = std::make_shared<AtenTriuBuilder>();
         layer_builders_["aten::unsqueeze"] = std::make_shared<AtenUnsqueezeBuilder>();
         layer_builders_["aten::unsqueeze_"] = std::make_shared<AtenUnsqueezeBuilder>();
         layer_builders_["aten::view"] = std::make_shared<AtenViewBuilder>();

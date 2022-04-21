@@ -102,6 +102,8 @@ bool putAttributeInAtenTopk(layer_inID_type& layer_inID, dtensor_ptr_type& d_ten
 
 bool putAttributeInAtenTranspose(layer_inID_type& layer_inID, dtensor_ptr_type& d_tensor);
 
+bool putAttributeInAtenTriu(layer_inID_type& layer_inID, dtensor_ptr_type& d_tensor);
+
 bool putAttributeInAtenUnsqueeze(layer_inID_type& layer_inID, dtensor_ptr_type& d_tensor);
 
 bool putAttributeInAtenWarn(layer_inID_type& layer_inID, dtensor_ptr_type& d_tensor);
