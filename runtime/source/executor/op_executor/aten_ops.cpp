@@ -408,6 +408,10 @@ at::Tensor atenRelu(const at::Tensor &self) { return at::relu(self); }
 
 at::Tensor atenReshape(const at::Tensor &self, at::IntArrayRef shape) { return at::reshape(self, shape); }
 
+at::Tensor atenRemainder(const at::Tensor &self, const at::Scalar &other) { return at::remainder(self, other); }
+
+at::Tensor atenRepeat(const at::Tensor &self, at::IntArrayRef repeats) { return at::native::repeat(self, repeats); }
+
 at::Tensor atenSelect(const at::Tensor &self, at::Dimname dim, int64_t index) { return at::select(self, dim, index); }
 
 at::Tensor atenSelect(const at::Tensor &self, int64_t dim, int64_t index) { return at::select(self, dim, index); }
@@ -495,6 +499,8 @@ at::Tensor atenTranspose(const at::Tensor &self, at::Dimname dim0, at::Dimname d
 {
     return at::transpose(self, dim0, dim1);
 }
+
+at::Tensor atenTriu(const at::Tensor &self, int64_t diagonal) { return at::triu(self, diagonal); }
 
 at::Tensor atenUnsqueeze(const at::Tensor &self, int64_t dim) { return at::unsqueeze(self, dim); }
 

@@ -3293,6 +3293,52 @@ void executeAtenReshape(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, Stream
     stream_executor.updateBlob(out_stensor_id[0], DataType::TENSOR, tensorToIValue(output_tensor));
 }
 
+void executeAtenRepeat(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
+{
+    DLOG(INFO) << "execute Aten Repeat node";
+
+    auto in_stensor_id = layer->getInSTensorID();
+    auto out_stensor_id = layer->getOutSTensorID();
+
+    torch::jit::IValue iv_self = stream_executor.findBlob(in_stensor_id[0]).second;
+    torch::jit::IValue iv_other = stream_executor.findBlob(in_stensor_id[1]).second;
+    assert(iv_self.isTensor());
+    at::Tensor self_tensor = iv_self.toTensor();
+
+    assert(iv_other.isList());
+    std::vector<int64_t> repeats;
+    for (auto item : iv_other.toList().vec()) {
+        int64_t val = item.toInt();
+        repeats.push_back(val);
+    }
+    auto output = atenRepeat(self_tensor, at::IntArrayRef(repeats));
+
+    // update output
+    stream_executor.updateBlob(out_stensor_id[0], DataType::TENSOR, tensorToIValue(output));
+}
+
+void executeAtenRemainder(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
+{
+    DLOG(INFO) << "execute Aten Remainde node";
+
+    auto in_stensor_id = layer->getInSTensorID();
+    auto out_stensor_id = layer->getOutSTensorID();
+
+    torch::jit::IValue iv_self = stream_executor.findBlob(in_stensor_id[0]).second;
+    torch::jit::IValue iv_other = stream_executor.findBlob(in_stensor_id[1]).second;
+    assert(iv_self.isTensor());
+    at::Tensor self_tensor = iv_self.toTensor();
+
+    if (iv_other.isScalar()) {
+        at::Scalar other_scalar = iv_other.toScalar();
+        auto output = atenRemainder(self_tensor, other_scalar);
+        // update output
+        stream_executor.updateBlob(out_stensor_id[0], DataType::TENSOR, tensorToIValue(output));
+    } else {
+        DLOG(FATAL) << "Unsupported input type for aten::ge";
+    }
+}
+
 void executeAtenSelect(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
     DLOG(INFO) << "execute Aten Select node";
@@ -3850,6 +3896,29 @@ void executeAtenTranspose(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, Stre
     }
 
     auto output = atenTranspose(self_tensor, dim0, dim1);
+    stream_executor.updateBlob(out_stensor_id[0], DataType::TENSOR, tensorToIValue(output));
+}
+
+void executeAtenTriu(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
+{
+    DLOG(INFO) << "execute Aten Triu node";
+
+    auto triu_layer = std::static_pointer_cast<nn_compiler::ir::AtenTriuLayer>(layer);
+
+    auto in_stensor_id = layer->getInSTensorID();
+    auto out_stensor_id = layer->getOutSTensorID();
+
+    torch::jit::IValue iv_tensor = stream_executor.findBlob(in_stensor_id[0]).second;
+    assert(iv_tensor.isTensor());
+    auto self_tensor = iv_tensor.toTensor();
+
+    auto diagonal = triu_layer->getDiagonal();
+    if (nn_compiler::ir::isDefaultValue(diagonal)) {
+        auto diagonal_iv = stream_executor.findBlob(in_stensor_id[1]).second;
+        assert(diagonal_iv.isInt());
+        diagonal = diagonal_iv.toInt();
+    }
+    auto output = atenTriu(self_tensor, diagonal);
     stream_executor.updateBlob(out_stensor_id[0], DataType::TENSOR, tensorToIValue(output));
 }
 

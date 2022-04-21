@@ -295,6 +295,10 @@ at::Tensor atenRelu(const at::Tensor &self);
 
 at::Tensor atenReshape(const at::Tensor &self, at::IntArrayRef shape);
 
+at::Tensor atenRemainder(const at::Tensor &self,const at::Scalar &other);
+
+at::Tensor atenRepeat(const at::Tensor & self, at::IntArrayRef repeats);
+
 at::Tensor atenSelect(const at::Tensor &self, at::Dimname dim, int64_t index);
 
 at::Tensor atenSelect(const at::Tensor &self, int64_t dim, int64_t index);
@@ -354,6 +358,8 @@ std::tuple<at::Tensor, at::Tensor> atenTopk(const at::Tensor &self, int64_t k, i
 at::Tensor atenTranspose(const at::Tensor &self, int64_t dim0, int64_t dim1);
 
 at::Tensor atenTranspose(const at::Tensor &self, at::Dimname dim0, at::Dimname dim1);
+
+at::Tensor atenTriu(const at::Tensor & self, int64_t diagonal);
 
 at::Tensor atenUnsqueeze(const at::Tensor &self, int64_t dim);
 
