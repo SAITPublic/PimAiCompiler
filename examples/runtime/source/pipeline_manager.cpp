@@ -29,6 +29,8 @@ RetVal PipelineManager::initialize(const std::string& input_file, const std::str
         model_type_ = ModelType::GNMT;
     } else if (model_type == "HWR") {
         model_type_ = ModelType::HWR;
+    } else if (model_type == "Transformer") {
+        model_type_ = ModelType::Transformer;
     } else {
         DLOG(FATAL) << "Unsupported model type.";
     }
@@ -49,6 +51,9 @@ RetVal PipelineManager::run()
             break;
         case ModelType::HWR:
             load_and_run_hwr();
+            break;
+        case ModelType::Transformer:
+            load_and_run_transformer();
             break;
         default:
             break;
@@ -161,8 +166,8 @@ void PipelineManager::load_and_run_hwr()
     std::vector<torch::Tensor> input_tensors;
     std::vector<torch::Tensor> output_tensors;
     // load inputs from files
-    auto tensor_ = loadTensor(input_file, {1, 1, 1024, 128}, DataType::FLOAT16).cuda();
-    input_tensors.push_back(tensor_);
+    auto tensor = loadTensor(input_file, {1, 1, 1024, 128}, DataType::FLOAT16).cuda();
+    input_tensors.push_back(tensor);
 
     for (auto item : input_tensors) {
         DLOG(INFO) << "Input: "
@@ -170,15 +175,40 @@ void PipelineManager::load_and_run_hwr()
     }
     // Inference
     runtime.inferenceModel(input_tensors, output_tensors, is_profiling_);
-    // check outputs
-    TVComparator& tv_comp = TVComparator::getInstance();
-    tv_comp.loadTV("./examples/runtime/resource/hwr/inputs/output_hwr_y_hat_128_1_98.bin", {128, 1, 98},
-                   DataType::FLOAT16, "hwr_final_output");
-    if (tv_comp.compare(output_tensors.at(0).cpu(), "hwr_final_output")) {
-        DLOG(INFO) << "HWR run successfully, output is correct !";
-    } else {
-        DLOG(INFO) << "HWR run failed, output is incorrect !";
+}
+
+void PipelineManager::load_and_run_transformer()
+{
+    std::string input_file = "./examples/runtime/resource/transformer/inputs/transformer.bin";
+    std::string current_path = fs::current_path();
+    if (current_path.find("/build") != std::string::npos) {
+        input_file = "../" + input_file;
     }
+    if (access(input_file.c_str(), F_OK) == -1) {
+        DLOG(FATAL) << "Please run at base or build directory.";
+    }
+
+    std::unique_ptr<nn_compiler::ir::NNModel> model = std::make_unique<nn_compiler::ir::NNModel>();
+
+    NNCompiler compiler;
+    compiler.initialize(input_file_path_, "Transformer");
+    compiler.compile(model);
+
+    NNRuntime runtime(model, "Transformer");
+
+    std::vector<torch::Tensor> input_tensors;
+    std::vector<torch::Tensor> output_tensors;
+    // load inputs from files
+    auto tensor = loadTensor(input_file, {1, 11}, DataType::INT64).cuda();
+    input_tensors.push_back(tensor);
+
+    for (auto item : input_tensors) {
+        DLOG(INFO) << "Input: "
+                   << "size: " << item.sizes() << " dtype:" << item.dtype() << " device:" << item.device();
+    }
+
+    // Inference
+    runtime.inferenceModel(input_tensors, output_tensors, is_profiling_);
 }
 
 }  // namespace examples

@@ -7,7 +7,7 @@ namespace examples
 class PipelineManager
 {
    public:
-    enum class ModelType { NO_MODEL = 0, RNNT, GNMT, HWR };
+    enum class ModelType { NO_MODEL = 0, RNNT, GNMT, HWR, Transformer };
 
     PipelineManager() = default;
 
@@ -52,6 +52,8 @@ class PipelineManager
     void load_and_run_gnmt();
 
     void load_and_run_hwr();
+
+    void load_and_run_transformer();
 
 };  // class PipelineManager
 

@@ -119,9 +119,27 @@ def test_gnmt_inference(input_file : str, src_file : str, src_length_file : str,
     print('GNMT avg_time:{}ms'.format((time_end - time_start) / test_cnt * 1000))
 
 
+def test_transformer_inference(input_file : str, input_tensor_file : str, model_type : str):
+    # Prepare inputs
+    input_tensor = torch.load(input_tensor_file).cuda()
+    # Init nncompiler
+    nncompiler = NNCompiler.PipelineManager(input_file, model_type)
+    # warn-up
+    _ = nncompiler.inferenceModel([input_tensor])
+    # Run and test
+    torch.cuda.synchronize()
+    time_start = time.time()
+    test_cnt = 100
+    for _ in tqdm.tqdm(range(test_cnt)):
+        outpus = nncompiler.inferenceModel([input_tensor])
+        torch.cuda.synchronize()
+    time_end = time.time()
+    print('Transformer avg_time:{}ms'.format((time_end - time_start) / test_cnt * 1000))
+
+
 if __name__ == '__main__':
     arg_parser = argparse.ArgumentParser()
-    arg_parser.add_argument("--model_kind", type=str, choices=['RNNT', 'HWR', 'GNMT'], help='choose model to inference', required=True)
+    arg_parser.add_argument("--model_kind", type=str, choices=['RNNT', 'HWR', 'GNMT', 'Transformer'], help='choose model to inference', required=True)
     arg_parser.add_argument('--input_file', type=str, help='Input file', required=True)
     args = arg_parser.parse_args()
     
@@ -144,3 +162,7 @@ if __name__ == '__main__':
         bos_file = os.path.join(current_dir, '../resource/gnmt/inputs/bos_1_1_torch.cuda.LongTensor.pt')
         assert os.path.exists(src_file) and os.path.exists(src_length_file) and os.path.exists(bos_file)
         test_gnmt_inference(gnmt_input_file, src_file, src_length_file, bos_file, args.model_kind)
+    elif args.model_kind == 'Transformer':
+        input_tensor_file = os.path.join(current_dir, '../resource/transformer/inputs/transformer.pt')
+        assert os.path.exists(input_tensor_file)
+        test_transformer_inference(args.input_file, input_tensor_file, args.model_kind)
