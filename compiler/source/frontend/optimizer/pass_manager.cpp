@@ -53,7 +53,12 @@ void PassManager::runPasses(std::unique_ptr<nn_compiler::ir::NNModel>& model)
     remove_constant_layers->add(remove_dropout_layers);
     remove_dropout_layers->add(remove_set_attr_layers);
     remove_set_attr_layers->add(remove_get_attr_layers);
-    remove_get_attr_layers->add(convert_linear_to_addmm);
+    // TODO(SRCX): For Transformer model, bug exists in the C_GEMV kernel of addmm. Fix it.
+    if (model_name_ == "Transformer") {
+        remove_get_attr_layers->add(remove_if_with_addmm);
+    } else {
+        remove_get_attr_layers->add(convert_linear_to_addmm);
+    }
     convert_linear_to_addmm->add(remove_if_with_addmm);
     remove_if_with_addmm->add(swap_addmm_inputs);
     // TODO(SRCX): Fix remove_cat_for_addmm for torch-1.10 models.

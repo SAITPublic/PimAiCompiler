@@ -31,7 +31,7 @@ RetVal ModelBuilder::preloadModel(std::unique_ptr<nn_compiler::ir::NNModel>& mod
         auto type = layer->getType();
         if (type == nn_compiler::ir::LayerType::ATENLSTM1 || type == nn_compiler::ir::LayerType::ATENLSTM2 ||
             type == nn_compiler::ir::LayerType::ATENCONV2D || type == nn_compiler::ir::LayerType::ATENBATCHNORM2D ||
-            type == nn_compiler::ir::LayerType::ATENLINEAR) {
+            type == nn_compiler::ir::LayerType::ATENLINEAR || type == nn_compiler::ir::LayerType::ATENLAYERNORM) {
             // For Ops' with weight/bias, preload weights/bias to data_container.
             if (type == nn_compiler::ir::LayerType::ATENLSTM1) {
                 auto lstm1_layer = std::dynamic_pointer_cast<ir::AtenLSTM1Layer>(layer);

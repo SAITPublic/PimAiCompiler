@@ -13,7 +13,7 @@ std::shared_ptr<ir::NNLayer> AtenBatchNorm2dBuilder::buildLayer(const torch::jit
 
     aten_batch_norm2d_layer_ = std::make_shared<ir::AtenBatchNorm2dLayer>(name, type);
 
-    auto weight_bias = parser()->getGeneralWeightAndBias(node_ref);
+    auto weight_bias = parser()->getGeneralWeightAndBias(node_ref, 1, 2);
     aten_batch_norm2d_layer_->setWeights(weight_bias.first);
     aten_batch_norm2d_layer_->setBiases(weight_bias.second);
 

@@ -13,7 +13,7 @@ std::shared_ptr<ir::NNLayer> AtenConv2dBuilder::buildLayer(const torch::jit::Nod
 
     aten_conv2d_layer_ = std::make_shared<ir::AtenConv2dLayer>(name, type);
 
-    auto weight_bias = parser()->getGeneralWeightAndBias(node_ref);
+    auto weight_bias = parser()->getGeneralWeightAndBias(node_ref, 1, 2);
     aten_conv2d_layer_->setWeights(weight_bias.first);
     aten_conv2d_layer_->setBiases(weight_bias.second);
 

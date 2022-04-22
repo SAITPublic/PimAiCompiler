@@ -31,7 +31,7 @@ do
         "--model_type"|"-m")
             let "i++"
             m=${!i}
-            ARGS="$ARGS -m $(echo ${!i} | tr '[a-z]' '[A-Z]')"
+            ARGS="$ARGS -m $(echo ${!i})"
             ;;
         "--help"|"-h")
             usage

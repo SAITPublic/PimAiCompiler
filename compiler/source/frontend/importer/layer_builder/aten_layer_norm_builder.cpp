@@ -17,7 +17,7 @@ std::shared_ptr<ir::NNLayer> AtenLayerNormBuilder::buildLayer(const torch::jit::
 
     aten_layer_norm_layer_ = std::make_shared<ir::AtenLayerNormLayer>(name, type);
 
-    auto weight_bias = parser()->getGeneralWeightAndBias(node_ref);
+    auto weight_bias = parser()->getGeneralWeightAndBias(node_ref, 2, 3);
     aten_layer_norm_layer_->setWeights(weight_bias.first);
     aten_layer_norm_layer_->setBiases(weight_bias.second);
 

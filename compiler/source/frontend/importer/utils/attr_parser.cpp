@@ -39,17 +39,17 @@ at::Tensor AttrParser::getTensorAttr(const torch::jit::Node* node, c10::Symbol s
 }
 
 std::pair<std::vector<at::Tensor>, std::vector<at::Tensor> > AttrParser::getGeneralWeightAndBias(
-    const torch::jit::Node* node)
+    const torch::jit::Node* node, int weight_idx, int bias_idx)
 {
     // get weights
-    auto weight_node = node->inputs()[1]->node();
+    auto weight_node = node->inputs()[weight_idx]->node();
     std::vector<at::Tensor> weight_vec;
     if (weight_node->kind() == c10::prim::Constant && weight_node->hasAttribute(c10::attr::value)) {
         auto weight_tensor = weight_node->t(c10::attr::value);
         weight_vec.push_back(weight_tensor);
     }
     // get bias
-    auto bias_node = node->inputs()[2]->node();
+    auto bias_node = node->inputs()[bias_idx]->node();
     std::vector<at::Tensor> bias_vec;
     if (bias_node->kind() == c10::prim::Constant && bias_node->hasAttribute(c10::attr::value)) {
         auto bias_tensor = bias_node->t(c10::attr::value);
@@ -94,8 +94,6 @@ std::pair<std::vector<at::Tensor>, std::vector<at::Tensor> > AttrParser::getLstm
 void ptTensor2DTensor(at::Tensor torch_tensor, std::shared_ptr<DTensor> d_tensor)
 {
     c10::ScalarType dtype = torch_tensor.scalar_type();
-    // dtype of the weights of LSTM are float32 or float16/half
-    assert(dtype == c10::ScalarType::Float || dtype == c10::ScalarType::Half);
 
     // get the data pointer of tensor
     int num_elements = torch_tensor.numel();
@@ -105,13 +103,17 @@ void ptTensor2DTensor(at::Tensor torch_tensor, std::shared_ptr<DTensor> d_tensor
     if (dtype == c10::ScalarType::Float) {
         d_tensor->setData(tensor_data, num_elements * sizeof(float));
         d_tensor->setDataType(nn_compiler::ir::DataType::FLOAT32);
-        // for float32, bit_width = 32
-        d_tensor->setBitWidth(32);
     } else if (dtype == c10::ScalarType::Half) {
         d_tensor->setData(tensor_data, num_elements * sizeof(float) / 2);  // fp16
         d_tensor->setDataType(nn_compiler::ir::DataType::FLOAT16);
-        // for float32, bit_width = 16
-        d_tensor->setBitWidth(16);
+    } else if (dtype == c10::ScalarType::Long) {
+        d_tensor->setData(tensor_data, num_elements * sizeof(int64_t));
+        d_tensor->setDataType(nn_compiler::ir::DataType::INT64);
+    } else if (dtype == c10::ScalarType::Bool) {
+        d_tensor->setData(tensor_data, num_elements * sizeof(bool));
+        d_tensor->setDataType(nn_compiler::ir::DataType::BOOL);
+    } else {
+        DLOG(FATAL) << "Unsupported data type for prim::Constant.";
     }
 
     // get stride of tensor

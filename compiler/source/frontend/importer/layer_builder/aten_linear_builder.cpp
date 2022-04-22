@@ -22,7 +22,7 @@ std::shared_ptr<ir::NNLayer> AtenLinearBuilder::buildLayer(const torch::jit::Nod
 
     aten_linear_layer_ = std::make_shared<ir::AtenLinearLayer>(name, type);
 
-    auto weight_bias = parser()->getGeneralWeightAndBias(node_ref);
+    auto weight_bias = parser()->getGeneralWeightAndBias(node_ref, 1, 2);
     aten_linear_layer_->setWeights(weight_bias.first);
     aten_linear_layer_->setBiases(weight_bias.second);
 
