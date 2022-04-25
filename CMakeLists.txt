@@ -23,12 +23,12 @@ add_definitions(-D_GLIBCXX_USE_CXX11_ABI=1)
 add_definitions(-DPIM_SUPPORT)
 add_definitions(-D__HIP_PLATFORM_HCC__)
 
-# for debug, set `-O0 -g`
+# for debug, set `-g`
 # for release, set -O3 for optimize
 if(CMAKE_BUILD_TYPE MATCHES "Release")
     add_definitions(-O3 -w)
 elseif(CMAKE_BUILD_TYPE MATCHES "Debug")
-    add_definitions(-O0 -g -w)
+    add_definitions(-g -w)
 endif()
 
 #include(Torch.cmake)
