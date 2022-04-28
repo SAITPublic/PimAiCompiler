@@ -1,41 +1,40 @@
-# NNCompiler
+# PIM AI Compiler
 
 This repository contains on-device neural network compiler, GPU+PIM runtime and python libs.
 1) Neural network compiler consists of IR generator, high/low level IR optimizer, PIM code generator.
 2) GPU+PIM Runtime provides resource manager(model, memory) and stream executor(miopen, pim, custom kernels).
 3) Python libs provide model compile and inference for both pytorch and tensorflow in runtime.
 
-# Build Docker
+
+## Build Docker
 * Build Image
 ```
 $ docker/build-docker.sh
-** In case building docker outside SAIT servers, comment out proxy settings in Dockerfile ** 
+** Please comment out proxy settings in Dockerfile according to build environment ** 
 ```
 * Launch container
 ```
-launch-container.sh <image name> [directory to be mapped]
+$ docker/launch-container.sh <image name> [directory to be mapped]
 ```
+> Please refer PIM SDK manual to configure environment prerequisites with detailed instructions.
 
 
-# How to build
+## How to build
 
-Ensure that the HTTP proxy settings are correct.
+**Note that**
+
+To build and test PIM AI Compiler on PIM system, environment prerequisites have to be completely setup according to PIM SDK manual.
 
 [update submodule]   
 ```
-$ git submodule init    
-$ git submodule update    
+$ git submodule init
+$ git submodule update
 ```
+> When your environment has to use proxy server, please ensure that the HTTP proxy settings are correct.
 
 [set LIBTORCH_DIR]
 ```
 $ export LIBTORCH_DIR=/home/user/.local/lib/python3.6/site-packages/torch
-```
-if you do not have libtorch, you can get it from 75.12.84.95: /home/srcxfim/public_file/torch-1.10.0a0+git6f4069a-cp36-cp36m-linux_x86_64.whl
-and install the torch package in container first
-```
-$ pip install torch-1.10.0a0+git6f4069a-cp36-cp36m-linux_x86_64.whl
-
 ```
 
 [clean build & install]
@@ -43,10 +42,9 @@ $ pip install torch-1.10.0a0+git6f4069a-cp36-cp36m-linux_x86_64.whl
 $ ./scripts/build.sh all -o .
 ```
 
-# How to run
-
-## NNCompiler
-
+## How to Test
+### Simple example for testing PIM AI Compiler
+PIM AI Compiler provides simpleMain example program for users who want to validate its functionalities.
 ```
 ./build/examples/runtime/simpleMain -h [--help]
 
@@ -57,7 +55,7 @@ General Options:
   -?, <--help>             Help info
 ```
 
-# How to test
+### Test Applications
 
 [unit test]
 ```
@@ -65,10 +63,12 @@ $ ./build/runtime/unit-tests/NNCompilerAtenOpUnitTest
 $ ./build/runtime/unit-tests/NNCompilerCustomOpUnitTest
 $ ./build/runtime/unit-tests/NNCompilerPrimOpUnitTest
 ```
+
 [C++ API test]
 ```
 $ ./build/examples/runtime/simpleMain
 ```
+
 [python API test]
 ```
 $ export LIBTORCH_DIR=/home/user/.local/lib/python3.6/site-packages/torch
@@ -77,4 +77,3 @@ $ export PYTHONPATH=$PYTHONPATH:/opt/rocm/lib/
 
 $ python3 ./examples/runtime/simpleMain.py
 ```
-
