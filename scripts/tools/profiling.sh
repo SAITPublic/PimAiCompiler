@@ -12,7 +12,7 @@ function usage () {
         <command>               <argument>
 
         --input(-i)             input file name
-        --model_type(-m)        model type: RNNT/GNMT/HWR"
+        --model_type(-m)        model type: RNNT/GNMT/HWR/Transformer"
 }
 
 ARGS=""
@@ -20,7 +20,7 @@ ARGS=""
 for (( i=1; i<=$#; i++))
 do
     case "${!i}" in
-        "--ir"|"-i")
+        "--input"|"-i")
             let "i++"
             case ${!i} in
                 /*) IR=${!i};;

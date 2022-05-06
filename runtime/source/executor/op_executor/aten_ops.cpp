@@ -529,6 +529,7 @@ void customAtenAddmm(std::string act_type, at::Tensor &self_tensor, at::Tensor &
     int dim_self = self_tensor.dim();
     int i0_is_vector = 0;
     int i1_is_vector = 0;
+    bool relu = false;
 
     for (int i = 0; i < dim_i0; ++i) {
         if (mat1_tensor.size(i) != 1) {
@@ -541,15 +542,14 @@ void customAtenAddmm(std::string act_type, at::Tensor &self_tensor, at::Tensor &
             i1_is_vector += 1;
         }
     }
+    if (act_type == "aten::relu") {
+        relu = true;
+    }
 
     if (i0_is_vector == 1 && i1_is_vector != 1 && dim_i0 > 1) {
         float alpha = 1.0f;
         float beta = 0.0f;
-        bool relu = false;
         int m = 1;
-        if (act_type == "aten::relu") {
-            relu = true;
-        }
 
         if (!self_tensor.is_contiguous()) self_tensor = self_tensor.contiguous();
         if (!mat1_tensor.is_contiguous()) mat1_tensor = mat1_tensor.contiguous();
@@ -584,11 +584,6 @@ void customAtenAddmm(std::string act_type, at::Tensor &self_tensor, at::Tensor &
 
         output_iv = tensorToIValue(output);
     } else if (i0_is_vector != 1 && i1_is_vector == 1 && dim_i1 > 1) {
-        bool relu = false;
-        if (act_type == "aten::relu") {
-            relu = true;
-        }
-
         if (!self_tensor.is_contiguous()) self_tensor = self_tensor.contiguous();
         if (!mat1_tensor.is_contiguous()) mat1_tensor = mat1_tensor.contiguous();
         if (!mat2_tensor.is_contiguous()) mat2_tensor = mat2_tensor.contiguous();
@@ -631,6 +626,9 @@ void customAtenAddmm(std::string act_type, at::Tensor &self_tensor, at::Tensor &
         }
 
         auto output = atenAddmm(self_tensor, mat1_tensor, mat2_tensor, beta, alpha);
+        if (relu) {
+            output = atenRelu(output);
+        }
         // update output
         for (int i = 0; i < dim_i1 - 2; ++i) {
             output = output.unsqueeze(0);
@@ -638,6 +636,9 @@ void customAtenAddmm(std::string act_type, at::Tensor &self_tensor, at::Tensor &
         output_iv = tensorToIValue(output);
     } else {
         auto output = atenAddmm(self_tensor, mat1_tensor, mat2_tensor, beta, alpha);
+        if (relu) {
+            output = atenRelu(output);
+        }
         output_iv = tensorToIValue(output);
     }
 }
@@ -648,6 +649,14 @@ void customAtenMatmul(at::Tensor &self_tensor, at::Tensor &other_tensor, torch::
     int dim_i1 = other_tensor.dim();
     int i0_is_vector = 0;
     int i1_is_vector = 0;
+    bool is_bmm = 0;
+    auto isBmm = [](int dim_i0, std::vector<int64_t> shape, int i0_is_vector, int i1_is_vector) -> bool {
+        if (dim_i0 >= 3 && shape[dim_i0 - 3] != 1 && (i0_is_vector == 1 || i1_is_vector == 1)) {
+            return true;
+        } else {
+            return false;
+        }
+    };
 
     for (int i = 0; i < dim_i0; ++i) {
         if (self_tensor.size(i) != 1) {
@@ -660,7 +669,9 @@ void customAtenMatmul(at::Tensor &self_tensor, at::Tensor &other_tensor, torch::
             i1_is_vector += 1;
         }
     }
-    if (i0_is_vector == 1 && i1_is_vector != 1) {
+    is_bmm = isBmm(dim_i0, self_tensor.sizes().vec(), i0_is_vector, i1_is_vector) ||
+             isBmm(dim_i1, other_tensor.sizes().vec(), i0_is_vector, i1_is_vector);
+    if (i0_is_vector == 1 && i1_is_vector != 1 && !is_bmm) {
         if (!self_tensor.is_contiguous()) self_tensor = self_tensor.contiguous();
         if (!other_tensor.is_contiguous()) other_tensor = other_tensor.contiguous();
 
@@ -695,7 +706,7 @@ void customAtenMatmul(at::Tensor &self_tensor, at::Tensor &other_tensor, torch::
         PimDestroyDesc(pim_desc);
 
         output_iv = tensorToIValue(output);
-    } else if (i0_is_vector != 1 && i1_is_vector == 1) {
+    } else if (i0_is_vector != 1 && i1_is_vector == 1 && !is_bmm) {
         if (!self_tensor.is_contiguous()) self_tensor = self_tensor.contiguous();
         if (!other_tensor.is_contiguous()) other_tensor = other_tensor.contiguous();
 
@@ -732,7 +743,7 @@ void customAtenMatmul(at::Tensor &self_tensor, at::Tensor &other_tensor, torch::
         PimDestroyDesc(pim_desc);
 
         output_iv = tensorToIValue(output);
-    } else if (i0_is_vector == 1 && i1_is_vector == 1) {
+    } else if (i0_is_vector == 1 && i1_is_vector == 1 && !is_bmm) {
         if (!self_tensor.is_contiguous()) self_tensor = self_tensor.contiguous();
         if (!other_tensor.is_contiguous()) other_tensor = other_tensor.contiguous();
 

@@ -8,6 +8,7 @@
 #include "executor/stream_executor.h"
 #include "pim_runtime_api.h"
 #include "utils/utils.h"
+#include "utils/tv_tools.h"
 
 using namespace nn_compiler::runtime::utils;
 
@@ -56,62 +57,63 @@ void executeAtenAdd(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExec
     at::Tensor self_tensor = iv_self.toTensor();
     if (iv_other.isTensor()) {
         at::Tensor other_tensor = iv_other.toTensor();
-        auto output = atenAdd(self_tensor, other_tensor, alpha);
-        stream_executor.updateBlob(out_stensor_id[0], DataType::TENSOR, tensorToIValue(output));
-        // TODO(SRCX): Bug exists. Fix this part of optimization.
-        // {
-        //     if (!self_tensor.is_contiguous()) self_tensor = self_tensor.contiguous();
-        //     if (!other_tensor.is_contiguous()) other_tensor = other_tensor.contiguous();
-        //     int dim0 = self_tensor.dim();
-        //     int dim1 = other_tensor.dim();
+        // auto output = atenAdd(self_tensor, other_tensor, alpha);
+        {
+            if (!self_tensor.is_contiguous()) self_tensor = self_tensor.contiguous();
+            if (!other_tensor.is_contiguous()) other_tensor = other_tensor.contiguous();
+            int dim0 = self_tensor.dim();
+            int dim1 = other_tensor.dim();
 
-        //     auto options = at::TensorOptions().dtype(at::kHalf).device(at::kCUDA);
-        //     auto output_tmp = at::zeros(self_tensor.sizes().vec(), options);
+            auto options = at::TensorOptions().dtype(at::kHalf).device(at::kCUDA);
+            auto output_tmp = at::zeros(self_tensor.sizes().vec(), options);
 
-        //     _Float16* A = (_Float16*)self_tensor.data_ptr();
-        //     _Float16* B = (_Float16*)other_tensor.data_ptr();
-        //     _Float16* C = A;
+            _Float16* A = (_Float16*)self_tensor.data_ptr();
+            _Float16* B = (_Float16*)other_tensor.data_ptr();
+            _Float16* C = A;
 
-        //     at::Tensor tmp;
-        //     auto input1_layer = stream_executor.getGraph()->getLayerByPosition((layer->getPreLayerIDs())[0]);
-        //     auto input2_layer = stream_executor.getGraph()->getLayerByPosition((layer->getPreLayerIDs())[1]);
-        //     bool add_opt_flag =
-        //         input1_layer->getType() == nn_compiler::ir::LayerType::ATENLSTM1 &&
-        //         input2_layer->getType() == nn_compiler::ir::LayerType::ATENLSTM1 &&
-        //         std::static_pointer_cast<nn_compiler::ir::AtenLSTM1Layer>(input1_layer)->getCustomOptNumber() == 2 &&
-        //         std::static_pointer_cast<nn_compiler::ir::AtenLSTM1Layer>(input2_layer)->getCustomOptNumber() == 1;
-        //     if (stream_executor.getModelType() == "GNMT" && add_opt_flag) {
-        //         auto out1_layer = stream_executor.getGraph()->getLayerByPosition((layer->getNextLayerIDs())[0]);
-        //         auto out1_out1_layer =
-        //             stream_executor.getGraph()->getLayerByPosition((out1_layer->getNextLayerIDs())[0]);
-        //         int cat_mem_id =
-        //             std::static_pointer_cast<nn_compiler::ir::AtenCatLayer>(out1_out1_layer)->getMemLayerId();
-        //         auto options = at::TensorOptions().dtype(at::kHalf).device(at::kCUDA);
-        //         tmp = torch::from_blob((_Float16*)(stream_executor.findBlob(cat_mem_id).second.toTensor().data_ptr()),
-        //                                {1, 1, 1024}, options);
-        //         C = (_Float16*)tmp.data_ptr();
-        //     }
+            at::Tensor tmp;
+            auto pre_layers = layer->getPreLayerIDs();
+            auto input1_layer = stream_executor.getGraph()->getLayerByPosition(pre_layers[0]);
+            auto input2_layer = stream_executor.getGraph()->getLayerByPosition(pre_layers[1]);
+            bool add_opt_flag =
+                input1_layer->getType() == nn_compiler::ir::LayerType::ATENLSTM1 &&
+                input2_layer->getType() == nn_compiler::ir::LayerType::ATENLSTM1 &&
+                std::static_pointer_cast<nn_compiler::ir::AtenLSTM1Layer>(input1_layer)->getCustomOptNumber() == 2 &&
+                std::static_pointer_cast<nn_compiler::ir::AtenLSTM1Layer>(input2_layer)->getCustomOptNumber() == 1;
+            if (stream_executor.getModelType() == "GNMT" && add_opt_flag) {
+                auto out1_layer = stream_executor.getGraph()->getLayerByPosition((layer->getNextLayerIDs())[0]);
+                auto out1_out1_layer =
+                    stream_executor.getGraph()->getLayerByPosition((out1_layer->getNextLayerIDs())[0]);
+                int cat_mem_id =
+                    std::static_pointer_cast<nn_compiler::ir::AtenCatLayer>(out1_out1_layer)->getMemLayerId();
+                auto options = at::TensorOptions().dtype(at::kHalf).device(at::kCUDA);
+                tmp = torch::from_blob((_Float16*)(stream_executor.findBlob(cat_mem_id).second.toTensor().data_ptr()),
+                                       {1, 1, 1024}, options);
+                C = (_Float16*)tmp.data_ptr();
+            }
 
-        //     int m = 1;
-        //     int n = 1;
-        //     int a_m_s = 1;
-        //     int a_n_s = 1;
-        //     int b_m_s = 1;
-        //     int b_n_s = 1;
+            int m = 1;
+            int n = 1;
+            int a_m_s = 1;
+            int a_n_s = 1;
+            int b_m_s = 1;
+            int b_n_s = 1;
 
-        //     m = self_tensor.size(dim0 - 2);
-        //     n = self_tensor.size(dim0 - 1);
+            m = self_tensor.size(dim0 - 2);
+            n = self_tensor.size(dim0 - 1);
 
-        //     bool sym = (dim0 == dim1);
-        //     custom_add(nullptr, A, B, C, m, n, alpha, sym, a_m_s, a_n_s, b_m_s, b_n_s);
+            bool sym = (dim0 == dim1);
+            custom_add(nullptr, A, B, C, m, n, alpha, sym, a_m_s, a_n_s, b_m_s, b_n_s);
 
-        //     // update output
-        //     if (add_opt_flag) {
-        //         stream_executor.updateBlob(out_stensor_id[0], DataType::TENSOR, tensorToIValue(tmp));
-        //     } else {
-        //         stream_executor.updateBlob(out_stensor_id[0], DataType::TENSOR, tensorToIValue(self_tensor));
-        //     }
-        // }
+            // update output
+            if (stream_executor.getModelType() == "GNMT" && add_opt_flag) {
+                stream_executor.updateBlob(out_stensor_id[0], DataType::TENSOR, tensorToIValue(tmp));
+            } else {
+                stream_executor.updateBlob(out_stensor_id[0], DataType::TENSOR, tensorToIValue(self_tensor));
+            }
+        }
+        // update output
+        // stream_executor.updateBlob(out_stensor_id[0], DataType::TENSOR, tensorToIValue(output));
     } else if (iv_other.isScalar()) {
         at::Scalar other_scalar = iv_other.toScalar();
         auto output = atenAdd(self_tensor, other_scalar, alpha);
@@ -154,7 +156,6 @@ void executeAtenAddmm(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamEx
         customAtenMatmul(mat1_tensor, mat2_tensor, output);
     } else {
         auto self_tensor = iv_self.toTensor();
-        // TODO(SRCX): Bug exists. Fix this part of optimization for Transformer model.
         customAtenAddmm(act_type, self_tensor, mat1_tensor, mat2_tensor, beta, alpha, output);
     }
     stream_executor.updateBlob(out_stensor_id[0], DataType::TENSOR, output);
@@ -1101,6 +1102,7 @@ void executeAtenEmbedding(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, Stre
 
         auto output =
             atenEmbedding(iv_weights.toTensor(), iv_indices.toTensor(), padding_idx, scale_grad_by_freq, sparse);
+
         stream_executor.updateBlob(out_stensor_id[0], DataType::TENSOR, tensorToIValue(output));
     } else {
         auto weights = embedding_layer->getWeights();
@@ -2698,10 +2700,9 @@ void executeAtenMatmul(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamE
     auto self_tensor = iv_self.toTensor();
     auto other_tensor = iv_other.toTensor();
 
-    auto output = atenMatmul(self_tensor, other_tensor);
-    // TODO(SRCX): Bug exists. Fix this part of optimization for Transformer model.
-    // customAtenMatmul(self_tensor, other_tensor, output);
-    stream_executor.updateBlob(out_stensor_id[0], DataType::TENSOR, tensorToIValue(output));
+    torch::jit::IValue output;
+    customAtenMatmul(self_tensor, other_tensor, output);
+    stream_executor.updateBlob(out_stensor_id[0], DataType::TENSOR, output);
 }
 
 void executeAtenMax(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)

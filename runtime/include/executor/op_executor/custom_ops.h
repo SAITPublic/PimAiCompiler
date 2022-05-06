@@ -412,6 +412,9 @@ void custom_add(hipStream_t p_stream, U *A, U *B, U *C, int m, int n, W alpha, b
     static constexpr int block_x = 256;
     static constexpr int per_thread = 4;
     int num_n = (n + block_x - 1) / block_x / per_thread;
+    if (num_n == 0) {
+        num_n = 1;
+    }
     dim3 add_grid(num_n, m);
     dim3 add_threads(block_x);
 
@@ -445,7 +448,8 @@ void rocblas_bmm_template_xAy(hipStream_t p_stream, const V *x, const V *A, W *y
         return;
     }
     static constexpr int NB = 256;
-    dim3 gemvt_grid(n / NB);
+    int num_n = (n + NB - 1) / NB;
+    dim3 gemvt_grid(num_n);
     dim3 gemvt_threads(NB);
 
     hipLaunchKernelGGL((bmm_kernel_xAy<NB>), gemvt_grid, gemvt_threads, 0, p_stream, m, n, k,
