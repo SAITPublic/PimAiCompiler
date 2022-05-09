@@ -2016,8 +2016,9 @@ void executeAtenLSTM1(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamEx
                                    *(lstm_tensor.input_tensor_), &weight_size, miopenHalf);
             auto weight_buf = at::empty(weight_size / datasize, input.options());
             int expected_weight_size =
-                hidden_size * 4 * (input_size + hidden_size + 2) * bidirectional_int +
-                hidden_size * 4 * (hidden_size + hidden_size + 2) * (num_layers - 1) * bidirectional_int;
+                4 * hidden_size * (input_size + hidden_size + 2 * has_biases) * bidirectional_int +
+                4 * hidden_size * ((hidden_size * bidirectional_int) + hidden_size + 2 * has_biases) *
+                    (num_layers - 1) * bidirectional_int;
             assert((weight_size / datasize) == expected_weight_size);
 
             size_t offset = 0;
@@ -2425,8 +2426,9 @@ void executeAtenLSTM2(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamEx
                                    *(lstm_tensor.input_tensor_), &weight_size, miopenHalf);
             auto weight_buf = at::empty(weight_size / datasize, input.options());
             int expected_weight_size =
-                hidden_size * 4 * (input_size + hidden_size + 2) * bidirectional_int +
-                hidden_size * 4 * (hidden_size + hidden_size + 2) * (num_layers - 1) * bidirectional_int;
+                4 * hidden_size * (input_size + hidden_size + 2 * has_biases) * bidirectional_int +
+                4 * hidden_size * ((hidden_size * bidirectional_int) + hidden_size + 2 * has_biases) *
+                    (num_layers - 1) * bidirectional_int;
             assert((weight_size / datasize) == expected_weight_size);
             size_t offset = 0;
             size_t param_size = 0;
