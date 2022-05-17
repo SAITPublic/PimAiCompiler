@@ -1011,15 +1011,12 @@ void executeAtenDiv(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExec
     torch::jit::IValue iv_other = stream_executor.findBlob(in_stensor_id[1]).second;
     assert(iv_self.isTensor());
     at::Tensor self_tensor = iv_self.toTensor();
-    auto dtype = stream_executor.findBlob(in_stensor_id[1]).first;
-    if (dtype == DataType::TENSOR) {
-        assert(iv_other.isTensor());
+    if (iv_other.isTensor()) {
         at::Tensor other_tensor = iv_other.toTensor();
         auto output = atenDiv(self_tensor, other_tensor);
         // update output
         stream_executor.updateBlob(out_stensor_id[0], DataType::TENSOR, tensorToIValue(output));
-    } else if (isScalarType(dtype)) {
-        assert(iv_other.isScalar());
+    } else if (iv_other.isScalar()) {
         at::Scalar other_scalar = iv_other.toScalar();
         auto output = atenDiv(self_tensor, other_scalar);
         // update output
@@ -3024,9 +3021,8 @@ void executeAtenNeg(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExec
     assert(in_stensor_id.size() == 1);
 
     torch::jit::IValue iv = stream_executor.findBlob(in_stensor_id[0]).second;
-    auto dtype = stream_executor.findBlob(in_stensor_id[0]).first;
 
-    if (isScalarType(dtype)) {
+    if (iv.isScalar()) {
         if (iv.isInt()) {
             int out = iv.toInt() * -1;
             stream_executor.updateBlob(out_stensor_id[0], DataType::INT64, scalarToIValue<int>(out));
@@ -3569,15 +3565,12 @@ void executeAtenSub(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExec
     torch::jit::IValue iv_other = stream_executor.findBlob(in_stensor_id[1]).second;
     assert(iv_self.isTensor());
     at::Tensor self_tensor = iv_self.toTensor();
-    auto dtype = stream_executor.findBlob(in_stensor_id[1]).first;
-    if (dtype == DataType::TENSOR) {
-        assert(iv_other.isTensor());
+    if (iv_other.isTensor()) {
         at::Tensor other_tensor = iv_other.toTensor();
         auto output = atenSub(self_tensor, other_tensor, alpha);
         // update output
         stream_executor.updateBlob(out_stensor_id[0], DataType::TENSOR, tensorToIValue(output));
-    } else if (isScalarType(dtype)) {
-        assert(iv_other.isScalar());
+    } else if (iv_other.isScalar()) {
         at::Scalar other_scalar = iv_other.toScalar();
         auto output = atenSub(self_tensor, other_scalar, alpha);
         // update output
