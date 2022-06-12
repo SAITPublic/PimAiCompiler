@@ -31,6 +31,8 @@ RetVal PipelineManager::initialize(const std::string& input_file, const std::str
         model_type_ = ModelType::HWR;
     } else if (model_type == "Transformer") {
         model_type_ = ModelType::Transformer;
+    } else if (model_type == "SwitchTransformer") {
+        model_type_ = ModelType::SwitchTransformer;
     } else {
         DLOG(FATAL) << "Unsupported model type.";
     }
@@ -54,6 +56,9 @@ RetVal PipelineManager::run()
             break;
         case ModelType::Transformer:
             load_and_run_transformer();
+            break;
+        case ModelType::SwitchTransformer:
+            load_and_run_switchtransformer();
             break;
         default:
             break;
@@ -201,6 +206,45 @@ void PipelineManager::load_and_run_transformer()
     // load inputs from files
     auto tensor = loadTensor(input_file, {1, 11}, DataType::INT64).cuda();
     input_tensors.push_back(tensor);
+
+    for (auto item : input_tensors) {
+        DLOG(INFO) << "Input: "
+                   << "size: " << item.sizes() << " dtype:" << item.dtype() << " device:" << item.device();
+    }
+
+    // Inference
+    runtime.inferenceModel(input_tensors, output_tensors, is_profiling_);
+}
+
+void PipelineManager::load_and_run_switchtransformer()
+{
+    std::string input_file = "examples/runtime/resource/switch_transformer/inputs/src_2_13_input.bin";
+    std::string src_attention_mask = "examples/runtime/resource/switch_transformer/inputs/src_2_13_attention_mask.bin";
+    std::string current_path = fs::current_path();
+    if (current_path.find("/build") != std::string::npos) {
+        input_file = "../" + input_file;
+        src_attention_mask = "../" + src_attention_mask;
+    }
+    if (access(input_file.c_str(), F_OK) == -1) {
+        DLOG(FATAL) << "Please run at base or build directory.";
+    }
+
+    std::unique_ptr<nn_compiler::ir::NNModel> model = std::make_unique<nn_compiler::ir::NNModel>();
+
+    NNCompiler compiler;
+    compiler.initialize(input_file_path_, "SwitchTransformer");
+    compiler.compile(model);
+
+    NNRuntime runtime(model, "SwitchTransformer");
+
+    std::vector<torch::Tensor> input_tensors;
+    std::vector<torch::Tensor> output_tensors;
+    // load inputs from files
+    auto tensor = loadTensor(input_file, {2, 13}, DataType::INT64).cuda();
+    auto attention_mask = loadTensor(src_attention_mask, {2, 13}, DataType::INT64).cuda();
+
+    input_tensors.push_back(tensor);
+    input_tensors.push_back(attention_mask);
 
     for (auto item : input_tensors) {
         DLOG(INFO) << "Input: "
