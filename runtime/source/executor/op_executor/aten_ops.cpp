@@ -63,10 +63,7 @@ at::Tensor atenArgmax(at::Tensor &self, c10::optional<int64_t> dim, bool keepdim
 }
 
 // refer to castTensorTo() in torch/csrc/jit/runtime/register_special_ops.cpp
-at::Tensor atenAsTensor(at::Tensor &self, at::ScalarType dtype, at::Device device)
-{
-    return self.to(device, dtype);
-}
+at::Tensor atenAsTensor(at::Tensor &self, at::ScalarType dtype, at::Device device) { return self.to(device, dtype); }
 
 at::Tensor atenBatchNorm2d(const at::Tensor &input, const c10::optional<at::Tensor> &weight,
                            const c10::optional<at::Tensor> &bias, const c10::optional<at::Tensor> &running_mean,
@@ -138,6 +135,8 @@ at::Tensor atenDropout(const at::Tensor &input, double p, bool train) { return a
 
 at::Tensor &atenDropout_(at::Tensor &self, double p, bool train) { return at::dropout_(self, p, train); }
 
+at::Tensor atenEinsum(std::string equation, at::TensorList tensors) { return at::einsum(equation, tensors); }
+
 at::Tensor atenEmbedding(const at::Tensor &weight, const at::Tensor &indices, int64_t padding_idx,
                          bool scale_grad_by_freq, bool sparse)
 {
@@ -176,6 +175,12 @@ at::Tensor &atenFill(at::Tensor &self, at::Tensor &other) { return at::fill_(sel
 at::Tensor atenFloorDivide(const at::Tensor &self, at::Scalar value) { return at::floor_divide(self, value); }
 
 at::Tensor atenFloorDivide(const at::Tensor &self, const at::Tensor &other) { return at::floor_divide(self, other); }
+
+at::Tensor atenFullLike(const at::Tensor &self, at::Scalar fill_value, const at::TensorOptions &options,
+                        c10::optional<at::MemoryFormat> memory_format)
+{
+    return at::full_like(self, fill_value, options, memory_format);
+}
 
 at::Tensor atenGather(const at::Tensor &self, int64_t dim, const at::Tensor &index, bool sparse_grad)
 {
@@ -244,6 +249,8 @@ int64_t atenIntImplicit(const at::Tensor &a) { return a.item<int64_t>(); }
 
 bool atenIs(const at::IValue &self, const at::IValue &other) { return self.is(other); }
 
+at::Tensor atenIsInf(const at::Tensor &self) { return at::isinf(self); }
+
 at::Scalar atenItem(const at::Tensor &self) { return at::native::item(self); }
 
 at::Tensor atenLayerNorm(const at::Tensor &input, at::IntArrayRef normalized_shape,
@@ -264,6 +271,10 @@ at::Tensor atenLeakyRelu(const at::Tensor &self, at::Scalar negative_slope)
 {
     return at::leaky_relu(self, negative_slope);
 }
+
+at::Tensor atenLe(const at::Tensor &self, const at::Tensor &other) { return at::le(self, other); }
+
+at::Tensor atenLe(const at::Tensor &self, at::Scalar other) { return at::le(self, other); }
 
 int64_t atenLen(const c10::List<at::IValue> &list) { return list.size(); }
 

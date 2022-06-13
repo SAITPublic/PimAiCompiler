@@ -105,6 +105,8 @@ at::Tensor atenDropout(const at::Tensor &input, double p, bool train);
 
 at::Tensor &atenDropout_(at::Tensor &self, double p, bool train);
 
+at::Tensor atenEinsum(std::string equation, at::TensorList tensors);
+
 at::Tensor atenEmbedding(const at::Tensor &weight, const at::Tensor &indices, int64_t padding_idx = -1,
                          bool scale_grad_by_freq = false, bool sparse = false);
 
@@ -134,6 +136,9 @@ static std::string atenFormat(const std::string &fmt)
     }
     return fmt;
 }
+
+at::Tensor atenFullLike(const at::Tensor &self, at::Scalar fill_value, const at::TensorOptions &options = {},
+                        c10::optional<at::MemoryFormat> memory_format = c10::nullopt);
 
 /**
  * @brief  Replace {} using strings in variadic arguments like python format()
@@ -186,6 +191,8 @@ int64_t atenIntImplicit(const at::Tensor &a);
 
 bool atenIs(const at::IValue &self, const at::IValue &other);
 
+at::Tensor atenIsInf(const at::Tensor &self);
+
 at::Scalar atenItem(const at::Tensor &self);
 
 at::Tensor atenLayerNorm(const at::Tensor &input, at::IntArrayRef normalized_shape,
@@ -197,6 +204,10 @@ std::tuple<at::Tensor, at::Tensor, at::Tensor> atenLayerNorm(const at::Tensor &i
                                                              const c10::optional<at::Tensor> &bias, double eps);
 
 at::Tensor atenLeakyRelu(const at::Tensor &self, at::Scalar negative_slope);
+
+at::Tensor atenLe(const at::Tensor &self, const at::Tensor &other);
+
+at::Tensor atenLe(const at::Tensor &self, at::Scalar other);
 
 int64_t atenLen(const c10::List<at::IValue> &list);
 

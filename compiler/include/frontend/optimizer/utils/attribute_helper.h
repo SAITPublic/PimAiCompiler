@@ -48,6 +48,8 @@ bool putAttributeInAtenEmbedding(layer_inID_type& layer_inID, dtensor_ptr_type& 
 
 bool putAttributeInAtenFormat(layer_inID_type& layer_inID, dtensor_ptr_type& d_tensor);
 
+bool putAttributeInAtenFullLike(layer_inID_type& layer_inID, dtensor_ptr_type& d_tensor);
+
 bool putAttributeInAtenGather(layer_inID_type& layer_inID, dtensor_ptr_type& d_tensor);
 
 bool putAttributeInAtenGetItem(layer_inID_type& layer_inID, dtensor_ptr_type& d_tensor);

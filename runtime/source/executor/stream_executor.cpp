@@ -371,6 +371,7 @@ void StreamExecutor::registerOp()
     this->global_op_register_.insert({ir::LayerType::ATENFILL, op_executor::executeAtenFill});
     this->global_op_register_.insert({ir::LayerType::ATENFLOORDIVIDE, op_executor::executeAtenFloorDivide});
     this->global_op_register_.insert({ir::LayerType::ATENFORMAT, op_executor::executeAtenFormat});
+    this->global_op_register_.insert({ir::LayerType::ATENFULLLIKE, op_executor::executeAtenFullLike});
     this->global_op_register_.insert({ir::LayerType::ATENGETITEM, op_executor::executeAtenGetItem});
     this->global_op_register_.insert({ir::LayerType::ATENGATHER, op_executor::executeAtenGather});
     this->global_op_register_.insert({ir::LayerType::ATENGE, op_executor::executeAtenGe});
@@ -382,9 +383,11 @@ void StreamExecutor::registerOp()
     this->global_op_register_.insert({ir::LayerType::ATENINTIMPLICIT, op_executor::executeAtenIntImplicit});
     this->global_op_register_.insert({ir::LayerType::ATENITEM, op_executor::executeAtenItem});
     this->global_op_register_.insert({ir::LayerType::ATENIS, op_executor::executeAtenIs});
+    this->global_op_register_.insert({ir::LayerType::ATENISINF, op_executor::executeAtenIsInf});
     this->global_op_register_.insert({ir::LayerType::ATENISNOT, op_executor::executeAtenIsNot});
     this->global_op_register_.insert({ir::LayerType::ATENLAYERNORM, op_executor::executeAtenLayerNorm});
     this->global_op_register_.insert({ir::LayerType::ATENLEAKYRELU, op_executor::executeAtenLeakyRelu});
+    this->global_op_register_.insert({ir::LayerType::ATENLE, op_executor::executeAtenLe});
     this->global_op_register_.insert({ir::LayerType::ATENLEN, op_executor::executeAtenLen});
     this->global_op_register_.insert({ir::LayerType::ATENLINEAR, op_executor::executeAtenLinear});
     this->global_op_register_.insert({ir::LayerType::ATENLIST, op_executor::executeAtenList});

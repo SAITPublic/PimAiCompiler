@@ -475,6 +475,25 @@ bool putAttributeInAtenFormat(layer_inID_type& layer_inID, dtensor_ptr_type& d_t
     return true;
 }
 
+bool putAttributeInAtenFullLike(layer_inID_type& layer_inID, dtensor_ptr_type& d_tensor)
+{
+    auto cur_layer = std::dynamic_pointer_cast<ir::AtenFullLikeLayer>(layer_inID.first);
+    auto idx = layer_inID.second;
+
+    if (idx == 0) {
+        DLOG(INFO) << "prim::Constant attempts to set into the input of layer: " << layer_inID.first->getName();
+        return false;
+    } else if (idx == 1) {
+        cur_layer->setFullValue(getValueFromConstant<int>(d_tensor, cur_layer->getType(), "full_value"));
+    } else if (idx == 2 || idx == 3 || idx == 4 || idx == 5 || idx == 6) {
+        DLOG(INFO) << "don't need set prim::Constant value to layer: " << layer_inID.first->getName();
+        return false;
+    } else {
+        DLOG(FATAL) << "Incorrect data from prim::Constant";
+    }
+    return true;
+}
+
 bool putAttributeInAtenGather(layer_inID_type& layer_inID, dtensor_ptr_type& d_tensor)
 {
     auto cur_layer = std::dynamic_pointer_cast<ir::AtenGatherLayer>(layer_inID.first);

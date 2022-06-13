@@ -22,6 +22,7 @@
 #include "ir/include/layers/aten_embedding_layer.h"
 #include "ir/include/layers/aten_expand_layer.h"
 #include "ir/include/layers/aten_format_layer.h"
+#include "ir/include/layers/aten_full_like_layer.h"
 #include "ir/include/layers/aten_gather_layer.h"
 #include "ir/include/layers/aten_get_item_layer.h"
 #include "ir/include/layers/aten_index_put_layer.h"
