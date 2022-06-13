@@ -20,6 +20,8 @@ bool putAttributeInAtenArange2(layer_inID_type& layer_inID, dtensor_ptr_type& d_
 
 bool putAttributeInAtenArange3(layer_inID_type& layer_inID, dtensor_ptr_type& d_tensor);
 
+bool putAttributeInArgmax(layer_inID_type& layer_inID, dtensor_ptr_type& d_tensor);
+
 bool putAttributeInAtenAsTensor(layer_inID_type& layer_inID, dtensor_ptr_type& d_tensor);
 
 bool putAttributeInAtenBatchNorm(layer_inID_type& layer_inID, dtensor_ptr_type& d_tensor);

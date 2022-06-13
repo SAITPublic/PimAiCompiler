@@ -26,6 +26,15 @@ class LayerBuilder
     std::shared_ptr<AttrParser> attr_parser_ = nullptr;
 };
 
+class AtenAbsBuilder : public LayerBuilder
+{
+   public:
+    std::shared_ptr<ir::NNLayer> buildLayer(const torch::jit::Node* node_ref);
+
+   private:
+    std::shared_ptr<ir::AtenAbsLayer> aten_abs_layer_;
+};
+
 class AtenAddBuilder : public LayerBuilder
 {
    public:
@@ -96,6 +105,15 @@ class AtenArange3Builder : public LayerBuilder
 
    private:
     std::shared_ptr<ir::AtenArange3Layer> aten_arange_layer_;
+};
+
+class AtenArgmaxBuilder : public LayerBuilder
+{
+   public:
+    std::shared_ptr<ir::NNLayer> buildLayer(const torch::jit::Node* node_ref);
+
+   private:
+    std::shared_ptr<ir::AtenArgmaxLayer> aten_argmax_layer_;
 };
 
 class AtenAsTensorBuilder : public LayerBuilder
@@ -438,6 +456,15 @@ class AtenIsBuilder : public LayerBuilder
 
    private:
     std::shared_ptr<ir::AtenIsLayer> aten_is_layer_;
+};
+
+class AtenIsNotBuilder : public LayerBuilder
+{
+   public:
+    std::shared_ptr<ir::NNLayer> buildLayer(const torch::jit::Node* node_ref);
+
+   private:
+    std::shared_ptr<ir::AtenIsNotLayer> aten_is_not_layer_;
 };
 
 class AtenItemBuilder : public LayerBuilder
@@ -1132,6 +1159,7 @@ class LayerBuilders
     LayerBuilders()
     {
         // Register layer builder.
+        layer_builders_["aten::abs"] = std::make_shared<AtenAbsBuilder>();
         layer_builders_["aten::add"] = std::make_shared<AtenAddBuilder>();
         layer_builders_["aten::add_"] = std::make_shared<AtenAddBuilder>();
         layer_builders_["aten::addmm"] = std::make_shared<AtenAddmmBuilder>();
@@ -1141,6 +1169,7 @@ class LayerBuilders
         layer_builders_["aten::arange1"] = std::make_shared<AtenArange1Builder>();
         layer_builders_["aten::arange2"] = std::make_shared<AtenArange2Builder>();
         layer_builders_["aten::arange3"] = std::make_shared<AtenArange3Builder>();
+        layer_builders_["aten::argmax"] = std::make_shared<AtenArgmaxBuilder>();
         layer_builders_["aten::as_tensor"] = std::make_shared<AtenAsTensorBuilder>();
         layer_builders_["aten::batch_norm"] = std::make_shared<AtenBatchNorm2dBuilder>();
         layer_builders_["aten::bitwise_not"] = std::make_shared<AtenBitwiseNotBuilder>();
@@ -1234,6 +1263,7 @@ class LayerBuilders
         layer_builders_["aten::zeros_like"] = std::make_shared<AtenZerosLikeBuilder>();
         layer_builders_["aten::__derive_index"] = std::make_shared<AtenDeriveIndexBuilder>();
         layer_builders_["aten::__is__"] = std::make_shared<AtenIsBuilder>();
+        layer_builders_["aten::__isnot__"] = std::make_shared<AtenIsNotBuilder>();
         layer_builders_["aten::__not__"] = std::make_shared<AtenNotBuilder>();
 
         layer_builders_["prim::Block"] = std::make_shared<PrimBlockBuilder>();

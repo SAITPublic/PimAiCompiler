@@ -333,6 +333,7 @@ const std::shared_ptr<ir::NNGraph> StreamExecutor::getGraph() { return this->gra
 
 void StreamExecutor::registerOp()
 {
+    this->global_op_register_.insert({ir::LayerType::ATENABS, op_executor::executeAtenAbs});
     this->global_op_register_.insert({ir::LayerType::ATENADD, op_executor::executeAtenAdd});
     this->global_op_register_.insert({ir::LayerType::ATENADDMM, op_executor::executeAtenAddmm});
     this->global_op_register_.insert({ir::LayerType::ATENAND, op_executor::executeAtenAnd});
@@ -341,6 +342,7 @@ void StreamExecutor::registerOp()
     this->global_op_register_.insert({ir::LayerType::ATENARANGE1, op_executor::executeAtenArange1});
     this->global_op_register_.insert({ir::LayerType::ATENARANGE2, op_executor::executeAtenArange2});
     this->global_op_register_.insert({ir::LayerType::ATENARANGE3, op_executor::executeAtenArange3});
+    this->global_op_register_.insert({ir::LayerType::ATENARGMAX, op_executor::executeAtenArgmax});
     this->global_op_register_.insert({ir::LayerType::ATENASTENSOR, op_executor::executeAtenAsTensor});
     this->global_op_register_.insert({ir::LayerType::ATENBATCHNORM2D, op_executor::executeAtenBatchNorm2d});
     this->global_op_register_.insert({ir::LayerType::ATENBITWISENOT, op_executor::executeAtenBitwiseNot});
@@ -380,6 +382,7 @@ void StreamExecutor::registerOp()
     this->global_op_register_.insert({ir::LayerType::ATENINTIMPLICIT, op_executor::executeAtenIntImplicit});
     this->global_op_register_.insert({ir::LayerType::ATENITEM, op_executor::executeAtenItem});
     this->global_op_register_.insert({ir::LayerType::ATENIS, op_executor::executeAtenIs});
+    this->global_op_register_.insert({ir::LayerType::ATENISNOT, op_executor::executeAtenIsNot});
     this->global_op_register_.insert({ir::LayerType::ATENLAYERNORM, op_executor::executeAtenLayerNorm});
     this->global_op_register_.insert({ir::LayerType::ATENLEAKYRELU, op_executor::executeAtenLeakyRelu});
     this->global_op_register_.insert({ir::LayerType::ATENLEN, op_executor::executeAtenLen});

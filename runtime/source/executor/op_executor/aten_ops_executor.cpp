@@ -18,6 +18,25 @@ namespace runtime
 {
 namespace op_executor
 {
+void executeAtenAbs(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
+{
+     DLOG(INFO) << "execute Aten Abs node";
+
+    auto add_layer = std::static_pointer_cast<nn_compiler::ir::AtenAbsLayer>(layer);
+
+    int in_id = 0;
+    auto in_stensor_id = layer->getInSTensorID();
+    auto out_stensor_id = layer->getOutSTensorID();
+    
+    // Find the input blob
+    torch::jit::IValue iv_self = stream_executor.findBlob(in_stensor_id[in_id]).second;
+    auto self_tensor = iv_self.toTensor();
+    auto output = atenAbs(self_tensor);
+
+    // update output
+    stream_executor.updateBlob(out_stensor_id[0], DataType::TENSOR, tensorToIValue(output));
+}
+
 void executeAtenAdd(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
     DLOG(INFO) << "execute Aten Add node";
@@ -423,6 +442,35 @@ void executeAtenArange3(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, Stream
 
     auto output = atenArange3(start, end, step, options);
     stream_executor.updateBlob(out_stensor_id[0], DataType::TENSOR, tensorToIValue(output));
+}
+
+void executeAtenArgmax(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
+{
+    DLOG(INFO) << "execute Aten argmax node";
+    auto argmax_layer = std::static_pointer_cast<nn_compiler::ir::AtenArgmaxLayer>(layer);
+
+    auto in_stensor_ids = layer->getInSTensorID();
+    auto out_stensor_ids = layer->getOutSTensorID();
+
+    int in_id = 0;
+    torch::jit::IValue iv_tensor = stream_executor.findBlob(in_stensor_ids[in_id++]).second;
+    assert(iv_tensor.isTensor());
+    auto in_tensor = iv_tensor.toTensor();
+
+    auto dim = argmax_layer->getDim();
+    if (nn_compiler::ir::isDefaultValue(dim)) {
+        auto iv = stream_executor.findBlob(in_stensor_ids[in_id++]).second;
+        dim = iv.toInt();
+    }
+
+    auto keepdim = argmax_layer->getKeepDim();
+    if (nn_compiler::ir::isDefaultValue(keepdim)) {
+        auto iv = stream_executor.findBlob(in_stensor_ids[in_id++]).second;
+        keepdim = iv.toInt();
+    }
+
+    auto output = atenArgmax(in_tensor, dim, static_cast<bool>(keepdim));
+    stream_executor.updateBlob(out_stensor_ids[0], DataType::TENSOR, tensorToIValue(output));
 }
 
 void executeAtenAsTensor(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
@@ -1592,6 +1640,23 @@ void executeAtenIs(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecu
     torch::jit::IValue iv_other = stream_executor.findBlob(in_stensor_id[1]).second;
 
     auto output = atenIs(iv_self, iv_other);
+    // update output
+    stream_executor.updateBlob(out_stensor_id[0], DataType::BOOL, boolToIValue(output));
+}
+
+void executeAtenIsNot(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
+{
+    DLOG(INFO) << "execute Aten IsNot node";
+
+    auto in_stensor_id = layer->getInSTensorID();
+    auto out_stensor_id = layer->getOutSTensorID();
+    assert(in_stensor_id.size() == 2);
+
+    // Find the input blob
+    torch::jit::IValue iv_self = stream_executor.findBlob(in_stensor_id[0]).second;
+    torch::jit::IValue iv_other = stream_executor.findBlob(in_stensor_id[1]).second;
+
+    auto output = !(atenIs(iv_self, iv_other));
     // update output
     stream_executor.updateBlob(out_stensor_id[0], DataType::BOOL, boolToIValue(output));
 }

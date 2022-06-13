@@ -13,6 +13,9 @@ namespace runtime
 {
 namespace op_executor
 {
+
+at::Tensor atenAbs(const at::Tensor &self) { return at::abs(self); }
+
 at::Tensor atenAdd(const at::Tensor &self, const at::Scalar &other, const at::Scalar &alpha)
 {
     return at::add(self, other, alpha);
@@ -54,8 +57,16 @@ at::Tensor atenArange3(at::Scalar start, at::Scalar end, at::Scalar step, const 
     return at::arange(start, end, step, options);
 }
 
+at::Tensor atenArgmax(at::Tensor &self, c10::optional<int64_t> dim, bool keepdim)
+{
+    return at::argmax(self, dim, keepdim);
+}
+
 // refer to castTensorTo() in torch/csrc/jit/runtime/register_special_ops.cpp
-at::Tensor atenAsTensor(at::Tensor &self, at::ScalarType dtype, at::Device device) { return self.to(device, dtype); }
+at::Tensor atenAsTensor(at::Tensor &self, at::ScalarType dtype, at::Device device)
+{
+    return self.to(device, dtype);
+}
 
 at::Tensor atenBatchNorm2d(const at::Tensor &input, const c10::optional<at::Tensor> &weight,
                            const c10::optional<at::Tensor> &bias, const c10::optional<at::Tensor> &running_mean,

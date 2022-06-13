@@ -19,6 +19,7 @@
     }                                                                                           \
     }  // namespace nn_compiler
 
+DECLARE_TORCH_OP_BUILDER(AtenAbs, nn_compiler::ir::LayerType::ATENABS, aten_abs_layer_)
 DECLARE_TORCH_OP_BUILDER(AtenAdd, nn_compiler::ir::LayerType::ATENADD, aten_add_layer_)
 DECLARE_TORCH_OP_BUILDER(AtenAddmm, nn_compiler::ir::LayerType::ATENADDMM, aten_addmm_layer_)
 DECLARE_TORCH_OP_BUILDER(AtenAnd, nn_compiler::ir::LayerType::ATENAND, aten_and_layer_)
@@ -27,6 +28,7 @@ DECLARE_TORCH_OP_BUILDER(AtenAppend, nn_compiler::ir::LayerType::ATENAPPEND, ate
 DECLARE_TORCH_OP_BUILDER(AtenArange1, nn_compiler::ir::LayerType::ATENARANGE1, aten_arange_layer_)
 DECLARE_TORCH_OP_BUILDER(AtenArange2, nn_compiler::ir::LayerType::ATENARANGE2, aten_arange_layer_)
 DECLARE_TORCH_OP_BUILDER(AtenArange3, nn_compiler::ir::LayerType::ATENARANGE3, aten_arange_layer_)
+DECLARE_TORCH_OP_BUILDER(AtenArgmax, nn_compiler::ir::LayerType::ATENARGMAX, aten_argmax_layer_)
 DECLARE_TORCH_OP_BUILDER(AtenAsTensor, nn_compiler::ir::LayerType::ATENASTENSOR, aten_as_tensor_layer_)
 DECLARE_TORCH_OP_BUILDER(AtenBitwiseNot, nn_compiler::ir::LayerType::ATENBITWISENOT, aten_bitwise_not_layer_)
 DECLARE_TORCH_OP_BUILDER(AtenBmm, nn_compiler::ir::LayerType::ATENBMM, aten_bmm_layer_)
@@ -63,6 +65,7 @@ DECLARE_TORCH_OP_BUILDER(AtenIndexSelect, nn_compiler::ir::LayerType::ATENINDEXS
 DECLARE_TORCH_OP_BUILDER(AtenInt, nn_compiler::ir::LayerType::ATENINT, aten_int_layer_)
 DECLARE_TORCH_OP_BUILDER(AtenIntImplicit, nn_compiler::ir::LayerType::ATENINTIMPLICIT, aten_int_implicit_layer_)
 DECLARE_TORCH_OP_BUILDER(AtenIs, nn_compiler::ir::LayerType::ATENIS, aten_is_layer_)
+DECLARE_TORCH_OP_BUILDER(AtenIsNot, nn_compiler::ir::LayerType::ATENISNOT, aten_is_not_layer_)
 DECLARE_TORCH_OP_BUILDER(AtenItem, nn_compiler::ir::LayerType::ATENITEM, aten_item_layer_)
 DECLARE_TORCH_OP_BUILDER(AtenLeakyRelu, nn_compiler::ir::LayerType::ATENLEAKYRELU, aten_leaky_relu_layer_)
 DECLARE_TORCH_OP_BUILDER(AtenLen, nn_compiler::ir::LayerType::ATENLEN, aten_len_layer_)

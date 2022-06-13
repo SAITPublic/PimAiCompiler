@@ -7,6 +7,7 @@
 #include "ir/include/layers/aten_arange1_layer.h"
 #include "ir/include/layers/aten_arange2_layer.h"
 #include "ir/include/layers/aten_arange3_layer.h"
+#include "ir/include/layers/aten_argmax_layer.h"
 #include "ir/include/layers/aten_as_tensor_layer.h"
 #include "ir/include/layers/aten_batch_norm2d_layer.h"
 #include "ir/include/layers/aten_cat_layer.h"

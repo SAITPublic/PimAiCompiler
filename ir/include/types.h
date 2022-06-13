@@ -41,6 +41,7 @@ enum DataType {
 };
 
 enum class LayerType {
+    ATENABS,
     ATENADD,
     ATENADDMM,
     ATENAND,
@@ -49,6 +50,7 @@ enum class LayerType {
     ATENARANGE1,
     ATENARANGE2,
     ATENARANGE3,
+    ATENARGMAX,
     ATENASTENSOR,
     ATENBATCHNORM2D,
     ATENBITWISENOT,
@@ -87,6 +89,7 @@ enum class LayerType {
     ATENINT,
     ATENINTIMPLICIT,
     ATENIS,
+    ATENISNOT,
     ATENITEM,
     ATENLAYERNORM,
     ATENLEAKYRELU,

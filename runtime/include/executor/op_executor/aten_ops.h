@@ -13,6 +13,9 @@ namespace runtime
 {
 namespace op_executor
 {
+
+at::Tensor atenAbs(const at::Tensor &self);
+
 at::Tensor atenAdd(const at::Tensor &self, const at::Scalar &other, const at::Scalar &alpha = 1);
 
 at::Tensor atenAdd(const at::Tensor &self, const at::Tensor &other, const at::Scalar &alpha = 1);
@@ -35,6 +38,8 @@ at::Tensor atenArange1(at::Scalar end, const at::TensorOptions &options);
 at::Tensor atenArange2(at::Scalar start, at::Scalar end, const at::TensorOptions &options);
 
 at::Tensor atenArange3(at::Scalar start, at::Scalar end, at::Scalar step, const at::TensorOptions &options);
+
+at::Tensor atenArgmax(at::Tensor &self, c10::optional<int64_t> dim = c10::nullopt, bool keepdim = false);
 
 at::Tensor atenAsTensor(at::Tensor &self, at::ScalarType dtype, at::Device device);
 
@@ -138,7 +143,7 @@ static std::string atenFormat(const std::string &fmt)
  * @return A new string after formatting
  */
 template <typename T, typename... Types>
-std::string atenFormat(std::string &fmt, const T &next, const Types &... args)
+std::string atenFormat(std::string &fmt, const T &next, const Types &...args)
 {
     int index = fmt.find("{}");
     if (index == std::string::npos) {
@@ -295,9 +300,9 @@ at::Tensor atenRelu(const at::Tensor &self);
 
 at::Tensor atenReshape(const at::Tensor &self, at::IntArrayRef shape);
 
-at::Tensor atenRemainder(const at::Tensor &self,const at::Scalar &other);
+at::Tensor atenRemainder(const at::Tensor &self, const at::Scalar &other);
 
-at::Tensor atenRepeat(const at::Tensor & self, at::IntArrayRef repeats);
+at::Tensor atenRepeat(const at::Tensor &self, at::IntArrayRef repeats);
 
 at::Tensor atenSelect(const at::Tensor &self, at::Dimname dim, int64_t index);
 
@@ -359,7 +364,7 @@ at::Tensor atenTranspose(const at::Tensor &self, int64_t dim0, int64_t dim1);
 
 at::Tensor atenTranspose(const at::Tensor &self, at::Dimname dim0, at::Dimname dim1);
 
-at::Tensor atenTriu(const at::Tensor & self, int64_t diagonal);
+at::Tensor atenTriu(const at::Tensor &self, int64_t diagonal);
 
 at::Tensor atenUnsqueeze(const at::Tensor &self, int64_t dim);
 

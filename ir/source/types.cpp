@@ -7,6 +7,7 @@ namespace ir
 std::string convertLayerTypeToString(LayerType type)
 {
     static std::unordered_map<LayerType, std::string> converter;
+    converter.insert({LayerType::ATENABS, "aten::abs"});
     converter.insert({LayerType::ATENADD, "aten::add"});
     converter.insert({LayerType::ATENADDMM, "aten::addmm"});
     converter.insert({LayerType::ATENAND, "aten::__and__"});
@@ -15,6 +16,7 @@ std::string convertLayerTypeToString(LayerType type)
     converter.insert({LayerType::ATENARANGE1, "aten::arange1"});
     converter.insert({LayerType::ATENARANGE2, "aten::arange2"});
     converter.insert({LayerType::ATENARANGE3, "aten::arange3"});
+    converter.insert({LayerType::ATENARGMAX, "aten::argmax"});
     converter.insert({LayerType::ATENASTENSOR, "aten::as_tensor"});
     converter.insert({LayerType::ATENBATCHNORM2D, "aten::batch_norm"});
     converter.insert({LayerType::ATENBITWISENOT, "aten::bitwise_not"});
@@ -54,6 +56,7 @@ std::string convertLayerTypeToString(LayerType type)
     converter.insert({LayerType::ATENINTIMPLICIT, "aten::IntImplicit"});
     converter.insert({LayerType::ATENITEM, "aten::item"});
     converter.insert({LayerType::ATENIS, "aten::__is__"});
+    converter.insert({LayerType::ATENISNOT, "aten::__isnot__"});
     converter.insert({LayerType::ATENLAYERNORM, "aten::layer_norm"});
     converter.insert({LayerType::ATENLEAKYRELU, "aten::leaky_relu"});
     converter.insert({LayerType::ATENLEN, "aten::len"});

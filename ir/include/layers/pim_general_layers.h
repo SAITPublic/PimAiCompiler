@@ -22,6 +22,7 @@
     }                                                                                              \
     }
 
+DECLARE_TORCH_OP_LAYER(AtenAbs)
 DECLARE_TORCH_OP_LAYER(AtenAnd)
 DECLARE_TORCH_OP_LAYER(AtenAny)
 DECLARE_TORCH_OP_LAYER(AtenAppend)
@@ -45,6 +46,7 @@ DECLARE_TORCH_OP_LAYER(AtenIndex)
 DECLARE_TORCH_OP_LAYER(AtenInt)
 DECLARE_TORCH_OP_LAYER(AtenIntImplicit)
 DECLARE_TORCH_OP_LAYER(AtenIs)
+DECLARE_TORCH_OP_LAYER(AtenIsNot)
 DECLARE_TORCH_OP_LAYER(AtenItem)
 DECLARE_TORCH_OP_LAYER(AtenLen)
 DECLARE_TORCH_OP_LAYER(AtenList)

@@ -163,6 +163,25 @@ bool putAttributeInAtenArange3(layer_inID_type& layer_inID, dtensor_ptr_type& d_
     return true;
 }
 
+bool putAttributeInArgmax(layer_inID_type& layer_inID, dtensor_ptr_type& d_tensor)
+{
+    auto cur_layer = std::dynamic_pointer_cast<ir::AtenArgmaxLayer>(layer_inID.first);
+    auto idx = layer_inID.second;
+    auto layer_type = cur_layer->getType();
+
+    if (idx == 0) {
+        DLOG(INFO) << "prim::Constant attempts to set into the input of layer: " << layer_inID.first->getName();
+        return false;
+    } else if (idx == 1) {
+        cur_layer->setDim(getValueFromConstant<int64_t>(d_tensor, layer_type, "dim"));
+    } else if (idx == 2) {
+        cur_layer->setKeepDim(getValueFromConstant<int64_t>(d_tensor, layer_type, "keepdim"));
+    } else {
+        DLOG(FATAL) << "Incorrect data from prim::Constant";
+    }
+    return true;
+}
+
 bool putAttributeInAtenAsTensor(layer_inID_type& layer_inID, dtensor_ptr_type& d_tensor)
 {
     auto cur_layer = std::dynamic_pointer_cast<ir::AtenAsTensorLayer>(layer_inID.first);
