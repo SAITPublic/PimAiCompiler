@@ -121,6 +121,16 @@ at::Tensor atenCpu(const at::Tensor &self) { return self.cpu(); }
 
 at::Tensor atenCuda(const at::Tensor &self) { return self.cuda(); }
 
+at::Tensor atenCumsum(const at::Tensor &self, int64_t dim, c10::optional<at::ScalarType> dtype)
+{
+    return at::cumsum(self, dim, dtype);
+}
+
+at::Tensor atenCumsum(const at::Tensor &self, at::Dimname dim, c10::optional<at::ScalarType> dtype)
+{
+    return at::cumsum(self, dim, dtype);
+}
+
 int64_t atenDeriveIndex(int64_t index, int64_t start, int64_t step) { return start + index * step; }
 
 at::Tensor atenDetach(const at::Tensor &self) { return at::detach(self); }
@@ -358,6 +368,18 @@ at::Tensor atenMaxPool2d(const at::Tensor &self, at::IntArrayRef kernel_size, at
                          at::IntArrayRef padding, at::IntArrayRef dilation, bool ceil_mode)
 {
     return at::max_pool2d(self, kernel_size, stride, padding, dilation, ceil_mode);
+}
+
+at::Tensor atenMean(const at::Tensor &self, c10::optional<at::ScalarType> dtype) { return at::mean(self, dtype); }
+
+at::Tensor atenMean(const at::Tensor &self, at::IntArrayRef dim, bool keepdim, c10::optional<at::ScalarType> dtype)
+{
+    return at::mean(self, dim, keepdim, dtype);
+}
+
+at::Tensor atenMean(const at::Tensor &self, at::DimnameList dim, bool keepdim, c10::optional<at::ScalarType> dtype)
+{
+    return at::mean(self, dim, keepdim, dtype);
 }
 
 at::Tensor atenMin(const at::Tensor &self) { return at::min(self); }

@@ -269,6 +269,15 @@ class AtenDeriveIndexBuilder : public LayerBuilder
     std::shared_ptr<ir::AtenDeriveIndexLayer> aten_derive_index_layer_;
 };
 
+class AtenCumsumBuilder : public LayerBuilder
+{
+   public:
+    std::shared_ptr<ir::NNLayer> buildLayer(const torch::jit::Node* node_ref);
+
+   private:
+    std::shared_ptr<ir::AtenCumsumLayer> aten_cumsum_layer_;
+};
+
 class AtenDetachBuilder : public LayerBuilder
 {
    public:
@@ -645,6 +654,15 @@ class AtenMaxPool2dBuilder : public LayerBuilder
 
    private:
     std::shared_ptr<ir::AtenMaxPool2dLayer> aten_max_pool2d_layer_;
+};
+
+class AtenMeanBuilder : public LayerBuilder
+{
+   public:
+    std::shared_ptr<ir::NNLayer> buildLayer(const torch::jit::Node* node_ref);
+
+   private:
+    std::shared_ptr<ir::AtenMeanLayer> aten_mean_layer_;
 };
 
 class AtenMinBuilder : public LayerBuilder
@@ -1269,6 +1287,7 @@ class LayerBuilders
         layer_builders_["aten::copy_"] = std::make_shared<AtenCopyBuilder>();
         layer_builders_["aten::cpu"] = std::make_shared<AtenCpuBuilder>();
         layer_builders_["aten::cuda"] = std::make_shared<AtenCudaBuilder>();
+        layer_builders_["aten::cumsum"] = std::make_shared<AtenCumsumBuilder>();
         layer_builders_["aten::detach"] = std::make_shared<AtenDetachBuilder>();
         layer_builders_["aten::dim"] = std::make_shared<AtenDimBuilder>();
         layer_builders_["aten::div"] = std::make_shared<AtenDivBuilder>();
@@ -1312,6 +1331,7 @@ class LayerBuilders
         layer_builders_["aten::matmul"] = std::make_shared<AtenMatmulBuilder>();
         layer_builders_["aten::max"] = std::make_shared<AtenMaxBuilder>();
         layer_builders_["aten::max_pool2d"] = std::make_shared<AtenMaxPool2dBuilder>();
+        layer_builders_["aten::mean"] = std::make_shared<AtenMeanBuilder>();
         layer_builders_["aten::min"] = std::make_shared<AtenMinBuilder>();
         layer_builders_["aten::mul"] = std::make_shared<AtenMulBuilder>();
         layer_builders_["aten::ne"] = std::make_shared<AtenNeBuilder>();

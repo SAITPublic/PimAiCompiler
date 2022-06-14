@@ -33,6 +33,7 @@ std::string convertLayerTypeToString(LayerType type)
     converter.insert({LayerType::ATENCOPY, "aten::copy_"});
     converter.insert({LayerType::ATENCPU, "aten::cpu"});
     converter.insert({LayerType::ATENCUDA, "aten::cuda"});
+    converter.insert({LayerType::ATENCUMSUM, "aten::cumsum"});
     converter.insert({LayerType::ATENDERIVEINDEX, "aten::__derive_index"});
     converter.insert({LayerType::ATENDETACH, "aten::detach"});
     converter.insert({LayerType::ATENDIM, "aten::dim"});
@@ -76,6 +77,7 @@ std::string convertLayerTypeToString(LayerType type)
     converter.insert({LayerType::ATENMATMUL, "aten::matmul"});
     converter.insert({LayerType::ATENMAX, "aten::max"});
     converter.insert({LayerType::ATENMAXPOOL2D, "aten::max_pool2d"});
+    converter.insert({LayerType::ATENMEAN, "aten::mean"});
     converter.insert({LayerType::ATENMIN, "aten::min"});
     converter.insert({LayerType::ATENMUL, "aten::mul"});
     converter.insert({LayerType::ATENNE, "aten::ne"});

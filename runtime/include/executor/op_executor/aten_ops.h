@@ -87,6 +87,10 @@ at::Tensor atenCpu(const at::Tensor &self);
 
 at::Tensor atenCuda(const at::Tensor &self);
 
+at::Tensor atenCumsum(const at::Tensor &self, int64_t dim, c10::optional<at::ScalarType> dtype = c10::nullopt);
+
+at::Tensor atenCumsum(const at::Tensor &self, at::Dimname dim, c10::optional<at::ScalarType> dtype = c10::nullopt);
+
 int64_t atenDeriveIndex(int64_t index, int64_t start, int64_t step);
 
 at::Tensor atenDetach(const at::Tensor &self);
@@ -255,6 +259,14 @@ std::tuple<at::Tensor, at::Tensor> atenMax(const at::Tensor &self, at::Dimname d
 
 at::Tensor atenMaxPool2d(const at::Tensor &self, at::IntArrayRef kernel_size, at::IntArrayRef stride,
                          at::IntArrayRef padding, at::IntArrayRef dilation, bool ceil_mode);
+
+at::Tensor atenMean(const at::Tensor &self, c10::optional<at::ScalarType> dtype = c10::nullopt);
+
+at::Tensor atenMean(const at::Tensor &self, at::IntArrayRef dim, bool keepdim = false,
+                    c10::optional<at::ScalarType> dtype = c10::nullopt);
+
+at::Tensor atenMean(const at::Tensor &self, at::DimnameList dim, bool keepdim = false,
+                    c10::optional<at::ScalarType> dtype = c10::nullopt);
 
 at::Tensor atenMin(const at::Tensor &self);
 

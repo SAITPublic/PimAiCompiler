@@ -359,6 +359,7 @@ void StreamExecutor::registerOp()
     this->global_op_register_.insert({ir::LayerType::ATENCOPY, op_executor::executeAtenCopy});
     this->global_op_register_.insert({ir::LayerType::ATENCPU, op_executor::executeAtenCpu});
     this->global_op_register_.insert({ir::LayerType::ATENCUDA, op_executor::executeAtenCuda});
+    this->global_op_register_.insert({ir::LayerType::ATENCUMSUM, op_executor::executeAtenCumsum});
     this->global_op_register_.insert({ir::LayerType::ATENDERIVEINDEX, op_executor::executeAtenDeriveIndex});
     this->global_op_register_.insert({ir::LayerType::ATENDETACH, op_executor::executeAtenDetach});
     this->global_op_register_.insert({ir::LayerType::ATENDIM, op_executor::executeAtenDim});
@@ -401,6 +402,7 @@ void StreamExecutor::registerOp()
     this->global_op_register_.insert({ir::LayerType::ATENMATMUL, op_executor::executeAtenMatmul});
     this->global_op_register_.insert({ir::LayerType::ATENMAX, op_executor::executeAtenMax});
     this->global_op_register_.insert({ir::LayerType::ATENMAXPOOL2D, op_executor::executeAtenMaxPool2d});
+    this->global_op_register_.insert({ir::LayerType::ATENMEAN, op_executor::executeAtenMean});
     this->global_op_register_.insert({ir::LayerType::ATENMIN, op_executor::executeAtenMin});
     this->global_op_register_.insert({ir::LayerType::ATENMUL, op_executor::executeAtenMul});
     this->global_op_register_.insert({ir::LayerType::ATENNE, op_executor::executeAtenNe});

@@ -980,6 +980,32 @@ void executeAtenCuda(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExe
     stream_executor.updateBlob(out_stensor_id[0], DataType::TENSOR, tensorToIValue(output));
 }
 
+void executeAtenCumsum(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
+{
+    DLOG(INFO) << "execute Aten Cumsum node";
+
+    auto in_stensor_ids = layer->getInSTensorID();
+    auto out_stensor_ids = layer->getOutSTensorID();
+
+    int in_id = 0;
+    torch::jit::IValue iv_self = stream_executor.findBlob(in_stensor_ids[in_id++]).second;
+    assert(iv_self.isTensor());
+    auto self_tensor = iv_self.toTensor();
+
+    torch::jit::IValue iv_dim = stream_executor.findBlob(in_stensor_ids[in_id++]).second;
+    torch::jit::IValue iv_dtype = stream_executor.findBlob(in_stensor_ids[in_id++]).second;
+    at::Tensor output;
+    if (iv_dtype.isNone() && iv_dim.isInt()) {
+        output = atenCumsum(self_tensor, iv_dim.toInt());
+    } else if (!iv_dtype.isNone() && iv_dim.isInt()) {
+        auto dtype = iv_dtype.toScalarType();
+        output = atenCumsum(self_tensor, iv_dim.toInt(), dtype);
+    } else {
+        DLOG(FATAL) << "Aten Cumsum has incorrect inputs";
+    }
+    stream_executor.updateBlob(out_stensor_ids[0], DataType::TENSOR, tensorToIValue(output));
+}
+
 void executeAtenDeriveIndex(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
     DLOG(INFO) << "execute Aten derive_index node";
@@ -3046,6 +3072,41 @@ void executeAtenMaxPool2d(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, Stre
                                 at::ArrayRef<int64_t>(padding_vec), at::ArrayRef<int64_t>(dilation_vec),
                                 static_cast<bool>(ceil_mode));
     stream_executor.updateBlob(out_stensor_id[0], DataType::TENSOR, tensorToIValue(output));
+}
+
+void executeAtenMean(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
+{
+     DLOG(INFO) << "execute Aten Mean node";
+
+    auto in_stensor_ids = layer->getInSTensorID();
+    auto out_stensor_ids = layer->getOutSTensorID();
+
+    int in_id = 0;
+    torch::jit::IValue iv_self = stream_executor.findBlob(in_stensor_ids[in_id++]).second;
+    assert(iv_self.isTensor());
+    at::Tensor self_tensor = iv_self.toTensor();
+
+    at::Tensor output;
+    if (in_stensor_ids.size() == 4) {
+        torch::jit::IValue iv_dim = stream_executor.findBlob(in_stensor_ids[in_id++]).second;
+        assert(iv_dim.isList());
+        auto dim_list = iv_dim.toListRef();
+        auto array_ref = parseIValueVector<int64_t>(dim_list);
+
+        torch::jit::IValue iv_keepdim = stream_executor.findBlob(in_stensor_ids[in_id++]).second;
+        auto keepdim = iv_keepdim.toBool();
+
+        torch::jit::IValue iv_dtype = stream_executor.findBlob(in_stensor_ids[in_id++]).second;
+        if (iv_dtype.isNone()) {
+            output = atenMean(self_tensor, at::ArrayRef<int64_t>(array_ref), keepdim);
+        } else {
+            auto dtype = iv_dtype.toScalarType();
+            output = atenMean(self_tensor, at::ArrayRef<int64_t>(array_ref), keepdim, dtype);
+        }
+        stream_executor.updateBlob(out_stensor_ids[0], DataType::TENSOR, tensorToIValue(output));
+    } else {
+        DLOG(FATAL)<<"Aten mean's input size is incorrect! size: "<<in_stensor_ids.size();
+    }
 }
 
 void executeAtenMin(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
