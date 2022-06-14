@@ -82,14 +82,17 @@ std::string convertLayerTypeToString(LayerType type)
     converter.insert({LayerType::ATENNEG, "aten::neg"});
     converter.insert({LayerType::ATENNORM, "aten::norm"});
     converter.insert({LayerType::ATENNOT, "aten::not"});
+    converter.insert({LayerType::ATENONEHOT, "aten::one_hot"});
     converter.insert({LayerType::ATENONES, "aten::ones"});
     converter.insert({LayerType::ATENPACKPADDEDSEQUENCE, "aten::_pack_padded_sequence"});
     converter.insert({LayerType::ATENPADPACKEDSEQUENCE, "aten::_pad_packed_sequence"});
+    converter.insert({LayerType::ATENPERMUTE, "aten::permute"});
     converter.insert({LayerType::ATENPOW, "aten::pow"});
     converter.insert({LayerType::ATENRELU, "aten::relu"});
     converter.insert({LayerType::ATENRESHAPE, "aten::reshape"});
     converter.insert({LayerType::ATENREMAINDER, "aten::remainder"});
     converter.insert({LayerType::ATENREPEAT, "aten::repeat"});
+    converter.insert({LayerType::ATENRSQRT, "aten::rsqrt"});
     converter.insert({LayerType::ATENSELECT, "aten::select"});
     converter.insert({LayerType::ATENSETITEM, "aten::_set_item"});
     converter.insert({LayerType::ATENSIZE, "aten::size"});
@@ -105,9 +108,11 @@ std::string convertLayerTypeToString(LayerType type)
     converter.insert({LayerType::ATENTO2, "aten::to2"});
     converter.insert({LayerType::ATENTOPK, "aten::topk"});
     converter.insert({LayerType::ATENTRIU, "aten::triu"});
+    converter.insert({LayerType::ATENTYPEAS, "aten::type_as"});
     converter.insert({LayerType::ATENUNSQUEEZE, "aten::unsqueeze"});
     converter.insert({LayerType::ATENVIEW, "aten::view"});
     converter.insert({LayerType::ATENWARN, "aten::warn"});
+    converter.insert({LayerType::ATENWHERE, "aten::where"});
     converter.insert({LayerType::ATENZEROS, "aten::zeros"});
     converter.insert({LayerType::ATENZEROSLIKE, "aten::zeros_like"});
 

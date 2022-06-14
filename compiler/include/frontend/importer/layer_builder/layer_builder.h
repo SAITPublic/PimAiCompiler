@@ -701,6 +701,16 @@ class AtenNotBuilder : public LayerBuilder
     std::shared_ptr<ir::AtenNotLayer> aten_not_layer_;
 };
 
+class AtenOneHotBuilder : public LayerBuilder
+{
+   public:
+    std::shared_ptr<ir::NNLayer> buildLayer(const torch::jit::Node* node_ref);
+
+   private:
+    std::shared_ptr<ir::AtenOneHotLayer> aten_one_hot_layer_;
+};
+
+
 class AtenOnesBuilder : public LayerBuilder
 {
    public:
@@ -727,6 +737,16 @@ class AtenPadPackedSequenceBuilder : public LayerBuilder
    private:
     std::shared_ptr<ir::AtenPadPackedSequenceLayer> aten_pad_packed_sequence_layer_;
 };
+
+class AtenPermuteBuilder : public LayerBuilder
+{
+   public:
+    std::shared_ptr<ir::NNLayer> buildLayer(const torch::jit::Node* node_ref);
+
+   private:
+    std::shared_ptr<ir::AtenPermuteLayer> aten_permute_layer_;
+};
+
 
 class AtenPowBuilder : public LayerBuilder
 {
@@ -771,6 +791,15 @@ class AtenRepeatBuilder : public LayerBuilder
 
    private:
     std::shared_ptr<ir::AtenRepeatLayer> aten_repeat_layer_;
+};
+
+class AtenRsqrtBuilder : public LayerBuilder
+{
+   public:
+    std::shared_ptr<ir::NNLayer> buildLayer(const torch::jit::Node* node_ref);
+
+   private:
+    std::shared_ptr<ir::AtenRsqrtLayer> aten_rsqrt_layer_;
 };
 
 class AtenSelectBuilder : public LayerBuilder
@@ -872,6 +901,15 @@ class AtenTensorBuilder : public LayerBuilder
     std::shared_ptr<ir::AtenTensorLayer> aten_tensor_layer_;
 };
 
+class AtenTypeAsBuilder : public LayerBuilder
+{
+   public:
+    std::shared_ptr<ir::NNLayer> buildLayer(const torch::jit::Node* node_ref);
+
+   private:
+    std::shared_ptr<ir::AtenTypeAsLayer> aten_type_as_layer_;
+};
+
 class AtenTo1Builder : public LayerBuilder
 {
    public:
@@ -933,6 +971,15 @@ class AtenWarnBuilder : public LayerBuilder
 
    private:
     std::shared_ptr<ir::AtenWarnLayer> aten_warn_layer_;
+};
+
+class AtenWhereBuilder : public LayerBuilder
+{
+   public:
+    std::shared_ptr<ir::NNLayer> buildLayer(const torch::jit::Node* node_ref);
+
+   private:
+    std::shared_ptr<ir::AtenWhereLayer> aten_where_layer_;
 };
 
 class AtenZerosBuilder : public LayerBuilder
@@ -1270,16 +1317,19 @@ class LayerBuilders
         layer_builders_["aten::ne"] = std::make_shared<AtenNeBuilder>();
         layer_builders_["aten::neg"] = std::make_shared<AtenNegBuilder>();
         layer_builders_["aten::norm"] = std::make_shared<AtenNormBuilder>();
+        layer_builders_["aten::one_hot"] = std::make_shared<AtenOneHotBuilder>();
         layer_builders_["aten::ones"] = std::make_shared<AtenOnesBuilder>();
 
         layer_builders_["aten::_pack_padded_sequence"] = std::make_shared<AtenPackPaddedSequenceBuilder>();
         layer_builders_["aten::_pad_packed_sequence"] = std::make_shared<AtenPadPackedSequenceBuilder>();
 
+        layer_builders_["aten::permute"] = std::make_shared<AtenPermuteBuilder>();
         layer_builders_["aten::pow"] = std::make_shared<AtenPowBuilder>();
         layer_builders_["aten::relu"] = std::make_shared<AtenReluBuilder>();
         layer_builders_["aten::reshape"] = std::make_shared<AtenReshapeBuilder>();
         layer_builders_["aten::remainder"] = std::make_shared<AtenRemainderBuilder>();
         layer_builders_["aten::repeat"] = std::make_shared<AtenRepeatBuilder>();
+        layer_builders_["aten::rsqrt"] = std::make_shared<AtenRsqrtBuilder>();
         layer_builders_["aten::select"] = std::make_shared<AtenSelectBuilder>();
         layer_builders_["aten::squeeze"] = std::make_shared<AtenSqueezeBuilder>();
         layer_builders_["aten::_set_item"] = std::make_shared<AtenSetItemBuilder>();
@@ -1295,10 +1345,12 @@ class LayerBuilders
         layer_builders_["aten::topk"] = std::make_shared<AtenTopkBuilder>();
         layer_builders_["aten::transpose"] = std::make_shared<AtenTransposeBuilder>();
         layer_builders_["aten::triu"] = std::make_shared<AtenTriuBuilder>();
+        layer_builders_["aten::type_as"] = std::make_shared<AtenTypeAsBuilder>();
         layer_builders_["aten::unsqueeze"] = std::make_shared<AtenUnsqueezeBuilder>();
         layer_builders_["aten::unsqueeze_"] = std::make_shared<AtenUnsqueezeBuilder>();
         layer_builders_["aten::view"] = std::make_shared<AtenViewBuilder>();
         layer_builders_["aten::warn"] = std::make_shared<AtenWarnBuilder>();
+        layer_builders_["aten::where"] = std::make_shared<AtenWhereBuilder>();
         layer_builders_["aten::zeros"] = std::make_shared<AtenZerosBuilder>();
         layer_builders_["aten::zeros_like"] = std::make_shared<AtenZerosLikeBuilder>();
         layer_builders_["aten::__derive_index"] = std::make_shared<AtenDeriveIndexBuilder>();

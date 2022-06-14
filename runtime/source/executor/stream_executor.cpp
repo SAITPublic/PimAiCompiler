@@ -407,15 +407,18 @@ void StreamExecutor::registerOp()
     this->global_op_register_.insert({ir::LayerType::ATENNEG, op_executor::executeAtenNeg});
     this->global_op_register_.insert({ir::LayerType::ATENNORM, op_executor::executeAtenNorm});
     this->global_op_register_.insert({ir::LayerType::ATENNOT, op_executor::executeAtenNot});
+    this->global_op_register_.insert({ir::LayerType::ATENONEHOT, op_executor::executeAtenOneHot});
     this->global_op_register_.insert({ir::LayerType::ATENONES, op_executor::executeAtenOnes});
     this->global_op_register_.insert(
         {ir::LayerType::ATENPACKPADDEDSEQUENCE, op_executor::executeAtenPackPaddedSequence});
     this->global_op_register_.insert({ir::LayerType::ATENPADPACKEDSEQUENCE, op_executor::executeAtenPadPackedSequence});
+    this->global_op_register_.insert({ir::LayerType::ATENPERMUTE, op_executor::executeAtenPermute});
     this->global_op_register_.insert({ir::LayerType::ATENPOW, op_executor::executeAtenPow});
     this->global_op_register_.insert({ir::LayerType::ATENRELU, op_executor::executeAtenRelu});
     this->global_op_register_.insert({ir::LayerType::ATENRESHAPE, op_executor::executeAtenReshape});
     this->global_op_register_.insert({ir::LayerType::ATENREMAINDER, op_executor::executeAtenRemainder});
     this->global_op_register_.insert({ir::LayerType::ATENREPEAT, op_executor::executeAtenRepeat});
+    this->global_op_register_.insert({ir::LayerType::ATENRSQRT, op_executor::executeAtenRsqrt});
     this->global_op_register_.insert({ir::LayerType::ATENSELECT, op_executor::executeAtenSelect});
     this->global_op_register_.insert({ir::LayerType::ATENSETITEM, op_executor::executeAtenSetItem});
     this->global_op_register_.insert({ir::LayerType::ATENSIZE, op_executor::executeAtenSize});
@@ -431,9 +434,11 @@ void StreamExecutor::registerOp()
     this->global_op_register_.insert({ir::LayerType::ATENTO2, op_executor::executeAtenTo2});
     this->global_op_register_.insert({ir::LayerType::ATENTOPK, op_executor::executeAtenTopk});
     this->global_op_register_.insert({ir::LayerType::ATENTRIU, op_executor::executeAtenTriu});
+    this->global_op_register_.insert({ir::LayerType::ATENTYPEAS, op_executor::executeAtenTypeAs});
     this->global_op_register_.insert({ir::LayerType::ATENUNSQUEEZE, op_executor::executeAtenUnsqueeze});
     this->global_op_register_.insert({ir::LayerType::ATENVIEW, op_executor::executeAtenView});
     this->global_op_register_.insert({ir::LayerType::ATENWARN, op_executor::executeAtenWarn});
+    this->global_op_register_.insert({ir::LayerType::ATENWHERE, op_executor::executeAtenWhere});
     this->global_op_register_.insert({ir::LayerType::ATENZEROS, op_executor::executeAtenZeros});
     this->global_op_register_.insert({ir::LayerType::ATENZEROSLIKE, op_executor::executeAtenZerosLike});
 

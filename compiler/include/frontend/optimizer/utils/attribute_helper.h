@@ -76,6 +76,8 @@ bool putAttributeInAtenMin(layer_inID_type& layer_inID, dtensor_ptr_type& d_tens
 
 bool putAttributeInAtenNorm(layer_inID_type& layer_inID, dtensor_ptr_type& d_tensor);
 
+bool putAttributeInAtenOneHot(layer_inID_type& layer_inID, dtensor_ptr_type& d_tensor);
+
 bool putAttributeInAtenOnes(layer_inID_type& layer_inID, dtensor_ptr_type& d_tensor);
 
 bool putAttributeInAtenPackPaddedSequence(layer_inID_type& layer_inID, dtensor_ptr_type& d_tensor);

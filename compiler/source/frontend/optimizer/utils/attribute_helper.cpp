@@ -802,6 +802,23 @@ bool putAttributeInAtenNorm(layer_inID_type& layer_inID, dtensor_ptr_type& d_ten
     return true;
 }
 
+bool putAttributeInAtenOneHot(layer_inID_type& layer_inID, dtensor_ptr_type& d_tensor)
+{
+    auto cur_layer = std::dynamic_pointer_cast<ir::AtenOneHotLayer>(layer_inID.first);
+    auto idx = layer_inID.second;
+    auto layer_type = cur_layer->getType();
+
+    if (idx == 0) {
+        DLOG(INFO) << "prim::Constant attempts to set into the input of layer: " << layer_inID.first->getName();
+        return false;
+    } else if (idx == 1) {
+        cur_layer->setNumClasses(getValueFromConstant<int64_t>(d_tensor, cur_layer->getType(), "num_classes"));
+    } else {
+        DLOG(FATAL) << "Incorrect data from prim::Constant";
+    }
+    return true;
+}
+
 bool putAttributeInAtenOnes(layer_inID_type& layer_inID, dtensor_ptr_type& d_tensor)
 {
     auto cur_layer = std::dynamic_pointer_cast<ir::AtenOnesLayer>(layer_inID.first);

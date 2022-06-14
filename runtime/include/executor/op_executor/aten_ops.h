@@ -292,6 +292,8 @@ at::Tensor atenNot(const at::Tensor &self);
 
 bool atenNot(const bool &input);
 
+at::Tensor atenOneHot(const at::Tensor &self, int64_t num_classes = -1);
+
 at::Tensor atenOnes(at::IntArrayRef size, const at::TensorOptions &options);
 
 std::tuple<at::Tensor, at::Tensor> atenPackPaddedSequence(const at::Tensor &input, const at::Tensor &lengths,
@@ -300,6 +302,8 @@ std::tuple<at::Tensor, at::Tensor> atenPackPaddedSequence(const at::Tensor &inpu
 std::tuple<at::Tensor, at::Tensor> atenPadPackedSequence(const at::Tensor &data, const at::Tensor &batch_sizes,
                                                          bool batch_first, at::Scalar padding_value,
                                                          int64_t total_length);
+
+at::Tensor atenPermute(const at::Tensor &self, at::IntArrayRef dims);
 
 at::Tensor atenPow(const at::Tensor &self, const at::Tensor &exponent);
 
@@ -314,6 +318,8 @@ at::Tensor atenReshape(const at::Tensor &self, at::IntArrayRef shape);
 at::Tensor atenRemainder(const at::Tensor &self, const at::Scalar &other);
 
 at::Tensor atenRepeat(const at::Tensor &self, at::IntArrayRef repeats);
+
+at::Tensor atenRsqrt(const at::Tensor &self);
 
 at::Tensor atenSelect(const at::Tensor &self, at::Dimname dim, int64_t index);
 
@@ -377,11 +383,23 @@ at::Tensor atenTranspose(const at::Tensor &self, at::Dimname dim0, at::Dimname d
 
 at::Tensor atenTriu(const at::Tensor &self, int64_t diagonal);
 
+at::Tensor atenTypeAs(const at::Tensor &self, const at::Tensor &other);
+
 at::Tensor atenUnsqueeze(const at::Tensor &self, int64_t dim);
 
 at::Tensor atenView(const at::Tensor &self, at::IntArrayRef size);
 
 void atenWarn(const std::string &str);
+
+at::Tensor atenWhere(const at::Tensor &condition, const at::Tensor &self, const at::Tensor &other);
+
+at::Tensor atenWhere(const at::Tensor &condition, at::Scalar self, const at::Tensor &other);
+
+at::Tensor atenWhere(const at::Tensor &condition, const at::Tensor &self, at::Scalar other);
+
+at::Tensor atenWhere(const at::Tensor &condition, at::Scalar self, at::Scalar other);
+
+std::vector<at::Tensor> atenWhere(const at::Tensor &condition);
 
 at::Tensor atenZeros(at::IntArrayRef size, c10::optional<at::DimnameList> names, at::TensorOptions options = {});
 

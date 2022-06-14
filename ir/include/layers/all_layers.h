@@ -38,6 +38,7 @@
 #include "ir/include/layers/aten_max_pool2d_layer.h"
 #include "ir/include/layers/aten_min_layer.h"
 #include "ir/include/layers/aten_norm_layer.h"
+#include "ir/include/layers/aten_one_hot_layer.h"
 #include "ir/include/layers/aten_ones_layer.h"
 #include "ir/include/layers/aten_pack_padded_sequence_layer.h"
 #include "ir/include/layers/aten_pad_packed_sequence_layer.h"

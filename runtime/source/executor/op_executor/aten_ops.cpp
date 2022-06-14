@@ -405,6 +405,8 @@ at::Tensor atenNot(const at::Tensor &self) { return at::logical_not(self); }
 
 bool atenNot(const bool &input) { return !input; };
 
+at::Tensor atenOneHot(const at::Tensor &self, int64_t num_classes) { return at::one_hot(self, num_classes); }
+
 at::Tensor atenOnes(at::IntArrayRef size, const at::TensorOptions &options) { return at::ones(size, options); }
 
 std::tuple<at::Tensor, at::Tensor> atenPackPaddedSequence(const at::Tensor &input, const at::Tensor &lengths,
@@ -420,6 +422,8 @@ std::tuple<at::Tensor, at::Tensor> atenPadPackedSequence(const at::Tensor &data,
     return at::_pad_packed_sequence(data, batch_sizes, batch_first, padding_value, total_length);
 }
 
+at::Tensor atenPermute(const at::Tensor &self, at::IntArrayRef dims) { return at::native::permute(self, dims); }
+
 at::Tensor atenPow(const at::Tensor &self, const at::Tensor &exponent) { return at::pow(self, exponent); }
 
 at::Tensor atenPow(at::Scalar self, const at::Tensor &exponent) { return at::pow(self, exponent); }
@@ -433,6 +437,8 @@ at::Tensor atenReshape(const at::Tensor &self, at::IntArrayRef shape) { return a
 at::Tensor atenRemainder(const at::Tensor &self, const at::Scalar &other) { return at::remainder(self, other); }
 
 at::Tensor atenRepeat(const at::Tensor &self, at::IntArrayRef repeats) { return at::native::repeat(self, repeats); }
+
+at::Tensor atenRsqrt(const at::Tensor &self) { return at::rsqrt(self); }
 
 at::Tensor atenSelect(const at::Tensor &self, at::Dimname dim, int64_t index) { return at::select(self, dim, index); }
 
@@ -524,11 +530,35 @@ at::Tensor atenTranspose(const at::Tensor &self, at::Dimname dim0, at::Dimname d
 
 at::Tensor atenTriu(const at::Tensor &self, int64_t diagonal) { return at::triu(self, diagonal); }
 
+at::Tensor atenTypeAs(const at::Tensor &self, const at::Tensor &other) { return at::native::type_as(self, other); }
+
 at::Tensor atenUnsqueeze(const at::Tensor &self, int64_t dim) { return at::unsqueeze(self, dim); }
 
 at::Tensor atenView(const at::Tensor &self, at::IntArrayRef size) { return at::native::view(self, size); }
 
 void atenWarn(const std::string &str) { LOG(WARNING) << str; }
+
+at::Tensor atenWhere(const at::Tensor &condition, const at::Tensor &self, const at::Tensor &other)
+{
+    return at::where(condition, self, other);
+}
+
+at::Tensor atenWhere(const at::Tensor &condition, at::Scalar self, const at::Tensor &other)
+{
+    return at::where(condition, self, other);
+}
+
+at::Tensor atenWhere(const at::Tensor &condition, const at::Tensor &self, at::Scalar other)
+{
+    return at::where(condition, self, other);
+}
+
+at::Tensor atenWhere(const at::Tensor &condition, at::Scalar self, at::Scalar other)
+{
+    return at::where(condition, self, other);
+}
+
+std::vector<at::Tensor> atenWhere(const at::Tensor &condition) { return at::where(condition); }
 
 at::Tensor atenZeros(at::IntArrayRef size, c10::optional<at::DimnameList> names, at::TensorOptions options)
 {
