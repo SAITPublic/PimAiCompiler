@@ -52,6 +52,7 @@
 #include "ir/include/layers/aten_sum_layer.h"
 #include "ir/include/layers/aten_to1_layer.h"
 #include "ir/include/layers/aten_to2_layer.h"
+#include "ir/include/layers/aten_to3_layer.h"
 #include "ir/include/layers/aten_topk_layer.h"
 #include "ir/include/layers/aten_transpose_layer.h"
 #include "ir/include/layers/aten_triu_layer.h"

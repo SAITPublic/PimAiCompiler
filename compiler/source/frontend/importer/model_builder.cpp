@@ -462,7 +462,9 @@ void ModelBuilder::importTorchScriptMethodBlock(std::unique_ptr<ir::NNModel>& nn
                 auto input_num = (node->inputs()).size();
                 std::shared_ptr<frontend::LayerBuilder> builder = nullptr;
                 std::string type = c10::typeKindToString(node->inputs()[1]->type()->kind());
-                if (type == "TensorType") {
+                if (type == "DeviceObjType") {
+                    builder = this->layer_builders_.get("aten::to3");
+                } else if (type == "TensorType") {
                     builder = this->layer_builders_.get("aten::to2");
                 } else if (type == "IntType") {
                     builder = this->layer_builders_.get("aten::to1");
@@ -473,7 +475,7 @@ void ModelBuilder::importTorchScriptMethodBlock(std::unique_ptr<ir::NNModel>& nn
                 if (builder != nullptr) {
                     graph->addLayer(createLayer(builder, node, nn_model));
                 } else {
-                    DLOG(FATAL) << kind.toQualString() << " layer builder not found.";
+                    DLOG(FATAL) << kind.toQualString() << " layer builder not found. "<<type;
                 }
                 break;
             }

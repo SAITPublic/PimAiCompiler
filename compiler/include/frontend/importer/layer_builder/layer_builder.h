@@ -946,6 +946,15 @@ class AtenTo2Builder : public LayerBuilder
     std::shared_ptr<ir::AtenTo2Layer> aten_to_layer_;
 };
 
+class AtenTo3Builder : public LayerBuilder
+{
+   public:
+    std::shared_ptr<ir::NNLayer> buildLayer(const torch::jit::Node* node_ref);
+
+   private:
+    std::shared_ptr<ir::AtenTo3Layer> aten_to_layer_;
+};
+
 class AtenTopkBuilder : public LayerBuilder
 {
    public:
@@ -1362,6 +1371,7 @@ class LayerBuilders
         layer_builders_["aten::tensor"] = std::make_shared<AtenTensorBuilder>();
         layer_builders_["aten::to1"] = std::make_shared<AtenTo1Builder>();
         layer_builders_["aten::to2"] = std::make_shared<AtenTo2Builder>();
+        layer_builders_["aten::to3"] = std::make_shared<AtenTo3Builder>();
         layer_builders_["aten::topk"] = std::make_shared<AtenTopkBuilder>();
         layer_builders_["aten::transpose"] = std::make_shared<AtenTransposeBuilder>();
         layer_builders_["aten::triu"] = std::make_shared<AtenTriuBuilder>();

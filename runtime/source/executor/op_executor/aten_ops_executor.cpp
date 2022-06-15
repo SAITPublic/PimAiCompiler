@@ -3076,7 +3076,7 @@ void executeAtenMaxPool2d(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, Stre
 
 void executeAtenMean(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
-     DLOG(INFO) << "execute Aten Mean node";
+    DLOG(INFO) << "execute Aten Mean node";
 
     auto in_stensor_ids = layer->getInSTensorID();
     auto out_stensor_ids = layer->getOutSTensorID();
@@ -3105,7 +3105,7 @@ void executeAtenMean(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExe
         }
         stream_executor.updateBlob(out_stensor_ids[0], DataType::TENSOR, tensorToIValue(output));
     } else {
-        DLOG(FATAL)<<"Aten mean's input size is incorrect! size: "<<in_stensor_ids.size();
+        DLOG(FATAL) << "Aten mean's input size is incorrect! size: " << in_stensor_ids.size();
     }
 }
 
@@ -3333,12 +3333,12 @@ void executeAtenOneHot(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamE
 
     auto in_stensor_ids = layer->getInSTensorID();
     auto out_stensor_ids = layer->getOutSTensorID();
-    
+
     int in_id = 0;
     auto iv_self = stream_executor.findBlob(in_stensor_ids[in_id++]).second;
     assert(iv_self.isTensor());
     auto self_tensor = iv_self.toTensor();
-    
+
     auto num_classes = one_hot_layer->getNumClasses();
     if (nn_compiler::ir::isDefaultValue(num_classes)) {
         auto iv = stream_executor.findBlob(in_stensor_ids[in_id++]).second;
@@ -4125,6 +4125,72 @@ void executeAtenTo2(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExec
     }
 }
 
+void executeAtenTo3(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
+{
+    DLOG(INFO) << "execute Aten To3 node";
+
+    auto to3_layer = std::static_pointer_cast<nn_compiler::ir::AtenTo3Layer>(layer);
+
+    auto in_stensor_ids = layer->getInSTensorID();
+    auto out_stensor_ids = layer->getOutSTensorID();
+
+    int in_id = 0;
+    torch::jit::IValue iv_self = stream_executor.findBlob(in_stensor_ids[in_id++]).second;
+    assert(iv_self.isTensor());
+    at::Tensor self_tensor = iv_self.toTensor();
+
+    torch::jit::IValue iv_device = stream_executor.findBlob(in_stensor_ids[in_id++]).second;
+    auto device = iv_device.toDevice();
+
+    auto ori_dtype = to3_layer->getDType();
+    if (nn_compiler::ir::isDefaultValue(ori_dtype)) {
+        auto ori_dtype_iv = stream_executor.findBlob(in_stensor_ids[in_id++]).second;
+        assert(ori_dtype_iv.isInt());
+        ori_dtype = ori_dtype_iv.toInt();
+    }
+    auto dtype = at::ScalarType(ori_dtype);
+
+    int non_blocking_val = to3_layer->getNonBlocking();
+    if (nn_compiler::ir::isDefaultValue(non_blocking_val)) {
+        auto non_blocking_iv = stream_executor.findBlob(in_stensor_ids[in_id++]).second;
+        if (non_blocking_iv.isNone()) {
+            non_blocking_val = 0;
+        } else {
+            non_blocking_val = non_blocking_iv.toInt();
+        }
+    }
+    bool non_blocking = static_cast<bool>(non_blocking_val);
+
+    int copy_val = to3_layer->getCopy();
+    if (nn_compiler::ir::isDefaultValue(copy_val)) {
+        auto copy_iv = stream_executor.findBlob(in_stensor_ids[in_id++]).second;
+        if (copy_iv.isNone()) {
+            copy_val = 0;
+        } else {
+            copy_val = copy_iv.toInt();
+        }
+    }
+    bool copy = static_cast<bool>(copy_val);
+
+    auto optional_memory_format = to3_layer->getOptionalMemoryFormat();
+    if (in_stensor_ids.size() > in_id) {
+        auto optional_memory_format_iv = stream_executor.findBlob(in_stensor_ids[in_id++]).second;
+        assert(optional_memory_format_iv.isInt());
+        optional_memory_format = optional_memory_format_iv.toInt();
+    }
+
+    if (optional_memory_format == -1) {  // optional_memory_format = NONE
+        auto output = atenTo(self_tensor, device, dtype, non_blocking, copy);
+        // update output
+        stream_executor.updateBlob(out_stensor_ids[0], DataType::TENSOR, tensorToIValue(output));
+    } else {
+        auto memory_format = getMemoryFormat(optional_memory_format);
+        auto output = atenTo(self_tensor, device, dtype, non_blocking, copy, memory_format);
+        // update output
+        stream_executor.updateBlob(out_stensor_ids[0], DataType::TENSOR, tensorToIValue(output));
+    }
+}
+
 void executeAtenTopk(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
     DLOG(INFO) << "execute Aten Topk node";
@@ -4328,11 +4394,11 @@ void executeAtenWhere(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamEx
 
     auto in_stensor_ids = layer->getInSTensorID();
     auto out_stensor_ids = layer->getOutSTensorID();
-    
+
     int in_id = 0;
     torch::jit::IValue iv_condition = stream_executor.findBlob(in_stensor_ids[in_id++]).second;
-    assert (iv_condition.isTensor());
-    auto condition =iv_condition.toTensor();
+    assert(iv_condition.isTensor());
+    auto condition = iv_condition.toTensor();
     if (in_stensor_ids.size() == 3) {
         torch::jit::IValue iv_self = stream_executor.findBlob(in_stensor_ids[in_id++]).second;
         torch::jit::IValue iv_other = stream_executor.findBlob(in_stensor_ids[in_id++]).second;
@@ -4350,7 +4416,7 @@ void executeAtenWhere(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamEx
         }
         stream_executor.updateBlob(out_stensor_ids[0], DataType::TENSOR, tensorToIValue(output));
     } else {
-        DLOG(FATAL) << "aten::where node's input size is: "<< in_stensor_ids.size();
+        DLOG(FATAL) << "aten::where node's input size is: " << in_stensor_ids.size();
     }
 }
 

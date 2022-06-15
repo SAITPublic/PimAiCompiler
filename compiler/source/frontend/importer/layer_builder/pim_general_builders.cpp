@@ -115,6 +115,7 @@ DECLARE_TORCH_OP_BUILDER(AtenTanh, nn_compiler::ir::LayerType::ATENTANH, aten_ta
 DECLARE_TORCH_OP_BUILDER(AtenTensor, nn_compiler::ir::LayerType::ATENTENSOR, aten_tensor_layer_)
 DECLARE_TORCH_OP_BUILDER(AtenTo1, nn_compiler::ir::LayerType::ATENTO1, aten_to_layer_)
 DECLARE_TORCH_OP_BUILDER(AtenTo2, nn_compiler::ir::LayerType::ATENTO2, aten_to_layer_)
+DECLARE_TORCH_OP_BUILDER(AtenTo3, nn_compiler::ir::LayerType::ATENTO3, aten_to_layer_)
 DECLARE_TORCH_OP_BUILDER(AtenTopk, nn_compiler::ir::LayerType::ATENTOPK, aten_topk_layer_)
 DECLARE_TORCH_OP_BUILDER(AtenTranspose, nn_compiler::ir::LayerType::ATENTRANSPOSE, aten_transpose_layer_)
 DECLARE_TORCH_OP_BUILDER(AtenTriu, nn_compiler::ir::LayerType::ATENTRIU, aten_triu_layer_)

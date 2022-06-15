@@ -141,6 +141,7 @@ enum class LayerType {
     ATENTENSOR,
     ATENTO1,
     ATENTO2,
+    ATENTO3,
     ATENTOPK,
     ATENTRANSPOSE,
     ATENTRIU,

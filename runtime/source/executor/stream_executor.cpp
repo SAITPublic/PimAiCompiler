@@ -434,6 +434,7 @@ void StreamExecutor::registerOp()
     this->global_op_register_.insert({ir::LayerType::ATENTRANSPOSE, op_executor::executeAtenTranspose});
     this->global_op_register_.insert({ir::LayerType::ATENTO1, op_executor::executeAtenTo1});
     this->global_op_register_.insert({ir::LayerType::ATENTO2, op_executor::executeAtenTo2});
+    this->global_op_register_.insert({ir::LayerType::ATENTO3, op_executor::executeAtenTo3});
     this->global_op_register_.insert({ir::LayerType::ATENTOPK, op_executor::executeAtenTopk});
     this->global_op_register_.insert({ir::LayerType::ATENTRIU, op_executor::executeAtenTriu});
     this->global_op_register_.insert({ir::LayerType::ATENTYPEAS, op_executor::executeAtenTypeAs});

@@ -6,16 +6,16 @@ namespace nn_compiler
 {
 namespace ir
 {
-// Tensor to(const Tensor& self, ScalarType dtype, bool non_blocking,
+// Tensor to(const Tensor& self, Device device, ScalarType dtype, bool non_blocking,
 //                               bool copy, c10::optional<c10::MemoryFormat> optional_memory_format)
-class AtenTo1Layer : public NNLayer
+class AtenTo3Layer : public NNLayer
 {
    public:
-    AtenTo1Layer() {}
+    AtenTo3Layer() {}
 
-    AtenTo1Layer(std::string name, LayerType type) : NNLayer(name, type) {}
+    AtenTo3Layer(std::string name, LayerType type) : NNLayer(name, type) {}
 
-    explicit AtenTo1Layer(const AtenTo1Layer& aten_to_layer) : NNLayer(aten_to_layer)
+    explicit AtenTo3Layer(const AtenTo3Layer& aten_to_layer) : NNLayer(aten_to_layer)
     {
         this->dtype_ = aten_to_layer.dtype_;
         this->non_blocking_ = aten_to_layer.non_blocking_;
@@ -23,9 +23,9 @@ class AtenTo1Layer : public NNLayer
         this->optional_memory_format_ = aten_to_layer.optional_memory_format_;
     }
 
-    virtual ~AtenTo1Layer() {}
+    virtual ~AtenTo3Layer() {}
 
-    virtual std::shared_ptr<NNLayer> clone() { return std::shared_ptr<AtenTo1Layer>(new AtenTo1Layer(*this)); }
+    virtual std::shared_ptr<NNLayer> clone() { return std::shared_ptr<AtenTo3Layer>(new AtenTo3Layer(*this)); }
 
     void setDType(int64_t dtype) { dtype_ = dtype; }
 

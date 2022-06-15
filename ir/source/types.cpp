@@ -108,6 +108,7 @@ std::string convertLayerTypeToString(LayerType type)
     converter.insert({LayerType::ATENTRANSPOSE, "aten::transpose"});
     converter.insert({LayerType::ATENTO1, "aten::to1"});
     converter.insert({LayerType::ATENTO2, "aten::to2"});
+    converter.insert({LayerType::ATENTO3, "aten::to2"});
     converter.insert({LayerType::ATENTOPK, "aten::topk"});
     converter.insert({LayerType::ATENTRIU, "aten::triu"});
     converter.insert({LayerType::ATENTYPEAS, "aten::type_as"});
