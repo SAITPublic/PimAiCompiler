@@ -112,6 +112,9 @@ void ptTensor2DTensor(at::Tensor torch_tensor, std::shared_ptr<DTensor> d_tensor
     } else if (dtype == c10::ScalarType::Bool) {
         d_tensor->setData(tensor_data, num_elements * sizeof(bool));
         d_tensor->setDataType(nn_compiler::ir::DataType::BOOL);
+    } else if (dtype == c10::ScalarType::Int) {
+        d_tensor->setData(tensor_data, num_elements * sizeof(int));
+        d_tensor->setDataType(nn_compiler::ir::DataType::INT32);
     } else {
         DLOG(FATAL) << "Unsupported data type for prim::Constant.";
     }

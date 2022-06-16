@@ -3094,14 +3094,14 @@ void executeAtenMean(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExe
         auto array_ref = parseIValueVector<int64_t>(dim_list);
 
         torch::jit::IValue iv_keepdim = stream_executor.findBlob(in_stensor_ids[in_id++]).second;
-        auto keepdim = iv_keepdim.toBool();
+        auto keepdim = iv_keepdim.toInt();
 
         torch::jit::IValue iv_dtype = stream_executor.findBlob(in_stensor_ids[in_id++]).second;
         if (iv_dtype.isNone()) {
-            output = atenMean(self_tensor, at::ArrayRef<int64_t>(array_ref), keepdim);
+            output = atenMean(self_tensor, at::ArrayRef<int64_t>(array_ref), (bool)keepdim);
         } else {
             auto dtype = iv_dtype.toScalarType();
-            output = atenMean(self_tensor, at::ArrayRef<int64_t>(array_ref), keepdim, dtype);
+            output = atenMean(self_tensor, at::ArrayRef<int64_t>(array_ref), (bool)keepdim, dtype);
         }
         stream_executor.updateBlob(out_stensor_ids[0], DataType::TENSOR, tensorToIValue(output));
     } else {

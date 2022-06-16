@@ -13,7 +13,7 @@ void ModelBuilder::build(std::unique_ptr<ir::NNModel>& nn_model, const std::stri
     // convert torch node to nn-graph layer
     torchToNNGraph(nn_model, torch_model_);
 
-    ir::utils::printGraphModel(nn_model);
+    // ir::utils::printGraphModel(nn_model);
     return;
 }
 

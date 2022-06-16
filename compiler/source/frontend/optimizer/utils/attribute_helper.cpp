@@ -462,15 +462,16 @@ bool putAttributeInAtenFormat(layer_inID_type& layer_inID, dtensor_ptr_type& d_t
     auto cur_layer = std::dynamic_pointer_cast<ir::AtenFormatLayer>(layer_inID.first);
     auto idx = layer_inID.second;
 
+    // e.g. str = aten::format (159, 12613, 12618, 176)
     // e.g. str = aten::format(%30, %31, %47)
     // %31 and %47 are inputs, %30 is attribute: assembly_format
-    if (idx == 1 || idx == 2) {
+    if (idx == 1 || idx == 2 || idx == 3) {
         DLOG(INFO) << "prim::Constant attempts to set into the input of layer: " << layer_inID.first->getName();
         return false;
     } else if (idx == 0) {
         cur_layer->setAssemblyFormat(getStringFromConstant(d_tensor, cur_layer->getType(), "assembly_format"));
     } else {
-        DLOG(FATAL) << "Incorrect data from prim::Constant";
+        DLOG(FATAL) << "Incorrect data from prim::Constant " << idx;
     }
     return true;
 }
@@ -1119,7 +1120,7 @@ bool putAttributeInAtenTo1(layer_inID_type& layer_inID, dtensor_ptr_type& d_tens
 
 bool putAttributeInAtenTo2(layer_inID_type& layer_inID, dtensor_ptr_type& d_tensor)
 {
-    auto cur_layer = std::dynamic_pointer_cast<ir::AtenTo2Layer>(layer_inID.first);
+    auto cur_layer = std::reinterpret_pointer_cast<ir::AtenTo2Layer>(layer_inID.first);
     auto idx = layer_inID.second;
     auto layer_type = cur_layer->getType();
 
@@ -1204,7 +1205,7 @@ bool putAttributeInAtenTriu(layer_inID_type& layer_inID, dtensor_ptr_type& d_ten
         return false;
     } else if (idx == 1) {
         cur_layer->setDiagonal(getValueFromConstant<int64_t>(d_tensor, cur_layer->getType(), "Diagonal"));
-    }  else {
+    } else {
         DLOG(FATAL) << "Incorrect data from prim::Constant";
     }
     return true;
