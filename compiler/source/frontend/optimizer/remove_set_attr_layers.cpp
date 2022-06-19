@@ -33,7 +33,10 @@ void RemoveSetAttrLayers::run(std::unique_ptr<nn_compiler::ir::NNModel>& model)
 
     for (auto layer : remove_layers_) {
         auto predecessors = ir::utils::searchPredecessor(layer, graph);
-        assert(predecessors.size() == 2);
+        if (predecessors.size() != 2) {
+            // the first variable layer has been removed
+            continue;
+        }
         auto variable_layer = predecessors[0];
         auto compute_layer = predecessors[1];
 
@@ -42,8 +45,10 @@ void RemoveSetAttrLayers::run(std::unique_ptr<nn_compiler::ir::NNModel>& model)
         auto new_stensor_id = compute_layer->getOutSTensorID()[0];
         auto successors = ir::utils::searchSuccessors(variable_layer, graph);
         for (auto successor : successors) {
-            for (auto idx : successor.second) {
-                (successor.first)->renewInSTensorID(idx, new_stensor_id);
+            if ((successor.first)->getType() == ir::LayerType::PRIMGETATTR) {
+                for (auto idx : successor.second) {
+                    (successor.first)->renewInSTensorID(idx, new_stensor_id);
+                }
             }
         }
 
