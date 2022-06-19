@@ -463,11 +463,11 @@ void ModelBuilder::importTorchScriptMethodBlock(std::unique_ptr<ir::NNModel>& nn
                 std::shared_ptr<frontend::LayerBuilder> builder = nullptr;
                 std::string type = c10::typeKindToString(node->inputs()[1]->type()->kind());
                 if (type == "DeviceObjType") {
-                    builder = this->layer_builders_.get("aten::to3");
-                } else if (type == "TensorType") {
-                    builder = this->layer_builders_.get("aten::to2");
-                } else if (type == "IntType") {
                     builder = this->layer_builders_.get("aten::to1");
+                } else if (type == "IntType") {
+                    builder = this->layer_builders_.get("aten::to2");
+                } else if (type == "TensorType") {
+                    builder = this->layer_builders_.get("aten::to3");
                 } else {
                     DLOG(FATAL) << "Unsupported input type of aten::to.";
                 }

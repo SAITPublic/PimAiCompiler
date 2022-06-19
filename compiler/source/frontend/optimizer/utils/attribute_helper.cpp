@@ -1091,6 +1091,42 @@ bool putAttributeInAtenTo1(layer_inID_type& layer_inID, dtensor_ptr_type& d_tens
     auto layer_type = cur_layer->getType();
 
     // e.g.
+    // Tensor = aten::to(%328, %27, %49, %self.output_attentions, %self.output_attentions)
+    // %328 is input, %27 is attribute: device, %49 is attribute: dtype,
+    // %self.output_attentions is assigned to attribute: non_blocking and copy both,
+    // None is assigned to attribute: optional_memory_format.
+    if (idx == 0) {
+        DLOG(INFO) << "prim::Constant attempts to set into the input of layer: " << layer_inID.first->getName();
+        return false;
+    } else if (idx == 1) {
+        cur_layer->setDevice(getStringFromConstant(d_tensor, cur_layer->getType(), "device"));
+    } else if (idx == 2) {
+        cur_layer->setDType(getValueFromConstant<int64_t>(d_tensor, layer_type, "dtype"));
+    } else if (idx == 3) {
+        cur_layer->setNonBlocking(getValueFromConstant<int>(d_tensor, layer_type, "non_blocking"));
+    } else if (idx == 4) {
+        cur_layer->setCopy(getValueFromConstant<int>(d_tensor, layer_type, "copy"));
+    } else if (idx == 5) {
+        // optional_memory_format could be NONE
+        auto data = d_tensor->getData<int64_t>();
+        if ((*data).size()) {
+            cur_layer->setOptionalMemoryFormat((*data)[0]);
+        } else {
+            DLOG(INFO) << "NONE is set to attribute optional_memory_format of aten::to";
+        }
+    } else {
+        DLOG(FATAL) << "Incorrect data from prim::Constant";
+    }
+    return true;
+}
+
+bool putAttributeInAtenTo2(layer_inID_type& layer_inID, dtensor_ptr_type& d_tensor)
+{
+    auto cur_layer = std::dynamic_pointer_cast<ir::AtenTo2Layer>(layer_inID.first);
+    auto idx = layer_inID.second;
+    auto layer_type = cur_layer->getType();
+
+    // e.g.
     // Tensor = aten::to(%x_lens.1, %99, %self.pre_rnn.lstm.training, %self.pre_rnn.lstm.training, %3)
     // %x_lens.1 is input, %99 is attribute: dtype,
     // %self.pre_rnn.lstm.training is assigned to attribute: non_blocking and copy both,
@@ -1118,9 +1154,9 @@ bool putAttributeInAtenTo1(layer_inID_type& layer_inID, dtensor_ptr_type& d_tens
     return true;
 }
 
-bool putAttributeInAtenTo2(layer_inID_type& layer_inID, dtensor_ptr_type& d_tensor)
+bool putAttributeInAtenTo3(layer_inID_type& layer_inID, dtensor_ptr_type& d_tensor)
 {
-    auto cur_layer = std::reinterpret_pointer_cast<ir::AtenTo2Layer>(layer_inID.first);
+    auto cur_layer = std::reinterpret_pointer_cast<ir::AtenTo3Layer>(layer_inID.first);
     auto idx = layer_inID.second;
     auto layer_type = cur_layer->getType();
 
@@ -1364,6 +1400,7 @@ AttributeHelper::AttributeHelper()
     type_to_function_["aten::sum"] = &putAttributeInAtenSum;
     type_to_function_["aten::to1"] = &putAttributeInAtenTo1;
     type_to_function_["aten::to2"] = &putAttributeInAtenTo2;
+    type_to_function_["aten::to3"] = &putAttributeInAtenTo3;
     type_to_function_["aten::topk"] = &putAttributeInAtenTopk;
     type_to_function_["aten::transpose"] = &putAttributeInAtenTranspose;
     type_to_function_["aten::triu"] = &putAttributeInAtenTriu;

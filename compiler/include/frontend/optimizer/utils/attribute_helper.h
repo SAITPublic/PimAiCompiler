@@ -104,6 +104,8 @@ bool putAttributeInAtenTo1(layer_inID_type& layer_inID, dtensor_ptr_type& d_tens
 
 bool putAttributeInAtenTo2(layer_inID_type& layer_inID, dtensor_ptr_type& d_tensor);
 
+bool putAttributeInAtenTo3(layer_inID_type& layer_inID, dtensor_ptr_type& d_tensor);
+
 bool putAttributeInAtenTopk(layer_inID_type& layer_inID, dtensor_ptr_type& d_tensor);
 
 bool putAttributeInAtenTranspose(layer_inID_type& layer_inID, dtensor_ptr_type& d_tensor);

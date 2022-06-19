@@ -4009,17 +4009,30 @@ void executeAtenTo1(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExec
 
     auto to1_layer = std::static_pointer_cast<nn_compiler::ir::AtenTo1Layer>(layer);
 
-    auto in_stensor_id = layer->getInSTensorID();
+    auto in_stensor_ids = layer->getInSTensorID();
     auto out_stensor_id = layer->getOutSTensorID();
 
     int in_id = 0;
-    torch::jit::IValue iv_self = stream_executor.findBlob(in_stensor_id[in_id++]).second;
+    torch::jit::IValue iv_self = stream_executor.findBlob(in_stensor_ids[in_id++]).second;
     assert(iv_self.isTensor());
     at::Tensor self_tensor = iv_self.toTensor();
 
+    auto str_device = to1_layer->getDevice();
+    at::Device device("cpu");
+    if (nn_compiler::ir::isDefaultValue(str_device)) {
+        auto iv_device = stream_executor.findBlob(in_stensor_ids[in_id++]).second;
+        if (!iv_device.isNone()) {
+            device = iv_device.toDevice();
+        } else {
+            DLOG(FATAL) << "None device found for aten::to layer.";
+        }
+    } else {
+        device = at::Device(device);
+    }
+
     auto ori_dtype = to1_layer->getDType();
     if (nn_compiler::ir::isDefaultValue(ori_dtype)) {
-        auto ori_dtype_iv = stream_executor.findBlob(in_stensor_id[in_id++]).second;
+        auto ori_dtype_iv = stream_executor.findBlob(in_stensor_ids[in_id++]).second;
         assert(ori_dtype_iv.isInt());
         ori_dtype = ori_dtype_iv.toInt();
     }
@@ -4027,7 +4040,7 @@ void executeAtenTo1(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExec
 
     int non_blocking_val = to1_layer->getNonBlocking();
     if (nn_compiler::ir::isDefaultValue(non_blocking_val)) {
-        auto non_blocking_iv = stream_executor.findBlob(in_stensor_id[in_id++]).second;
+        auto non_blocking_iv = stream_executor.findBlob(in_stensor_ids[in_id++]).second;
         if (non_blocking_iv.isNone()) {
             non_blocking_val = 0;
         } else {
@@ -4038,7 +4051,7 @@ void executeAtenTo1(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExec
 
     int copy_val = to1_layer->getCopy();
     if (nn_compiler::ir::isDefaultValue(copy_val)) {
-        auto copy_iv = stream_executor.findBlob(in_stensor_id[in_id++]).second;
+        auto copy_iv = stream_executor.findBlob(in_stensor_ids[in_id++]).second;
         if (copy_iv.isNone()) {
             copy_val = 0;
         } else {
@@ -4048,19 +4061,22 @@ void executeAtenTo1(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExec
     bool copy = static_cast<bool>(copy_val);
 
     auto optional_memory_format = to1_layer->getOptionalMemoryFormat();
-    if (nn_compiler::ir::isDefaultValue(optional_memory_format)) {
-        auto optional_memory_format_iv = stream_executor.findBlob(in_stensor_id[in_id++]).second;
-        assert(optional_memory_format_iv.isInt());
-        optional_memory_format = optional_memory_format_iv.toInt();
+    if (in_stensor_ids.size() > in_id) {
+        auto optional_memory_format_iv = stream_executor.findBlob(in_stensor_ids[in_id++]).second;
+        if (optional_memory_format_iv.isInt()) {
+            optional_memory_format = optional_memory_format_iv.toInt();
+        } else {
+            assert(optional_memory_format_iv.isNone());
+        }
     }
 
     if (optional_memory_format == -1) {  // optional_memory_format = NONE
-        auto output = atenTo(self_tensor, dtype, non_blocking, copy);
+        auto output = atenTo(self_tensor, device, dtype, non_blocking, copy);
         // update output
         stream_executor.updateBlob(out_stensor_id[0], DataType::TENSOR, tensorToIValue(output));
     } else {
         auto memory_format = getMemoryFormat(optional_memory_format);
-        auto output = atenTo(self_tensor, dtype, non_blocking, copy, memory_format);
+        auto output = atenTo(self_tensor, device, dtype, non_blocking, copy, memory_format);
         // update output
         stream_executor.updateBlob(out_stensor_id[0], DataType::TENSOR, tensorToIValue(output));
     }
@@ -4072,21 +4088,25 @@ void executeAtenTo2(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExec
 
     auto to2_layer = std::static_pointer_cast<nn_compiler::ir::AtenTo2Layer>(layer);
 
-    auto in_stensor_id = layer->getInSTensorID();
+    auto in_stensor_ids = layer->getInSTensorID();
     auto out_stensor_id = layer->getOutSTensorID();
 
     int in_id = 0;
-    torch::jit::IValue iv_self = stream_executor.findBlob(in_stensor_id[in_id++]).second;
+    torch::jit::IValue iv_self = stream_executor.findBlob(in_stensor_ids[in_id++]).second;
     assert(iv_self.isTensor());
     at::Tensor self_tensor = iv_self.toTensor();
 
-    torch::jit::IValue iv_other = stream_executor.findBlob(in_stensor_id[in_id++]).second;
-    assert(iv_other.isTensor());
-    at::Tensor other_tensor = iv_other.toTensor();
+    auto ori_dtype = to2_layer->getDType();
+    if (nn_compiler::ir::isDefaultValue(ori_dtype)) {
+        auto ori_dtype_iv = stream_executor.findBlob(in_stensor_ids[in_id++]).second;
+        assert(ori_dtype_iv.isInt());
+        ori_dtype = ori_dtype_iv.toInt();
+    }
+    auto dtype = at::ScalarType(ori_dtype);
 
     int non_blocking_val = to2_layer->getNonBlocking();
     if (nn_compiler::ir::isDefaultValue(non_blocking_val)) {
-        auto non_blocking_iv = stream_executor.findBlob(in_stensor_id[in_id++]).second;
+        auto non_blocking_iv = stream_executor.findBlob(in_stensor_ids[in_id++]).second;
         if (non_blocking_iv.isNone()) {
             non_blocking_val = 0;
         } else {
@@ -4097,7 +4117,7 @@ void executeAtenTo2(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExec
 
     int copy_val = to2_layer->getCopy();
     if (nn_compiler::ir::isDefaultValue(copy_val)) {
-        auto copy_iv = stream_executor.findBlob(in_stensor_id[in_id++]).second;
+        auto copy_iv = stream_executor.findBlob(in_stensor_ids[in_id++]).second;
         if (copy_iv.isNone()) {
             copy_val = 0;
         } else {
@@ -4107,19 +4127,22 @@ void executeAtenTo2(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExec
     bool copy = static_cast<bool>(copy_val);
 
     auto optional_memory_format = to2_layer->getOptionalMemoryFormat();
-    if (nn_compiler::ir::isDefaultValue(optional_memory_format)) {
-        auto optional_memory_format_iv = stream_executor.findBlob(in_stensor_id[in_id++]).second;
-        assert(optional_memory_format_iv.isInt());
-        optional_memory_format = optional_memory_format_iv.toInt();
+    if (in_stensor_ids.size() > in_id) {
+        auto optional_memory_format_iv = stream_executor.findBlob(in_stensor_ids[in_id++]).second;
+        if (optional_memory_format_iv.isInt()) {
+            optional_memory_format = optional_memory_format_iv.toInt();
+        } else {
+            assert(optional_memory_format_iv.isNone());
+        }
     }
 
     if (optional_memory_format == -1) {  // optional_memory_format = NONE
-        auto output = atenTo(self_tensor, other_tensor, non_blocking, copy);
+        auto output = atenTo(self_tensor, dtype, non_blocking, copy);
         // update output
         stream_executor.updateBlob(out_stensor_id[0], DataType::TENSOR, tensorToIValue(output));
     } else {
         auto memory_format = getMemoryFormat(optional_memory_format);
-        auto output = atenTo(self_tensor, other_tensor, non_blocking, copy, memory_format);
+        auto output = atenTo(self_tensor, dtype, non_blocking, copy, memory_format);
         // update output
         stream_executor.updateBlob(out_stensor_id[0], DataType::TENSOR, tensorToIValue(output));
     }
@@ -4139,16 +4162,9 @@ void executeAtenTo3(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExec
     assert(iv_self.isTensor());
     at::Tensor self_tensor = iv_self.toTensor();
 
-    torch::jit::IValue iv_device = stream_executor.findBlob(in_stensor_ids[in_id++]).second;
-    auto device = iv_device.toDevice();
-
-    auto ori_dtype = to3_layer->getDType();
-    if (nn_compiler::ir::isDefaultValue(ori_dtype)) {
-        auto ori_dtype_iv = stream_executor.findBlob(in_stensor_ids[in_id++]).second;
-        assert(ori_dtype_iv.isInt());
-        ori_dtype = ori_dtype_iv.toInt();
-    }
-    auto dtype = at::ScalarType(ori_dtype);
+    torch::jit::IValue iv_other = stream_executor.findBlob(in_stensor_ids[in_id++]).second;
+    assert(iv_other.isTensor());
+    at::Tensor other_tensor = iv_other.toTensor();
 
     int non_blocking_val = to3_layer->getNonBlocking();
     if (nn_compiler::ir::isDefaultValue(non_blocking_val)) {
@@ -4175,17 +4191,20 @@ void executeAtenTo3(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExec
     auto optional_memory_format = to3_layer->getOptionalMemoryFormat();
     if (in_stensor_ids.size() > in_id) {
         auto optional_memory_format_iv = stream_executor.findBlob(in_stensor_ids[in_id++]).second;
-        assert(optional_memory_format_iv.isInt());
-        optional_memory_format = optional_memory_format_iv.toInt();
+        if (optional_memory_format_iv.isInt()) {
+            optional_memory_format = optional_memory_format_iv.toInt();
+        } else {
+            assert(optional_memory_format_iv.isNone());
+        }
     }
 
     if (optional_memory_format == -1) {  // optional_memory_format = NONE
-        auto output = atenTo(self_tensor, device, dtype, non_blocking, copy);
+        auto output = atenTo(self_tensor, other_tensor, non_blocking, copy);
         // update output
         stream_executor.updateBlob(out_stensor_ids[0], DataType::TENSOR, tensorToIValue(output));
     } else {
         auto memory_format = getMemoryFormat(optional_memory_format);
-        auto output = atenTo(self_tensor, device, dtype, non_blocking, copy, memory_format);
+        auto output = atenTo(self_tensor, other_tensor, non_blocking, copy, memory_format);
         // update output
         stream_executor.updateBlob(out_stensor_ids[0], DataType::TENSOR, tensorToIValue(output));
     }

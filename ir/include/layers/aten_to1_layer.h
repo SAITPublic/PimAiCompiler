@@ -6,8 +6,9 @@ namespace nn_compiler
 {
 namespace ir
 {
-// Tensor to(const Tensor& self, ScalarType dtype, bool non_blocking,
-//                               bool copy, c10::optional<c10::MemoryFormat> optional_memory_format)
+// Tensor to(const Tensor & self, Device device, ScalarType dtype,
+//     bool non_blocking=false, bool copy=false, c10::optional<MemoryFormat> memory_format=c10::nullopt);
+
 class AtenTo1Layer : public NNLayer
 {
    public:
@@ -17,6 +18,7 @@ class AtenTo1Layer : public NNLayer
 
     explicit AtenTo1Layer(const AtenTo1Layer& aten_to_layer) : NNLayer(aten_to_layer)
     {
+        this->device_ = aten_to_layer.device_;
         this->dtype_ = aten_to_layer.dtype_;
         this->non_blocking_ = aten_to_layer.non_blocking_;
         this->copy_ = aten_to_layer.copy_;
@@ -27,6 +29,8 @@ class AtenTo1Layer : public NNLayer
 
     virtual std::shared_ptr<NNLayer> clone() { return std::shared_ptr<AtenTo1Layer>(new AtenTo1Layer(*this)); }
 
+    void setDevice(std::string device) { device_ = device; }
+
     void setDType(int64_t dtype) { dtype_ = dtype; }
 
     void setNonBlocking(int nonblocking) { non_blocking_ = nonblocking; }
@@ -34,6 +38,8 @@ class AtenTo1Layer : public NNLayer
     void setCopy(int copy) { copy_ = copy; }
 
     void setOptionalMemoryFormat(int optional_memory_format) { optional_memory_format_ = optional_memory_format; }
+
+    std::string getDevice() const { return device_; }
 
     int64_t getDType() const { return dtype_; }
 
@@ -45,7 +51,8 @@ class AtenTo1Layer : public NNLayer
 
     void printAttr()
     {
-        DLOG(INFO) << "    AtenToAttr                     ";
+        DLOG(INFO) << "    AtenTo1Attr                    ";
+        DLOG(INFO) << "    device is                      " << device_;
         DLOG(INFO) << "    dtype is                       " << dtype_;
         DLOG(INFO) << "    non_blocking                   " << non_blocking_;
         DLOG(INFO) << "    copy is                        " << copy_;
@@ -53,6 +60,7 @@ class AtenTo1Layer : public NNLayer
     }
 
    private:
+    std::string device_ = "";
     int64_t dtype_ = INT64_MIN;
     int non_blocking_ = INT32_MAX;
     int copy_ = INT32_MAX;
