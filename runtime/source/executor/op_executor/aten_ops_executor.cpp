@@ -1515,19 +1515,28 @@ void executeAtenGe(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecu
     // Find the input blob
     torch::jit::IValue iv_self = stream_executor.findBlob(in_stensor_id[0]).second;
     torch::jit::IValue iv_other = stream_executor.findBlob(in_stensor_id[1]).second;
-    assert(iv_self.isTensor());
-    at::Tensor self_tensor = iv_self.toTensor();
+    if (iv_self.isTensor()) {
+        at::Tensor self_tensor = iv_self.toTensor();
 
-    if (iv_other.isTensor()) {
-        at::Tensor other_tensor = iv_other.toTensor();
-        auto output = atenGe(self_tensor, other_tensor);
-        // update output
-        stream_executor.updateBlob(out_stensor_id[0], DataType::TENSOR, tensorToIValue(output));
-    } else if (iv_other.isScalar()) {
-        at::Scalar other_scalar = iv_other.toScalar();
-        auto output = atenGe(self_tensor, other_scalar);
-        // update output
-        stream_executor.updateBlob(out_stensor_id[0], DataType::TENSOR, tensorToIValue(output));
+        if (iv_other.isTensor()) {
+            at::Tensor other_tensor = iv_other.toTensor();
+            auto output = atenGe(self_tensor, other_tensor);
+            // update output
+            stream_executor.updateBlob(out_stensor_id[0], DataType::TENSOR, tensorToIValue(output));
+        } else if (iv_other.isScalar()) {
+            at::Scalar other_scalar = iv_other.toScalar();
+            auto output = atenGe(self_tensor, other_scalar);
+            // update output
+            stream_executor.updateBlob(out_stensor_id[0], DataType::TENSOR, tensorToIValue(output));
+        } else {
+            DLOG(FATAL) << "Unsupported input type for aten::ge";
+        }
+    } else if (iv_self.isInt()) {
+        assert(iv_other.isInt());
+        auto self_value = iv_self.toInt();
+        auto other_value = iv_other.toInt();
+        bool output = (self_value >= other_value);
+        stream_executor.updateBlob(out_stensor_id[0], DataType::BOOL, boolToIValue(output));
     } else {
         DLOG(FATAL) << "Unsupported input type for aten::ge";
     }
