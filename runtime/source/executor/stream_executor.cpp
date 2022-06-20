@@ -365,6 +365,7 @@ void StreamExecutor::registerOp()
     this->global_op_register_.insert({ir::LayerType::ATENDIM, op_executor::executeAtenDim});
     this->global_op_register_.insert({ir::LayerType::ATENDIV, op_executor::executeAtenDiv});
     this->global_op_register_.insert({ir::LayerType::ATENDROPOUT, op_executor::executeAtenDropout});
+    this->global_op_register_.insert({ir::LayerType::ATENEINSUM, op_executor::executeAtenEinsum});
     this->global_op_register_.insert({ir::LayerType::ATENEMBEDDING, op_executor::executeAtenEmbedding});
     this->global_op_register_.insert({ir::LayerType::ATENEQ, op_executor::executeAtenEq});
     this->global_op_register_.insert({ir::LayerType::ATENEQUAL, op_executor::executeAtenEqual});
