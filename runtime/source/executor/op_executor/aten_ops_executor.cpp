@@ -3860,31 +3860,41 @@ void executeAtenSub(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExec
 
     auto sub_layer = std::static_pointer_cast<nn_compiler::ir::AtenSubLayer>(layer);
 
-    auto in_stensor_id = layer->getInSTensorID();
-    auto out_stensor_id = layer->getOutSTensorID();
+    auto in_stensor_ids = layer->getInSTensorID();
+    auto out_stensor_ids = layer->getOutSTensorID();
 
     int64_t alpha = sub_layer->getAlpha();
-    if (nn_compiler::ir::isDefaultValue(alpha)) {
-        auto alpha_iv = stream_executor.findBlob(in_stensor_id[2]).second;
+    if (nn_compiler::ir::isDefaultValue(alpha) && in_stensor_ids.size() == 3) {
+        auto alpha_iv = stream_executor.findBlob(in_stensor_ids[2]).second;
         assert(alpha_iv.isInt());
         alpha = alpha_iv.toInt();
+    } else {
+        // default value for alpha is 1
+        alpha = 1;
     }
 
     // Find the input blob
-    torch::jit::IValue iv_self = stream_executor.findBlob(in_stensor_id[0]).second;
-    torch::jit::IValue iv_other = stream_executor.findBlob(in_stensor_id[1]).second;
-    assert(iv_self.isTensor());
-    at::Tensor self_tensor = iv_self.toTensor();
-    if (iv_other.isTensor()) {
-        at::Tensor other_tensor = iv_other.toTensor();
-        auto output = atenSub(self_tensor, other_tensor, alpha);
-        // update output
-        stream_executor.updateBlob(out_stensor_id[0], DataType::TENSOR, tensorToIValue(output));
-    } else if (iv_other.isScalar()) {
-        at::Scalar other_scalar = iv_other.toScalar();
-        auto output = atenSub(self_tensor, other_scalar, alpha);
-        // update output
-        stream_executor.updateBlob(out_stensor_id[0], DataType::TENSOR, tensorToIValue(output));
+    torch::jit::IValue iv_self = stream_executor.findBlob(in_stensor_ids[0]).second;
+    torch::jit::IValue iv_other = stream_executor.findBlob(in_stensor_ids[1]).second;
+    if (iv_self.isTensor()) {
+        at::Tensor self_tensor = iv_self.toTensor();
+        if (iv_other.isTensor()) {
+            at::Tensor other_tensor = iv_other.toTensor();
+            auto output = atenSub(self_tensor, other_tensor, alpha);
+            // update output
+            stream_executor.updateBlob(out_stensor_ids[0], DataType::TENSOR, tensorToIValue(output));
+        } else if (iv_other.isScalar()) {
+            at::Scalar other_scalar = iv_other.toScalar();
+            auto output = atenSub(self_tensor, other_scalar, alpha);
+            // update output
+            stream_executor.updateBlob(out_stensor_ids[0], DataType::TENSOR, tensorToIValue(output));
+        } else {
+            DLOG(FATAL) << "Unsupported input type for aten::sub";
+        }
+    } else if (iv_self.isInt()) {
+        assert(iv_other.isInt());
+        auto output = iv_self.toInt() - iv_other.toInt();
+        stream_executor.updateBlob(out_stensor_ids[0], DataType::INT64, intToIValue(output));
     } else {
         DLOG(FATAL) << "Unsupported input type for aten::sub";
     }
