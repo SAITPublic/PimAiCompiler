@@ -59,11 +59,14 @@ void RemoveIfWithAddmm::run(std::unique_ptr<nn_compiler::ir::NNModel> &model)
         auto new_id = addmm_layer->getOutSTensorID()[0];  // always only one output from aten::addmm
 
         auto end_if_layer = layers[layer_idx + 5];  // prim::EndIf of matmul + add
+
         auto successors = ir::utils::searchSuccessors(end_if_layer, graph);
         for (auto successor : successors) {
             auto in_ID_idx = successor.second;
             for (auto idx = 0; idx < in_ID_idx.size(); idx++) {
-                (successor.first)->renewInSTensorID(in_ID_idx[idx], new_id);
+                auto success_layer = successor.first;
+                success_layer->renewInSTensorID(in_ID_idx[idx], new_id);
+                model->updateLayerRelationShips(new_id, end_if_layer, success_layer);
             }
         }
     }

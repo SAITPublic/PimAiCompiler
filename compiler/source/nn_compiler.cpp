@@ -1,5 +1,4 @@
 #include "nn_compiler.hpp"
-
 namespace nn_compiler
 {
 namespace compiler
@@ -47,7 +46,6 @@ RetVal NNCompiler::frontend(const std::string& file_path, const std::string& mod
     frontend_driver_->initialize(file_path, model_name);
     frontend_driver_->run(model);
     frontend_driver_->finalize();
-
     return RetVal::SUCCESS;
 }
 

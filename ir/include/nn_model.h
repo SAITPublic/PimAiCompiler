@@ -13,8 +13,10 @@
 #include <map>
 #include <memory>
 #include <string>
+#include <unordered_set>
 #include <vector>
 
+#include "ir/include/layers/nn_layer.h"
 #include "ir/include/nn_graph.h"
 #include "ir/include/tensors/torch_shape_tensor.h"
 
@@ -55,10 +57,57 @@ class NNModel
 
     std::map<uint32_t, std::shared_ptr<TSSTensor>> getTSSTensors() { return shape_tensors_; }
 
+    void addLayerRelationShips(uint32_t shape_tensor_id, std::shared_ptr<ir::NNLayer> layer)
+    {
+        auto res = layer_relations_map_[shape_tensor_id];
+        bool jud = false;
+        for (auto layer_ : res) {
+            if (layer_ == layer) {
+                jud = true;
+                break;
+            }
+        }
+        if (!jud) {
+            res.push_back(layer);
+        }
+        layer_relations_map_[shape_tensor_id] = res;
+    }
+
+    void updateLayerRelationShips(uint32_t shape_tensor_id, std::shared_ptr<ir::NNLayer> from_layer,
+                                  std::shared_ptr<ir::NNLayer> to_layer)
+    {
+        auto res = layer_relations_map_[shape_tensor_id];
+        for (int idx = 0; idx < res.size(); idx++) {
+            if (res[idx] == from_layer) {
+                res[idx] = to_layer;
+            }
+        }
+        layer_relations_map_[shape_tensor_id] = res;
+    }
+
+    void deleteLayerRelationShips(uint32_t shape_tensor_id, std::shared_ptr<ir::NNLayer> layer)
+    {
+        auto res = layer_relations_map_[shape_tensor_id];
+        std::vector<std::shared_ptr<ir::NNLayer>> tmp_res;
+        for (auto layer_ : res) {
+            if (layer_ != layer) {
+                tmp_res.push_back(layer_);
+            }
+        }
+        layer_relations_map_[shape_tensor_id] = tmp_res;
+    }
+
+    std::map<uint32_t, std::vector<std::shared_ptr<ir::NNLayer>>> getLayerRelationShips()
+    {
+        return layer_relations_map_;
+    }
+
    private:
     std::vector<std::shared_ptr<NNGraph>> graphs_;
 
     std::map<uint32_t, std::shared_ptr<TSSTensor>> shape_tensors_;
+
+    std::map<uint32_t, std::vector<std::shared_ptr<ir::NNLayer>>> layer_relations_map_;
 };
 
 }  // namespace ir

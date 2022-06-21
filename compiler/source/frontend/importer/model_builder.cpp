@@ -214,6 +214,7 @@ void ModelBuilder::importTorchScriptMethodBlock(std::unique_ptr<ir::NNModel>& nn
             layer->addOutSTensorID(value_tensor_map_[input]);
 
             graph->addLayer(layer);
+            nn_model->addLayerRelationShips(value_tensor_map_[input], layer);
         }
     }
 
@@ -297,7 +298,9 @@ void ModelBuilder::importTorchScriptMethodBlock(std::unique_ptr<ir::NNModel>& nn
                             shape_tensor->setReprType(variable_layer->getNType());
                             variable_layer->addOutSTensorID(node_output_id);
                             attr_layer_map.emplace(attrMap_key, variable_layer);
+                            
                             graph->addLayer(variable_layer);
+                            nn_model->addLayerRelationShips(node_output_id, variable_layer);
                         }
                     }
                 }
@@ -316,10 +319,12 @@ void ModelBuilder::importTorchScriptMethodBlock(std::unique_ptr<ir::NNModel>& nn
                     // Add input1, target attribute
                     for (auto oid : variable_layer->getOutSTensorID()) {
                         set_attr_layer->addInSTensorID(oid);
+                        nn_model->addLayerRelationShips(oid, set_attr_layer);
                     }
                     // Add input2, target value
                     for (unsigned int i = 1; i < node->inputs().size(); i++) {
                         set_attr_layer->addInSTensorID(value_tensor_map_[node->inputs()[i]]);
+                        nn_model->addLayerRelationShips(value_tensor_map_[node->inputs()[i]], set_attr_layer);
                     }
                     // No output
                     for (auto node_output : node->outputs()) {
@@ -335,6 +340,7 @@ void ModelBuilder::importTorchScriptMethodBlock(std::unique_ptr<ir::NNModel>& nn
                         } else {
                             set_attr_layer->addOutSTensorID(value_tensor_map_[node_output]);
                         }
+                        nn_model->addLayerRelationShips(value_tensor_map_[node_output], set_attr_layer);
                     }
                     graph->addLayer(set_attr_layer);
                 }
@@ -371,11 +377,12 @@ void ModelBuilder::importTorchScriptMethodBlock(std::unique_ptr<ir::NNModel>& nn
                                     shape_tensor->setFeaturemapType(convertTorchScriptType(node_output->type()));
                                     shape_tensor->setParentLayer(variable_layer->getID());
                                     shape_tensor->setReprType(node_output->type()->repr_str());
-                                    // value_tensor_map_.emplace(node_output, node_output_id);
+                                    value_tensor_map_.emplace(node_output, node_output_id);
                                     variable_layer->addOutSTensorID(node_output_id);
                                 } else {
                                     variable_layer->addOutSTensorID(value_tensor_map_[node_output]);
                                 }
+                                nn_model->addLayerRelationShips(value_tensor_map_[node_output], variable_layer);
                             }
                             attr_layer_map.emplace(attrMap_key, variable_layer);
                             graph->addLayer(variable_layer);
@@ -396,6 +403,7 @@ void ModelBuilder::importTorchScriptMethodBlock(std::unique_ptr<ir::NNModel>& nn
                         // Add input
                         for (auto oid : variable_layer->getOutSTensorID()) {
                             get_attr_layer->addInSTensorID(oid);
+                            nn_model->addLayerRelationShips(oid, get_attr_layer);
                         }
                         // Add output
                         for (auto node_output : node->outputs()) {
@@ -411,6 +419,7 @@ void ModelBuilder::importTorchScriptMethodBlock(std::unique_ptr<ir::NNModel>& nn
                             } else {
                                 get_attr_layer->addOutSTensorID(value_tensor_map_[node_output]);
                             }
+                            nn_model->addLayerRelationShips(value_tensor_map_[node_output], get_attr_layer);
                         }
                         graph->addLayer(get_attr_layer);
                     }
@@ -515,6 +524,7 @@ void ModelBuilder::importTorchScriptMethodBlock(std::unique_ptr<ir::NNModel>& nn
             layer->addInSTensorID(value_tensor_map_[output]);
 
             graph->addLayer(layer);
+            nn_model->addLayerRelationShips(value_tensor_map_[output], layer);
         }
     }
     nn_model->appendGraph(graph);
@@ -543,6 +553,7 @@ std::shared_ptr<ir::NNLayer> ModelBuilder::createLayer(std::shared_ptr<frontend:
     // Add input
     for (auto node_input : node->inputs()) {
         layer->addInSTensorID(value_tensor_map_[node_input]);
+        nn_model->addLayerRelationShips(value_tensor_map_[node_input], layer);
     }
 
     // Add output
@@ -558,6 +569,7 @@ std::shared_ptr<ir::NNLayer> ModelBuilder::createLayer(std::shared_ptr<frontend:
         } else {
             layer->addOutSTensorID(value_tensor_map_[node_output]);
         }
+        nn_model->addLayerRelationShips(value_tensor_map_[node_output], layer);
     }
     return layer;
 }

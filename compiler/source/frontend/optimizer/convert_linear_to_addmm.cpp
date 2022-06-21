@@ -41,6 +41,13 @@ void ConvertLinearToAddmm::run(std::unique_ptr<nn_compiler::ir::NNModel>& model)
         new_addmm_layer->setInSTensorID(in_ids_of_addmm);
         new_addmm_layer->setOutSTensorID(out_stensor_id);  // same output id
 
+        for (auto idx : in_stensor_ids) {
+            model->updateLayerRelationShips(idx, layer, new_addmm_layer);
+        }
+        for (auto idx : out_stensor_id) {
+            model->updateLayerRelationShips(idx, layer, new_addmm_layer);
+        }
+
         auto layer_position = graph->getLayerPos(layer);
         graph->deleteLayer(layer->getID());
         graph->addLayer2pos(new_addmm_layer, layer_position - 1);

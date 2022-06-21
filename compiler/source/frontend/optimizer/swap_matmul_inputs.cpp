@@ -54,12 +54,19 @@ void SwapMatmulInputs::run(std::unique_ptr<nn_compiler::ir::NNModel>& model)
         graph->addLayer2pos(transpose_layer_for_input, graph->getLayerPos(predecessors[0]));
         auto in_ids = layer->getInSTensorID();
         transpose_layer_for_input->addInSTensorID(in_ids[0]);
+
+        model->updateLayerRelationShips(in_ids[0], layer, transpose_layer_for_input);
+
         auto new_stensor1 = std::make_shared<nn_compiler::ir::TSSTensor>();
-        model->addTSSTensor(std::make_pair(new_stensor1->getID(), new_stensor1));
+        auto idx1 = new_stensor1->getID();
+        model->addTSSTensor(std::make_pair(idx1, new_stensor1));
         new_stensor1->setFeaturemapType(model->getTSSTensors()[in_ids[0]]->getFeaturemapType());
         new_stensor1->setReprType(model->getTSSTensors()[in_ids[0]]->getReprType());
-        transpose_layer_for_input->addOutSTensorID(new_stensor1->getID());
-        layer->renewInSTensorID(0, new_stensor1->getID());
+
+        transpose_layer_for_input->addOutSTensorID(idx1);
+        model->addLayerRelationShips(idx1, transpose_layer_for_input);
+        model->addLayerRelationShips(idx1, layer);
+        layer->renewInSTensorID(0, idx1);
 
         // swap input order of matmul
         auto in_stensor_ids = layer->getInSTensorID();
@@ -77,12 +84,20 @@ void SwapMatmulInputs::run(std::unique_ptr<nn_compiler::ir::NNModel>& model)
         // insert right after matmul.
         graph->addLayer2pos(transpose_layer_for_output, graph->getLayerPos(layer));
         auto out_ids = layer->getOutSTensorID();
+
+        model->updateLayerRelationShips(out_ids[0], layer, transpose_layer_for_output);
+
         auto new_stensor2 = std::make_shared<nn_compiler::ir::TSSTensor>();
+        auto idx2 = new_stensor2->getID();
         new_stensor2->setFeaturemapType(model->getTSSTensors()[out_ids[0]]->getFeaturemapType());
         new_stensor2->setReprType(model->getTSSTensors()[out_ids[0]]->getReprType());
-        model->addTSSTensor(std::make_pair(new_stensor2->getID(), new_stensor2));
-        layer->setOutSTensorID({new_stensor2->getID()});
-        transpose_layer_for_output->addInSTensorID(layer->getOutSTensorID()[0]);
+        
+        model->addTSSTensor(std::make_pair(idx2, new_stensor2));
+        layer->setOutSTensorID({idx2});
+        transpose_layer_for_output->addInSTensorID(idx2);
+        model->addLayerRelationShips(idx2, transpose_layer_for_output);
+        model->addLayerRelationShips(idx2, layer);
+
         transpose_layer_for_output->setOutSTensorID(out_ids);
     }
 }

@@ -74,6 +74,10 @@ void TakeInBodyNet::take_in_if_body(std::unique_ptr<nn_compiler::ir::NNModel>& m
         end_layer->setName(convertLayerTypeToString(end_layer->getType()) + "_" + std::to_string(end_layer->getID()));
         end_layer->setOutSTensorID(if_layer_out_tensor_ids);
 
+        for (auto idx : if_layer_out_tensor_ids) {
+            model->updateLayerRelationShips(idx, layer, end_layer);
+        }
+
         uint32_t layer_pos_in_main_graph = 0;
         // find if layer's pos in main graph, and insert current layers into if layer behind
         auto main_graph_layers = main_graph->getLayers();
@@ -88,6 +92,7 @@ void TakeInBodyNet::take_in_if_body(std::unique_ptr<nn_compiler::ir::NNModel>& m
             auto subnet_outputs = net->getGraphOutTensorID();
             for (auto idx : subnet_outputs) {
                 if_end_in_id.push_back(idx);
+                model->addLayerRelationShips(idx, end_layer);
             }
             auto layers = net->getLayers();
             for (uint32_t i = 0; i < layers.size(); i++) {
@@ -145,6 +150,7 @@ void TakeInBodyNet::take_in_loop_body(std::unique_ptr<nn_compiler::ir::NNModel>&
             auto index_to_block_id_shape_tensor = shape_tensors[id];
             index_to_block_id_shape_tensor->setFeaturemapType(data_type);
             new_loop_to_block_id.push_back(id);
+            model->deleteLayerRelationShips(idx, layer);
         }
 
         // find loop layer's pos in main graph, and insert current layers into loop layer behind
@@ -171,17 +177,23 @@ void TakeInBodyNet::take_in_loop_body(std::unique_ptr<nn_compiler::ir::NNModel>&
                                           std::to_string(loop_index_layer->getID()));
 
                 loop_index_layer->addOutSTensorID(index_to_block_id);
+                model->addLayerRelationShips(index_to_block_id, loop_index_layer);
 
                 auto block_layer =
                     std::make_shared<nn_compiler::ir::PrimBlockLayer>("", nn_compiler::ir::LayerType::PRIMBLOCK);
                 block_layer->setName(convertLayerTypeToString(block_layer->getType()) + "_" +
                                      std::to_string(block_layer->getID()));
 
+                model->addLayerRelationShips(index_to_block_id, block_layer);
                 block_layer->addInSTensorID(index_to_block_id);
                 for (auto idx : new_loop_to_block_id) {
                     block_layer->addInSTensorID(idx);
+                    model->addLayerRelationShips(idx, block_layer);
                 }
                 block_layer->setOutSTensorID(subnet_inputs);
+                for (auto idx : subnet_inputs) {
+                    model->addLayerRelationShips(idx, block_layer);
+                }
 
                 // if loop has no output, we need add edge to link block and loop layer
                 if (new_loop_to_block_id.size() == 0) {
@@ -190,6 +202,11 @@ void TakeInBodyNet::take_in_loop_body(std::unique_ptr<nn_compiler::ir::NNModel>&
                     loop_to_block_id_shape_tensor->setFeaturemapType(nn_compiler::ir::DataType::UINT8);
                     new_loop_to_block_id.push_back(loop_to_block_id);
                     block_layer->addInSTensorID(loop_to_block_id);
+                    model->addLayerRelationShips(loop_to_block_id, block_layer);
+                }
+
+                for(auto idx : new_loop_to_block_id) {
+                    model->addLayerRelationShips(idx, layer);
                 }
 
                 layer->setOutSTensorID(new_loop_to_block_id);
@@ -207,7 +224,13 @@ void TakeInBodyNet::take_in_loop_body(std::unique_ptr<nn_compiler::ir::NNModel>&
                     end_layer->setName(convertLayerTypeToString(end_layer->getType()) + "_" +
                                        std::to_string(end_layer->getID()));
                     end_layer->setInSTensorID(subnet_outputs);
+                    for (auto idx : subnet_outputs) {
+                        model->addLayerRelationShips(idx, end_layer);
+                    }
                     end_layer->setOutSTensorID(loop_layer_out_tensor_ids);
+                    for (auto idx : loop_layer_out_tensor_ids) {
+                        model->addLayerRelationShips(idx, end_layer);
+                    }
                     main_graph->addLayer2pos(end_layer, layer_pos_in_main_graph++);
                 }
 

@@ -43,11 +43,14 @@ void RemoveSetAttrLayers::run(std::unique_ptr<nn_compiler::ir::NNModel>& model)
         // update successsors of prim::Variable layer
         auto old_stensor_id = variable_layer->getOutSTensorID()[0];
         auto new_stensor_id = compute_layer->getOutSTensorID()[0];
+
         auto successors = ir::utils::searchSuccessors(variable_layer, graph);
         for (auto successor : successors) {
             if ((successor.first)->getType() == ir::LayerType::PRIMGETATTR) {
                 for (auto idx : successor.second) {
-                    (successor.first)->renewInSTensorID(idx, new_stensor_id);
+                    auto success_layer = successor.first;
+                    success_layer->renewInSTensorID(idx, new_stensor_id);
+                    model->updateLayerRelationShips(new_stensor_id, layer, success_layer);
                 }
             }
         }

@@ -31,10 +31,16 @@ void RemoveGetAttrLayers::run(std::unique_ptr<nn_compiler::ir::NNModel>& model)
         // there is always one input and one output from prim::GetAttr
         auto old_stensor_id = layer->getOutSTensorID()[0];
         auto new_stensor_id = layer->getInSTensorID()[0];
+
+        model->deleteLayerRelationShips(new_stensor_id, layer);
+
+        auto predecessors = ir::utils::searchPredecessor(layer, graph);
         auto successors = ir::utils::searchSuccessors(layer, graph);
         for (auto successor : successors) {
             for (auto idx : successor.second) {
-                (successor.first)->renewInSTensorID(idx, new_stensor_id);
+                auto success_layer = successor.first;
+                success_layer->renewInSTensorID(idx, new_stensor_id);
+                model->addLayerRelationShips(new_stensor_id, success_layer);
             }
         }
         graph->deleteLayer(layer->getID());

@@ -99,7 +99,7 @@ void ConstructList::run(std::unique_ptr<nn_compiler::ir::NNModel>& model)
             if (idx == predecessors.size() - 1 && predecessors[idx]->getType() == nn_compiler::ir::LayerType::PRIMIF) {
                 continue;
             }
-
+            model->deleteLayerRelationShips(predecessors[idx]->getOutSTensorID()[0], list_construct_layer);
             auto constant_layer = std::dynamic_pointer_cast<nn_compiler::ir::PrimConstantLayer>(predecessors[idx]);
             auto successors_of_constant_layer = ir::utils::searchSuccessor(predecessors[idx], graph);
             if (successors_of_constant_layer.size() == 1) {
@@ -156,14 +156,21 @@ void ConstructList::run(std::unique_ptr<nn_compiler::ir::NNModel>& model)
         }
         for (auto out_stensor : out_stensors) {
             new_variable_layer->addOutSTensorID(out_stensor);
+            model->updateLayerRelationShips(out_stensor, list_construct_layer, new_variable_layer);
         }
+
+        auto idx = 0;
+        auto if_layer = predecessors[predecessors.size() - 1];
         if (which_body_net == "then") {
-            auto if_layer = predecessors[predecessors.size() - 1];
-            new_variable_layer->addInSTensorID(if_layer->getOutSTensorID()[0]);
+            idx = if_layer->getOutSTensorID()[0];
+            new_variable_layer->addInSTensorID(idx);
+            model->updateLayerRelationShips(idx, list_construct_layer, new_variable_layer);
         } else if (which_body_net == "else") {
-            auto if_layer = predecessors[predecessors.size() - 1];
-            new_variable_layer->addInSTensorID(if_layer->getOutSTensorID()[1]);
+            idx = if_layer->getOutSTensorID()[1];
+            new_variable_layer->addInSTensorID(idx);
+            model->updateLayerRelationShips(idx, list_construct_layer, new_variable_layer);
         }
+        
 
         if (only_for_lstm_weight) {
             new_variable_layer->setToRemove(true);

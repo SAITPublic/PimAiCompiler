@@ -87,6 +87,8 @@ void FuseActivation::run(std::unique_ptr<nn_compiler::ir::NNModel>& model)
             predecessors[0]->renewOutSTensorID(0, out_ids[0]);
 
             layers_to_be_removed.push_back(cur_layer);
+            
+            model->updateLayerRelationShips(out_ids[0], cur_layer, predecessors[0]);
         }
     }
 
