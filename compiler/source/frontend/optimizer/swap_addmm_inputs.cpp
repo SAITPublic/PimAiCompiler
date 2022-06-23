@@ -37,8 +37,8 @@ void SwapAddmmInputs::run(std::unique_ptr<nn_compiler::ir::NNModel>& model)
         // transpose with height and width
         transpose_layer_for_input->setDim0(-2);
         transpose_layer_for_input->setDim1(-1);
-        // insert right after predecessor.
-        graph->addLayer2pos(transpose_layer_for_input, graph->getLayerPos(predecessors[1]));
+        // insert transpose layer before addmm.
+        graph->addLayer2pos(transpose_layer_for_input, graph->getLayerPos(layer) - 1);
         auto in_id = layer->getInSTensorID()[1];
         transpose_layer_for_input->addInSTensorID(in_id);
 

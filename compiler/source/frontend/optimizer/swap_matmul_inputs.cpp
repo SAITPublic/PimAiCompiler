@@ -50,8 +50,8 @@ void SwapMatmulInputs::run(std::unique_ptr<nn_compiler::ir::NNModel>& model)
         // transpose with height and width
         transpose_layer_for_input->setDim0(-2);
         transpose_layer_for_input->setDim1(-1);
-        // insert right after predecessor. However, can we insert it just before matmul?
-        graph->addLayer2pos(transpose_layer_for_input, graph->getLayerPos(predecessors[0]));
+        // insert transpose layer before matmul
+        graph->addLayer2pos(transpose_layer_for_input, graph->getLayerPos(layer) - 1);
         auto in_ids = layer->getInSTensorID();
         transpose_layer_for_input->addInSTensorID(in_ids[0]);
 
