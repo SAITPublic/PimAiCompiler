@@ -22,8 +22,6 @@ void executeAtenAbs(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExec
 {
     DLOG(INFO) << "execute Aten Abs node";
 
-    auto add_layer = std::static_pointer_cast<nn_compiler::ir::AtenAbsLayer>(layer);
-
     int in_id = 0;
     auto in_stensor_id = layer->getInSTensorID();
     auto out_stensor_id = layer->getOutSTensorID();
@@ -76,8 +74,40 @@ void executeAtenAdd(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExec
     at::Tensor self_tensor = iv_self.toTensor();
     if (iv_other.isTensor()) {
         at::Tensor other_tensor = iv_other.toTensor();
-        // auto output = atenAdd(self_tensor, other_tensor, alpha);
-        {
+        auto self_sizes = self_tensor.sizes();
+        auto other_sizes = other_tensor.sizes();
+
+        auto customAddDimensionsCheck = [=](const c10::IntArrayRef& input1_size, const c10::IntArrayRef& input2_size) {
+            if (input1_size.size() == 1 || input1_size.size() == 2) {
+                // there is no batch and channel dimension for tensors, default 1 batch and 1 channel.
+                return true;
+            } else if (input1_size.size() == 3) {// tensor with channel, height, width
+                if (input1_size[0] != 1 || (input2_size.size() == 3 && input2_size[0] != 1)) {
+                    // tensor channel != 1
+                    return false;
+                } else {
+                    return true;
+                }
+            } else if (input1_size.size() == 4) { // tensor with batch, channel, height, width
+                if ((input2_size.size() == 4 && input1_size[0] != input2_size[0]) ||
+                        (input1_size[1] != 1) || 
+                        (input2_size.size() == 4 && input2_size[1] != 1) ||
+                        (input2_size.size() == 3 && input2_size[0] != 1)) {
+                    // different batch of tensors, or tensor channel != 1
+                    return false;
+                } else {
+                    return true;
+                }
+            } else {
+                return false;
+            }
+        };
+
+        // custom_large_add only works for:
+        // 1) float16 data type, and 2) same batch size, and 3) channel == 1
+        if (self_tensor.dtype() == c10::ScalarType::Half &&
+                (self_sizes.size() >= other_sizes.size() ?
+                    customAddDimensionsCheck(self_sizes, other_sizes) : customAddDimensionsCheck(other_sizes, self_sizes))) {
             if (!self_tensor.is_contiguous()) self_tensor = self_tensor.contiguous();
             if (!other_tensor.is_contiguous()) other_tensor = other_tensor.contiguous();
             int dim0 = self_tensor.dim();
@@ -130,9 +160,10 @@ void executeAtenAdd(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExec
             } else {
                 stream_executor.updateBlob(out_stensor_id[0], DataType::TENSOR, tensorToIValue(self_tensor));
             }
+        } else {
+            auto output = atenAdd(self_tensor, other_tensor, alpha);
+            stream_executor.updateBlob(out_stensor_id[0], DataType::TENSOR, tensorToIValue(output));
         }
-        // update output
-        // stream_executor.updateBlob(out_stensor_id[0], DataType::TENSOR, tensorToIValue(output));
     } else if (iv_other.isScalar()) {
         at::Scalar other_scalar = iv_other.toScalar();
         auto output = atenAdd(self_tensor, other_scalar, alpha);
