@@ -91,7 +91,7 @@ void SwapMatmulInputs::run(std::unique_ptr<nn_compiler::ir::NNModel>& model)
         auto idx2 = new_stensor2->getID();
         new_stensor2->setFeaturemapType(model->getTSSTensors()[out_ids[0]]->getFeaturemapType());
         new_stensor2->setReprType(model->getTSSTensors()[out_ids[0]]->getReprType());
-        
+
         model->addTSSTensor(std::make_pair(idx2, new_stensor2));
         layer->setOutSTensorID({idx2});
         transpose_layer_for_output->addInSTensorID(idx2);

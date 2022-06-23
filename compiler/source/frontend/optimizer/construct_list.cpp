@@ -170,7 +170,6 @@ void ConstructList::run(std::unique_ptr<nn_compiler::ir::NNModel>& model)
             new_variable_layer->addInSTensorID(idx);
             model->updateLayerRelationShips(idx, list_construct_layer, new_variable_layer);
         }
-        
 
         if (only_for_lstm_weight) {
             new_variable_layer->setToRemove(true);

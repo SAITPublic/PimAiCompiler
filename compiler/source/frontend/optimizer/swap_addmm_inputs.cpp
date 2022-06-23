@@ -49,8 +49,7 @@ void SwapAddmmInputs::run(std::unique_ptr<nn_compiler::ir::NNModel>& model)
         model->addTSSTensor(std::make_pair(idx1, new_stensor1));
         new_stensor1->setFeaturemapType(model->getTSSTensors()[in_id]->getFeaturemapType());
         new_stensor1->setReprType(model->getTSSTensors()[in_id]->getReprType());
-        
-        
+
         transpose_layer_for_input->addOutSTensorID(idx1);
         model->addLayerRelationShips(idx1, transpose_layer_for_input);
         model->addLayerRelationShips(idx1, layer);
@@ -78,7 +77,7 @@ void SwapAddmmInputs::run(std::unique_ptr<nn_compiler::ir::NNModel>& model)
         auto idx2 = new_stensor2->getID();
         new_stensor2->setFeaturemapType(model->getTSSTensors()[out_ids[0]]->getFeaturemapType());
         new_stensor2->setReprType(model->getTSSTensors()[out_ids[0]]->getReprType());
-        
+
         model->addTSSTensor(std::make_pair(idx2, new_stensor2));
         layer->setOutSTensorID({idx2});
         transpose_layer_for_output->addInSTensorID(idx2);

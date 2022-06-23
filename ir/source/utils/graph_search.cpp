@@ -95,8 +95,8 @@ std::map<std::shared_ptr<ir::NNLayer>, uint32_t> searchSuccessor(const std::shar
     return ret;
 }
 
-std::map<std::shared_ptr<ir::NNLayer>, std::vector<uint32_t>> searchSuccessors(
-    const std::shared_ptr<ir::NNLayer> layer, const std::shared_ptr<ir::NNGraph> graph)
+std::map<std::shared_ptr<ir::NNLayer>, std::vector<uint32_t>> searchSuccessors(const std::shared_ptr<ir::NNLayer> layer,
+                                                                               const std::shared_ptr<ir::NNGraph> graph)
 {
     std::map<std::shared_ptr<ir::NNLayer>, std::vector<uint32_t>> ret;
 

@@ -298,7 +298,7 @@ void ModelBuilder::importTorchScriptMethodBlock(std::unique_ptr<ir::NNModel>& nn
                             shape_tensor->setReprType(variable_layer->getNType());
                             variable_layer->addOutSTensorID(node_output_id);
                             attr_layer_map.emplace(attrMap_key, variable_layer);
-                            
+
                             graph->addLayer(variable_layer);
                             nn_model->addLayerRelationShips(node_output_id, variable_layer);
                         }
@@ -503,6 +503,9 @@ void ModelBuilder::importTorchScriptMethodBlock(std::unique_ptr<ir::NNModel>& nn
         }
     }
 
+    bool isEmptyInputAndNodes = (method_block->inputs().begin() == method_block->inputs().end()) &&
+                                (method_block->nodes().begin() == method_block->nodes().end());
+
     // set graph outputs
     for (auto output : method_block->outputs()) {
         if (value_tensor_map_.find(output) == value_tensor_map_.end()) {
@@ -515,6 +518,11 @@ void ModelBuilder::importTorchScriptMethodBlock(std::unique_ptr<ir::NNModel>& nn
         } else {
             graph->addGraphOutTensorID(value_tensor_map_[output]);
         }
+        // if layer's then and else net has no layers and inputs
+        if (isEmptyInputAndNodes && !is_main_graph) {
+            nn_model->addLayerRelationShips(value_tensor_map_[output], nullptr);
+        }
+
         // Add output layer (only for main graph)
         if (is_main_graph) {
             auto output_layer_builder = this->layer_builders_.get("prim::Output");

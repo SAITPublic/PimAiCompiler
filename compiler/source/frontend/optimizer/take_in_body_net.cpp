@@ -90,11 +90,21 @@ void TakeInBodyNet::take_in_if_body(std::unique_ptr<nn_compiler::ir::NNModel>& m
         for (unsigned int i = 0; i < if_nets.size(); i++) {
             auto net = if_nets[i];
             auto subnet_outputs = net->getGraphOutTensorID();
-            for (auto idx : subnet_outputs) {
-                if_end_in_id.push_back(idx);
-                model->addLayerRelationShips(idx, end_layer);
-            }
             auto layers = net->getLayers();
+            // note: when if then or else net has no layers, we add updateLayerRelationShips for net outputs by using id
+            // and nullptr in model build.
+            if (layers.size() == 0) {
+                for (auto idx : subnet_outputs) {
+                    if_end_in_id.push_back(idx);
+                    model->updateLayerRelationShips(idx, nullptr, end_layer);
+                }
+            } else {
+                for (auto idx : subnet_outputs) {
+                    if_end_in_id.push_back(idx);
+                    model->addLayerRelationShips(idx, end_layer);
+                }
+            }
+
             for (uint32_t i = 0; i < layers.size(); i++) {
                 auto temp_layer = layers[i];
                 main_graph->addLayer2pos(temp_layer, layer_pos_in_main_graph++);
@@ -205,7 +215,7 @@ void TakeInBodyNet::take_in_loop_body(std::unique_ptr<nn_compiler::ir::NNModel>&
                     model->addLayerRelationShips(loop_to_block_id, block_layer);
                 }
 
-                for(auto idx : new_loop_to_block_id) {
+                for (auto idx : new_loop_to_block_id) {
                     model->addLayerRelationShips(idx, layer);
                 }
 
