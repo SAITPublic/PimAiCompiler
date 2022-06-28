@@ -840,11 +840,11 @@ void executeAtenClamp(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamEx
     auto max = clamp_layer->getMax();
     if (nn_compiler::ir::isDefaultValue(min)) {
         auto iv = stream_executor.findBlob(in_stensor_id[in_id++]).second;
-        min = static_cast<int>(iv.toInt());
+        min = static_cast<double>(iv.toDouble());
     }
     if (nn_compiler::ir::isDefaultValue(max)) {
         auto iv = stream_executor.findBlob(in_stensor_id[in_id++]).second;
-        max = static_cast<int>(iv.toInt());
+        max = static_cast<double>(iv.toDouble());
     }
 
     auto output = atenClamp(self_tensor, min, max);

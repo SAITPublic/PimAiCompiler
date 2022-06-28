@@ -290,9 +290,9 @@ bool putAttributeInAtenClamp(layer_inID_type& layer_inID, dtensor_ptr_type& d_te
         DLOG(INFO) << "prim::Constant attempts to set into the input of layer: " << layer_inID.first->getName();
         return false;
     } else if (idx == 1) {
-        cur_layer->setMin(getValueFromConstant<int>(d_tensor, layer_type, "min"));
+        cur_layer->setMin(getValueFromConstant<double>(d_tensor, layer_type, "min"));
     } else if (idx == 2) {
-        cur_layer->setMax(getValueFromConstant<int>(d_tensor, layer_type, "max"));
+        cur_layer->setMax(getValueFromConstant<double>(d_tensor, layer_type, "max"));
     } else {
         DLOG(FATAL) << "Incorrect data from prim::Constant";
     }

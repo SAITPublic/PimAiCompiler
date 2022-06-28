@@ -23,13 +23,13 @@ class AtenClampLayer : public NNLayer
 
     virtual std::shared_ptr<NNLayer> clone() { return std::shared_ptr<AtenClampLayer>(new AtenClampLayer(*this)); }
 
-    void setMin(int min) { min_ = min; }
+    void setMin(double min) { min_ = min; }
 
-    int getMin() { return min_; }
+    double getMin() { return min_; }
 
-    void setMax(int max) { max_ = max; }
+    void setMax(double max) { max_ = max; }
 
-    int getMax() { return max_; }
+    double getMax() { return max_; }
 
     void printAttr()
     {
@@ -39,8 +39,8 @@ class AtenClampLayer : public NNLayer
     }
 
    private:
-    int min_ = INT32_MAX;
-    int max_ = INT32_MAX;
+    double min_ = DBL_MAX;
+    double max_ = DBL_MAX;
 };
 
 }  // namespace ir
