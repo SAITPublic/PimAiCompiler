@@ -136,10 +136,29 @@ def test_transformer_inference(input_file : str, input_tensor_file : str, model_
     time_end = time.time()
     print('Transformer avg_time:{}ms'.format((time_end - time_start) / test_cnt * 1000))
 
+def test_switchtransformer_inference(input_file : str, input_tensor_file : str, attention_mask_file : str, model_type : str):
+    # Prepare inputs
+    input_tensor = torch.load(input_tensor_file).cuda()
+    attention_mask = torch.load(attention_mask_file).cuda()
+    # Init nncompiler
+    nncompiler = NNCompiler.PipelineManager(input_file, model_type)
+    # warn-up
+    _ = nncompiler.inferenceModel([input_tensor, attention_mask])
+    # Run and test
+    torch.cuda.synchronize()
+    time_start = time.time()
+    test_cnt = 100
+    for _ in tqdm.tqdm(range(test_cnt)):
+        outpus = nncompiler.inferenceModel([input_tensor, attention_mask])
+        torch.cuda.synchronize()
+    time_end = time.time()
+    print('Transformer avg_time:{}ms'.format((time_end - time_start) / test_cnt * 1000))
+
 
 if __name__ == '__main__':
     arg_parser = argparse.ArgumentParser()
-    arg_parser.add_argument("--model_kind", type=str, choices=['RNNT', 'HWR', 'GNMT', 'Transformer'], help='choose model to inference', required=True)
+    arg_parser.add_argument("--model_kind", type=str, choices=['RNNT', 'HWR', 'GNMT', 'Transformer', 'SwitchTransformer'], 
+                            help='choose model to inference', required=True)
     arg_parser.add_argument('--input_file', type=str, help='Input file', required=True)
     args = arg_parser.parse_args()
     
@@ -166,3 +185,8 @@ if __name__ == '__main__':
         input_tensor_file = os.path.join(current_dir, '../resource/transformer/inputs/transformer.pt')
         assert os.path.exists(input_tensor_file)
         test_transformer_inference(args.input_file, input_tensor_file, args.model_kind)
+    elif args.model_kind == 'SwitchTransformer':
+        input_tensor_file = os.path.join(current_dir, '../resource/switch_transformer/inputs/input_ids_2_13.pt')
+        attention_mask_file = os.path.join(current_dir, '../resource/switch_transformer/inputs/attention_mask_2_13.pt')
+        assert os.path.exists(input_tensor_file) and os.path.exists(attention_mask_file)
+        test_switchtransformer_inference(args.input_file, input_tensor_file, attention_mask_file, args.model_kind)
