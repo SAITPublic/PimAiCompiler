@@ -634,6 +634,14 @@ void executePrimVariable(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, Strea
 
         auto out_stensor_id = layer->getOutSTensorID()[0];
         stream_executor.updateBlob(out_stensor_id, DataType::BOOL, iv);
+    } else if (ntype.find("int") != std::string::npos) {  // int type
+        auto data_ptr = variable_attrs.at(0)->getData<uint8_t>();
+        auto d_type = variable_attrs.at(0)->getDataType();
+        uint8_t* ptr = const_cast<uint8_t*>(data_ptr->data());
+        torch::jit::IValue iv = convertVaraibleData2IValve(ptr, d_type);
+
+        auto out_stensor_id = layer->getOutSTensorID()[0];
+        stream_executor.updateBlob(out_stensor_id, DataType::INT32, iv);
     } else if (ntype.find("Tensor") != std::string::npos) {  // tesnor type
         auto t_dtensor = variable_attrs.at(0);
         auto d_type = t_dtensor->getDataType();
@@ -649,7 +657,7 @@ void executePrimVariable(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, Strea
         auto out_stensor_id = layer->getOutSTensorID()[0];
         stream_executor.updateBlob(out_stensor_id, DataType::TENSOR, iv);
     } else {
-        DLOG(FATAL) << "Variable op data type: " << ntype << "do not support! ";
+        DLOG(FATAL) << "Variable op data type: " << ntype << " do not support! ";
     }
 }
 
