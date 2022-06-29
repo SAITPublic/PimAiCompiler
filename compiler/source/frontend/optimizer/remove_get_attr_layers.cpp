@@ -34,8 +34,8 @@ void RemoveGetAttrLayers::run(std::unique_ptr<nn_compiler::ir::NNModel>& model)
 
         model->deleteLayerRelationShips(new_stensor_id, layer);
 
-        auto predecessors = ir::utils::searchPredecessor(layer, graph);
-        auto successors = ir::utils::searchSuccessors(layer, graph);
+        auto predecessors = ir::utils::searchPredecessor(layer, model);
+        auto successors = ir::utils::searchMapSuccessors(layer, model);
         for (auto successor : successors) {
             for (auto idx : successor.second) {
                 auto success_layer = successor.first;

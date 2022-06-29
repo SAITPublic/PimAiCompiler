@@ -13,7 +13,7 @@ bool RemoveSetAttrLayers::fitCondition(std::unique_ptr<nn_compiler::ir::NNModel>
     for (auto graph : graphs) {
         for (auto layer : graph->getLayers()) {
             if (layer->getType() == nn_compiler::ir::LayerType::PRIMSETATTR) {
-                auto predecessors = ir::utils::searchPredecessor(layer, graph);
+                auto predecessors = ir::utils::searchPredecessor(layer, model);
                 if (predecessors.size() == 2 &&
                     predecessors[0]->getType() == nn_compiler::ir::LayerType::PRIMVARIABLE) {
                     remove_layers_.push_back(layer);
@@ -32,7 +32,7 @@ void RemoveSetAttrLayers::run(std::unique_ptr<nn_compiler::ir::NNModel>& model)
     auto graph = model->getGraphs()[0];
 
     for (auto layer : remove_layers_) {
-        auto predecessors = ir::utils::searchPredecessor(layer, graph);
+        auto predecessors = ir::utils::searchPredecessor(layer, model);
         if (predecessors.size() != 2) {
             // the first variable layer has been removed
             continue;
@@ -44,7 +44,7 @@ void RemoveSetAttrLayers::run(std::unique_ptr<nn_compiler::ir::NNModel>& model)
         auto old_stensor_id = variable_layer->getOutSTensorID()[0];
         auto new_stensor_id = compute_layer->getOutSTensorID()[0];
 
-        auto successors = ir::utils::searchSuccessors(variable_layer, graph);
+        auto successors = ir::utils::searchMapSuccessors(variable_layer, model);
         for (auto successor : successors) {
             if ((successor.first)->getType() == ir::LayerType::PRIMGETATTR) {
                 for (auto idx : successor.second) {

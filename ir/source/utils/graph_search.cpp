@@ -10,18 +10,16 @@ std::vector<std::shared_ptr<ir::NNLayer>> searchPredecessor(const std::shared_pt
                                                             const std::unique_ptr<ir::NNModel> &nn_model)
 {
     std::vector<std::shared_ptr<ir::NNLayer>> vec;
-    auto graphs = nn_model->getGraphs();
+    auto in_stensor_ids = layer->getInSTensorID();
+    auto relation_layers_map = nn_model->getLayerRelationShips();
 
-    auto in_tensor_ids = layer->getInSTensorID();
-    for (auto in_tensor_id : in_tensor_ids) {
-        for (auto graph : graphs) {
-            for (auto target_layer : graph->getLayers()) {
-                if (target_layer->getID() == layer->getID()) {
-                    continue;
-                }
-                auto out_tensor_ids = target_layer->getOutSTensorID();
-                if (std::find(out_tensor_ids.begin(), out_tensor_ids.end(), in_tensor_id) != out_tensor_ids.end()) {
+    for (auto in_id : in_stensor_ids) {
+        auto relation_layers = relation_layers_map[in_id];
+        for (auto target_layer : relation_layers) {
+            for (auto r_layer_out_id : target_layer->getOutSTensorID()) {
+                if (r_layer_out_id == in_id) {
                     vec.push_back(target_layer);
+                    break;
                 }
             }
         }
@@ -30,19 +28,21 @@ std::vector<std::shared_ptr<ir::NNLayer>> searchPredecessor(const std::shared_pt
     return vec;
 }
 
-std::vector<std::shared_ptr<ir::NNLayer>> searchPredecessor(const std::shared_ptr<ir::NNLayer> layer,
-                                                            const std::shared_ptr<ir::NNGraph> graph)
+std::vector<std::shared_ptr<ir::NNLayer>> searchSuccessorLayers(const std::shared_ptr<ir::NNLayer> layer,
+                                                                const std::unique_ptr<ir::NNModel> &nn_model)
 {
     std::vector<std::shared_ptr<ir::NNLayer>> vec;
-    auto in_tensor_ids = layer->getInSTensorID();
-    for (auto in_tensor_id : in_tensor_ids) {
-        for (auto target_layer : graph->getLayers()) {
-            if (target_layer->getID() == layer->getID()) {
-                continue;
-            }
-            auto out_tensor_ids = target_layer->getOutSTensorID();
-            if (std::find(out_tensor_ids.begin(), out_tensor_ids.end(), in_tensor_id) != out_tensor_ids.end()) {
-                vec.push_back(target_layer);
+    auto out_stensor_ids = layer->getOutSTensorID();
+    auto relation_layers_map = nn_model->getLayerRelationShips();
+
+    for (auto out_id : out_stensor_ids) {
+        auto relation_layers = relation_layers_map[out_id];
+        for (auto target_layer : relation_layers) {
+            for (auto in_id_ : target_layer->getInSTensorID()) {
+                if (in_id_ == out_id) {
+                    vec.push_back(target_layer);
+                    break;
+                }
             }
         }
     }
@@ -50,42 +50,20 @@ std::vector<std::shared_ptr<ir::NNLayer>> searchPredecessor(const std::shared_pt
     return vec;
 }
 
-std::vector<std::shared_ptr<ir::NNLayer>> searchSuccessorLayerOnly(const std::shared_ptr<ir::NNLayer> layer,
-                                                                   const std::shared_ptr<ir::NNGraph> graph)
-{
-    std::vector<std::shared_ptr<ir::NNLayer>> ret;
-
-    auto out_tensor_ids = layer->getOutSTensorID();
-    for (auto out_tensor_id : out_tensor_ids) {
-        for (auto target_layer : graph->getLayers()) {
-            if (target_layer->getID() == layer->getID()) {
-                continue;
-            }
-            auto in_tensor_ids = target_layer->getInSTensorID();
-            if (std::find(in_tensor_ids.begin(), in_tensor_ids.end(), out_tensor_id) != in_tensor_ids.end()) {
-                ret.push_back(target_layer);
-            }
-        }
-    }
-
-    return ret;
-}
-
-std::map<std::shared_ptr<ir::NNLayer>, uint32_t> searchSuccessor(const std::shared_ptr<ir::NNLayer> layer,
-                                                                 const std::shared_ptr<ir::NNGraph> graph)
+std::map<std::shared_ptr<ir::NNLayer>, uint32_t> searchMapSuccessor(const std::shared_ptr<ir::NNLayer> layer,
+                                                                    const std::unique_ptr<ir::NNModel> &nn_model)
 {
     std::map<std::shared_ptr<ir::NNLayer>, uint32_t> ret;
+    auto out_stensor_ids = layer->getOutSTensorID();
+    auto relation_layers_map = nn_model->getLayerRelationShips();
 
-    auto out_tensor_ids = layer->getOutSTensorID();
-    for (auto out_tensor_id : out_tensor_ids) {
-        for (auto target_layer : graph->getLayers()) {
-            if (target_layer->getID() == layer->getID()) {
-                continue;
-            }
-            auto in_tensor_ids = target_layer->getInSTensorID();
-            for (auto in_tensor_id = in_tensor_ids.begin(); in_tensor_id != in_tensor_ids.end(); in_tensor_id++) {
-                if (*in_tensor_id == out_tensor_id) {
-                    auto idx = std::distance(in_tensor_ids.begin(), in_tensor_id);
+    for (auto out_id : out_stensor_ids) {
+        auto relation_layers = relation_layers_map[out_id];
+        for (auto target_layer : relation_layers) {
+            auto in_stensor_ids = target_layer->getInSTensorID();
+            for (auto in_stensor_id = in_stensor_ids.begin(); in_stensor_id != in_stensor_ids.end(); in_stensor_id++) {
+                if (*in_stensor_id == out_id) {
+                    auto idx = std::distance(in_stensor_ids.begin(), in_stensor_id);
                     ret.insert(std::make_pair(target_layer, idx));
                 }
             }
@@ -95,26 +73,24 @@ std::map<std::shared_ptr<ir::NNLayer>, uint32_t> searchSuccessor(const std::shar
     return ret;
 }
 
-std::map<std::shared_ptr<ir::NNLayer>, std::vector<uint32_t>> searchSuccessors(const std::shared_ptr<ir::NNLayer> layer,
-                                                                               const std::shared_ptr<ir::NNGraph> graph)
+std::map<std::shared_ptr<ir::NNLayer>, std::vector<uint32_t>> searchMapSuccessors(
+    const std::shared_ptr<ir::NNLayer> layer, const std::unique_ptr<ir::NNModel> &nn_model)
 {
     std::map<std::shared_ptr<ir::NNLayer>, std::vector<uint32_t>> ret;
+    auto out_stensor_ids = layer->getOutSTensorID();
+    auto relation_layers_map = nn_model->getLayerRelationShips();
 
-    auto out_tensor_ids = layer->getOutSTensorID();
-    for (auto out_tensor_id : out_tensor_ids) {
-        for (auto target_layer : graph->getLayers()) {
-            if (target_layer->getID() == layer->getID()) {
-                continue;
-            }
+    for (auto out_id : out_stensor_ids) {
+        auto relation_layers = relation_layers_map[out_id];
+        for (auto target_layer : relation_layers) {
             std::vector<uint32_t> idx_vec;
-            auto in_tensor_ids = target_layer->getInSTensorID();
-            for (auto in_tensor_id = in_tensor_ids.begin(); in_tensor_id != in_tensor_ids.end(); in_tensor_id++) {
-                if (*in_tensor_id == out_tensor_id) {
-                    auto idx = std::distance(in_tensor_ids.begin(), in_tensor_id);
+            auto in_stensor_ids = target_layer->getInSTensorID();
+            for (auto in_stensor_id = in_stensor_ids.begin(); in_stensor_id != in_stensor_ids.end(); in_stensor_id++) {
+                if (*in_stensor_id == out_id) {
+                    auto idx = std::distance(in_stensor_ids.begin(), in_stensor_id);
                     idx_vec.push_back(idx);
                 }
             }
-
             if (idx_vec.size() > 0) {
                 ret.insert(std::make_pair(target_layer, idx_vec));
             }

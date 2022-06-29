@@ -6,10 +6,10 @@ namespace nn_compiler
 namespace frontend
 {
 bool RemakeDTensorOfPrimVariable::checkVariableUsage(const std::shared_ptr<nn_compiler::ir::NNLayer>& layer,
-                                                     const std::shared_ptr<nn_compiler::ir::NNGraph>& graph,
+                                                     const std::unique_ptr<ir::NNModel>& nn_model,
                                                      const std::shared_ptr<nn_compiler::ir::DTensor>& data)
 {
-    auto consumers = ir::utils::searchSuccessors(layer, graph);
+    auto consumers = ir::utils::searchMapSuccessors(layer, nn_model);
     for (auto consumer : consumers) {
         auto cloned_layer_for_check = consumer.first->clone();
         auto cloned_data_for_check = data->clone();
@@ -39,7 +39,7 @@ bool RemakeDTensorOfPrimVariable::fitCondition(std::unique_ptr<nn_compiler::ir::
                     continue;
                 }
 
-                if (checkVariableUsage(layer, graph, data[0]) && ir::utils::isSingleValueType(data[0]->getDataType())) {
+                if (checkVariableUsage(layer, model, data[0]) && ir::utils::isSingleValueType(data[0]->getDataType())) {
                     variable_layers_.push_back(layer);
                 }
             }

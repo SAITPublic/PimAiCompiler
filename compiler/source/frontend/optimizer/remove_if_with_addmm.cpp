@@ -45,7 +45,7 @@ void RemoveIfWithAddmm::run(std::unique_ptr<nn_compiler::ir::NNModel> &model)
     */
     for (auto layer_idx : if_layer_idx_) {
         // remove the layer and its predecessors which are only computed for this if branch
-        getDeleteLayers(graph, layers[layer_idx - 1], delete_layers);  // only one input for prim::If
+        getDeleteLayers(model, layers[layer_idx - 1], delete_layers);  // only one input for prim::If
 
         // remove verbose layers
         delete_layers.push_back(layers[layer_idx]);      // prim::If
@@ -60,7 +60,7 @@ void RemoveIfWithAddmm::run(std::unique_ptr<nn_compiler::ir::NNModel> &model)
 
         auto end_if_layer = layers[layer_idx + 5];  // prim::EndIf of matmul + add
 
-        auto successors = ir::utils::searchSuccessors(end_if_layer, graph);
+        auto successors = ir::utils::searchMapSuccessors(end_if_layer, model);
         for (auto successor : successors) {
             auto in_ID_idx = successor.second;
             for (auto idx = 0; idx < in_ID_idx.size(); idx++) {
@@ -76,16 +76,16 @@ void RemoveIfWithAddmm::run(std::unique_ptr<nn_compiler::ir::NNModel> &model)
     }
 }
 
-void RemoveIfWithAddmm::getDeleteLayers(std::shared_ptr<nn_compiler::ir::NNGraph> graph,
+void RemoveIfWithAddmm::getDeleteLayers(std::unique_ptr<nn_compiler::ir::NNModel>& model,
                                         std::shared_ptr<nn_compiler::ir::NNLayer> layer,
                                         std::vector<std::shared_ptr<nn_compiler::ir::NNLayer>> &delete_layers)
 {
-    if ((ir::utils::searchSuccessors(layer, graph)).size() == 1) {
+    if ((ir::utils::searchMapSuccessors(layer, model)).size() == 1) {
         // the compute result of layer is only used by this if branch
         delete_layers.push_back(layer);
-        auto predecessors = ir::utils::searchPredecessor(layer, graph);
+        auto predecessors = ir::utils::searchPredecessor(layer, model);
         for (auto predecessor : predecessors) {
-            getDeleteLayers(graph, predecessor, delete_layers);
+            getDeleteLayers(model, predecessor, delete_layers);
         }
     }
 }

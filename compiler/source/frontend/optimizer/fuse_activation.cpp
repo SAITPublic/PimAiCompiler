@@ -9,7 +9,7 @@ FuseActivation::FuseActivation() {}
 
 bool FuseActivation::fitCondition(std::unique_ptr<nn_compiler::ir::NNModel>& model)
 {
-    auto dependCheck = [&](const std::shared_ptr<nn_compiler::ir::NNGraph> network,
+    auto dependCheck = [&](const std::unique_ptr<ir::NNModel>& model,
                            const std::shared_ptr<nn_compiler::ir::NNLayer> predecessor,
                            const std::shared_ptr<nn_compiler::ir::NNLayer> successor) {
         std::string predecessor_type = convertLayerTypeToString(predecessor->getType());
@@ -18,7 +18,7 @@ bool FuseActivation::fitCondition(std::unique_ptr<nn_compiler::ir::NNModel>& mod
             return false;
         }
 
-        auto successors = ir::utils::searchSuccessor(predecessor, network);
+        auto successors = ir::utils::searchMapSuccessor(predecessor, model);
         if (successors.size() > 1) {
             DLOG(INFO) << "failed to satisfy with fusion dependency";
             return false;
@@ -29,7 +29,7 @@ bool FuseActivation::fitCondition(std::unique_ptr<nn_compiler::ir::NNModel>& mod
                 DLOG(INFO) << "The predecessor of transpose layer is not addmm layer.";
                 return false;
             }
-            auto successors = ir::utils::searchSuccessor(successor, network);
+            auto successors = ir::utils::searchMapSuccessor(successor, model);
             if (successors.size() > 1) {
                 DLOG(INFO) << "failed to satisfy with fusion dependency";
                 return false;
@@ -37,21 +37,20 @@ bool FuseActivation::fitCondition(std::unique_ptr<nn_compiler::ir::NNModel>& mod
         }
         return true;
     };
+    // after take in body in net pass, there only one graph
+    auto graph = model->getGraphs()[0];
 
-    auto graphs = model->getGraphs();
-    for (auto graph : graphs) {
-        for (auto cur_layer : graph->getLayers()) {
-            std::string type = convertLayerTypeToString(cur_layer->getType());
-            if (feasibleParasiteType(type)) {
-                auto predecessors = ir::utils::searchPredecessor(cur_layer, graph);
-                assert(predecessors.size() > 0);
-                auto pre_of_predecessor = ir::utils::searchPredecessor(predecessors[0], graph);
-                if (predecessors.empty() || !dependCheck(graph, predecessors[0], pre_of_predecessor[0])) {
-                    continue;
-                }
-
-                layers_.push_back(cur_layer);
+    for (auto cur_layer : graph->getLayers()) {
+        std::string type = convertLayerTypeToString(cur_layer->getType());
+        if (feasibleParasiteType(type)) {
+            auto predecessors = ir::utils::searchPredecessor(cur_layer, model);
+            assert(predecessors.size() > 0);
+            auto pre_of_predecessor = ir::utils::searchPredecessor(predecessors[0], model);
+            if (predecessors.empty() || !dependCheck(model, predecessors[0], pre_of_predecessor[0])) {
+                continue;
             }
+
+            layers_.push_back(cur_layer);
         }
     }
 
@@ -68,8 +67,8 @@ void FuseActivation::run(std::unique_ptr<nn_compiler::ir::NNModel>& model)
     for (auto cur_layer : layers_) {
         std::string type = convertLayerTypeToString(cur_layer->getType());
         if (feasibleParasiteType(type)) {
-            auto predecessors = ir::utils::searchPredecessor(cur_layer, graph);
-            auto successors = ir::utils::searchPredecessor(predecessors[0], graph);
+            auto predecessors = ir::utils::searchPredecessor(cur_layer, model);
+            auto successors = ir::utils::searchPredecessor(predecessors[0], model);
 
             auto out_ids = cur_layer->getOutSTensorID();
             auto in_ids = cur_layer->getInSTensorID();

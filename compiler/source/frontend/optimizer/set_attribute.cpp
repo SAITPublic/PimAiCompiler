@@ -29,9 +29,6 @@ void SetAttribute::run(std::unique_ptr<nn_compiler::ir::NNModel> &model)
 {
     DLOG(INFO) << "SetAttribute::run is called.";
 
-    // there will be only one graph after take_in_body_net pass.
-    auto graph = model->getGraphs()[0];
-
     for (auto layer : constant_layers_) {
         auto constant_layer = std::dynamic_pointer_cast<nn_compiler::ir::PrimConstantLayer>(layer);
         if (constant_layer->getNType().find("None") != std::string::npos) {
@@ -40,7 +37,7 @@ void SetAttribute::run(std::unique_ptr<nn_compiler::ir::NNModel> &model)
         auto constant_value = constant_layer->getAttr();
         bool remove_layer = true;
 
-        doProcess(layer, graph, constant_value, remove_layer);
+        doProcess(layer, model, constant_value, remove_layer);
 
         constant_layer->setToRemove(remove_layer);
     }
@@ -50,7 +47,7 @@ void SetAttribute::run(std::unique_ptr<nn_compiler::ir::NNModel> &model)
         auto variable_data = (variable_layer->getAttr())[0];
         bool remove_layer = true;
 
-        doProcess(layer, graph, variable_data, remove_layer);
+        doProcess(layer, model, variable_data, remove_layer);
 
         variable_layer->setToRemove(remove_layer);
     }
@@ -59,10 +56,10 @@ void SetAttribute::run(std::unique_ptr<nn_compiler::ir::NNModel> &model)
 }
 
 void SetAttribute::doProcess(const std::shared_ptr<nn_compiler::ir::NNLayer> &layer,
-                             const std::shared_ptr<nn_compiler::ir::NNGraph> &graph,
+                             std::unique_ptr<nn_compiler::ir::NNModel> &model,
                              std::shared_ptr<nn_compiler::ir::DTensor> &data, bool &remove_layer)
 {
-    auto consumers = ir::utils::searchSuccessors(layer, graph);
+    auto consumers = ir::utils::searchMapSuccessors(layer, model);
     for (auto consumer : consumers) {
         for (auto inID : consumer.second) {
             std::pair<const std::shared_ptr<nn_compiler::ir::NNLayer>, unsigned int> layer_inID(consumer.first, inID);

@@ -38,7 +38,7 @@ class RemoveIfWithAddmm : public Pass
     std::vector<int> if_layer_idx_;
 
     // get layers which are only computed for deleted If branch
-    void getDeleteLayers(std::shared_ptr<nn_compiler::ir::NNGraph> graph,
+    void getDeleteLayers(std::unique_ptr<nn_compiler::ir::NNModel>& model,
                          std::shared_ptr<nn_compiler::ir::NNLayer> layer,
                          std::vector<std::shared_ptr<nn_compiler::ir::NNLayer>>& delete_layers);
 };
