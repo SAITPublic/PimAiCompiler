@@ -100,17 +100,6 @@ std::map<std::shared_ptr<ir::NNLayer>, std::vector<uint32_t>> searchMapSuccessor
     return ret;
 }
 
-std::shared_ptr<ir::NNLayer> searchLayerByOutID(uint32_t out_id, const std::shared_ptr<ir::NNGraph> graph)
-{
-    for (auto cur_layer : graph->getLayers()) {
-        auto cur_out_ids = cur_layer->getOutSTensorID();
-        if (std::count(cur_out_ids.begin(), cur_out_ids.end(), out_id)) {
-            return cur_layer;
-        }
-    }
-    return nullptr;
-}
-
 }  // namespace utils
 }  // namespace ir
 }  // namespace nn_compiler
