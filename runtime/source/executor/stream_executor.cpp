@@ -4,6 +4,7 @@
 #include "c10/hip/HIPFunctions.h"
 #include "executor/op_executor/aten_ops_executor.h"
 #include "executor/op_executor/prim_ops_executor.h"
+#include "executor/op_executor/stream_ops_executor.h"
 #include "executor/stream_executor.h"
 #include "executor/utils/profiler.h"
 
@@ -469,6 +470,9 @@ void StreamExecutor::registerOp()
     this->global_op_register_.insert({LayerType::PRIMUNCHECKEDCAST, op_executor::executePrimUncheckedCast});
     this->global_op_register_.insert({LayerType::PRIMUNINITIALIZED, op_executor::executePrimUninitialized});
     this->global_op_register_.insert({LayerType::PRIMVARIABLE, op_executor::executePrimVariable});
+
+    this->global_op_register_.insert({LayerType::STARTMULTISTREAM, op_executor::executeStartMultiStream});
+    this->global_op_register_.insert({LayerType::ENDMULTISTREAM, op_executor::executeEndMultiStream});
 }
 
 }  // namespace runtime
