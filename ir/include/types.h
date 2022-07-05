@@ -178,7 +178,10 @@ enum class LayerType {
     PRIMTYPE,
     PRIMUNCHECKEDCAST,
     PRIMUNINITIALIZED,
-    PRIMVARIABLE
+    PRIMVARIABLE,
+
+    STARTMULTISTREAM,
+    ENDMULTISTREAM
 };
 
 std::string convertLayerTypeToString(LayerType type);

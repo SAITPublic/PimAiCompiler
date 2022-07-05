@@ -70,3 +70,6 @@
 #include "ir/include/layers/prim_to_list_layer.h"
 #include "ir/include/layers/prim_tuple_index_layer.h"
 #include "ir/include/layers/prim_variable_layer.h"
+
+#include "ir/include/layers/end_multi_stream_layer.h"
+#include "ir/include/layers/start_multi_stream_layer.h"

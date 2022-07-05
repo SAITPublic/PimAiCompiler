@@ -146,6 +146,9 @@ std::string convertLayerTypeToString(LayerType type)
     converter.insert({LayerType::PRIMUNINITIALIZED, "prim::Uninitialized"});
     converter.insert({LayerType::PRIMVARIABLE, "prim::Variable"});
 
+    converter.insert({LayerType::ENDMULTISTREAM, "EndMultiStream"});
+    converter.insert({LayerType::STARTMULTISTREAM, "StartMultiStream"});
+
     auto iter = converter.find(type);
     if (iter == converter.end()) {
         DLOG(FATAL) << "Found unsupported layer type.";
