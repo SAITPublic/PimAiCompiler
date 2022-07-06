@@ -7,29 +7,28 @@ namespace nn_compiler
 {
 namespace ir
 {
-class StartMultiStreamLayer : public NNLayer
+class MultiStreamLayer : public NNLayer
 {
    public:
     /**
-     * @brief StartMultiStreamLayer constructor
+     * @brief MultiStreamLayer constructor
      * @param name the name of the layer
      * @param type the type of the layer
      */
 
-    StartMultiStreamLayer(std::string name, LayerType type) : NNLayer(name, type) {}
+    MultiStreamLayer(std::string name, LayerType type) : NNLayer(name, type) {}
 
-    explicit StartMultiStreamLayer(const StartMultiStreamLayer& start_multi_stream_layer) :
-        NNLayer(start_multi_stream_layer)
+    explicit MultiStreamLayer(const MultiStreamLayer& multi_stream_layer) : NNLayer(multi_stream_layer)
     {
-        this->layers_ = start_multi_stream_layer.layers_;
-        this->layers_num_ = start_multi_stream_layer.layers_num_;
+        this->layers_ = multi_stream_layer.layers_;
+        this->layers_num_ = multi_stream_layer.layers_num_;
     }
 
-    virtual ~StartMultiStreamLayer() {}
+    virtual ~MultiStreamLayer() {}
 
     virtual std::shared_ptr<NNLayer> clone()
     {
-        return std::shared_ptr<StartMultiStreamLayer>(new StartMultiStreamLayer(*this));
+        return std::shared_ptr<MultiStreamLayer>(new MultiStreamLayer(*this));
     }
 
     void setLayers(std::vector<std::shared_ptr<nn_compiler::ir::NNLayer>> layers) { layers_ = layers; }
@@ -42,7 +41,7 @@ class StartMultiStreamLayer : public NNLayer
 
     void printAttr()
     {
-        DLOG(INFO) << "      StartMultiStream Attr     ";
+        DLOG(INFO) << "      MultiStream Attr     ";
         DLOG(INFO) << "      layers_num is             " << layers_num_;
     }
 

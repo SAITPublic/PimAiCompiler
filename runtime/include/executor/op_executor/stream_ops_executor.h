@@ -9,8 +9,7 @@ namespace runtime
 {
 namespace op_executor
 {
-void executeStartMultiStream(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor);
-void executeEndMultiStream(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor);
+void executeMultiStream(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor);
 }  // namespace op_executor
 }  // namespace runtime
 }  // namespace nn_compiler

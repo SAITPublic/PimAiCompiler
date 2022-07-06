@@ -423,7 +423,7 @@ at::Tensor atenZeroslike(const at::Tensor &self, at::TensorOptions options = {},
 void customAtenAddmm(std::string act_type, at::Tensor &self_tensor, at::Tensor &mat1_tensor, at::Tensor &mat2_tensor,
                      at::Scalar beta, at::Scalar alpha, torch::jit::IValue &output_iv);
 
-void customAtenMatmul(at::Tensor &self_tensor, at::Tensor &other_tensor, torch::jit::IValue &output_iv);
+void customAtenMatmul(at::Tensor &self_tensor, at::Tensor &other_tensor, torch::jit::IValue &output_iv, void* stream = nullptr);
 
 }  // namespace op_executor
 }  // namespace runtime

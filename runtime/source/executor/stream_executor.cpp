@@ -190,7 +190,7 @@ RetVal StreamExecutor::inferenceModelwithProfiling(const std::vector<torch::Tens
             at::hip::device_synchronize();
         }
 
-        if (!is_control_op(layer_type)) {
+        if (!is_control_op(layer_type) && layer_type != ir::LayerType::MULTISTREAM) {
             cursor_++;
         }
     }
@@ -471,8 +471,7 @@ void StreamExecutor::registerOp()
     this->global_op_register_.insert({LayerType::PRIMUNINITIALIZED, op_executor::executePrimUninitialized});
     this->global_op_register_.insert({LayerType::PRIMVARIABLE, op_executor::executePrimVariable});
 
-    this->global_op_register_.insert({LayerType::STARTMULTISTREAM, op_executor::executeStartMultiStream});
-    this->global_op_register_.insert({LayerType::ENDMULTISTREAM, op_executor::executeEndMultiStream});
+    this->global_op_register_.insert({LayerType::MULTISTREAM, op_executor::executeMultiStream});
 }
 
 }  // namespace runtime

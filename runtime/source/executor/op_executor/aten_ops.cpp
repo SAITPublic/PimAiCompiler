@@ -717,7 +717,7 @@ void customAtenAddmm(std::string act_type, at::Tensor &self_tensor, at::Tensor &
     }
 }
 
-void customAtenMatmul(at::Tensor &self_tensor, at::Tensor &other_tensor, torch::jit::IValue &output_iv)
+void customAtenMatmul(at::Tensor &self_tensor, at::Tensor &other_tensor, torch::jit::IValue &output_iv, void* stream)
 {
     int dim_i0 = self_tensor.dim();
     int dim_i1 = other_tensor.dim();
@@ -809,7 +809,7 @@ void customAtenMatmul(at::Tensor &self_tensor, at::Tensor &other_tensor, torch::
         PimBo *dev_op1 = PimCreateBo(pim_desc, MEM_TYPE_DEVICE, GEMV_WEIGHT, A);
         PimBo *dev_out = PimCreateBo(pim_desc, MEM_TYPE_DEVICE, GEMV_OUTPUT, y);
 
-        PimExecuteGemv(dev_out, dev_op0, dev_op1, nullptr);
+        PimExecuteGemv(dev_out, dev_op0, dev_op1, stream);
 
         PimDestroyBo(dev_op0);
         PimDestroyBo(dev_op1);
@@ -853,7 +853,7 @@ void customAtenMatmul(at::Tensor &self_tensor, at::Tensor &other_tensor, torch::
         PimBo *dev_op1 = PimCreateBo(pim_desc, MEM_TYPE_DEVICE, GEMV_WEIGHT, A);
         PimBo *dev_out = PimCreateBo(pim_desc, MEM_TYPE_DEVICE, GEMV_OUTPUT, y);
 
-        PimExecuteGemv(dev_out, dev_op0, dev_op1, nullptr);
+        PimExecuteGemv(dev_out, dev_op0, dev_op1, stream);
 
         PimDestroyBo(dev_op0);
         PimDestroyBo(dev_op1);
