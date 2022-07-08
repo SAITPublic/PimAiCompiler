@@ -82,7 +82,7 @@ TEST(NNCompilerUnitTest, pimCustomGemvTest)
 
         PimDesc* pim_desc = PimCreateDesc(1, 1, n, k, PIM_FP16, OP_GEMV);
         PimBo* dev_in = PimCreateBo(pim_desc, MEM_TYPE_DEVICE, GEMV_INPUT, x);
-        PimBo* dev_wei = PimCreateBo(pim_desc, MEM_TYPE_DEVICE, GEMV_WEIGHT, A);
+        PimBo* dev_wei = PimCreateBo(pim_desc, MEM_TYPE_DEVICE, GEMV_WEIGHT_T, A);
         PimBo* dev_out = PimCreateBo(pim_desc, MEM_TYPE_DEVICE, GEMV_OUTPUT, y);
 
         PimExecuteGemv(dev_out, dev_in, dev_wei, nullptr);
@@ -119,7 +119,7 @@ TEST(NNCompilerUnitTest, pimCustomGemvTest)
 
         PimDesc* pim_desc = PimCreateDesc(1, 1, m, k, PIM_FP16, OP_GEMV);
         PimBo* dev_in = PimCreateBo(pim_desc, MEM_TYPE_DEVICE, GEMV_INPUT, x);
-        PimBo* dev_wei = PimCreateBo(pim_desc, MEM_TYPE_DEVICE, GEMV_WEIGHT_T, A);
+        PimBo* dev_wei = PimCreateBo(pim_desc, MEM_TYPE_DEVICE, GEMV_WEIGHT, A);
         PimBo* dev_out = PimCreateBo(pim_desc, MEM_TYPE_DEVICE, GEMV_OUTPUT, y);
 
         PimExecuteGemv(dev_out, dev_in, dev_wei, nullptr);

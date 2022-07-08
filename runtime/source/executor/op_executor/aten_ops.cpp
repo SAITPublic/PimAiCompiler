@@ -644,7 +644,7 @@ void customAtenAddmm(std::string act_type, at::Tensor &self_tensor, at::Tensor &
 
         PimDesc *pim_desc = PimCreateDesc(1, 1, n, k, PIM_FP16, OP_GEMV);
         PimBo *dev_op0 = PimCreateBo(pim_desc, MEM_TYPE_DEVICE, GEMV_INPUT, x);
-        PimBo *dev_op1 = PimCreateBo(pim_desc, MEM_TYPE_DEVICE, GEMV_WEIGHT, A);
+        PimBo *dev_op1 = PimCreateBo(pim_desc, MEM_TYPE_DEVICE, GEMV_WEIGHT_T, A);
         PimBo *dev_op2 = PimCreateBo(pim_desc, MEM_TYPE_DEVICE, GEMV_INPUT, b);
         PimBo *dev_out = PimCreateBo(pim_desc, MEM_TYPE_DEVICE, GEMV_OUTPUT, y);
 
@@ -678,7 +678,7 @@ void customAtenAddmm(std::string act_type, at::Tensor &self_tensor, at::Tensor &
 
         PimDesc *pim_desc = PimCreateDesc(1, 1, m, k, PIM_FP16, OP_GEMV);
         PimBo *dev_op0 = PimCreateBo(pim_desc, MEM_TYPE_DEVICE, GEMV_INPUT, x);
-        PimBo *dev_op1 = PimCreateBo(pim_desc, MEM_TYPE_DEVICE, GEMV_WEIGHT_T, A);
+        PimBo *dev_op1 = PimCreateBo(pim_desc, MEM_TYPE_DEVICE, GEMV_WEIGHT, A);
         PimBo *dev_op2 = PimCreateBo(pim_desc, MEM_TYPE_DEVICE, GEMV_OUTPUT, b);
         PimBo *dev_out = PimCreateBo(pim_desc, MEM_TYPE_DEVICE, GEMV_OUTPUT, y);
 
@@ -769,7 +769,7 @@ void customAtenMatmul(at::Tensor &self_tensor, at::Tensor &other_tensor, torch::
 
         PimDesc *pim_desc = PimCreateDesc(1, 1, n, k, PIM_FP16, OP_GEMV);
         PimBo *dev_op0 = PimCreateBo(pim_desc, MEM_TYPE_DEVICE, GEMV_INPUT, x);
-        PimBo *dev_op1 = PimCreateBo(pim_desc, MEM_TYPE_DEVICE, GEMV_WEIGHT, A);
+        PimBo *dev_op1 = PimCreateBo(pim_desc, MEM_TYPE_DEVICE, GEMV_WEIGHT_T, A);
         PimBo *dev_out = PimCreateBo(pim_desc, MEM_TYPE_DEVICE, GEMV_OUTPUT, y);
 
         PimExecuteGemv(dev_out, dev_op0, dev_op1, nullptr);
@@ -806,7 +806,7 @@ void customAtenMatmul(at::Tensor &self_tensor, at::Tensor &other_tensor, torch::
 
         PimDesc *pim_desc = PimCreateDesc(1, 1, m, k, PIM_FP16, OP_GEMV);
         PimBo *dev_op0 = PimCreateBo(pim_desc, MEM_TYPE_DEVICE, GEMV_INPUT, x);
-        PimBo *dev_op1 = PimCreateBo(pim_desc, MEM_TYPE_DEVICE, GEMV_WEIGHT_T, A);
+        PimBo *dev_op1 = PimCreateBo(pim_desc, MEM_TYPE_DEVICE, GEMV_WEIGHT, A);
         PimBo *dev_out = PimCreateBo(pim_desc, MEM_TYPE_DEVICE, GEMV_OUTPUT, y);
 
         PimExecuteGemv(dev_out, dev_op0, dev_op1, nullptr);
@@ -823,7 +823,13 @@ void customAtenMatmul(at::Tensor &self_tensor, at::Tensor &other_tensor, torch::
 
         int m = 1;
         int n = 1;
-        int k = self_tensor.size(dim_i0 - 1);
+        int k = 0;
+        for (int i = 0; i < dim_i0; ++i) {
+            if (self_tensor.size(i) != 1) {
+                k = self_tensor.size(i);
+                break;
+            }
+        }
 
         _Float16 *A = (_Float16 *)self_tensor.data_ptr();
         _Float16 *x = (_Float16 *)other_tensor.data_ptr();
@@ -844,7 +850,7 @@ void customAtenMatmul(at::Tensor &self_tensor, at::Tensor &other_tensor, torch::
 
         PimDesc *pim_desc = PimCreateDesc(1, 1, k, m, PIM_FP16, OP_GEMV);
         PimBo *dev_op0 = PimCreateBo(pim_desc, MEM_TYPE_DEVICE, GEMV_INPUT, x);
-        PimBo *dev_op1 = PimCreateBo(pim_desc, MEM_TYPE_DEVICE, GEMV_WEIGHT_T, A);
+        PimBo *dev_op1 = PimCreateBo(pim_desc, MEM_TYPE_DEVICE, GEMV_WEIGHT, A);
         PimBo *dev_out = PimCreateBo(pim_desc, MEM_TYPE_DEVICE, GEMV_OUTPUT, y);
 
         PimExecuteGemv(dev_out, dev_op0, dev_op1, nullptr);
