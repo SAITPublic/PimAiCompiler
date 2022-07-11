@@ -7,7 +7,7 @@ namespace nn_compiler
 namespace middlend
 {
 /** @Details:
- *  
+ *
  **/
 class MutiStreamExecution : public Pass
 {
