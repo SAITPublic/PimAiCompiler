@@ -1,5 +1,6 @@
 #pragma once
 
+#include "c10/hip/HIPFunctions.h"
 #include "ir/include/layers/nn_layer.h"
 #include "ir/include/tensors/data_tensor.h"
 
@@ -39,6 +40,18 @@ class MultiStreamLayer : public NNLayer
 
     int getLayerNum() { return layers_num_; }
 
+    void setStreams()
+    {
+        if (layers_num_ == INT32_MAX) return ;
+        for (int i = 0; i < layers_num_; i++) {
+            hipStream_t stream;
+            hipStreamCreate(&stream);
+            streams_.push_back(stream);
+        }
+    }
+
+    std::vector<hipStream_t> getStreams() { return streams_; }
+
     void printAttr()
     {
         DLOG(INFO) << "      MultiStream Attr     ";
@@ -48,6 +61,7 @@ class MultiStreamLayer : public NNLayer
    private:
     std::vector<std::shared_ptr<nn_compiler::ir::NNLayer>> layers_;
     int layers_num_ = INT32_MAX;
+    std::vector<hipStream_t> streams_;
 };
 
 }  // namespace ir

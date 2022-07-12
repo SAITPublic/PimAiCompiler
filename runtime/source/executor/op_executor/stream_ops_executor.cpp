@@ -20,8 +20,7 @@ void executeMultiStream(std::shared_ptr<nn_compiler::ir::NNLayer> &layer, Stream
     auto muti_stream_layer = std::static_pointer_cast<nn_compiler::ir::MultiStreamLayer>(layer);
     auto execution_layers = muti_stream_layer->getLayers();
     auto layer_num = muti_stream_layer->getLayerNum();
-
-    hipStream_t streams[layer_num];
+    auto streams = muti_stream_layer->getStreams();
 
     std::vector<_Float16 *> vector_values;
     std::vector<_Float16 *> matrix_values;
@@ -73,8 +72,6 @@ void executeMultiStream(std::shared_ptr<nn_compiler::ir::NNLayer> &layer, Stream
         outputs.push_back((_Float16 *)output.data_ptr());
         output_tensors.push_back(output);
         output_ids.push_back(out_stensor_id[0]);
-
-        hipStreamCreate(&streams[i]);
     }
 
     for (int i = 0; i < layer_num; i++) {
