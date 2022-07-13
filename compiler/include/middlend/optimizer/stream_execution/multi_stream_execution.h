@@ -25,6 +25,10 @@ class MutiStreamExecution : public Pass
 
     bool isSameLayerType(std::vector<std::shared_ptr<ir::NNLayer>>& predecessors);
 
+    int reorganizeLayerOrders(std::shared_ptr<ir::NNGraph>& graph, int start_idx);
+
+    void insertMultiStreamLayer(std::shared_ptr<ir::NNGraph>& graph, int idx);
+
 };  // class MutiStreamExecution
 
 }  // namespace middlend

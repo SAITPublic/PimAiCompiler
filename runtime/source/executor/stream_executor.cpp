@@ -190,7 +190,7 @@ RetVal StreamExecutor::inferenceModelwithProfiling(const std::vector<torch::Tens
             at::hip::device_synchronize();
         }
 
-        if (!is_control_op(layer_type) && layer_type != ir::LayerType::MULTISTREAM) {
+        if (!is_control_op(layer_type)) {
             cursor_++;
         }
     }

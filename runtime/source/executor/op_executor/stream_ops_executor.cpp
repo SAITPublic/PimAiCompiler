@@ -75,12 +75,11 @@ void executeMultiStream(std::shared_ptr<nn_compiler::ir::NNLayer> &layer, Stream
     }
 
     for (int i = 0; i < layer_num; i++) {
-        // rocblas_gemv_template_Axy(stream[i], A, x, y, m, n, k, alpha, beta);
         hipLaunchKernelGGL((gemvt_kernel_Axy<NB>), dim3(1, m_values[i]), dim3(NB), 0, streams[i],
                            m_values[i], k_values[i], alpha,
-                           matrix_values[i],  // k
+                           matrix_values[i],
                            k_values[i],
-                           vector_values[i],  // kxn
+                           vector_values[i],
                            n_values[i], beta, outputs[i]);
     }
 
