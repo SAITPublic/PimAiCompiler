@@ -88,6 +88,8 @@ class NNGraph
         return idx;
     }
 
+    void swapLayerOrder(uint32_t idx1, uint32_t idx2) { std::swap(layers_[idx1], layers_[idx2]); }
+
     std::vector<std::shared_ptr<NNLayer>>& getLayers() { return layers_; }
 
     void addSTensor(std::pair<uint32_t, std::shared_ptr<STensor>> shape_tensor) { shape_tensors_.insert(shape_tensor); }
