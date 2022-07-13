@@ -15,7 +15,6 @@
 #include "frontend/optimizer/swap_addmm_inputs.h"
 #include "frontend/optimizer/swap_matmul_inputs.h"
 #include "frontend/optimizer/take_in_body_net.h"
-#include "frontend/optimizer/update_layer_id.h"
 
 namespace nn_compiler
 {
@@ -43,7 +42,6 @@ void PassManager::runPasses(std::unique_ptr<nn_compiler::ir::NNModel>& model)
     auto swap_matmul_inputs = std::make_shared<SwapMatmulInputs>();
     auto fuse_act = std::make_shared<FuseActivation>();
     auto set_weights_for_embedding = std::make_shared<SetWeightsForEmbedding>();
-    auto update_layer_id = std::make_shared<UpdateLayerId>();
 
     base_pass->add(take_in_body_net);
     take_in_body_net->add(construct_list);
@@ -63,9 +61,6 @@ void PassManager::runPasses(std::unique_ptr<nn_compiler::ir::NNModel>& model)
 
     if (model_name_ == "RNNT") {
         fuse_act->add(set_weights_for_embedding);
-        set_weights_for_embedding->add(update_layer_id);
-    } else {
-        fuse_act->add(update_layer_id);
     }
 
     while (base_pass->getSuccessor() != nullptr) {

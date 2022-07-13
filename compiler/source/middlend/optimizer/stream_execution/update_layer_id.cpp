@@ -1,9 +1,9 @@
-#include "frontend/optimizer/update_layer_id.h"
 #include "ir/include/utils/graph_util.h"
+#include "middlend/optimizer/stream_execution/update_layer_id.h"
 
 namespace nn_compiler
 {
-namespace frontend
+namespace middlend
 {
 UpdateLayerId::UpdateLayerId() {}
 
@@ -54,8 +54,7 @@ void UpdateLayerId::run(std::unique_ptr<nn_compiler::ir::NNModel>& model)
         layer->setPreLayerIDs(pre_layer_ids);
         layer->setNextLayerIDs(next_layer_ids);
     }
-    // DLOG(FATAL)<<"";
 }
 
-}  // namespace frontend
+}  // namespace middlend
 }  // namespace nn_compiler
