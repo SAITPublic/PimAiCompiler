@@ -20,7 +20,6 @@ void executeMultiStream(std::shared_ptr<nn_compiler::ir::NNLayer> &layer, Stream
     auto muti_stream_layer = std::static_pointer_cast<nn_compiler::ir::MultiStreamLayer>(layer);
     auto execution_layers = muti_stream_layer->getLayers();
     auto layer_num = muti_stream_layer->getLayerNum();
-    auto streams = muti_stream_layer->getStreams();
 
     std::vector<_Float16 *> vector_values;
     std::vector<_Float16 *> matrix_values;
@@ -74,6 +73,7 @@ void executeMultiStream(std::shared_ptr<nn_compiler::ir::NNLayer> &layer, Stream
         output_ids.push_back(out_stensor_id[0]);
     }
 
+    auto streams = stream_executor.getStreams();
     for (int i = 0; i < layer_num; i++) {
         hipLaunchKernelGGL((gemvt_kernel_Axy<NB>), dim3(1, m_values[i]), dim3(NB), 0, streams[i],
                            m_values[i], k_values[i], alpha,
@@ -88,7 +88,7 @@ void executeMultiStream(std::shared_ptr<nn_compiler::ir::NNLayer> &layer, Stream
     }
 
     for (int i = 0; i < layer_num; i++) {
-        stream_executor.updateBlob(output_ids[i], DataType::TENSOR, output_tensors[i]);
+        stream_executor.updateBlob(output_ids[i], DataType::TENSOR, tensorToIValue(output_tensors[i]));
     }
 
     stream_executor.setCursor(layer->getID() + layer_num);

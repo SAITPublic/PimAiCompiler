@@ -259,7 +259,6 @@ void MultiStreamExecution::insertMultiStreamLayer(std::shared_ptr<ir::NNGraph>& 
     auto new_layer = std::make_shared<nn_compiler::ir::MultiStreamLayer>(new_name, new_type);
     new_layer->setLayers(matmul_layers);
     new_layer->setLayerNum(matmul_layers.size());
-    new_layer->setStreams();
     graph->addLayer2pos(new_layer, idx - matmul_layers.size() - 1);
 }
 

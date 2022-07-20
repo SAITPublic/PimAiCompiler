@@ -85,6 +85,17 @@ RetVal StreamExecutor::preProcess()
         }
     }
 
+    int max_stream_num = 0;
+    for (auto layer : graph_->getLayers()) {
+        if (layer->getType() == ir::LayerType::MULTISTREAM) {
+            auto multi_stream_layer = std::static_pointer_cast<ir::MultiStreamLayer>(layer);
+            max_stream_num =
+                multi_stream_layer->getLayerNum() > max_stream_num ? multi_stream_layer->getLayerNum() : max_stream_num;
+        }
+    }
+    this->setStreamNum(max_stream_num);
+    this->setStreams();
+
     DLOG(INFO) << "Num inputs of Graph: " << input_blob_ids_.size();
     DLOG(INFO) << "Num outputs of Graph: " << output_blob_ids_.size();
 

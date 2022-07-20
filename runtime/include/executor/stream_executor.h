@@ -8,6 +8,7 @@
 #include <vector>
 
 #include "builder/model_builder.h"
+#include "c10/hip/HIPFunctions.h"
 #include "common/include/types.hpp"
 #include "executor/utils/utils.h"
 #include "ir/include/layers/all_layers.h"
@@ -108,6 +109,21 @@ class StreamExecutor
         return tensors;
     }
 
+    void setStreams()
+    {
+        for (int i = 0; i < stream_num_; i++) {
+            hipStream_t stream;
+            hipStreamCreate(&stream);
+            streams_.push_back(stream);
+        }
+    }
+
+    std::vector<hipStream_t>& getStreams() { return streams_; }
+
+    void setStreamNum(int stream_num) { stream_num_ = stream_num; }
+
+    int getStreamNum() { return stream_num_; }
+
    private:
     std::shared_ptr<ir::NNGraph> graph_;
 
@@ -135,6 +151,10 @@ class StreamExecutor
     std::vector<miopenTensorDescriptor_t> output_tensors_;
     miopenHandle_t handle_;
     miopenRNNDescriptor_t rnn_desc_;
+
+    // multi-stream
+    std::vector<hipStream_t> streams_;
+    int stream_num_ = 0;
 };
 
 }  // namespace runtime
