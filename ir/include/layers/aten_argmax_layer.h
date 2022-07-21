@@ -21,10 +21,7 @@ class AtenArgmaxLayer : public NNLayer
 
     virtual ~AtenArgmaxLayer() {}
 
-    virtual std::shared_ptr<NNLayer> clone()
-    {
-        return std::shared_ptr<AtenArgmaxLayer>(new AtenArgmaxLayer(*this));
-    }
+    virtual std::shared_ptr<NNLayer> clone() { return std::shared_ptr<AtenArgmaxLayer>(new AtenArgmaxLayer(*this)); }
 
     void setDim(int64_t dim) { dim_ = dim; }
 

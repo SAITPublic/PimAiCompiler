@@ -27,10 +27,7 @@ class MultiStreamLayer : public NNLayer
 
     virtual ~MultiStreamLayer() {}
 
-    virtual std::shared_ptr<NNLayer> clone()
-    {
-        return std::shared_ptr<MultiStreamLayer>(new MultiStreamLayer(*this));
-    }
+    virtual std::shared_ptr<NNLayer> clone() { return std::shared_ptr<MultiStreamLayer>(new MultiStreamLayer(*this)); }
 
     void setLayers(std::vector<std::shared_ptr<nn_compiler::ir::NNLayer>> layers) { layers_ = layers; }
 
@@ -42,7 +39,7 @@ class MultiStreamLayer : public NNLayer
 
     void setStreams()
     {
-        if (layers_num_ == INT32_MAX) return ;
+        if (layers_num_ == INT32_MAX) return;
         for (int i = 0; i < layers_num_; i++) {
             hipStream_t stream;
             hipStreamCreate(&stream);

@@ -1,7 +1,7 @@
 #include <string>
 
-#include "middlend/optimizer/stream_execution/control_layer_execution.h"
 #include "ir/include/utils/graph_util.h"
+#include "middlend/optimizer/stream_execution/control_layer_execution.h"
 
 namespace nn_compiler
 {

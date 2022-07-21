@@ -1345,9 +1345,7 @@ std::string getStringFromConstant(dtensor_ptr_type& d_tensor, nn_compiler::ir::L
     std::string str = "";
     auto data = d_tensor->getData<uint8_t>();
 
-    auto isInvalidCharacter = [](char c) -> bool { 
-        return (c == '\n' || c == '\0');
-    };
+    auto isInvalidCharacter = [](char c) -> bool { return (c == '\n' || c == '\0'); };
 
     if ((*data).size()) {
         for (unsigned int i = 0; i < (*data).size() && !isInvalidCharacter((*data)[i]); i++) {

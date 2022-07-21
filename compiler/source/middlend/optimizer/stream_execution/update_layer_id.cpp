@@ -1,5 +1,5 @@
-#include "ir/include/utils/graph_util.h"
 #include "middlend/optimizer/stream_execution/update_layer_id.h"
+#include "ir/include/utils/graph_util.h"
 
 namespace nn_compiler
 {

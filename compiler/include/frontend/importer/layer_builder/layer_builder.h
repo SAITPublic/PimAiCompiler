@@ -728,7 +728,6 @@ class AtenOneHotBuilder : public LayerBuilder
     std::shared_ptr<ir::AtenOneHotLayer> aten_one_hot_layer_;
 };
 
-
 class AtenOnesBuilder : public LayerBuilder
 {
    public:
@@ -764,7 +763,6 @@ class AtenPermuteBuilder : public LayerBuilder
    private:
     std::shared_ptr<ir::AtenPermuteLayer> aten_permute_layer_;
 };
-
 
 class AtenPowBuilder : public LayerBuilder
 {

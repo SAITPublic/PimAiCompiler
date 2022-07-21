@@ -1,6 +1,6 @@
+#include "ir/include/utils/graph_print.h"
 #include "ir/include/layers/all_layers.h"
 #include "ir/include/types.h"
-#include "ir/include/utils/graph_print.h"
 
 namespace nn_compiler
 {

@@ -484,7 +484,7 @@ void ModelBuilder::importTorchScriptMethodBlock(std::unique_ptr<ir::NNModel>& nn
                 if (builder != nullptr) {
                     graph->addLayer(createLayer(builder, node, nn_model));
                 } else {
-                    DLOG(FATAL) << kind.toQualString() << " layer builder not found. "<<type;
+                    DLOG(FATAL) << kind.toQualString() << " layer builder not found. " << type;
                 }
                 break;
             }

@@ -10,7 +10,6 @@ namespace ir
 class AtenTriuLayer : public NNLayer
 {
    public:
-
     AtenTriuLayer(std::string name, LayerType type) : NNLayer(name, type) {}
 
     explicit AtenTriuLayer(const AtenTriuLayer& aten_triu_layer) : NNLayer(aten_triu_layer)

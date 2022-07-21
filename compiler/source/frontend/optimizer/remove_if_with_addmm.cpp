@@ -76,7 +76,7 @@ void RemoveIfWithAddmm::run(std::unique_ptr<nn_compiler::ir::NNModel> &model)
     }
 }
 
-void RemoveIfWithAddmm::getDeleteLayers(std::unique_ptr<nn_compiler::ir::NNModel>& model,
+void RemoveIfWithAddmm::getDeleteLayers(std::unique_ptr<nn_compiler::ir::NNModel> &model,
                                         std::shared_ptr<nn_compiler::ir::NNLayer> layer,
                                         std::vector<std::shared_ptr<nn_compiler::ir::NNLayer>> &delete_layers)
 {
