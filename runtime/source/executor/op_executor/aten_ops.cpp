@@ -45,16 +45,16 @@ at::Tensor atenAny(const at::Tensor &self) { return at::any(self); }
 
 void atenAppend(c10::List<at::IValue> &list, at::IValue el) { list.push_back(std::move(el)); }
 
-at::Tensor atenArange1(at::Scalar end, const at::TensorOptions &options) { return at::arange(end, options); }
+at::Tensor atenArange1(at::Scalar end, const at::TensorOptions &options) { return at::arange(end, options).cuda(); }
 
 at::Tensor atenArange2(at::Scalar start, at::Scalar end, const at::TensorOptions &options)
 {
-    return at::arange(start, end, options);
+    return at::arange(start, end, options).cuda();
 }
 
 at::Tensor atenArange3(at::Scalar start, at::Scalar end, at::Scalar step, const at::TensorOptions &options)
 {
-    return at::arange(start, end, step, options);
+    return at::arange(start, end, step, options).cuda();
 }
 
 at::Tensor atenArgmax(at::Tensor &self, c10::optional<int64_t> dim, bool keepdim)

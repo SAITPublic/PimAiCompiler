@@ -21,6 +21,8 @@ class PipelineManager
     PipelineManager(const std::string& input_file_path, std::string model_type, bool profiling = false);
 
     std::vector<torch::Tensor> inferenceModel(const std::vector<torch::Tensor>& input_tensors);
+    // void* _launchRuntime(std::shared_ptr<nn_compiler::ir::NNModel> model_,
+    //                         const std::vector<torch::Tensor>& input_tensor,  bool profiling);
 
     /**
      * @brief   Destroy all data and terminate the program

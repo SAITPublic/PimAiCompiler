@@ -339,6 +339,7 @@ void StreamExecutor::getOutputTensors(std::vector<torch::Tensor>& output_tensors
     for (auto idx = 0; idx < output_tensors.size(); idx++) {
         DLOG(INFO) << "Output tensor" << idx << ": " << output_tensors[idx];
     }
+    std::cout <<std::endl;
 }
 
 const std::shared_ptr<ir::NNGraph> StreamExecutor::getGraph() { return this->graph_; }
