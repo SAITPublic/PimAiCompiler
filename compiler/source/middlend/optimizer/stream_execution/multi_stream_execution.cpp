@@ -11,44 +11,47 @@ MultiStreamExecution::MultiStreamExecution() {}
 
 bool MultiStreamExecution::fitCondition(std::unique_ptr<nn_compiler::ir::NNModel>& model)
 {
-    auto graphs = model->getGraphs();
-    std::vector<nn_compiler::ir::LayerType> search_layers_type;
-    // TODO(zhiyu.zhu): there are some hard-coding in this part, how to make it more general?
-    for (auto graph : graphs) {
-        for (auto layer : graph->getLayers()) {
-            if (layer->getType() == nn_compiler::ir::LayerType::PRIMLISTCONSTRUCT) {
-                multi_stream_layers_.push_back(layer);
-                bool find_layer = false;
-                auto predecessors = ir::utils::searchPredecessor(layer, model);
-                if (predecessors.size() == 4 && isSameLayerType(predecessors)) {
-                    search_layers_type.push_back(predecessors[0]->getType());
-                    predecessors = ir::utils::searchPredecessor(predecessors[0], model);
-                    if (predecessors.size() <= 1) {
-                        multi_stream_layers_.pop_back();
-                        continue;
-                    }
-                    search_layers_type.push_back(predecessors[0]->getType());
-                    predecessors = ir::utils::searchPredecessor(predecessors[0], model);
-                    search_layers_type.push_back(predecessors[0]->getType());
-                    predecessors = ir::utils::searchPredecessor(predecessors[0], model);
-                    search_layers_type.push_back(predecessors[1]->getType());
-                    predecessors = ir::utils::searchPredecessor(predecessors[1], model);
-                    search_layers_type.push_back(predecessors[0]->getType());
-                    predecessors = ir::utils::searchPredecessor(predecessors[0], model);
-                    search_layers_type.push_back(predecessors[0]->getType());
+    auto graph = model->getGraphs()[0];
+    auto layers = graph->getLayers();
 
-                    auto successors = ir::utils::searchSuccessorLayers(predecessors[0], model);
-                    if (std::find(search_layers_type.begin(), search_layers_type.end(),
-                                  nn_compiler::ir::LayerType::ATENMATMUL) != search_layers_type.end() &&
-                        successors.size() == 4 && isSameLayerType(successors)) {
-                        multi_stream_layers_.push_back(predecessors[0]);
-                        find_layer = true;
-                    }
-                }
-                if (!find_layer) {
-                    multi_stream_layers_.pop_back();
+    for (auto idx = 0; idx < layers.size(); idx++) {
+        auto predecessors = ir::utils::searchPredecessor(layers[idx], model);
+        pre_layers_map_[layers[idx]] = predecessors;
+    }
+
+    for (auto idx = 0; idx < layers.size(); idx++) {
+        if (layers[idx]->getType() == ir::LayerType::PRIMENDIF) {
+            // if&else branches shouldn't be parrallel
+            continue;
+        }
+
+        auto predecessors = pre_layers_map_[layers[idx]];
+        int non_constant_layer_num = 0;
+        for (auto predecessor : predecessors) {
+            if (predecessor->getType() != ir::LayerType::PRIMCONSTANT) {
+                non_constant_layer_num++;
+            }
+        }
+        if (non_constant_layer_num > 1) {
+            for (auto predecessor : predecessors) {
+                if (predecessor->getType() != ir::LayerType::PRIMCONSTANT) {
+                    std::vector<std::shared_ptr<nn_compiler::ir::NNLayer>> new_branch;
+                    new_branch.push_back(predecessor);
+                    branches_.push_back(new_branch);
                 }
             }
+
+            std::shared_ptr<nn_compiler::ir::NNLayer> multi_stream_start_layer = nullptr;
+            if (!backwardToCheckAndFindStartLayer(model, multi_stream_start_layer)) {
+                branches_.clear();
+                continue;
+            }
+            if (multi_stream_start_layer != nullptr) {
+                multi_stream_layers_.push_back(multi_stream_start_layer);
+                multi_stream_layers_.push_back(layers[idx]);
+            }
+
+            branches_.clear();
         }
     }
 
@@ -79,18 +82,124 @@ void MultiStreamExecution::run(std::unique_ptr<nn_compiler::ir::NNModel>& model)
     }
 }
 
-bool MultiStreamExecution::isSameLayerType(std::vector<std::shared_ptr<ir::NNLayer>>& predecessors)
+bool MultiStreamExecution::backwardToCheckAndFindStartLayer(
+    std::unique_ptr<nn_compiler::ir::NNModel>& model,
+    std::shared_ptr<nn_compiler::ir::NNLayer>& multi_stream_start_layer)
 {
-    bool ret = false;
-    if (predecessors.size() != 0) {
-        if (predecessors.size() == 1) return true;
-        nn_compiler::ir::LayerType tmp;
-        tmp = predecessors[0]->getType();
-        for (int i = 1; i < predecessors.size(); ++i) {
-            ret = tmp == predecessors[i]->getType() ? true : false;
+    std::vector<int> search_index_of_branches(branches_.size(), 0);
+    // backward to find branch ops within max_search_level_
+    for (auto i = 0; i < branches_.size(); i++) {
+        auto& branch = branches_[i];
+        bool found_stream_support_op = false;
+        for (int cnt = 0; cnt < max_search_level_; cnt++) {
+            auto origin_branch_size = branch.size();
+            for (auto& index = search_index_of_branches[i]; index < origin_branch_size; index++) {
+                if (branch[index]->getType() == ir::LayerType::PRIMENDIF) {
+                    break;
+                }
+                if (branch[index]->getType() == ir::LayerType::ATENADD ||
+                    branch[index]->getType() == ir::LayerType::ATENADDMM ||
+                    branch[index]->getType() == ir::LayerType::ATENMATMUL) {
+                    // currently, only add, addmm and matmul support stream argument.
+                    // other Ops are calling aten lib directly.
+                    found_stream_support_op = true;
+                }
+
+                auto predecessors = pre_layers_map_[branch[index]];
+                for (auto predecessor : predecessors) {
+                    if (predecessor->getType() != ir::LayerType::PRIMCONSTANT) {
+                        branch.push_back(predecessor);
+                    }
+                }
+            }
+        }
+        if (!found_stream_support_op) {
+            return false;
         }
     }
-    return ret;
+
+    std::vector<int> stream_op_index_in_branches(branches_.size(), -1);
+    for (auto i = 0; i < branches_.size(); i++) {
+        auto& branch = branches_[i];
+        for (auto j = 0; j < branch.size(); j++) {
+            if (branch[j]->getType() == ir::LayerType::ATENMATMUL || branch[j]->getType() == ir::LayerType::ATENADDMM) {
+                // TODO: for current supported model, addmm and matmul spend much more time than add.
+                // It may be possible for us to support mult-stream for add later, when large add is found in the model.
+                stream_op_index_in_branches[i] = j;
+                break;
+            }
+        }
+    }
+    for (auto i = 0; i < stream_op_index_in_branches.size(); i++) {
+        if (stream_op_index_in_branches[i] == -1) {  // double-check no stream-support ops for parralelism
+            return false;
+        }
+    }
+
+    // find start layer of parralelism module
+    std::set<std::pair<int, std::shared_ptr<nn_compiler::ir::NNLayer>>> candidate_starts_set;  // pair: (level, layer)
+    for (auto i = 0; i < branches_.size(); i++) {
+        auto& branch = branches_[i];
+        if (candidate_starts_set.size() == 0) {
+            if (i == 0) {
+                for (auto j = stream_op_index_in_branches[i]; j < branch.size(); j++) {
+                    candidate_starts_set.insert(std::make_pair((j - stream_op_index_in_branches[i] + 1), branch[j]));
+                }
+            } else {
+                return false;
+            }
+        }
+        std::set<std::pair<int, std::shared_ptr<nn_compiler::ir::NNLayer>>> updated_set;
+        for (auto j = stream_op_index_in_branches[i]; j < branch.size(); j++) {
+            auto item = std::make_pair((j - stream_op_index_in_branches[i] + 1), branch[j]);
+            if (candidate_starts_set.find(item) != candidate_starts_set.end()) {
+                updated_set.insert(item);
+            }
+        }
+        candidate_starts_set = updated_set;
+    }
+    if (candidate_starts_set.size() == 0 ||
+        candidate_starts_set.begin()->second == branches_[0][stream_op_index_in_branches[0]]) {
+        // no same start, or the start layer is just the parralelism layer
+        return false;
+    }
+
+    // the module may be nested case (more than one layer has multiple input branches).
+    // check whether the candidate start is just the predecessor of stream ops
+    for (auto candidate_start : candidate_starts_set) {
+        std::queue<std::shared_ptr<nn_compiler::ir::NNLayer>> stream_branch_ops;
+        bool valid_start = true;
+        for (auto i = 0; i < branches_.size(); i++) {
+            stream_branch_ops.push(branches_[i][stream_op_index_in_branches[i]]);
+            bool found_in_branch = false;
+            int cnt = 0;
+            while (!stream_branch_ops.empty() && cnt++ < max_search_level_) {
+                auto cur_layer = stream_branch_ops.front();
+                stream_branch_ops.pop();
+                auto pre_layers = pre_layers_map_[cur_layer];
+                for (auto pre_layer : pre_layers) {
+                    if (pre_layer == candidate_start.second) {
+                        found_in_branch = true;
+                        break;
+                    }
+                    stream_branch_ops.push(pre_layer);
+                }
+                if (found_in_branch) {
+                    break;
+                }
+            }
+            if (!found_in_branch) {
+                valid_start = false;
+                break;
+            }
+        }
+        if (valid_start) {
+            multi_stream_start_layer = candidate_start.second;
+            break;
+        }
+    }
+
+    return (multi_stream_start_layer != nullptr);
 }
 
 int MultiStreamExecution::reorganizeLayerOrders(std::shared_ptr<ir::NNGraph>& graph, int start_idx)
