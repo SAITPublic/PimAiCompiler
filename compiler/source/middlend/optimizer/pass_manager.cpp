@@ -17,14 +17,14 @@ void PassManager::runPasses(std::unique_ptr<nn_compiler::ir::NNModel>& model)
     DLOG(INFO) << "PassManager::runPasses is called.";
     auto base_pass = std::make_shared<Pass>();
 
-    auto muti_stream_execution = std::make_shared<MutiStreamExecution>();
+    auto multi_stream_execution = std::make_shared<MultiStreamExecution>();
     auto update_layer_id = std::make_shared<UpdateLayerId>();
     auto control_layer_execution = std::make_shared<ControlLayerExecution>();
     auto lstm_labeling = std::make_shared<LstmLabeling>();
     auto cat_labeling = std::make_shared<CatLabeling>();
 
-    base_pass->add(muti_stream_execution);
-    muti_stream_execution->add(update_layer_id);
+    base_pass->add(multi_stream_execution);
+    multi_stream_execution->add(update_layer_id);
     update_layer_id->add(control_layer_execution);
     control_layer_execution->add(lstm_labeling);
     lstm_labeling->add(cat_labeling);

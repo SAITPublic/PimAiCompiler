@@ -9,19 +9,19 @@ namespace middlend
 /** @Details:
  *
  **/
-class MutiStreamExecution : public Pass
+class MultiStreamExecution : public Pass
 {
    public:
-    MutiStreamExecution();
+    MultiStreamExecution();
 
     bool fitCondition(std::unique_ptr<nn_compiler::ir::NNModel>& model);
 
     void run(std::unique_ptr<nn_compiler::ir::NNModel>& model);
 
-    ~MutiStreamExecution() = default;
+    ~MultiStreamExecution() = default;
 
    private:
-    std::vector<std::shared_ptr<nn_compiler::ir::NNLayer>> muti_stream_layers_;
+    std::vector<std::shared_ptr<nn_compiler::ir::NNLayer>> multi_stream_layers_;
 
     bool isSameLayerType(std::vector<std::shared_ptr<ir::NNLayer>>& predecessors);
 
@@ -29,7 +29,7 @@ class MutiStreamExecution : public Pass
 
     void insertMultiStreamLayer(std::shared_ptr<ir::NNGraph>& graph, int idx);
 
-};  // class MutiStreamExecution
+};  // class MultiStreamExecution
 
 }  // namespace middlend
 }  // namespace nn_compiler

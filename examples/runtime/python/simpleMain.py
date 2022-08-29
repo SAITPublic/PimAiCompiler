@@ -23,6 +23,7 @@ def test_simple_add_net(graph_file : str):
     # compare
     assert compare_tensors([pytorch_outs], nncompiler_outs)
 
+
 def test_simple_if_net(graph_file : str):
     from ir_net.simple_net_if import TestNet3
     # Set inputs
@@ -50,6 +51,7 @@ def test_simple_loop_net(graph_files : str):
         # compare
         assert compare_tensors([pytorch_outs], nncompiler_outs)
 
+
 def test_simple_cases():
     # Some simple cases
     # Set graph files
@@ -72,7 +74,7 @@ def test_rnnt_inference(input_file : str, feature_file : str, feature_len_file :
     feature_len = torch.load(feature_len_file)  # dtype=torch.long
     # Init nncompiler
     nncompiler = NNCompiler.PipelineManager(input_file, model_type)
-    # warn-up
+    # warm-up
     _, _, _ = nncompiler.inferenceModel([feature, feature_len])
     # Run and test
     time_start = time.time()
@@ -88,14 +90,14 @@ def test_hwr_inference(input_file : str, input_tensor_file : str, model_type : s
     input_tensor = torch.load(input_tensor_file).cuda()   # dtype=torch.fp16
     # Init nncompiler
     nncompiler = NNCompiler.PipelineManager(input_file, model_type)
-    # warn-up
+    # warm-up
     _ = nncompiler.inferenceModel([input_tensor])
     # Run and test
     torch.cuda.synchronize()
     time_start = time.time()
     test_cnt = 100
     for _ in tqdm.tqdm(range(test_cnt)):
-        outpus = nncompiler.inferenceModel([input_tensor])
+        outputs = nncompiler.inferenceModel([input_tensor])
         torch.cuda.synchronize()
     time_end = time.time()
     print('HWR avg_time:{}ms'.format((time_end - time_start) / test_cnt * 1000))
@@ -108,7 +110,7 @@ def test_gnmt_inference(input_file : str, src_file : str, src_length_file : str,
     bos = torch.load(bos_file).cuda()   # dtype=torch.long
     # Init nncompiler
     nncompiler = NNCompiler.PipelineManager(input_file, model_type)
-        # warn-up
+    # warm-up
     _, _, _ = nncompiler.inferenceModel([src, src_length, bos])
     # Run and test
     time_start = time.time()
@@ -124,35 +126,36 @@ def test_transformer_inference(input_file : str, input_tensor_file : str, model_
     input_tensor = torch.load(input_tensor_file).cuda()
     # Init nncompiler
     nncompiler = NNCompiler.PipelineManager(input_file, model_type)
-    # warn-up
+    # warm-up
     _ = nncompiler.inferenceModel([input_tensor])
     # Run and test
     torch.cuda.synchronize()
     time_start = time.time()
     test_cnt = 100
     for _ in tqdm.tqdm(range(test_cnt)):
-        outpus = nncompiler.inferenceModel([input_tensor])
+        outputs = nncompiler.inferenceModel([input_tensor])
         torch.cuda.synchronize()
     time_end = time.time()
     print('Transformer avg_time:{}ms'.format((time_end - time_start) / test_cnt * 1000))
 
-def test_switchtransformer_inference(input_file : str, input_tensor_file : str, attention_mask_file : str, model_type : str):
+
+def test_switch_transformer_inference(input_file : str, input_tensor_file : str, attention_mask_file : str, model_type : str):
     # Prepare inputs
     input_tensor = torch.load(input_tensor_file).cuda()
     attention_mask = torch.load(attention_mask_file).cuda()
     # Init nncompiler
     nncompiler = NNCompiler.PipelineManager(input_file, model_type)
-    # warn-up
+    # warm-up
     _ = nncompiler.inferenceModel([input_tensor, attention_mask])
     # Run and test
     torch.cuda.synchronize()
     time_start = time.time()
     test_cnt = 100
     for _ in tqdm.tqdm(range(test_cnt)):
-        outpus = nncompiler.inferenceModel([input_tensor, attention_mask])
+        outputs = nncompiler.inferenceModel([input_tensor, attention_mask])
         torch.cuda.synchronize()
     time_end = time.time()
-    print('Transformer avg_time:{}ms'.format((time_end - time_start) / test_cnt * 1000))
+    print('Switch Transformer avg_time:{}ms'.format((time_end - time_start) / test_cnt * 1000))
 
 
 if __name__ == '__main__':
@@ -189,4 +192,4 @@ if __name__ == '__main__':
         input_tensor_file = os.path.join(current_dir, '../resource/switch_transformer/inputs/input_ids_2_13.pt')
         attention_mask_file = os.path.join(current_dir, '../resource/switch_transformer/inputs/attention_mask_2_13.pt')
         assert os.path.exists(input_tensor_file) and os.path.exists(attention_mask_file)
-        test_switchtransformer_inference(args.input_file, input_tensor_file, attention_mask_file, args.model_kind)
+        test_switch_transformer_inference(args.input_file, input_tensor_file, attention_mask_file, args.model_kind)
