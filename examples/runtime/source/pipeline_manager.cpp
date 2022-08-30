@@ -13,7 +13,8 @@ namespace fs = std::experimental::filesystem;
 
 namespace examples
 {
-RetVal PipelineManager::initialize(const std::string& input_file, const std::string& model_type, const bool& profiling)
+RetVal PipelineManager::initialize(const std::string& input_file, const std::string& model_type, const bool& profiling,
+                                   const int& gpu_num)
 {
     if (model_type == "RNNT") {
         model_type_ = ModelType::RNNT;
@@ -30,6 +31,7 @@ RetVal PipelineManager::initialize(const std::string& input_file, const std::str
     }
     input_file_path_ = input_file;
     is_profiling_ = profiling;
+    gpu_num_ = gpu_num;
 
     return RetVal::SUCCESS;
 }
@@ -208,6 +210,23 @@ void PipelineManager::load_and_run_transformer()
     runtime.inferenceModel(input_tensors, output_tensors, is_profiling_);
 }
 
+static std::vector<torch::Tensor> output_tensors_;
+
+static void launchInference(std::shared_ptr<nn_compiler::ir::NNModel> model_,
+                                      const std::vector<torch::Tensor> &input_tensors, std::string model_type_,
+                                      bool profiling, int gpu_id)
+{
+    hipSetDevice(gpu_id);
+    std::unique_ptr<nn_compiler::ir::NNModel> model = std::make_unique<nn_compiler::ir::NNModel>(*model_);
+    std::shared_ptr<NNRuntime> runtime_ = std::make_shared<NNRuntime>(model, model_type_);
+    std::vector<torch::Tensor> input_tensors_;
+    for (auto item : input_tensors) {
+        input_tensors_.emplace_back(item.cuda());
+    }
+
+    runtime_->inferenceModel(input_tensors_, output_tensors_, profiling);
+}
+
 void PipelineManager::load_and_run_switchtransformer()
 {
     std::string input_file = "examples/runtime/resource/switch_transformer/inputs/src_2_13_input.bin";
@@ -221,30 +240,36 @@ void PipelineManager::load_and_run_switchtransformer()
         DLOG(FATAL) << "Please run at base or build directory.";
     }
 
+    std::vector<std::thread> thread_pool_;
+    // load inputs from files
+    auto input_tensor = loadTensor(input_file, {2, 13}, DataType::INT64).cuda();
+    auto attention_mask = loadTensor(src_attention_mask, {2, 13}, DataType::INT64).cuda();
+
     std::unique_ptr<nn_compiler::ir::NNModel> model = std::make_unique<nn_compiler::ir::NNModel>();
 
     NNCompiler compiler;
     compiler.initialize(input_file_path_, "SwitchTransformer");
     compiler.compile(model);
+    std::shared_ptr<nn_compiler::ir::NNModel> model_ = std::move(model);
 
-    NNRuntime runtime(model, "SwitchTransformer");
+    std::vector<torch::Tensor> input_chunks = input_tensor.chunk(gpu_num_, 0);
+    std::vector<torch::Tensor> attention_chunks = attention_mask.chunk(gpu_num_, 0);
 
-    std::vector<torch::Tensor> input_tensors;
-    std::vector<torch::Tensor> output_tensors;
-    // load inputs from files
-    auto tensor = loadTensor(input_file, {2, 13}, DataType::INT64).cuda();
-    auto attention_mask = loadTensor(src_attention_mask, {2, 13}, DataType::INT64).cuda();
-
-    input_tensors.push_back(tensor);
-    input_tensors.push_back(attention_mask);
-
-    for (auto item : input_tensors) {
-        DLOG(INFO) << "Input: "
-                   << "size: " << item.sizes() << " dtype:" << item.dtype() << " device:" << item.device();
+    for (int idx = 0; idx < input_chunks.size(); idx++) {
+        auto input = input_chunks[idx];
+        auto attention_mask = attention_chunks[idx];
+        std::vector<torch::Tensor> input_tensors;
+        input_tensors.push_back(input);
+        input_tensors.push_back(attention_mask);
+        thread_pool_.emplace_back(
+            std::thread(&launchInference, model_, input_tensors, "SwitchTransformer", is_profiling_, idx));
+    }
+    for (auto& t : thread_pool_) {
+        t.join();
     }
 
-    // Inference
-    runtime.inferenceModel(input_tensors, output_tensors, is_profiling_);
+    torch::Tensor total_tensor = at::cat(output_tensors_, 0);
+    std::cout<<total_tensor<<std::endl;
 }
 
 }  // namespace examples

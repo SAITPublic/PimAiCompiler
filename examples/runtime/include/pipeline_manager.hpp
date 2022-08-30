@@ -1,5 +1,8 @@
 #pragma once
 
+#include <thread>
+#include <vector>
+
 #include "common/include/types.hpp"
 
 namespace examples
@@ -24,7 +27,8 @@ class PipelineManager
      *            const bool& profiling
      * @returns   return code
      */
-    RetVal initialize(const std::string& input_file, const std::string& model_type, const bool& profiling);
+    RetVal initialize(const std::string& input_file, const std::string& model_type, const bool& profiling,
+                      const int& gpu_num);
 
     /**
      * @brief   Call and run pipeline
@@ -46,6 +50,8 @@ class PipelineManager
     ModelType model_type_ = ModelType::NO_MODEL;
 
     bool is_profiling_ = false;
+
+    int gpu_num_ = 1;
 
     void load_and_run_rnnt();
 
