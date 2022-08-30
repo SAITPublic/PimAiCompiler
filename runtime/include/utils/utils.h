@@ -25,6 +25,18 @@ std::pair<int, DataType> parseNtype(std::string& ntype);
 
 torch::jit::IValue convertVaraibleData2IValve(uint8_t* ptr, DataType d_type);
 
+class AUTO_Mutex
+{
+   private:
+    static std::mutex mutex_;
+
+   public:
+    AUTO_Mutex();
+    ~AUTO_Mutex();
+    static void auto_lock() { mutex_.lock(); }
+    static void auto_unlock() { mutex_.unlock(); }
+};
+
 }  // namespace utils
 }  // namespace runtime
 }  // namespace nn_compiler

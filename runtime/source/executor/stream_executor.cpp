@@ -326,14 +326,15 @@ std::vector<torch::Tensor> StreamExecutor::iValueParser(torch::jit::IValue& iv)
 
 void StreamExecutor::getOutputTensors(std::vector<torch::Tensor>& output_tensors)
 {
-    output_tensors.clear();
     std::vector<std::vector<int64_t>> out_list;
 
     for (auto id : output_blob_ids_) {
         auto iv = findBlob(id).second;
         auto temp_out = iValueParser(iv);
         for (auto out : temp_out) {
-            output_tensors.push_back(out);
+            AUTO_Mutex::auto_lock();
+            output_tensors.push_back(out.to("cuda:0")); //All output needs to be copied to cuda:0
+            AUTO_Mutex::auto_unlock();
         }
     }
     for (auto idx = 0; idx < output_tensors.size(); idx++) {

@@ -7,6 +7,7 @@
 #include <string>
 #include <vector>
 
+#include "../utils/utils.h"
 #include "builder/model_builder.h"
 #include "c10/hip/HIPFunctions.h"
 #include "common/include/types.hpp"
