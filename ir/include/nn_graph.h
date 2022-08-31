@@ -75,6 +75,19 @@ class NNGraph
         return nullptr;
     }
 
+    int32_t deleteLayer(const std::shared_ptr<NNLayer>& layer)
+    {
+        int32_t idx = -1;
+        for (auto iter = layers_.begin(); iter != layers_.end(); iter++) {
+            if ((*iter) == layer) {
+                idx = std::distance(layers_.begin(), iter);
+                layers_.erase(layers_.begin() + idx);
+                return idx;
+            }
+        }
+        return idx;
+    }
+
     uint32_t deleteLayer(uint32_t id)
     {
         uint32_t idx = 0;
