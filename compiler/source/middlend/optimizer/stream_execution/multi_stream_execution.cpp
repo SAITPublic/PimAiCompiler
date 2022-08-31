@@ -42,20 +42,18 @@ bool MultiStreamExecution::fitCondition(std::unique_ptr<nn_compiler::ir::NNModel
             }
 
             std::shared_ptr<nn_compiler::ir::NNLayer> multi_stream_start_layer = nullptr;
-            if (!backwardToCheckAndFindStartLayer(model, multi_stream_start_layer)) {
+            std::vector<std::shared_ptr<nn_compiler::ir::NNLayer>> multi_stream_apply_layers;
+            if (!backwardToCheckAndFindStartLayer(model, multi_stream_start_layer, multi_stream_apply_layers)) {
                 branches_.clear();
                 continue;
             }
-            if (multi_stream_start_layer != nullptr) {
-                multi_stream_layers_.push_back(multi_stream_start_layer);
-                multi_stream_layers_.push_back(layers[idx]);
-            }
+            start_to_stream_layers_[multi_stream_start_layer] = multi_stream_apply_layers;
 
             branches_.clear();
         }
     }
 
-    return (multi_stream_layers_.size() != 0);
+    return (start_to_stream_layers_.size() != 0);
 }
 
 void MultiStreamExecution::run(std::unique_ptr<nn_compiler::ir::NNModel>& model)
@@ -63,28 +61,28 @@ void MultiStreamExecution::run(std::unique_ptr<nn_compiler::ir::NNModel>& model)
     DLOG(INFO) << "MultiStreamExecution::run is called.";
     auto graph = model->getGraphs()[0];
     auto layers = graph->getLayers();
+    auto layer_size = layers.size();
 
-    for (int idx = 0; idx < layers.size(); idx++) {
-        auto layer = layers[idx];
-        if (std::find(multi_stream_layers_.begin(), multi_stream_layers_.end(), layer) != multi_stream_layers_.end()) {
-            idx = reorganizeLayerOrders(graph, idx);
-        }
+    std::vector<std::shared_ptr<nn_compiler::ir::NNLayer>> start_layers;
+    for (auto pairs : start_to_stream_layers_) {
+        start_layers.push_back(pairs.first);
     }
 
-    layers = graph->getLayers();
-    for (int idx = 0; idx < layers.size(); idx++) {
-        auto layer = layers[idx];
-        if (std::find(multi_stream_layers_.begin(), multi_stream_layers_.end(), layer) != multi_stream_layers_.end() &&
-            layer->getType() != ir::LayerType::PRIMLISTCONSTRUCT) {
-            insertMultiStreamLayer(graph, idx);
+    for (auto idx = 0; idx < layer_size; idx++) {
+        if (std::find(start_layers.begin(), start_layers.end(), layers[idx]) != start_layers.end()) {
+            // reorganize layer oders and create multi-stream layer
+            process(model, idx);
+
             layers = graph->getLayers();
+            layer_size = layers.size();
         }
     }
 }
 
 bool MultiStreamExecution::backwardToCheckAndFindStartLayer(
     std::unique_ptr<nn_compiler::ir::NNModel>& model,
-    std::shared_ptr<nn_compiler::ir::NNLayer>& multi_stream_start_layer)
+    std::shared_ptr<nn_compiler::ir::NNLayer>& multi_stream_start_layer,
+    std::vector<std::shared_ptr<nn_compiler::ir::NNLayer>>& multi_stream_apply_layers)
 {
     std::vector<int> search_index_of_branches(branches_.size(), 0);
     // backward to find branch ops within max_search_level_
@@ -199,67 +197,65 @@ bool MultiStreamExecution::backwardToCheckAndFindStartLayer(
         }
     }
 
-    return (multi_stream_start_layer != nullptr);
+    for (auto i = 0; i < branches_.size(); i++) {
+        multi_stream_apply_layers.push_back(branches_[i][stream_op_index_in_branches[i]]);
+    }
+
+    return (multi_stream_start_layer != nullptr && multi_stream_apply_layers.size() != 0);
 }
 
-int MultiStreamExecution::reorganizeLayerOrders(std::shared_ptr<ir::NNGraph>& graph, int start_idx)
+void MultiStreamExecution::process(std::unique_ptr<nn_compiler::ir::NNModel>& model, int start_idx)
 {
+    auto graph = model->getGraphs()[0];
     auto layers = graph->getLayers();
-    int idx = start_idx + 1;
+    auto start_layer = layers[start_idx];
 
-    std::vector<ir::LayerType> layer_types;
-    layer_types.push_back(layers[idx]->getType());
-    assert((idx + 1) < layers.size());
-    // Presupposition: no same datatype for Ops in each stream. Remove this condition later.
-    for (int i = idx + 1; i < layers.size(); i++) {
-        if (layers[i]->getType() == layer_types[0]) {
-            break;
-        } else {
-            layer_types.push_back(layers[i]->getType());
-        }
+    auto multi_stream_apply_layers = start_to_stream_layers_[start_layer];
+    int found_num = 0;
+    std::vector<std::shared_ptr<nn_compiler::ir::NNLayer>> pre_process_layers;
+    std::queue<std::shared_ptr<nn_compiler::ir::NNLayer>> processor;
+    for (auto layer : multi_stream_apply_layers) {
+        processor.push(layer);
     }
 
-    int end_idx = start_idx + 1;
-    for (end_idx; end_idx < layers.size(); end_idx++) {
-        if (std::find(multi_stream_layers_.begin(), multi_stream_layers_.end(), layers[end_idx]) !=
-            multi_stream_layers_.end()) {
-            break;
-        }
-    }
-
-    int swap_idx = idx + 1;
-    for (auto layer_type : layer_types) {
-        layers = graph->getLayers();
-        for (int i = swap_idx; i < end_idx; i++) {
-            if (layers[i]->getType() == layer_type) {
-                graph->swapLayerOrder(swap_idx++, i);
+    while (!processor.empty() && found_num < multi_stream_apply_layers.size()) {
+        auto cur_layer = processor.front();
+        processor.pop();
+        auto predecessors = pre_layers_map_[cur_layer];
+        for (auto predecessor : predecessors) {
+            if (predecessor->getType() == ir::LayerType::PRIMCONSTANT) {
+                continue;
+            }
+            if (predecessor == start_layer) {
+                found_num++;
+            } else {
+                pre_process_layers.push_back(predecessor);
+                processor.push(predecessor);
             }
         }
     }
+    std::reverse(pre_process_layers.begin(), pre_process_layers.end());
 
-    return end_idx;
-}
-
-void MultiStreamExecution::insertMultiStreamLayer(std::shared_ptr<ir::NNGraph>& graph, int idx)
-{
-    auto layers = graph->getLayers();
-    std::vector<std::shared_ptr<ir::NNLayer>> matmul_layers;
-    bool find_matmul = false;
-    for (idx; idx < layers.size(); idx++) {
-        while (layers[idx]->getType() == ir::LayerType::ATENMATMUL) {
-            matmul_layers.push_back(layers[idx++]);
-            find_matmul = true;
-        }
-        if (find_matmul) {
-            break;
-        }
+    int new_idx = start_idx;
+    for (auto layer : pre_process_layers) {
+        graph->deleteLayer(layer);
+        graph->addLayer2pos(layer, new_idx++);
     }
+    for (auto layer : multi_stream_apply_layers) {
+        graph->deleteLayer(layer);
+    }
+
     auto new_type = nn_compiler::ir::LayerType::MULTISTREAM;
-    auto new_name = "multi_stream_for_" + matmul_layers[0]->getName();
+    auto new_name = "multi_stream_for_" + start_layer->getName();
     auto new_layer = std::make_shared<nn_compiler::ir::MultiStreamLayer>(new_name, new_type);
-    new_layer->setLayers(matmul_layers);
-    new_layer->setLayerNum(matmul_layers.size());
-    graph->addLayer2pos(new_layer, idx - matmul_layers.size() - 1);
+    new_layer->setLayers(multi_stream_apply_layers);
+    new_layer->setLayerNum(multi_stream_apply_layers.size());
+    graph->addLayer2pos(new_layer, new_idx++);
+
+    // add back multi_stream_apply_layers to guarantee contiguous layer IDs for the following UpdateLayerId pass
+    for (auto layer : multi_stream_apply_layers) {
+        graph->addLayer2pos(layer, new_idx++);
+    }
 }
 
 }  // namespace middlend
