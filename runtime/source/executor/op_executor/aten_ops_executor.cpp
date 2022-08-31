@@ -3499,7 +3499,7 @@ void executeAtenOnes(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExe
         options = options.pinned_memory(static_cast<bool>(pin_memory));
     }
 
-    auto output = atenOnes(at::ArrayRef<int64_t>(array_ref), options).to(at::kCUDA);
+    auto output = atenOnes(at::ArrayRef<int64_t>(array_ref), options);
     stream_executor.updateBlob(out_stensor_id[0], DataType::TENSOR, tensorToIValue(output));
 }
 

@@ -429,7 +429,7 @@ bool atenNot(const bool &input) { return !input; };
 
 at::Tensor atenOneHot(const at::Tensor &self, int64_t num_classes) { return at::one_hot(self, num_classes); }
 
-at::Tensor atenOnes(at::IntArrayRef size, const at::TensorOptions &options) { return at::ones(size, options); }
+at::Tensor atenOnes(at::IntArrayRef size, const at::TensorOptions &options) { return at::ones(size, options).cuda(); }
 
 std::tuple<at::Tensor, at::Tensor> atenPackPaddedSequence(const at::Tensor &input, const at::Tensor &lengths,
                                                           bool batch_first)

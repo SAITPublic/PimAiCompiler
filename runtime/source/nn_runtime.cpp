@@ -18,8 +18,8 @@ NNRuntime::NNRuntime(std::unique_ptr<nn_compiler::ir::NNModel>& model, std::stri
                                                  model_type_);
     executor_->preProcess();
 
-    rocblas_init();
     PimInitialize(RT_TYPE_HIP, PIM_FP16);
+    rocblas_init();
 }
 
 void NNRuntime::inferenceModel(const std::vector<torch::Tensor>& input_tensors,
