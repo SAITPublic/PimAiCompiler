@@ -242,8 +242,8 @@ void PipelineManager::load_and_run_switchtransformer()
 
     std::vector<std::thread> thread_pool_;
     // load inputs from files
-    auto input_tensor = loadTensor(input_file, {2, 13}, DataType::INT64).cuda();
-    auto attention_mask = loadTensor(src_attention_mask, {2, 13}, DataType::INT64).cuda();
+    auto input_tensor = loadTensor(input_file, {2, 13}, DataType::INT64);
+    auto attention_mask = loadTensor(src_attention_mask, {2, 13}, DataType::INT64);
 
     std::unique_ptr<nn_compiler::ir::NNModel> model = std::make_unique<nn_compiler::ir::NNModel>();
 
@@ -252,8 +252,15 @@ void PipelineManager::load_and_run_switchtransformer()
     compiler.compile(model);
     std::shared_ptr<nn_compiler::ir::NNModel> model_ = std::move(model);
 
-    std::vector<torch::Tensor> input_chunks = input_tensor.chunk(gpu_num_, 0);
-    std::vector<torch::Tensor> attention_chunks = attention_mask.chunk(gpu_num_, 0);
+    int input_num = 0;
+    if (input_tensor.size(0) > gpu_num_) {
+        input_num = gpu_num_;
+    } else {
+        input_num = input_tensor.size(0);
+    }
+
+    std::vector<torch::Tensor> input_chunks = input_tensor.chunk(input_num, 0);
+    std::vector<torch::Tensor> attention_chunks = attention_mask.chunk(input_num, 0);
 
     for (int idx = 0; idx < input_chunks.size(); idx++) {
         auto input = input_chunks[idx];

@@ -56,7 +56,7 @@ class PipelineManager
     std::vector<torch::Tensor> outputs;
 
     std::vector<std::pair<std::thread, threadParam*>> thread_pool_;
-    threadParam param_;
+
     static int finally_nums;
     static std::vector<torch::Tensor> output_tensors_;
     static void launchInference(std::shared_ptr<nn_compiler::ir::NNModel> model_,

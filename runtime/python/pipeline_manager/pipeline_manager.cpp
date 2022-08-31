@@ -68,35 +68,47 @@ std::vector<torch::Tensor> PipelineManager::inferenceModel(const std::vector<tor
 {
     outputs.clear();
     output_tensors_.clear();
+    if (model_type_ == "SwitchTransformer") {
+        int input_num = 0;
+        if (input_tensors[0].size(0) > thread_pool_.size()) {
+            input_num = thread_pool_.size();
+        } else {
+            input_num = input_tensors[0].size(0);
+        }
 
-    std::vector<torch::Tensor> input_chunks = input_tensors[0].chunk(thread_pool_.size(), 0);
-    std::vector<torch::Tensor> attention_chunks = input_tensors[1].chunk(thread_pool_.size(), 0);
+        std::vector<torch::Tensor> input_chunks = input_tensors[0].chunk(input_num, 0);
+        std::vector<torch::Tensor> attention_chunks = input_tensors[1].chunk(input_num, 0);
 
-    std::vector<std::vector<torch::Tensor>> total_input_tensors;
+        std::vector<std::vector<torch::Tensor>> total_input_tensors;
 
-    for (int idx = 0; idx < thread_pool_.size(); idx++) {
-        auto input = input_chunks[idx];
-        auto attention_mask = attention_chunks[idx];
-        std::vector<torch::Tensor> input_tensors;
-        input_tensors.push_back(input);
-        input_tensors.push_back(attention_mask);
-        total_input_tensors.push_back(input_tensors);
+        for (int idx = 0; idx < input_chunks.size(); idx++) {
+            auto input = input_chunks[idx];
+            auto attention_mask = attention_chunks[idx];
+            std::vector<torch::Tensor> input_tensors;
+            input_tensors.push_back(input);
+            input_tensors.push_back(attention_mask);
+            total_input_tensors.push_back(input_tensors);
+        }
+
+        finally_nums = 0;
+        for (int i = 0; i < input_chunks.size(); i++) {
+            thread_pool_[i].second->input_tensor = total_input_tensors[i];
+            thread_pool_[i].second->is_enable = true;
+        }
+
+        while (true) {
+            sleep(0);
+            if (finally_nums == input_chunks.size()) break;
+        }
+        torch::Tensor total_tensor = at::cat(output_tensors_, 0);
+        outputs.push_back(total_tensor);
+
+        return outputs;
+    } else {
+        thread_pool_[0].second->input_tensor = input_tensors;
+        thread_pool_[0].second->is_enable = true;
+        return output_tensors_;
     }
-
-    finally_nums = 0;
-    for (int i = 0; i < thread_pool_.size(); i++) {
-        thread_pool_[i].second->input_tensor = total_input_tensors[i];
-        thread_pool_[i].second->is_enable = true;
-    }
-
-    while (true) {
-        sleep(0);
-        if (finally_nums == thread_pool_.size()) break;
-    }
-    torch::Tensor total_tensor = at::cat(output_tensors_, 0);
-    outputs.push_back(total_tensor);
-
-    return outputs;
 }
 
 }  // namespace NNRuntimeInterface
