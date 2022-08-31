@@ -24,8 +24,8 @@ class PipelineManager
         std::vector<torch::Tensor> input_tensor;
     };
     PipelineManager() = default;
-    PipelineManager(const std::string& input_file_path, std::string model_type, bool profiling = false,
-                    int gpu_num = 1);
+    PipelineManager(const std::string& input_file_path, std::string model_type, int gpu_num = 1,
+                    bool profiling = false);
     ~PipelineManager()
     {
         for (auto& thread_pair : thread_pool_) {

@@ -21,7 +21,7 @@ int main(int argc, char* argv[])
 
     examples::PipelineManager pipeline_manager;
 
-    pipeline_manager.initialize(input_file_path, model_type, profiling, gpu_num);
+    pipeline_manager.initialize(input_file_path, model_type, gpu_num, profiling);
 
     pipeline_manager.run();
 

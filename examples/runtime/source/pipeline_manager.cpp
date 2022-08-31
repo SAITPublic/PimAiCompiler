@@ -13,8 +13,8 @@ namespace fs = std::experimental::filesystem;
 
 namespace examples
 {
-RetVal PipelineManager::initialize(const std::string& input_file, const std::string& model_type, const bool& profiling,
-                                   const int& gpu_num)
+RetVal PipelineManager::initialize(const std::string& input_file, const std::string& model_type, const int& gpu_num,
+                                   const bool& profiling)
 {
     if (model_type == "RNNT") {
         model_type_ = ModelType::RNNT;

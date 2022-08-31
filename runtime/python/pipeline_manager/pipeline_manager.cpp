@@ -40,8 +40,8 @@ void PipelineManager::launchInference(std::shared_ptr<nn_compiler::ir::NNModel> 
     }
 }
 
-PipelineManager::PipelineManager(const std::string& input_file_path, std::string model_type, bool profiling,
-                                 int gpu_num)
+PipelineManager::PipelineManager(const std::string& input_file_path, std::string model_type, int gpu_num,
+                                 bool profiling)
 {
     this->input_file_path_ = input_file_path;
     this->model_type_ = model_type;

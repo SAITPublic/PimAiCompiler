@@ -8,6 +8,7 @@ PYBIND11_MODULE(NNCompiler, m)
 {
     py::class_<PipelineManager>(m, "PipelineManager")
         // ref: https://pybind11.readthedocs.io/en/latest/advanced/functions.html#default-arguments-revisited
-        .def(py::init<const std::string&, std::string>(), py::arg("input_file"), py::arg("model_type") = "")
+        .def(py::init<const std::string&, std::string, int>(), py::arg("input_file"), py::arg("model_type") = "",
+             py::arg("gpu_num") = 1)
         .def("inferenceModel", &PipelineManager::inferenceModel, py::arg("input_tensors"));
 }
