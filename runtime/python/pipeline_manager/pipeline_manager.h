@@ -17,14 +17,22 @@ namespace NNRuntimeInterface
 class PipelineManager
 {
    public:
-    public:
+   public:
     struct threadParam {
+        bool is_running;
         bool is_enable;
         std::vector<torch::Tensor> input_tensor;
     };
     PipelineManager() = default;
     PipelineManager(const std::string& input_file_path, std::string model_type, bool profiling = false,
                     int gpu_num = 1);
+    ~PipelineManager()
+    {
+        for (auto& thread_pair : thread_pool_) {
+            thread_pair.second->is_running = false;
+            thread_pair.first.join();
+        }
+    }
     std::vector<torch::Tensor> inferenceModel(const std::vector<torch::Tensor>& input_tensors);
     // void* _launchRuntime(std::shared_ptr<nn_compiler::ir::NNModel> model_,
     //                         const std::vector<torch::Tensor>& input_tensor,  bool profiling);

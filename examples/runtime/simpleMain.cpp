@@ -6,7 +6,8 @@ int main(int argc, char* argv[])
     cmdline::parser command_line_parser;
 
     command_line_parser.add<std::string>("input", 'i', "Input file path", true, "");
-    command_line_parser.add<std::string>("model", 'm', "Model type (RNNT/GNMT/HWR/Transfomer/SwitchTransformer)", true, "");
+    command_line_parser.add<std::string>("model", 'm', "Model type (RNNT/GNMT/HWR/Transfomer/SwitchTransformer)", true,
+                                         "");
     command_line_parser.add<bool>("profiling", 'p', "Profiling", false, false);
     command_line_parser.add<int>("gpu_num", 'n', "Profiling", false, 1);
 
@@ -20,7 +21,7 @@ int main(int argc, char* argv[])
 
     examples::PipelineManager pipeline_manager;
 
-    pipeline_manager.initialize(input_file_path, model_type, profiling,gpu_num);
+    pipeline_manager.initialize(input_file_path, model_type, profiling, gpu_num);
 
     pipeline_manager.run();
 

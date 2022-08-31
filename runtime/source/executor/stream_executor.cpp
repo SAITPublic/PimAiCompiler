@@ -333,14 +333,13 @@ void StreamExecutor::getOutputTensors(std::vector<torch::Tensor>& output_tensors
         auto temp_out = iValueParser(iv);
         for (auto out : temp_out) {
             AUTO_Mutex::auto_lock();
-            output_tensors.push_back(out.to("cuda:0")); //All output needs to be copied to cuda:0
+            output_tensors.push_back(out.to("cuda:0"));  // All output needs to be copied to cuda:0
             AUTO_Mutex::auto_unlock();
         }
     }
     for (auto idx = 0; idx < output_tensors.size(); idx++) {
         DLOG(INFO) << "Output tensor" << idx << ": " << output_tensors[idx];
     }
-    std::cout <<std::endl;
 }
 
 const std::shared_ptr<ir::NNGraph> StreamExecutor::getGraph() { return this->graph_; }

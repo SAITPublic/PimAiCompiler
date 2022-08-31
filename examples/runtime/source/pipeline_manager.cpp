@@ -213,8 +213,8 @@ void PipelineManager::load_and_run_transformer()
 static std::vector<torch::Tensor> output_tensors_;
 
 static void launchInference(std::shared_ptr<nn_compiler::ir::NNModel> model_,
-                                      const std::vector<torch::Tensor> &input_tensors, std::string model_type_,
-                                      bool profiling, int gpu_id)
+                            const std::vector<torch::Tensor>& input_tensors, std::string model_type_, bool profiling,
+                            int gpu_id)
 {
     hipSetDevice(gpu_id);
     std::unique_ptr<nn_compiler::ir::NNModel> model = std::make_unique<nn_compiler::ir::NNModel>(*model_);
@@ -269,7 +269,7 @@ void PipelineManager::load_and_run_switchtransformer()
     }
 
     torch::Tensor total_tensor = at::cat(output_tensors_, 0);
-    std::cout<<total_tensor<<std::endl;
+    DLOG(INFO) << total_tensor;
 }
 
 }  // namespace examples

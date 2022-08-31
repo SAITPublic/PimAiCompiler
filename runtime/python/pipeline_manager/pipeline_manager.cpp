@@ -21,7 +21,7 @@ void PipelineManager::launchInference(std::shared_ptr<nn_compiler::ir::NNModel> 
     bool created_runtime = false;
     std::shared_ptr<NNRuntime> runtime_ = NULL;
     hipSetDevice(gpu_id);
-    while (true) {
+    while (thread_param->is_running) {
         sleep(0);
         if (!created_runtime) {
             runtime_ = std::make_shared<NNRuntime>(model, model_type_);
@@ -57,6 +57,7 @@ PipelineManager::PipelineManager(const std::string& input_file_path, std::string
     std::shared_ptr<nn_compiler::ir::NNModel> model_ = std::move(model);
     for (int gpu_id = 0; gpu_id < gpu_num; gpu_id++) {
         PipelineManager::threadParam* thread_param = new PipelineManager::threadParam();
+        thread_param->is_running = true;
         thread_param->is_enable = false;
         thread_pool_.emplace_back(std::make_pair(
             std::thread(&launchInference, model_, thread_param, model_type_, is_profiling_, gpu_id), thread_param));
