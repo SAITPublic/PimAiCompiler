@@ -6,7 +6,6 @@ namespace nn_compiler
 {
 namespace ir
 {
-
 class AtenTriuLayer : public NNLayer
 {
    public:

@@ -21,6 +21,8 @@ class UpdateLayerId : public Pass
 
     void run(std::unique_ptr<nn_compiler::ir::NNModel>& model);
 
+    void setLayerRelations(std::shared_ptr<ir::NNLayer>& layer, std::unique_ptr<nn_compiler::ir::NNModel>& model);
+
     ~UpdateLayerId() = default;
 
 };  // class UpdateLayerId
