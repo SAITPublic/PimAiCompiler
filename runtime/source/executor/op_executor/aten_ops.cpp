@@ -596,7 +596,7 @@ at::Tensor atenZeroslike(const at::Tensor &self, at::TensorOptions options,
 }
 
 void customAtenAddmm(std::string act_type, at::Tensor &self_tensor, at::Tensor &mat1_tensor, at::Tensor &mat2_tensor,
-                     at::Scalar beta, at::Scalar alpha, torch::jit::IValue &output_iv)
+                     at::Scalar beta, at::Scalar alpha, torch::jit::IValue &output_iv, void* stream)
 {
     int dim_i0 = mat1_tensor.dim();
     int dim_i1 = mat2_tensor.dim();
@@ -648,7 +648,7 @@ void customAtenAddmm(std::string act_type, at::Tensor &self_tensor, at::Tensor &
         PimBo *dev_op2 = PimCreateBo(pim_desc, MEM_TYPE_DEVICE, GEMV_INPUT, b);
         PimBo *dev_out = PimCreateBo(pim_desc, MEM_TYPE_DEVICE, GEMV_OUTPUT, y);
 
-        PimExecuteGemvAdd(dev_out, dev_op0, dev_op1, dev_op2, relu, nullptr);
+        PimExecuteGemvAdd(dev_out, dev_op0, dev_op1, dev_op2, relu, stream);
 
         PimDestroyBo(dev_op0);
         PimDestroyBo(dev_op1);
@@ -682,7 +682,7 @@ void customAtenAddmm(std::string act_type, at::Tensor &self_tensor, at::Tensor &
         PimBo *dev_op2 = PimCreateBo(pim_desc, MEM_TYPE_DEVICE, GEMV_OUTPUT, b);
         PimBo *dev_out = PimCreateBo(pim_desc, MEM_TYPE_DEVICE, GEMV_OUTPUT, y);
 
-        PimExecuteGemvAdd(dev_out, dev_op0, dev_op1, dev_op2, relu, nullptr);
+        PimExecuteGemvAdd(dev_out, dev_op0, dev_op1, dev_op2, relu, stream);
 
         PimDestroyBo(dev_op0);
         PimDestroyBo(dev_op1);

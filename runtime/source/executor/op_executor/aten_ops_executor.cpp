@@ -81,18 +81,17 @@ void executeAtenAdd(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExec
             if (input1_size.size() == 1 || input1_size.size() == 2) {
                 // there is no batch and channel dimension for tensors, default 1 batch and 1 channel.
                 return true;
-            } else if (input1_size.size() == 3) {// tensor with channel, height, width
+            } else if (input1_size.size() == 3) {  // tensor with channel, height, width
                 if (input1_size[0] != 1 || (input2_size.size() == 3 && input2_size[0] != 1)) {
                     // tensor channel != 1
                     return false;
                 } else {
                     return true;
                 }
-            } else if (input1_size.size() == 4) { // tensor with batch, channel, height, width
-                if ((input2_size.size() == 4 && input1_size[0] != input2_size[0]) ||
-                        (input1_size[1] != 1) || 
-                        (input2_size.size() == 4 && input2_size[1] != 1) ||
-                        (input2_size.size() == 3 && input2_size[0] != 1)) {
+            } else if (input1_size.size() == 4) {  // tensor with batch, channel, height, width
+                if ((input2_size.size() == 4 && input1_size[0] != input2_size[0]) || (input1_size[1] != 1) ||
+                    (input2_size.size() == 4 && input2_size[1] != 1) ||
+                    (input2_size.size() == 3 && input2_size[0] != 1)) {
                     // different batch of tensors, or tensor channel != 1
                     return false;
                 } else {
@@ -106,8 +105,8 @@ void executeAtenAdd(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExec
         // custom_large_add only works for:
         // 1) float16 data type, and 2) same batch size, and 3) channel == 1
         if (self_tensor.dtype() == c10::ScalarType::Half &&
-                (self_sizes.size() >= other_sizes.size() ?
-                    customAddDimensionsCheck(self_sizes, other_sizes) : customAddDimensionsCheck(other_sizes, self_sizes))) {
+            (self_sizes.size() >= other_sizes.size() ? customAddDimensionsCheck(self_sizes, other_sizes)
+                                                     : customAddDimensionsCheck(other_sizes, self_sizes))) {
             if (!self_tensor.is_contiguous()) self_tensor = self_tensor.contiguous();
             if (!other_tensor.is_contiguous()) other_tensor = other_tensor.contiguous();
             int dim0 = self_tensor.dim();
@@ -207,6 +206,44 @@ void executeAtenAddmm(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamEx
     } else {
         auto self_tensor = iv_self.toTensor();
         customAtenAddmm(act_type, self_tensor, mat1_tensor, mat2_tensor, beta, alpha, output);
+    }
+    stream_executor.updateBlob(out_stensor_id[0], DataType::TENSOR, output);
+}
+
+void executeAtenAddmmWithStream(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor,
+                                void* stream)
+{
+    DLOG(INFO) << "execute Aten Addmm node";
+
+    auto addmm_layer = std::static_pointer_cast<nn_compiler::ir::AtenAddmmLayer>(layer);
+    auto act_type = addmm_layer->get_act_type();
+
+    // TODO(SRCX): choose the corresponding kernel when activation type is aten::none, aten::relu, aten::max
+    auto in_stensor_id = layer->getInSTensorID();
+    auto out_stensor_id = layer->getOutSTensorID();
+
+    // Find the input blob
+    torch::jit::IValue iv_self = stream_executor.findBlob(in_stensor_id[0]).second;
+    torch::jit::IValue iv_mat1 = stream_executor.findBlob(in_stensor_id[1]).second;
+    torch::jit::IValue iv_mat2 = stream_executor.findBlob(in_stensor_id[2]).second;
+    assert(iv_mat1.isTensor() && iv_mat2.isTensor());
+    auto mat1_tensor = iv_mat1.toTensor();
+    auto mat2_tensor = iv_mat2.toTensor();
+
+    int alpha = 1, beta = 1;
+    if (in_stensor_id.size() == 5) {
+        torch::jit::IValue iv_beta = stream_executor.findBlob(in_stensor_id[3]).second;
+        torch::jit::IValue iv_alpha = stream_executor.findBlob(in_stensor_id[4]).second;
+        beta = iv_beta.toInt();
+        alpha = iv_alpha.toInt();
+    }
+
+    torch::jit::IValue output;
+    if (iv_self.isNone()) {
+        customAtenMatmul(mat1_tensor, mat2_tensor, output, stream);
+    } else {
+        auto self_tensor = iv_self.toTensor();
+        customAtenAddmm(act_type, self_tensor, mat1_tensor, mat2_tensor, beta, alpha, output, stream);
     }
     stream_executor.updateBlob(out_stensor_id[0], DataType::TENSOR, output);
 }
@@ -2946,6 +2983,26 @@ void executeAtenMatmul(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamE
 
     torch::jit::IValue output;
     customAtenMatmul(self_tensor, other_tensor, output);
+    stream_executor.updateBlob(out_stensor_id[0], DataType::TENSOR, output);
+}
+
+void executeAtenMatmulWithStream(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor,
+                                 void* stream)
+{
+    DLOG(INFO) << "execute Aten Matmul node";
+
+    auto in_stensor_id = layer->getInSTensorID();
+    auto out_stensor_id = layer->getOutSTensorID();
+
+    // Find the input blob
+    torch::jit::IValue iv_self = stream_executor.findBlob(in_stensor_id[0]).second;
+    torch::jit::IValue iv_other = stream_executor.findBlob(in_stensor_id[1]).second;
+    assert(iv_self.isTensor() && iv_other.isTensor());
+    auto self_tensor = iv_self.toTensor();
+    auto other_tensor = iv_other.toTensor();
+
+    torch::jit::IValue output;
+    customAtenMatmul(self_tensor, other_tensor, output, stream);
     stream_executor.updateBlob(out_stensor_id[0], DataType::TENSOR, output);
 }
 

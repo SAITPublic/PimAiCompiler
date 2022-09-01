@@ -123,6 +123,11 @@ void executeAtenWarn(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExe
 void executeAtenWhere(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor);
 void executeAtenZeros(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor);
 void executeAtenZerosLike(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor);
+
+void executeAtenAddmmWithStream(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor,
+                                void* stream = nullptr);
+void executeAtenMatmulWithStream(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor,
+                                 void* stream = nullptr);
 }  // namespace op_executor
 }  // namespace runtime
 }  // namespace nn_compiler
