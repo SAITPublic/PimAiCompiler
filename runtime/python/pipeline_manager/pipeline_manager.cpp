@@ -52,15 +52,18 @@ PipelineManager::PipelineManager(const std::string& input_file_path, std::string
     compiler = std::make_shared<NNCompiler>();
     compiler->initialize(input_file_path_, model_type_);
     compiler->compile(model);
-
-    finally_nums = 0;
-    std::shared_ptr<nn_compiler::ir::NNModel> model_ = std::move(model);
-    for (int gpu_id = 0; gpu_id < gpu_num; gpu_id++) {
-        PipelineManager::threadParam* thread_param = new PipelineManager::threadParam();
-        thread_param->is_running = true;
-        thread_param->is_enable = false;
-        thread_pool_.emplace_back(std::make_pair(
-            std::thread(&launchInference, model_, thread_param, model_type_, is_profiling_, gpu_id), thread_param));
+    if (model_type_ == "SwitchTransformer") {
+        finally_nums = 0;
+        std::shared_ptr<nn_compiler::ir::NNModel> model_ = std::move(model);
+        for (int gpu_id = 0; gpu_id < gpu_num; gpu_id++) {
+            PipelineManager::threadParam* thread_param = new PipelineManager::threadParam();
+            thread_param->is_running = true;
+            thread_param->is_enable = false;
+            thread_pool_.emplace_back(std::make_pair(
+                std::thread(&launchInference, model_, thread_param, model_type_, is_profiling_, gpu_id), thread_param));
+        }
+    }else{
+        runtime = std::make_shared<NNRuntime>(model, model_type_);
     }
 }
 
@@ -105,9 +108,8 @@ std::vector<torch::Tensor> PipelineManager::inferenceModel(const std::vector<tor
 
         return outputs;
     } else {
-        thread_pool_[0].second->input_tensor = input_tensors;
-        thread_pool_[0].second->is_enable = true;
-        return output_tensors_;
+        runtime->inferenceModel(input_tensors, outputs, is_profiling_);
+        return outputs;
     }
 }
 
