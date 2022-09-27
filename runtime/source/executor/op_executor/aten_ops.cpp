@@ -601,29 +601,20 @@ void customAtenAddmm(std::string act_type, at::Tensor &self_tensor, at::Tensor &
     int dim_i0 = mat1_tensor.dim();
     int dim_i1 = mat2_tensor.dim();
     int dim_self = self_tensor.dim();
-    int i0_is_vector = 0;
-    int i1_is_vector = 0;
     PimActFunc act = PimActFunc::NONE;
 
-    for (int i = 0; i < dim_i0; ++i) {
-        if (mat1_tensor.size(i) != 1) {
-            i0_is_vector += 1;
-        }
-    }
+    auto mat1_shape = mat1_tensor.sizes().vec();
+    auto mat2_shape = mat2_tensor.sizes().vec();
+    gemmBroadcast(mat1_shape, mat2_shape);
+    auto gemm_type = getGemmType(mat1_shape, mat2_shape);
 
-    for (int i = 0; i < dim_i1; ++i) {
-        if (mat2_tensor.size(i) != 1) {
-            i1_is_vector += 1;
-        }
-    }
     if (act_type == "aten::relu") {
         act = PimActFunc::ACT_RELU;
     }
 
-    if (i0_is_vector == 1 && i1_is_vector != 1 && dim_i0 > 1) {
+    if (gemm_type == GEMM_TYPE::VM && dim_i0 > 1) {
         float alpha = 1.0f;
         float beta = 0.0f;
-        int m = 1;
 
         if (!self_tensor.is_contiguous()) self_tensor = self_tensor.contiguous();
         if (!mat1_tensor.is_contiguous()) mat1_tensor = mat1_tensor.contiguous();
@@ -642,13 +633,13 @@ void customAtenAddmm(std::string act_type, at::Tensor &self_tensor, at::Tensor &
         auto output = at::zeros(output_shape, options);
         _Float16 *y = (_Float16 *)output.data_ptr();
 
-        PimGemmDesc *pim_desc = PimCreateGemmDesc(1, 1, 1, in_w, out_w, PIM_FP16);
+        PimGemmDesc *pim_desc = PimCreateGemmDesc(1, 1, 1, in_w, 1, out_w, PIM_FP16);
         PimBo *dev_op0 = PimCreateBo(pim_desc, MEM_TYPE_DEVICE, GEMM_INPUT, x);
         PimBo *dev_op1 = PimCreateBo(pim_desc, MEM_TYPE_DEVICE, GEMM_WEIGHT, A);
         PimBo *dev_op2 = PimCreateBo(pim_desc, MEM_TYPE_DEVICE, GEMM_BIAS, b);
         PimBo *dev_out = PimCreateBo(pim_desc, MEM_TYPE_DEVICE, GEMM_OUTPUT, y);
 
-        PimExecuteGemm(dev_out, dev_op0, dev_op1, dev_op2, act, nullptr);
+        PimExecuteGemm(dev_out, dev_op0, dev_op1, dev_op2, act);
 
         PimDestroyBo(dev_op0);
         PimDestroyBo(dev_op1);
@@ -657,14 +648,13 @@ void customAtenAddmm(std::string act_type, at::Tensor &self_tensor, at::Tensor &
         PimDestroyGemmDesc(pim_desc);
 
         output_iv = tensorToIValue(output);
-    } else if (i0_is_vector != 1 && i1_is_vector == 1 && dim_i1 > 1) {
+    } else if (gemm_type == GEMM_TYPE::MV && dim_i1 > 1) {
         if (!self_tensor.is_contiguous()) self_tensor = self_tensor.contiguous();
         if (!mat1_tensor.is_contiguous()) mat1_tensor = mat1_tensor.contiguous();
         if (!mat2_tensor.is_contiguous()) mat2_tensor = mat2_tensor.contiguous();
 
-        int m = mat1_tensor.size(dim_i0 - 2);
-        int k = mat1_tensor.size(dim_i0 - 1);
-        int n = 1, c = 1, h = 1, in_w = k, out_w = m;
+        int out_w = mat1_tensor.size(dim_i0 - 2);
+        int in_w = mat1_tensor.size(dim_i0 - 1);
 
         _Float16 *b = (_Float16 *)self_tensor.data_ptr();
         _Float16 *A = (_Float16 *)mat1_tensor.data_ptr();
@@ -676,13 +666,13 @@ void customAtenAddmm(std::string act_type, at::Tensor &self_tensor, at::Tensor &
         auto output = at::zeros(output_shape, options);
         _Float16 *y = (_Float16 *)output.data_ptr();
 
-        PimGemmDesc *pim_desc = PimCreateGemmDesc(1, 1, 1, in_w, out_w, PIM_FP16, true);
+        PimGemmDesc *pim_desc = PimCreateGemmDesc(1, 1, in_w, 1, out_w, 1, PIM_FP16, W_X_I);
         PimBo *dev_op0 = PimCreateBo(pim_desc, MEM_TYPE_DEVICE, GEMM_INPUT, x);
         PimBo *dev_op1 = PimCreateBo(pim_desc, MEM_TYPE_DEVICE, GEMM_WEIGHT, A);
         PimBo *dev_op2 = PimCreateBo(pim_desc, MEM_TYPE_DEVICE, GEMM_BIAS, b);
         PimBo *dev_out = PimCreateBo(pim_desc, MEM_TYPE_DEVICE, GEMM_OUTPUT, y);
 
-        PimExecuteGemm(dev_out, dev_op0, dev_op1, dev_op2, act, nullptr);
+        PimExecuteGemm(dev_out, dev_op0, dev_op1, dev_op2, act, W_X_I);
 
         PimDestroyBo(dev_op0);
         PimDestroyBo(dev_op1);
@@ -709,11 +699,50 @@ void customAtenAddmm(std::string act_type, at::Tensor &self_tensor, at::Tensor &
         }
         output_iv = tensorToIValue(output);
     } else {
-        auto output = atenAddmm(self_tensor, mat1_tensor, mat2_tensor, beta, alpha);
-        if (act == PimActFunc::ACT_RELU) {
-            output = atenRelu(output);
+        // the dims of mat1_shape and mat2_shape are 4
+        int num = mat2_shape[0] * mat2_shape[1] * mat2_shape[3];
+        const char *env_k = std::getenv("ENABLE_PIM");
+        if (num > DIM_OUT_PIM && env_k != nullptr && *env_k == 1) {
+            float alpha = 1.0f;
+            float beta = 0.0f;
+
+            if (!self_tensor.is_contiguous()) self_tensor = self_tensor.contiguous();
+            if (!mat1_tensor.is_contiguous()) mat1_tensor = mat1_tensor.contiguous();
+            if (!mat2_tensor.is_contiguous()) mat2_tensor = mat2_tensor.contiguous();
+
+            int n = mat1_shape[0] > mat2_shape[0] ? mat1_shape[0] : mat2_shape[0];
+            int c = mat1_shape[1] > mat2_shape[1] ? mat1_shape[1] : mat2_shape[1];
+            int h = mat1_shape[2];
+            int in_w = mat2_shape[2];
+            int out_w = mat2_shape[3];
+
+            _Float16 *b = (_Float16 *)self_tensor.data_ptr();
+            _Float16 *x = (_Float16 *)mat1_tensor.data_ptr();
+            _Float16 *A = (_Float16 *)mat2_tensor.data_ptr();
+            auto options = at::TensorOptions().dtype(at::kHalf).device(at::kCUDA);
+            auto output = at::zeros({n, c, h, out_w}, options);
+            _Float16 *y = (_Float16 *)output.data_ptr();
+
+            PimGemmDesc *pim_desc = PimCreateGemmDesc(n, c, h, in_w, h, out_w, PIM_FP16);
+            PimBo *dev_op0 = PimCreateBo(pim_desc, MEM_TYPE_DEVICE, GEMM_INPUT, x);
+            PimBo *dev_op1 = PimCreateBo(pim_desc, MEM_TYPE_DEVICE, GEMM_WEIGHT, A);
+            PimBo *dev_op2 = PimCreateBo(pim_desc, MEM_TYPE_DEVICE, GEMM_BIAS, b);
+            PimBo *dev_out = PimCreateBo(pim_desc, MEM_TYPE_DEVICE, GEMM_OUTPUT, y);
+
+            PimExecuteGemm(dev_out, dev_op0, dev_op1, dev_op2, act);
+
+            PimDestroyBo(dev_op0);
+            PimDestroyBo(dev_op1);
+            PimDestroyBo(dev_op2);
+            PimDestroyBo(dev_out);
+            PimDestroyGemmDesc(pim_desc);
+        } else {
+            auto output = atenAddmm(self_tensor, mat1_tensor, mat2_tensor, beta, alpha);
+            if (act == PimActFunc::ACT_RELU) {
+                output = atenRelu(output);
+            }
+            output_iv = tensorToIValue(output);
         }
-        output_iv = tensorToIValue(output);
     }
 }
 
@@ -721,31 +750,13 @@ void customAtenMatmul(at::Tensor &self_tensor, at::Tensor &other_tensor, torch::
 {
     int dim_i0 = self_tensor.dim();
     int dim_i1 = other_tensor.dim();
-    int i0_is_vector = 0;
-    int i1_is_vector = 0;
-    bool is_bmm = 0;
-    auto isBmm = [](int dim_i0, std::vector<int64_t> shape, int i0_is_vector, int i1_is_vector) -> bool {
-        if (dim_i0 >= 3 && shape[dim_i0 - 3] != 1 && (i0_is_vector == 1 || i1_is_vector == 1)) {
-            return true;
-        } else {
-            return false;
-        }
-    };
 
-    for (int i = 0; i < dim_i0; ++i) {
-        if (self_tensor.size(i) != 1) {
-            i0_is_vector += 1;
-        }
-    }
+    auto self_shape = self_tensor.sizes().vec();
+    auto other_shape = other_tensor.sizes().vec();
+    gemmBroadcast(self_shape, other_shape);
+    auto gemm_type = getGemmType(self_shape, other_shape);
 
-    for (int i = 0; i < dim_i1; ++i) {
-        if (other_tensor.size(i) != 1) {
-            i1_is_vector += 1;
-        }
-    }
-    is_bmm = isBmm(dim_i0, self_tensor.sizes().vec(), i0_is_vector, i1_is_vector) ||
-             isBmm(dim_i1, other_tensor.sizes().vec(), i0_is_vector, i1_is_vector);
-    if (i0_is_vector == 1 && i1_is_vector != 1 && !is_bmm) {
+    if (gemm_type == GEMM_TYPE::VM) {
         if (!self_tensor.is_contiguous()) self_tensor = self_tensor.contiguous();
         if (!other_tensor.is_contiguous()) other_tensor = other_tensor.contiguous();
 
@@ -767,7 +778,7 @@ void customAtenMatmul(at::Tensor &self_tensor, at::Tensor &other_tensor, torch::
         auto output = at::zeros(output_shape, options);
         _Float16 *y = (_Float16 *)output.data_ptr();
 
-        PimGemmDesc *pim_desc = PimCreateGemmDesc(1, 1, 1, in_w, out_w, PIM_FP16);
+        PimGemmDesc *pim_desc = PimCreateGemmDesc(1, 1, 1, in_w, 1, out_w, PIM_FP16);
         PimBo *dev_op0 = PimCreateBo(pim_desc, MEM_TYPE_DEVICE, GEMM_INPUT, x);
         PimBo *dev_op1 = PimCreateBo(pim_desc, MEM_TYPE_DEVICE, GEMM_WEIGHT, A);
         PimBo *dev_out = PimCreateBo(pim_desc, MEM_TYPE_DEVICE, GEMM_OUTPUT, y);
@@ -780,13 +791,12 @@ void customAtenMatmul(at::Tensor &self_tensor, at::Tensor &other_tensor, torch::
         PimDestroyGemmDesc(pim_desc);
 
         output_iv = tensorToIValue(output);
-    } else if (i0_is_vector != 1 && i1_is_vector == 1 && !is_bmm) {
+    } else if (gemm_type == GEMM_TYPE::MV) {
         if (!self_tensor.is_contiguous()) self_tensor = self_tensor.contiguous();
         if (!other_tensor.is_contiguous()) other_tensor = other_tensor.contiguous();
 
-        int m = self_tensor.size(dim_i0 - 2);
-        int k = self_tensor.size(dim_i0 - 1);
-        int n = 1, c = 1, h = 1, in_w = k, out_w = m;
+        int out_w = self_tensor.size(dim_i0 - 2);
+        int in_w = self_tensor.size(dim_i0 - 1);
 
         _Float16 *A = (_Float16 *)self_tensor.data_ptr();
         _Float16 *x = (_Float16 *)other_tensor.data_ptr();
@@ -804,12 +814,12 @@ void customAtenMatmul(at::Tensor &self_tensor, at::Tensor &other_tensor, torch::
         auto output = at::zeros(output_shape, options);
         _Float16 *y = (_Float16 *)output.data_ptr();
 
-        PimGemmDesc *pim_desc = PimCreateGemmDesc(n, c, h, in_w, out_w, PIM_FP16, true);
+        PimGemmDesc *pim_desc = PimCreateGemmDesc(1, 1, in_w, 1, out_w, 1, PIM_FP16, W_X_I);
         PimBo *dev_op0 = PimCreateBo(pim_desc, MEM_TYPE_DEVICE, GEMM_INPUT, x);
         PimBo *dev_op1 = PimCreateBo(pim_desc, MEM_TYPE_DEVICE, GEMM_WEIGHT, A);
         PimBo *dev_out = PimCreateBo(pim_desc, MEM_TYPE_DEVICE, GEMM_OUTPUT, y);
 
-        PimExecuteGemm(dev_out, dev_op0, dev_op1, nullptr);
+        PimExecuteGemm(dev_out, dev_op0, dev_op1, nullptr, PimActFunc::NONE, W_X_I);
 
         PimDestroyBo(dev_op0);
         PimDestroyBo(dev_op1);
@@ -817,11 +827,10 @@ void customAtenMatmul(at::Tensor &self_tensor, at::Tensor &other_tensor, torch::
         PimDestroyGemmDesc(pim_desc);
 
         output_iv = tensorToIValue(output);
-    } else if (i0_is_vector == 1 && i1_is_vector == 1 && !is_bmm) {
+    } else if (gemm_type == GEMM_TYPE::VV) {
         if (!self_tensor.is_contiguous()) self_tensor = self_tensor.contiguous();
         if (!other_tensor.is_contiguous()) other_tensor = other_tensor.contiguous();
         int out_w = 1;
-        int n = 1;
         int in_w = 0;
         for (int i = 0; i < dim_i0; ++i) {
             if (self_tensor.size(i) != 1) {
@@ -847,12 +856,12 @@ void customAtenMatmul(at::Tensor &self_tensor, at::Tensor &other_tensor, torch::
         auto output = at::zeros(output_shape, options);
         _Float16 *y = (_Float16 *)output.data_ptr();
 
-        PimGemmDesc *pim_desc = PimCreateGemmDesc(1, 1, 1, in_w, out_w, PIM_FP16);
+        PimGemmDesc *pim_desc = PimCreateGemmDesc(1, 1, 1, in_w, 1, 1, PIM_FP16);
         PimBo *dev_op0 = PimCreateBo(pim_desc, MEM_TYPE_DEVICE, GEMM_INPUT, x);
         PimBo *dev_op1 = PimCreateBo(pim_desc, MEM_TYPE_DEVICE, GEMM_WEIGHT, A);
         PimBo *dev_out = PimCreateBo(pim_desc, MEM_TYPE_DEVICE, GEMM_OUTPUT, y);
 
-        PimExecuteGemm(dev_out, dev_op0, dev_op1, nullptr, PimActFunc::NONE, stream);
+        PimExecuteGemm(dev_out, dev_op0, dev_op1, nullptr, PimActFunc::NONE, I_X_W, stream);
 
         PimDestroyBo(dev_op0);
         PimDestroyBo(dev_op1);
@@ -861,8 +870,53 @@ void customAtenMatmul(at::Tensor &self_tensor, at::Tensor &other_tensor, torch::
 
         output_iv = tensorToIValue(output);
     } else {
-        auto output = atenMatmul(self_tensor, other_tensor);
-        output_iv = tensorToIValue(output);
+        // the dims of self_shape and other_shape are 4
+        int num = other_shape[0] * other_shape[1] * other_shape[3];
+        const char *env_k = std::getenv("ENABLE_PIM");
+        if (num > DIM_OUT_PIM && env_k != nullptr && *env_k == 1) {
+            if (!self_tensor.is_contiguous()) self_tensor = self_tensor.contiguous();
+            if (!other_tensor.is_contiguous()) other_tensor = other_tensor.contiguous();
+            int n = self_shape[0] > other_shape[0] ? self_shape[0] : other_shape[0];
+            int c = self_shape[1] > other_shape[1] ? self_shape[1] : other_shape[1];
+            int h = self_shape[2];
+            int in_w = other_shape[2];
+            int out_w = other_shape[3];
+
+            if (c != self_shape[1]) {
+                self_tensor.repeat({1, c, 1, 1});
+            } else if (c != other_shape[1]) {
+                other_tensor.repeat({1, c, 1, 1});
+            }
+
+            if (n != self_shape[0]) {
+                self_tensor.repeat({n, 1, 1, 1});
+            } else if (n != other_shape[0]) {
+                other_tensor.repeat({n, 1, 1, 1});
+            }
+
+            _Float16 *x = (_Float16 *)self_tensor.data_ptr();
+            _Float16 *A = (_Float16 *)other_tensor.data_ptr();
+            auto options = at::TensorOptions().dtype(at::kHalf).device(at::kCUDA);
+            auto output = at::zeros({n, c, h, out_w}, options);
+            _Float16 *y = (_Float16 *)output.data_ptr();
+
+            PimGemmDesc *pim_desc = PimCreateGemmDesc(n, c, h, in_w, h, out_w, PIM_FP16);
+            PimBo *dev_op0 = PimCreateBo(pim_desc, MEM_TYPE_DEVICE, GEMM_INPUT, x);
+            PimBo *dev_op1 = PimCreateBo(pim_desc, MEM_TYPE_DEVICE, GEMM_WEIGHT, A);
+            PimBo *dev_out = PimCreateBo(pim_desc, MEM_TYPE_DEVICE, GEMM_OUTPUT, y);
+
+            PimExecuteGemm(dev_out, dev_op0, dev_op1, nullptr);
+
+            PimDestroyBo(dev_op0);
+            PimDestroyBo(dev_op1);
+            PimDestroyBo(dev_out);
+            PimDestroyGemmDesc(pim_desc);
+
+            output_iv = tensorToIValue(output);
+        } else {
+            auto output = atenMatmul(self_tensor, other_tensor);
+            output_iv = tensorToIValue(output);
+        }
     }
 }
 

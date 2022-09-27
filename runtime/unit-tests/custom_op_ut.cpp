@@ -80,7 +80,7 @@ TEST(NNCompilerUnitTest, pimCustomGemvTest)
 
         PimInitialize(RT_TYPE_HIP, PIM_FP16);
 
-        PimGemmDesc* pim_desc = PimCreateGemmDesc(n, c, h, in_w, out_w, PIM_FP16);
+        PimGemmDesc* pim_desc = PimCreateGemmDesc(n, c, h, in_w, h, out_w, PIM_FP16);
         PimBo* dev_in = PimCreateBo(pim_desc, MEM_TYPE_DEVICE, GEMM_INPUT, x);
         PimBo* dev_wei = PimCreateBo(pim_desc, MEM_TYPE_DEVICE, GEMM_WEIGHT, A);
         PimBo* dev_out = PimCreateBo(pim_desc, MEM_TYPE_DEVICE, GEMM_OUTPUT, y);
@@ -117,12 +117,12 @@ TEST(NNCompilerUnitTest, pimCustomGemvTest)
 
         PimInitialize(RT_TYPE_HIP, PIM_FP16);
 
-        PimGemmDesc* pim_desc = PimCreateGemmDesc(n, c, h, in_w, out_w, PIM_FP16, true);
+        PimGemmDesc* pim_desc = PimCreateGemmDesc(n, c, in_w, h, out_w, h, PIM_FP16, W_X_I);
         PimBo* dev_in = PimCreateBo(pim_desc, MEM_TYPE_DEVICE, GEMM_INPUT, x);
         PimBo* dev_wei = PimCreateBo(pim_desc, MEM_TYPE_DEVICE, GEMM_WEIGHT, A);
         PimBo* dev_out = PimCreateBo(pim_desc, MEM_TYPE_DEVICE, GEMM_OUTPUT, y);
 
-        PimExecuteGemm(dev_out, dev_in, dev_wei, nullptr);
+        PimExecuteGemm(dev_out, dev_in, dev_wei, nullptr, PimActFunc::NONE, W_X_I);
 
         PimDestroyBo(dev_in);
         PimDestroyBo(dev_wei);

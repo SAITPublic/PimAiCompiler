@@ -279,6 +279,111 @@ torch::jit::IValue pop(std::vector<torch::jit::IValue>& stack)
 
 void drop(std::vector<torch::jit::IValue>& stack, size_t n) { stack.erase(stack.end() - n, stack.end()); }
 
+void gemmBroadcast(std::vector<int64_t>& shape1, std::vector<int64_t>& shape2)
+{
+    int dim1 = shape1.size();
+    int dim2 = shape2.size();
+    std::vector<int64_t> t1;
+    std::vector<int64_t> t2;
+    if (dim1 == dim2) {
+        for (int i = 0; i < 4; i++) {
+            if (i < dim1) {
+                t1.emplace_back(shape1[i]);
+                t2.emplace_back(shape2[i]);
+            } else {
+                t1.insert(t1.begin(), 1);
+                t2.insert(t2.begin(), 1);
+            }
+        }
+        shape1 = t1;
+        shape2 = t2;
+    } else if (dim1 < dim2) {
+        int num = dim2 - dim1;
+        if (num == 1) {
+            if (shape1[0] == shape2[0]) {
+                shape1.insert(shape1.begin() + 1, 1);
+            } else {
+                shape1.insert(shape1.begin(), 1);
+            }
+            gemmBroadcast(shape1, shape2);
+        } else if (num == 2) {
+            if (shape1[0] == shape2[0]) {
+                shape1.insert(shape1.begin() + 1, 1);
+                shape1.insert(shape1.begin() + 1, 1);
+            } else if (shape1[0] == shape2[1]) {
+                shape1.insert(shape1.begin() + 1, 1);
+                shape1.insert(shape1.begin(), 1);
+            } else if (shape1[1] == shape2[2]) {
+                shape1.insert(shape1.begin(), 1);
+                shape1.insert(shape1.begin(), 1);
+            }
+        } else {
+            DLOG(FATAL) << "The dims of input and weight must less than 4";
+        }
+
+    } else if (dim1 > dim2) {
+        int num = dim1 - dim2;
+        if (num == 1) {
+            if (shape1[dim1 - 1] == shape2[dim2 - 2]) {
+                shape2.insert(shape2.begin(), 1);
+            } else {
+                shape2.emplace_back(1);
+            }
+            gemmBroadcast(shape1, shape2);
+        } else if (num == 2) {
+            if (shape1[3] == shape2[1]) {
+                shape2.emplace_back(1);
+            } else {
+                shape2.insert(shape2.begin(), 1);
+            }
+
+            if (shape1[0] == shape2[0]) {
+                shape2.insert(shape2.begin() + 1, 1);
+            } else {
+                shape2.insert(shape2.begin(), 1);
+            }
+        } else if (num == 3) {
+            auto tmp = shape2[0];
+            if (tmp == shape1[3]) {
+                shape2 = shape1;
+                shape2[2] = tmp;
+                shape2[3] = 1;
+            } else {
+                shape2 = shape1;
+                shape2[2] = 1;
+                shape2[3] = tmp;
+            }
+        } else {
+            DLOG(FATAL) << "The dims of input and weight must less than 4";
+        }
+    }
+}
+
+GEMM_TYPE getGemmType(std::vector<int64_t> self_shape, std::vector<int64_t> other_shape)
+{
+    GEMM_TYPE type_ = GEMM_TYPE::UNKNOW;
+    if (self_shape[0] == 1 && self_shape[1] == 1 && other_shape[0] == 1 && other_shape[1] == 1) {
+        int self_is_vector = 0;
+        int other_is_vector = 0;
+        if (self_shape[2] != 1) self_is_vector++;
+        if (self_shape[3] != 1) self_is_vector++;
+        if (other_shape[2] != 1) other_is_vector++;
+        if (other_shape[3] != 1) other_is_vector++;
+        if (self_is_vector == 1 && other_is_vector == 1) {
+            type_ = GEMM_TYPE::VV;
+        } else if (self_is_vector == 1 && other_is_vector == 2) {
+            type_ = GEMM_TYPE::VM;
+        } else if (self_is_vector == 2 && other_is_vector == 1) {
+            type_ = GEMM_TYPE::MV;
+        } else {
+            type_ = GEMM_TYPE::MM;
+        }
+    } else {
+        type_ = GEMM_TYPE::MM;
+    }
+    return type_;
+}
+
 }  // namespace utils
 }  // namespace runtime
 }  // namespace nn_compiler

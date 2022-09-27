@@ -6,6 +6,8 @@
 #include "ir/include/layers/nn_layer.h"
 #include "ir/include/types.h"
 
+#define DIM_OUT_PIM (3200)
+
 namespace nn_compiler
 {
 namespace runtime
@@ -13,6 +15,14 @@ namespace runtime
 namespace utils
 {
 using namespace nn_compiler::ir;
+
+enum GEMM_TYPE {
+    UNKNOW,
+    VV,  // Vector * Vector
+    MV,  // Matrix * Vector
+    VM,  // Vector * Matrix
+    MM   // Matrix * Matrix
+};
 
 torch::jit::IValue boolToIValue(const bool& value);
 template <typename T>
@@ -169,6 +179,10 @@ void push(std::vector<torch::jit::IValue>& stack, Types&&... args)
 {
     (void)std::initializer_list<int>{(push_one(stack, std::forward<Types>(args)), 0)...};
 }
+
+void gemmBroadcast(std::vector<int64_t>& shape1, std::vector<int64_t>& shape2);
+
+GEMM_TYPE getGemmType(std::vector<int64_t> self_shape, std::vector<int64_t> other_shape);
 
 }  // namespace utils
 }  // namespace runtime
