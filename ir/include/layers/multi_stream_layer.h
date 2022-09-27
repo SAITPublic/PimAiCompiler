@@ -44,7 +44,7 @@ class MultiStreamLayer : public NNLayer
 
    private:
     std::vector<std::shared_ptr<nn_compiler::ir::NNLayer>> layers_;
-    int layers_num_ = 0; // default zero
+    int layers_num_ = 0;  // default zero
 };
 
 }  // namespace ir
