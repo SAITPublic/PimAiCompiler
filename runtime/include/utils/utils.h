@@ -1,7 +1,6 @@
 #pragma once
 
 #include <torch/script.h>
-#include <vector>
 
 #include "executor/utils/utils.h"
 #include "ir/include/tensors/data_tensor.h"

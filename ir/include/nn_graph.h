@@ -10,11 +10,6 @@
 
 #pragma once
 
-#include <algorithm>
-#include <memory>
-#include <string>
-#include <vector>
-
 #include "ir/include/layers/nn_layer.h"
 #include "ir/include/tensors/data_tensor.h"
 #include "ir/include/tensors/shape_tensor.h"

@@ -1,7 +1,6 @@
 #pragma once
 
 #include <torch/script.h>
-#include <vector>
 
 #include "frontend/importer/utils/attr_parser.h"
 #include "ir/include/layers/all_layers.h"

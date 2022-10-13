@@ -1,7 +1,4 @@
 #include <torch/script.h>
-#include <string>
-#include <unordered_map>
-#include <vector>
 
 #include "executor/op_executor/prim_ops.h"
 

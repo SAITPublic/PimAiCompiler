@@ -1,6 +1,3 @@
-#include <algorithm>
-#include <vector>
-
 #include "c10/hip/HIPFunctions.h"
 #include "executor/op_executor/aten_ops_executor.h"
 #include "executor/op_executor/custom_ops.h"

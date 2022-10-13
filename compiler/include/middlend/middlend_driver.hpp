@@ -1,7 +1,5 @@
 #pragma once
 
-#include <vector>
-
 #include "common/include/types.hpp"
 #include "ir/include/nn_model.h"
 

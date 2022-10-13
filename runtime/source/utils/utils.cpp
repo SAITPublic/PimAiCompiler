@@ -1,7 +1,6 @@
 #include <torch/script.h>
 #include <experimental/filesystem>
 #include <stdexcept>
-#include <vector>
 
 #include "utils/utils.h"
 

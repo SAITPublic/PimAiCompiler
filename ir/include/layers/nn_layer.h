@@ -10,15 +10,7 @@
 
 #pragma once
 
-#include <algorithm>
-#include <cassert>
-#include <cmath>
-#include <map>
-#include <memory>
-#include <string>
-#include <utility>
-#include <vector>
-
+#include "common/include/common.hpp"
 #include "glog/logging.h"
 #include "ir/include/types.h"
 

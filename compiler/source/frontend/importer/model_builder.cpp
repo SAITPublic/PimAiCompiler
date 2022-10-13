@@ -1,5 +1,3 @@
-#include <set>
-
 #include "frontend/importer/model_builder.h"
 #include "ir/include/utils/graph_util.h"
 

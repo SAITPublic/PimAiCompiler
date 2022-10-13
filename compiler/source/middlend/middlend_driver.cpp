@@ -1,6 +1,3 @@
-#include <cstdio>
-#include <cstdlib>
-
 #include "middlend/middlend_driver.hpp"
 #include "middlend/optimizer/pass_manager.h"
 

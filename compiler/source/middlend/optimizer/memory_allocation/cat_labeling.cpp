@@ -1,7 +1,3 @@
-#include <algorithm>
-#include <set>
-#include <vector>
-
 #include "middlend/optimizer/memory_allocation/cat_labeling.h"
 
 namespace nn_compiler

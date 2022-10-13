@@ -1,10 +1,5 @@
 #pragma once
 
-#include <iostream>
-#include <ostream>
-#include <string>
-#include <vector>
-
 #include <torch/csrc/jit/ir/ir.h>
 #include <torch/script.h>
 

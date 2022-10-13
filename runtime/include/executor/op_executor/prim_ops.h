@@ -4,8 +4,6 @@
 #define NNCOMPILER_PRIM_OP_H
 
 #include <torch/script.h>
-#include <unordered_map>
-#include <vector>
 
 #include "executor/utils/utils.h"
 

@@ -1,11 +1,7 @@
 #ifndef __CUSTOM_OPS__
 #define __CUSTOM_OPS__
-#include <assert.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <algorithm>
-#include <iostream>
 
+#include "common/include/common.hpp"
 #include "hip/hip_fp16.h"
 #include "hip/hip_runtime.h"
 

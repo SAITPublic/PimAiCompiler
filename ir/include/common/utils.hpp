@@ -1,7 +1,6 @@
 #pragma once
 
 #include <float.h>
-#include <math.h>
 #include <typeinfo>
 
 namespace nn_compiler::ir

@@ -11,8 +11,6 @@
 #pragma once
 
 #include <stdint.h>
-#include <string.h>
-#include <vector>
 
 #include "ir/include/tensors/shape_tensor.h"
 #include "ir/include/types.h"

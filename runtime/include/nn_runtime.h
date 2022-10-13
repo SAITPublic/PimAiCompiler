@@ -1,9 +1,5 @@
 #pragma once
 
-#include <memory>
-#include <tuple>
-#include <vector>
-
 #include "builder/model_builder.h"
 #include "executor/stream_executor.h"
 #include "ir/include/nn_model.h"

@@ -10,13 +10,6 @@
 
 #pragma once
 
-#include <map>
-#include <memory>
-#include <string>
-#include <unordered_set>
-#include <vector>
-
-#include "ir/include/layers/nn_layer.h"
 #include "ir/include/nn_graph.h"
 #include "ir/include/tensors/torch_shape_tensor.h"
 

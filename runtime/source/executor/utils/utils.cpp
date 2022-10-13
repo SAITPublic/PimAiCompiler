@@ -1,8 +1,5 @@
 #include <torch/script.h>
-#include <ostream>
 #include <stdexcept>
-#include <string>
-#include <vector>
 
 #include "executor/utils/utils.h"
 

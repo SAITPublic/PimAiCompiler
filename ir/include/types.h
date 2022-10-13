@@ -10,9 +10,7 @@
 
 #pragma once
 
-#include <float.h>
-#include <unordered_map>
-
+#include "common/include/common.hpp"
 #include "glog/logging.h"
 
 namespace nn_compiler

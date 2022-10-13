@@ -1,7 +1,6 @@
 #include <gtest/gtest.h>
 #include <stdint.h>
 #include <torch/script.h>
-#include <vector>
 
 #include "executor/op_executor/prim_ops.h"
 #include "glog/logging.h"

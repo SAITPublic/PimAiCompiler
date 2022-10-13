@@ -1,5 +1,3 @@
-#include <string>
-
 #include "ir/include/utils/graph_util.h"
 #include "middlend/optimizer/stream_execution/control_layer_execution.h"
 

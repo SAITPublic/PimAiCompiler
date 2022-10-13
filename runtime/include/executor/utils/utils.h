@@ -1,10 +1,7 @@
 #pragma once
 
-#include <torch/script.h>
-
 #include <exception>
-#include <stack>
-#include <vector>
+#include <torch/script.h>
 
 #include "ir/include/layers/nn_layer.h"
 #include "ir/include/types.h"

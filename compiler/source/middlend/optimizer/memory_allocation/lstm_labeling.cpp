@@ -1,6 +1,3 @@
-#include <set>
-#include <vector>
-
 #include "middlend/optimizer/memory_allocation/lstm_labeling.h"
 
 namespace nn_compiler

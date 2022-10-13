@@ -15,11 +15,14 @@
 
 #pragma once
 
+#include <float.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <algorithm>
+#include <cassert>
 #include <cmath>
 #include <fstream>
+#include <functional>
 #include <iostream>
 #include <list>
 #include <map>
@@ -29,6 +32,8 @@
 #include <sstream>
 #include <stack>
 #include <string>
+#include <thread>
 #include <tuple>
 #include <unordered_set>
+#include <utility>
 #include <vector>
