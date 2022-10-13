@@ -68,8 +68,6 @@ void SetWeightsForEmbedding::run(std::unique_ptr<nn_compiler::ir::NNModel>& grap
             if (successors_of_constant.size() == 1) {  // a constant only for embedding weight
                 cur_layer->deleteInSTensorID(idx);
                 graph->deleteLayer(constant_layer->getID());
-                auto out_stensor_id = constant_layer->getOutSTensorID()[0];  // always one output stensor from constant
-                graph->deleteSTensor(out_stensor_id);
             }
         }
     }

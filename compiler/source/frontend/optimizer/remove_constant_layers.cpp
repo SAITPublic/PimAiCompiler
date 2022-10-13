@@ -40,14 +40,12 @@ void RemoveConstantLayers::run(std::unique_ptr<nn_compiler::ir::NNModel>& model)
         auto successors = ir::utils::searchMapSuccessors(layer, model);
         // There is always only one output from prim::Constant or prim::Variable,
         // and the output could be used by multiple layers.
-        auto out_stensor_id = layer->getOutSTensorID()[0];
         for (auto successor : successors) {
             for (auto inID : successor.second) {
                 (successor.first)->deleteInSTensorID(inID);
             }
         }
         graph->deleteLayer(layer->getID());
-        graph->deleteSTensor(out_stensor_id);
     }
 }
 

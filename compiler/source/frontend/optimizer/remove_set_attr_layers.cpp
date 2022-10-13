@@ -41,7 +41,6 @@ void RemoveSetAttrLayers::run(std::unique_ptr<nn_compiler::ir::NNModel>& model)
         auto compute_layer = predecessors[1];
 
         // update successsors of prim::Variable layer
-        auto old_stensor_id = variable_layer->getOutSTensorID()[0];
         auto new_stensor_id = compute_layer->getOutSTensorID()[0];
 
         auto successors = ir::utils::searchMapSuccessors(variable_layer, model);
@@ -57,7 +56,6 @@ void RemoveSetAttrLayers::run(std::unique_ptr<nn_compiler::ir::NNModel>& model)
 
         graph->deleteLayer(layer->getID());
         graph->deleteLayer(variable_layer->getID());
-        graph->deleteSTensor(old_stensor_id);
     }
 }
 }  // namespace frontend

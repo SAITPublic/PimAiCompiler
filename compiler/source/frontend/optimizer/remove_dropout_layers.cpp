@@ -34,7 +34,6 @@ void RemoveDropoutLayers::run(std::unique_ptr<nn_compiler::ir::NNModel>& model)
             where %input0.1 is input, %131 and %132 are from constants.
             There is always only one input, one output for aten::dropout.
         */
-        auto old_stensor_id = layer->getOutSTensorID()[0];
         auto new_stensor_id = layer->getInSTensorID()[0];
 
         auto successors = ir::utils::searchMapSuccessors(layer, model);
@@ -46,7 +45,6 @@ void RemoveDropoutLayers::run(std::unique_ptr<nn_compiler::ir::NNModel>& model)
             }
         }
         graph->deleteLayer(layer->getID());
-        graph->deleteSTensor(old_stensor_id);
     }
 }
 

@@ -34,9 +34,6 @@ class TSSTensor
 
     uint32_t getID() { return id_; }
 
-    void setParentLayer(uint32_t layer_id) { parent_layer_id_ = layer_id; }
-    uint32_t getParentLayer() { return parent_layer_id_; }
-
     void setDim(std::vector<int32_t> dims)
     {
         dims_.clear();
@@ -72,6 +69,8 @@ class TSSTensor
     std::string getReprType() { return repr_type_; }
 
    private:
+    void setID(uint32_t id) { id_ = id; }
+
     static uint32_t getNextId()
     {
         static std::atomic<uint32_t> id{0};
@@ -79,11 +78,9 @@ class TSSTensor
     }
 
     uint32_t id_;
-    void setID(uint32_t id) { id_ = id; }
     std::string repr_type_;
     std::vector<int32_t> dims_;
     int32_t dim_size_ = 0;
-    uint32_t parent_layer_id_ = 0;
     DataType featuremap_type_ = DataType::UNDEFINED;
 };
 

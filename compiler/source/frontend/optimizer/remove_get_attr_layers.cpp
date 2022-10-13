@@ -29,7 +29,6 @@ void RemoveGetAttrLayers::run(std::unique_ptr<nn_compiler::ir::NNModel>& model)
 
     for (auto layer : remove_layers_) {
         // there is always one input and one output from prim::GetAttr
-        auto old_stensor_id = layer->getOutSTensorID()[0];
         auto new_stensor_id = layer->getInSTensorID()[0];
 
         model->deleteLayerRelationShips(new_stensor_id, layer);
@@ -44,7 +43,6 @@ void RemoveGetAttrLayers::run(std::unique_ptr<nn_compiler::ir::NNModel>& model)
             }
         }
         graph->deleteLayer(layer->getID());
-        graph->deleteSTensor(old_stensor_id);
     }
 }
 

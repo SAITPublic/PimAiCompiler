@@ -291,7 +291,6 @@ void ModelBuilder::importTorchScriptMethodBlock(std::unique_ptr<ir::NNModel>& nn
                             // Add output for prim::variable layer
                             int node_output_id = getUniqueTensorId(nn_model);
                             auto shape_tensor = nn_model->getTSSTensors()[node_output_id];
-                            shape_tensor->setParentLayer(variable_layer->getID());
                             shape_tensor->setFeaturemapType(convertTorchScriptType(attr.type()));
                             shape_tensor->setReprType(variable_layer->getNType());
                             variable_layer->addOutSTensorID(node_output_id);
@@ -331,7 +330,6 @@ void ModelBuilder::importTorchScriptMethodBlock(std::unique_ptr<ir::NNModel>& nn
                             int node_output_id = getUniqueTensorId(nn_model);
                             auto shape_tensor = nn_model->getTSSTensors()[node_output_id];
                             shape_tensor->setFeaturemapType(convertTorchScriptType(node_output->type()));
-                            shape_tensor->setParentLayer(set_attr_layer->getID());
                             shape_tensor->setReprType(node_output->type()->repr_str());
                             value_tensor_map_.emplace(node_output, node_output_id);
                             set_attr_layer->addOutSTensorID(node_output_id);
@@ -373,7 +371,6 @@ void ModelBuilder::importTorchScriptMethodBlock(std::unique_ptr<ir::NNModel>& nn
                                     int node_output_id = getUniqueTensorId(nn_model);
                                     auto shape_tensor = nn_model->getTSSTensors()[node_output_id];
                                     shape_tensor->setFeaturemapType(convertTorchScriptType(node_output->type()));
-                                    shape_tensor->setParentLayer(variable_layer->getID());
                                     shape_tensor->setReprType(node_output->type()->repr_str());
                                     value_tensor_map_.emplace(node_output, node_output_id);
                                     variable_layer->addOutSTensorID(node_output_id);
@@ -410,7 +407,6 @@ void ModelBuilder::importTorchScriptMethodBlock(std::unique_ptr<ir::NNModel>& nn
                                 int node_output_id = getUniqueTensorId(nn_model);
                                 auto shape_tensor = nn_model->getTSSTensors()[node_output_id];
                                 shape_tensor->setFeaturemapType(convertTorchScriptType(node_output->type()));
-                                shape_tensor->setParentLayer(get_attr_layer->getID());
                                 shape_tensor->setReprType(node_output->type()->repr_str());
                                 value_tensor_map_.emplace(node_output, node_output_id);
                                 get_attr_layer->addOutSTensorID(node_output_id);
@@ -568,7 +564,6 @@ std::shared_ptr<ir::NNLayer> ModelBuilder::createLayer(std::shared_ptr<frontend:
             int node_output_id = getUniqueTensorId(nn_model);
             auto shape_tensor = nn_model->getTSSTensors()[node_output_id];
             shape_tensor->setFeaturemapType(convertTorchScriptType(node_output->type()));
-            shape_tensor->setParentLayer(layer->getID());
             shape_tensor->setReprType(node_output->type()->repr_str());
             value_tensor_map_.emplace(node_output, node_output_id);
             layer->addOutSTensorID(node_output_id);

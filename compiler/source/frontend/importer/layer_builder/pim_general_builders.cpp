@@ -5,8 +5,6 @@
     {                                                                                           \
     namespace frontend                                                                          \
     {                                                                                           \
-    using nn_compiler::ir::DTensor;                                                             \
-    using nn_compiler::ir::STensor;                                                             \
     std::shared_ptr<ir::NNLayer> op_name##Builder::buildLayer(const torch::jit::Node* node_ref) \
     {                                                                                           \
         DLOG(INFO) << "build " << convertLayerTypeToString(type_name);                          \

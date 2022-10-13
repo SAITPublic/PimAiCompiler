@@ -100,12 +100,6 @@ class NNGraph
 
     std::vector<std::shared_ptr<NNLayer>>& getLayers() { return layers_; }
 
-    void addSTensor(std::pair<uint32_t, std::shared_ptr<STensor>> shape_tensor) { shape_tensors_.insert(shape_tensor); }
-
-    void deleteSTensor(uint32_t shape_tensor_id) { shape_tensors_.erase(shape_tensor_id); }
-
-    std::map<uint32_t, std::shared_ptr<STensor>> getSTensors() { return shape_tensors_; }
-
     void addDTensor(std::pair<uint32_t, std::shared_ptr<DTensor>> data_tensor)
     {
         data_tensors_.insert(std::move(data_tensor));
@@ -149,8 +143,6 @@ class NNGraph
     std::vector<uint32_t> out_tensor_ids_;
 
     std::vector<std::shared_ptr<NNLayer>> layers_;
-
-    std::map<uint32_t, std::shared_ptr<STensor>> shape_tensors_;
 
     std::map<uint32_t, std::shared_ptr<DTensor>> data_tensors_;
 };

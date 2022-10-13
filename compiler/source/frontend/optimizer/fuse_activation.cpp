@@ -63,7 +63,6 @@ void FuseActivation::run(std::unique_ptr<nn_compiler::ir::NNModel>& model)
     auto graph = model->getGraphs()[0];
 
     std::vector<std::shared_ptr<nn_compiler::ir::NNLayer>> layers_to_be_removed;
-    std::vector<uint32_t> tensors_to_be_removed;
     for (auto cur_layer : layers_) {
         std::string type = convertLayerTypeToString(cur_layer->getType());
         if (feasibleParasiteType(type)) {
@@ -74,7 +73,6 @@ void FuseActivation::run(std::unique_ptr<nn_compiler::ir::NNModel>& model)
             auto in_ids = cur_layer->getInSTensorID();
             CHECK_EQ(out_ids.size(), 1);
             CHECK_EQ(in_ids.size(), 1);
-            tensors_to_be_removed.push_back(in_ids[0]);
 
             if (convertLayerTypeToString(predecessors[0]->getType()).compare("aten::transpose") == 0) {
                 auto addmm_layer = std::static_pointer_cast<nn_compiler::ir::AtenAddmmLayer>(successors[0]);
@@ -93,10 +91,6 @@ void FuseActivation::run(std::unique_ptr<nn_compiler::ir::NNModel>& model)
 
     for (auto layer_to_be_removed : layers_to_be_removed) {
         graph->deleteLayer(layer_to_be_removed->getID());
-    }
-
-    for (auto tensor_to_be_removed : tensors_to_be_removed) {
-        graph->deleteSTensor(tensor_to_be_removed);
     }
 }
 
