@@ -12,8 +12,6 @@
 
 #include "common/include/common.hpp"
 #include "glog/logging.h"
-#include "ir/include/types.h"
-
 #include "ir/include/tensors/shape_tensor.h"
 
 namespace nn_compiler

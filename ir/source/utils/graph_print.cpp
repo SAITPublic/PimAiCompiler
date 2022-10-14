@@ -19,7 +19,7 @@ void printGraphModel(std::unique_ptr<ir::NNModel>& nn_model)
         network_line.append(graph->getName() + " (");
         for (auto iid : gin_ids) {
             network_line =
-                network_line.append(std::to_string(iid) + " : " + nn_model->getTSSTensors()[iid]->getReprType() + ", ");
+                network_line.append(std::to_string(iid) + " : " + nn_model->getSTensors()[iid]->getReprType() + ", ");
         }
         network_line.append(") :");
         DLOG(INFO) << network_line;
@@ -41,7 +41,7 @@ void printGraphModel(std::unique_ptr<ir::NNModel>& nn_model)
             auto in_ids = layer->getInSTensorID();
             auto out_ids = layer->getOutSTensorID();
             for (auto oid : out_ids) {
-                layer_line.append(std::to_string(oid) + " : " + nn_model->getTSSTensors()[oid]->getReprType() + ", ");
+                layer_line.append(std::to_string(oid) + " : " + nn_model->getSTensors()[oid]->getReprType() + ", ");
             }
             layer_line.append(" = " + convertLayerTypeToString(layer->getType()) + attr + " (");
             for (auto iid : in_ids) {

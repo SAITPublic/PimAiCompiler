@@ -125,17 +125,21 @@ void ptTensor2DTensor(at::Tensor torch_tensor, std::shared_ptr<DTensor> d_tensor
     // set the shape for DTensor
     if (torch_tensor.sizes().size() == 4) {
         d_tensor->setStride(strides);
-        d_tensor->setTensorShape(
-            STensor(torch_tensor.size(0), torch_tensor.size(1), torch_tensor.size(2), torch_tensor.size(3)));
+        std::vector<int32_t> tensor_shape = {torch_tensor.size(0), torch_tensor.size(1), torch_tensor.size(2),
+                                             torch_tensor.size(3)};
+        d_tensor->setTensorShape(STensor(tensor_shape));
     } else if (torch_tensor.sizes().size() == 3) {
         d_tensor->setStride({0, strides[0], strides[1], strides[2]});
-        d_tensor->setTensorShape(STensor(0, torch_tensor.size(0), torch_tensor.size(1), torch_tensor.size(2)));
+        std::vector<int32_t> tensor_shape = {0, torch_tensor.size(0), torch_tensor.size(1), torch_tensor.size(2)};
+        d_tensor->setTensorShape(STensor(tensor_shape));
     } else if (torch_tensor.sizes().size() == 2) {
         d_tensor->setStride({0, 0, strides[0], strides[1]});
-        d_tensor->setTensorShape(STensor(0, 0, torch_tensor.size(0), torch_tensor.size(1)));
+        std::vector<int32_t> tensor_shape = {0, 0, torch_tensor.size(0), torch_tensor.size(1)};
+        d_tensor->setTensorShape(STensor(tensor_shape));
     } else if (torch_tensor.sizes().size() == 1) {
         d_tensor->setStride({0, 0, 0, strides[0]});
-        d_tensor->setTensorShape(STensor(0, 0, 0, torch_tensor.size(0)));
+        std::vector<int32_t> tensor_shape = {0, 0, 0, torch_tensor.size(0)};
+        d_tensor->setTensorShape(STensor(tensor_shape));
     }
 }
 
@@ -168,7 +172,8 @@ std::shared_ptr<DTensor> getDTensorData(const torch::jit::Node* node_constant)
         auto value = node_constant->s(attr_symbol);
         auto len = value.length();
         data->setData(value.c_str(), len + 1);
-        data->setTensorShape(STensor(0, 0, 0, len));
+        std::vector<int32_t> tensor_shape = {0, 0, 0, len};
+        data->setTensorShape(STensor(tensor_shape));
         data->setDataType(nn_compiler::ir::DataType::UINT8);
         DLOG(INFO) << "set str: " << value;
 
@@ -177,7 +182,8 @@ std::shared_ptr<DTensor> getDTensorData(const torch::jit::Node* node_constant)
         auto value = node_constant->s(attr_symbol);
         auto len = value.length();
         data->setData(value.c_str(), len + 1);
-        data->setTensorShape(STensor(0, 0, 0, len));
+        std::vector<int32_t> tensor_shape = {0, 0, 0, len};
+        data->setTensorShape(STensor(tensor_shape));
         data->setDataType(nn_compiler::ir::DataType::UINT8);
         DLOG(INFO) << "set Device: " << value;
 
@@ -185,7 +191,8 @@ std::shared_ptr<DTensor> getDTensorData(const torch::jit::Node* node_constant)
         auto attr_symbol = node_constant->attributeNames().at(0);
         auto value = node_constant->i(attr_symbol);
         data->setData(&value, 8);
-        data->setTensorShape(STensor(0, 0, 0, 1));
+        std::vector<int32_t> tensor_shape = {0, 0, 0, 1};
+        data->setTensorShape(STensor(tensor_shape));
         data->setDataType(nn_compiler::ir::DataType::INT64);
         DLOG(INFO) << "set int64: " << value;
 
@@ -193,7 +200,8 @@ std::shared_ptr<DTensor> getDTensorData(const torch::jit::Node* node_constant)
         auto attr_symbol = node_constant->attributeNames().at(0);
         auto value = node_constant->i(attr_symbol);
         data->setData(&value, 8);
-        data->setTensorShape(STensor(0, 0, 0, 1));
+        std::vector<int32_t> tensor_shape = {0, 0, 0, 1};
+        data->setTensorShape(STensor(tensor_shape));
         data->setDataType(nn_compiler::ir::DataType::INT64);
         DLOG(INFO) << "set bool as int64: " << value;
 
@@ -208,7 +216,8 @@ std::shared_ptr<DTensor> getDTensorData(const torch::jit::Node* node_constant)
         auto attr_symbol = node_constant->attributeNames().at(0);
         auto value = node_constant->f(attr_symbol);
         data->setData(&value, 1 * sizeof(value));
-        data->setTensorShape(STensor(0, 0, 0, 1));
+        std::vector<int32_t> tensor_shape = {0, 0, 0, 1};
+        data->setTensorShape(STensor(tensor_shape));
         data->setDataType(nn_compiler::ir::DataType::FLOAT64);
         DLOG(INFO) << "set float64: " << value;
 
@@ -245,7 +254,8 @@ std::shared_ptr<DTensor> getDTensorData(const torch::jit::Node* node_constant)
         auto value = value_vec.data();
         auto parsed_ntype = parseNtype(ntype);
         data->setData(value, parsed_ntype.first * 8);
-        data->setTensorShape(STensor(0, 0, 0, parsed_ntype.first));
+        std::vector<int32_t> tensor_shape = {0, 0, 0, parsed_ntype.first};
+        data->setTensorShape(STensor(tensor_shape));
         data->setDataType(parsed_ntype.second);
         DLOG(INFO) << "set tuple:" << value_vec;
     } else if (ntype.find("[") != std::string::npos && ntype.find("]") != std::string::npos) {  // list type
@@ -258,7 +268,8 @@ std::shared_ptr<DTensor> getDTensorData(const torch::jit::Node* node_constant)
                 value.push_back(item.toInt());
             }
             data->setData(value.data(), value.size() * 8);
-            data->setTensorShape(STensor(0, 0, 0, value.size()));
+            std::vector<int32_t> tensor_shape = {0, 0, 0, value.size()};
+            data->setTensorShape(STensor(tensor_shape));
             data->setDataType(nn_compiler::ir::DataType::INT64);
         } else if (ntype.find("float") != std::string::npos) {
             std::vector<double> value;
@@ -266,7 +277,8 @@ std::shared_ptr<DTensor> getDTensorData(const torch::jit::Node* node_constant)
                 value.push_back(item.toDouble());
             }
             data->setData(value.data(), value.size() * 8);
-            data->setTensorShape(STensor(0, 0, 0, value.size()));
+            std::vector<int32_t> tensor_shape = {0, 0, 0, value.size()};
+            data->setTensorShape(STensor(tensor_shape));
             data->setDataType(nn_compiler::ir::DataType::FLOAT64);
         } else {
             DLOG(FATAL) << "unspported datatype for list.";

@@ -17,7 +17,7 @@ using namespace nn_compiler::ir;
 torch::Tensor createPtTensor(void* data_ptr, const std::vector<int64_t>& shape, DataType dtype,
                              const std::vector<int64_t>& stride = {});
 
-std::vector<int64_t> getDataShapeFromSTensor(nn_compiler::ir::STensor& value);
+std::vector<int64_t> getDataShapeFromSTensor(nn_compiler::ir::STensor& stensor);
 
 torch::Tensor loadTensor(const std::string& bin_file, const std::vector<int64_t>& shape, DataType dtype);
 

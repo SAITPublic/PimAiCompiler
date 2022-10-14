@@ -46,7 +46,7 @@ void RemoveCatForAddmm::run(std::unique_ptr<nn_compiler::ir::NNModel>& model)
         auto new_weights =
             create_new_constants(std::dynamic_pointer_cast<nn_compiler::ir::PrimConstantLayer>(old_weight));
         graph->deleteLayer(old_weight->getID());
-        model->deleteTSSTensor(old_weight->getOutSTensorID()[0]);
+        model->deleteSTensor(old_weight->getOutSTensorID()[0]);
         reorganize_graph(model, new_weights);
     }
 }
@@ -85,7 +85,8 @@ std::vector<std::shared_ptr<nn_compiler::ir::NNLayer>> RemoveCatForAddmm::create
         std::vector<float16> new_vec{(contiguous_data_vec.begin() + data_start),
                                      (contiguous_data_vec.begin() + data_amount)};
         new_data.push_back(new_vec);
-        data_shapes.push_back(nn_compiler::ir::STensor(0, 0, shape_of_input[1], shape_of_matmul_weight_[1]));
+        std::vector<int32_t> tensor_shape = {0, 0, shape_of_input[1], shape_of_matmul_weight_[1]};
+        data_shapes.push_back(nn_compiler::ir::STensor(tensor_shape));
         data_start = data_amount;
     }
 
@@ -131,9 +132,9 @@ void RemoveCatForAddmm::reorganize_graph(std::unique_ptr<nn_compiler::ir::NNMode
         addmm_layer->renewInSTensorID(1, out_stensor1_id);
         auto new_constant_layer1 = new_constants[0];
         graph->addLayer2pos(new_constant_layer1, graph->getLayerPos(addmm_layer) - 1);
-        auto constant_out_stensor1 = std::make_shared<nn_compiler::ir::TSSTensor>();
+        auto constant_out_stensor1 = std::make_shared<nn_compiler::ir::STensor>();
         new_constant_layer1->addOutSTensorID(constant_out_stensor1->getID());
-        model->addTSSTensor(std::make_pair(constant_out_stensor1->getID(), constant_out_stensor1));
+        model->addSTensor(std::make_pair(constant_out_stensor1->getID(), constant_out_stensor1));
         addmm_layer->renewInSTensorID(2, constant_out_stensor1->getID());
 
         // create second addmm Op
@@ -141,9 +142,9 @@ void RemoveCatForAddmm::reorganize_graph(std::unique_ptr<nn_compiler::ir::NNMode
             std::make_shared<nn_compiler::ir::AtenAddmmLayer>("", nn_compiler::ir::LayerType::ATENADDMM);
         new_addmm_layer->setName("splitted_" + addmm_layer->getName());
         graph->addLayer2pos(new_addmm_layer, graph->getLayerPos(addmm_layer));
-        auto new_addmm_out_stensor = std::make_shared<nn_compiler::ir::TSSTensor>();
+        auto new_addmm_out_stensor = std::make_shared<nn_compiler::ir::STensor>();
         new_addmm_layer->addOutSTensorID(new_addmm_out_stensor->getID());
-        model->addTSSTensor(std::make_pair(new_addmm_out_stensor->getID(), new_addmm_out_stensor));
+        model->addSTensor(std::make_pair(new_addmm_out_stensor->getID(), new_addmm_out_stensor));
 
         // update second addmm Op
         new_addmm_layer->addInSTensorID(addmm_layer->getOutSTensorID()[0]);
@@ -152,8 +153,8 @@ void RemoveCatForAddmm::reorganize_graph(std::unique_ptr<nn_compiler::ir::NNMode
         new_addmm_layer->addInSTensorID(out_stensor2_id);
         auto new_constant_layer2 = new_constants[1];
         graph->addLayer2pos(new_constant_layer2, graph->getLayerPos(new_addmm_layer) - 1);
-        auto constant_out_stensor2 = std::make_shared<nn_compiler::ir::TSSTensor>();
-        model->addTSSTensor(std::make_pair(constant_out_stensor2->getID(), constant_out_stensor2));
+        auto constant_out_stensor2 = std::make_shared<nn_compiler::ir::STensor>();
+        model->addSTensor(std::make_pair(constant_out_stensor2->getID(), constant_out_stensor2));
         new_constant_layer2->addOutSTensorID(constant_out_stensor2->getID());
         new_addmm_layer->addInSTensorID(constant_out_stensor2->getID());
 

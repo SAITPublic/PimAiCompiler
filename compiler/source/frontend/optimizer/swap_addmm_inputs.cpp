@@ -44,11 +44,11 @@ void SwapAddmmInputs::run(std::unique_ptr<nn_compiler::ir::NNModel>& model)
 
         model->updateLayerRelationShips(in_id, layer, transpose_layer_for_input);
 
-        auto new_stensor1 = std::make_shared<nn_compiler::ir::TSSTensor>();
+        auto new_stensor1 = std::make_shared<nn_compiler::ir::STensor>();
         auto idx1 = new_stensor1->getID();
-        model->addTSSTensor(std::make_pair(idx1, new_stensor1));
-        new_stensor1->setFeaturemapType(model->getTSSTensors()[in_id]->getFeaturemapType());
-        new_stensor1->setReprType(model->getTSSTensors()[in_id]->getReprType());
+        model->addSTensor(std::make_pair(idx1, new_stensor1));
+        new_stensor1->setFeaturemapType(model->getSTensors()[in_id]->getFeaturemapType());
+        new_stensor1->setReprType(model->getSTensors()[in_id]->getReprType());
 
         transpose_layer_for_input->addOutSTensorID(idx1);
         model->addLayerRelationShips(idx1, transpose_layer_for_input);
@@ -73,12 +73,12 @@ void SwapAddmmInputs::run(std::unique_ptr<nn_compiler::ir::NNModel>& model)
 
         model->updateLayerRelationShips(out_ids[0], layer, transpose_layer_for_output);
 
-        auto new_stensor2 = std::make_shared<nn_compiler::ir::TSSTensor>();
+        auto new_stensor2 = std::make_shared<nn_compiler::ir::STensor>();
         auto idx2 = new_stensor2->getID();
-        new_stensor2->setFeaturemapType(model->getTSSTensors()[out_ids[0]]->getFeaturemapType());
-        new_stensor2->setReprType(model->getTSSTensors()[out_ids[0]]->getReprType());
+        new_stensor2->setFeaturemapType(model->getSTensors()[out_ids[0]]->getFeaturemapType());
+        new_stensor2->setReprType(model->getSTensors()[out_ids[0]]->getReprType());
 
-        model->addTSSTensor(std::make_pair(idx2, new_stensor2));
+        model->addSTensor(std::make_pair(idx2, new_stensor2));
         layer->setOutSTensorID({idx2});
         transpose_layer_for_output->addInSTensorID(idx2);
         model->addLayerRelationShips(idx2, transpose_layer_for_output);

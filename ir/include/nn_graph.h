@@ -12,7 +12,6 @@
 
 #include "ir/include/layers/nn_layer.h"
 #include "ir/include/tensors/data_tensor.h"
-#include "ir/include/tensors/shape_tensor.h"
 
 namespace nn_compiler
 {

@@ -36,8 +36,8 @@ uint32_t ModelBuilder::getUniqueBlockId()
 
 uint32_t ModelBuilder::getUniqueTensorId(std::unique_ptr<ir::NNModel>& nn_model)
 {
-    auto shape_tensor = std::make_shared<ir::TSSTensor>();
-    nn_model->addTSSTensor(std::make_pair(shape_tensor->getID(), shape_tensor));
+    auto shape_tensor = std::make_shared<ir::STensor>();
+    nn_model->addSTensor(std::make_pair(shape_tensor->getID(), shape_tensor));
     return shape_tensor->getID();
 }
 
@@ -124,14 +124,16 @@ void addAttributeToLayer(c10::IValue ival, std::shared_ptr<nn_compiler::ir::Prim
         if (ival.isBool()) {
             auto value = ival.toBool();
             data->setData(&value, 8);
-            data->setTensorShape(nn_compiler::ir::STensor(0, 0, 0, 1));
+            std::vector<int32_t> tensor_shape = {0, 0, 0, 1};
+            data->setTensorShape(nn_compiler::ir::STensor(tensor_shape));
             data->setDataType(nn_compiler::ir::DataType::INT64);
             DLOG(INFO) << "set bool as int64: " << value;
 
         } else if (ival.isInt()) {
             auto value = ival.toInt();
             data->setData(&value, 8);
-            data->setTensorShape(nn_compiler::ir::STensor(0, 0, 0, 1));
+            std::vector<int32_t> tensor_shape = {0, 0, 0, 1};
+            data->setTensorShape(nn_compiler::ir::STensor(tensor_shape));
             data->setDataType(nn_compiler::ir::DataType::INT64);
             DLOG(INFO) << "set int64: " << value;
 
@@ -139,7 +141,8 @@ void addAttributeToLayer(c10::IValue ival, std::shared_ptr<nn_compiler::ir::Prim
             auto value = ival.toString()->string();
             auto len = value.length();
             data->setData(value.c_str(), len + 1);
-            data->setTensorShape(nn_compiler::ir::STensor(0, 0, 0, 1));
+            std::vector<int32_t> tensor_shape = {0, 0, 0, 1};
+            data->setTensorShape(nn_compiler::ir::STensor(tensor_shape));
             data->setDataType(nn_compiler::ir::DataType::UINT8);
             DLOG(INFO) << "set str: " << value;
 
@@ -147,14 +150,16 @@ void addAttributeToLayer(c10::IValue ival, std::shared_ptr<nn_compiler::ir::Prim
             auto value = ival.toNone();
             auto len = value.length();
             data->setData(value.c_str(), len + 1);
-            data->setTensorShape(nn_compiler::ir::STensor(0, 0, 0, len));
+            std::vector<int32_t> tensor_shape = {0, 0, 0, len};
+            data->setTensorShape(nn_compiler::ir::STensor(tensor_shape));
             data->setDataType(nn_compiler::ir::DataType::UINT8);
             DLOG(INFO) << "set None: " << value;
 
         } else if (ival.isDouble()) {
             auto value = ival.toDouble();
             data->setData(&value, 1 * sizeof(value));
-            data->setTensorShape(nn_compiler::ir::STensor(0, 0, 0, 1));
+            std::vector<int32_t> tensor_shape = {0, 0, 0, 1};
+            data->setTensorShape(nn_compiler::ir::STensor(tensor_shape));
             data->setDataType(nn_compiler::ir::DataType::FLOAT64);
             DLOG(INFO) << "set float64: " << value;
 
@@ -162,7 +167,8 @@ void addAttributeToLayer(c10::IValue ival, std::shared_ptr<nn_compiler::ir::Prim
             auto value = ival.toDevice().str();
             auto len = value.length();
             data->setData(value.c_str(), len + 1);
-            data->setTensorShape(nn_compiler::ir::STensor(0, 0, 0, len));
+            std::vector<int32_t> tensor_shape = {0, 0, 0, len};
+            data->setTensorShape(nn_compiler::ir::STensor(tensor_shape));
             data->setDataType(nn_compiler::ir::DataType::UINT8);
             DLOG(INFO) << "set Device: " << value;
 
@@ -194,7 +200,7 @@ void ModelBuilder::importTorchScriptMethodBlock(std::unique_ptr<ir::NNModel>& nn
         if (value_tensor_map_.find(input) == value_tensor_map_.end()) {
             // create input, it is either method input or block input
             int tensor_id = getUniqueTensorId(nn_model);
-            auto shape_tensor = nn_model->getTSSTensors()[tensor_id];
+            auto shape_tensor = nn_model->getSTensors()[tensor_id];
             shape_tensor->setFeaturemapType(convertTorchScriptType(input->type()));
             shape_tensor->setReprType(input->type()->repr_str());
             value_tensor_map_.emplace(input, tensor_id);
@@ -290,7 +296,7 @@ void ModelBuilder::importTorchScriptMethodBlock(std::unique_ptr<ir::NNModel>& nn
                             // No input
                             // Add output for prim::variable layer
                             int node_output_id = getUniqueTensorId(nn_model);
-                            auto shape_tensor = nn_model->getTSSTensors()[node_output_id];
+                            auto shape_tensor = nn_model->getSTensors()[node_output_id];
                             shape_tensor->setFeaturemapType(convertTorchScriptType(attr.type()));
                             shape_tensor->setReprType(variable_layer->getNType());
                             variable_layer->addOutSTensorID(node_output_id);
@@ -328,7 +334,7 @@ void ModelBuilder::importTorchScriptMethodBlock(std::unique_ptr<ir::NNModel>& nn
                         // always create new
                         if (value_tensor_map_.find(node_output) == value_tensor_map_.end()) {
                             int node_output_id = getUniqueTensorId(nn_model);
-                            auto shape_tensor = nn_model->getTSSTensors()[node_output_id];
+                            auto shape_tensor = nn_model->getSTensors()[node_output_id];
                             shape_tensor->setFeaturemapType(convertTorchScriptType(node_output->type()));
                             shape_tensor->setReprType(node_output->type()->repr_str());
                             value_tensor_map_.emplace(node_output, node_output_id);
@@ -369,7 +375,7 @@ void ModelBuilder::importTorchScriptMethodBlock(std::unique_ptr<ir::NNModel>& nn
                                 // always create new
                                 if (value_tensor_map_.find(node_output) == value_tensor_map_.end()) {
                                     int node_output_id = getUniqueTensorId(nn_model);
-                                    auto shape_tensor = nn_model->getTSSTensors()[node_output_id];
+                                    auto shape_tensor = nn_model->getSTensors()[node_output_id];
                                     shape_tensor->setFeaturemapType(convertTorchScriptType(node_output->type()));
                                     shape_tensor->setReprType(node_output->type()->repr_str());
                                     value_tensor_map_.emplace(node_output, node_output_id);
@@ -405,7 +411,7 @@ void ModelBuilder::importTorchScriptMethodBlock(std::unique_ptr<ir::NNModel>& nn
                             // always create new
                             if (value_tensor_map_.find(node_output) == value_tensor_map_.end()) {
                                 int node_output_id = getUniqueTensorId(nn_model);
-                                auto shape_tensor = nn_model->getTSSTensors()[node_output_id];
+                                auto shape_tensor = nn_model->getSTensors()[node_output_id];
                                 shape_tensor->setFeaturemapType(convertTorchScriptType(node_output->type()));
                                 shape_tensor->setReprType(node_output->type()->repr_str());
                                 value_tensor_map_.emplace(node_output, node_output_id);
@@ -504,7 +510,7 @@ void ModelBuilder::importTorchScriptMethodBlock(std::unique_ptr<ir::NNModel>& nn
     for (auto output : method_block->outputs()) {
         if (value_tensor_map_.find(output) == value_tensor_map_.end()) {
             int output_id = getUniqueTensorId(nn_model);
-            auto shape_tensor = nn_model->getTSSTensors()[output_id];
+            auto shape_tensor = nn_model->getSTensors()[output_id];
             shape_tensor->setFeaturemapType(convertTorchScriptType(output->type()));
             shape_tensor->setReprType(output->type()->repr_str());
             value_tensor_map_.emplace(output, output_id);
@@ -562,7 +568,7 @@ std::shared_ptr<ir::NNLayer> ModelBuilder::createLayer(std::shared_ptr<frontend:
     for (auto node_output : node->outputs()) {
         if (value_tensor_map_.find(node_output) == value_tensor_map_.end()) {
             int node_output_id = getUniqueTensorId(nn_model);
-            auto shape_tensor = nn_model->getTSSTensors()[node_output_id];
+            auto shape_tensor = nn_model->getSTensors()[node_output_id];
             shape_tensor->setFeaturemapType(convertTorchScriptType(node_output->type()));
             shape_tensor->setReprType(node_output->type()->repr_str());
             value_tensor_map_.emplace(node_output, node_output_id);

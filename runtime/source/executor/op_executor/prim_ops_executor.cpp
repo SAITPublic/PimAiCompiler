@@ -54,8 +54,8 @@ void executePrimConstant(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, Strea
         std::vector<int64_t> input_shape = getDataShapeFromSTensor(shape);
         std::vector<int64_t> stride = getDataShapeFromVector(stride_vec);
 
-        if (stream_executor.getModelType() == "GNMT" && constant_layer->getOutSTensorID()[0] == 4) {
-            std::vector<int64_t> reorder_shape(input_shape);
+        if (stream_executor.getModelType() == "GNMT" && constant_layer->getOutSTensorID()[0] == 10) {
+            std::vector<int64_t> reorder_shape = input_shape;
 
             int align_m = 32;
             int align_k = 16;

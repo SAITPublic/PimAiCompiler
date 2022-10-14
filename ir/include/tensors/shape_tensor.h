@@ -21,42 +21,53 @@ namespace ir
 class STensor
 {
    public:
-    STensor(uint32_t batch, uint32_t channel, uint32_t height, uint32_t width)
-        : n_(batch), c_(channel), h_(height), w_(width)
+    explicit STensor(std::vector<int32_t> dims)
     {
+        dim_size_ = dims.size();
+        for (int i = 0; i < dim_size_; i++) {
+            dims_.emplace_back(dims[i]);
+        }
         setID(getNextId());
     }
 
-    STensor() : STensor{0, 0, 0, 0} {}
+    STensor() { setID(getNextId()); }
 
     uint32_t getID() { return id_; }
 
-    void setBatch(uint32_t batch) { n_ = batch; }
-    uint32_t getBatch() const { return n_; }
+    void setDims(std::vector<int32_t> dims)
+    {
+        dims_.clear();
+        dim_size_ = dims.size();
+        for (int i = 0; i < dim_size_; i++) {
+            dims_.emplace_back(dims[i]);
+        }
+    }
+    std::vector<int32_t> getDims() { return dims_; }
 
-    void setChannel(uint32_t channel) { c_ = channel; }
-    uint32_t getChannel() const { return c_; }
+    int32_t getDimSize() { return dim_size_; }
 
-    void setHeight(uint32_t height) { h_ = height; }
-    uint32_t getHeight() const { return h_; }
+    void setFeaturemapType(DataType data_type) { featuremap_type_ = data_type; }
 
-    void setWidth(uint32_t width) { w_ = width; }
-    uint32_t getWidth() const { return w_; }
+    DataType getFeaturemapType() const { return featuremap_type_; }
+
+    void setReprType(std::string type_str) { repr_type_ = type_str; }
+
+    std::string getReprType() { return repr_type_; }
 
    private:
+    void setID(uint32_t id) { id_ = id; }
+
     static uint32_t getNextId()
     {
         static std::atomic<uint32_t> id{0};
         return id++;
     }
 
-    uint32_t id_;
-    void setID(uint32_t id) { id_ = id; }
-
-    uint32_t n_ = 0;
-    uint32_t c_ = 0;
-    uint32_t h_ = 0;
-    uint32_t w_ = 0;
+    uint32_t id_ = 0;
+    std::string repr_type_ = "";
+    std::vector<int32_t> dims_;
+    int32_t dim_size_ = 0;
+    DataType featuremap_type_ = DataType::UNDEFINED;
 };
 
 }  // namespace ir

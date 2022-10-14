@@ -68,7 +68,8 @@ void RemakeDTensorOfPrimVariable::run(std::unique_ptr<nn_compiler::ir::NNModel>&
                 int_arr[idx] = getSingleValue<int64_t>(variable_data[idx]);
             }
             new_dtensor->setData(int_arr, variable_data.size() * sizeof(int64_t));
-            new_dtensor->setTensorShape(nn_compiler::ir::STensor(0, 0, 0, variable_data.size()));
+            std::vector<int32_t> tensor_shape = {0, 0, 0, variable_data.size()};
+            new_dtensor->setTensorShape(nn_compiler::ir::STensor(tensor_shape));
             new_dtensor->setDataType(nn_compiler::ir::DataType::INT64);
 
             variable_layer->clearAttr();

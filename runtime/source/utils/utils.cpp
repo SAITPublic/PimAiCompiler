@@ -46,22 +46,15 @@ torch::Tensor createPtTensor(void* data_ptr, const std::vector<int64_t>& shape, 
     }
 }
 
-std::vector<int64_t> getDataShapeFromSTensor(nn_compiler::ir::STensor& value)
+std::vector<int64_t> getDataShapeFromSTensor(nn_compiler::ir::STensor& stensor)
 {
-    std::vector<int64_t> value_;
-    if (value.getBatch() != 0) {
-        value_.push_back(value.getBatch());
+    std::vector<int64_t> shape;
+    for (auto item : stensor.getDims()) {
+        if (item != 0) {
+            shape.push_back(item);
+        }
     }
-    if (value.getChannel() != 0) {
-        value_.push_back(value.getChannel());
-    }
-    if (value.getHeight() != 0) {
-        value_.push_back(value.getHeight());
-    }
-    if (value.getWidth() != 0) {
-        value_.push_back(value.getWidth());
-    }
-    return value_;
+    return shape;
 }
 
 torch::Tensor loadTensor(const std::string& bin_file, const std::vector<int64_t>& shape, DataType dtype)

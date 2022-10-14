@@ -11,7 +11,6 @@
 #pragma once
 
 #include "ir/include/nn_graph.h"
-#include "ir/include/tensors/torch_shape_tensor.h"
 
 namespace nn_compiler
 {
@@ -41,14 +40,14 @@ class NNModel
 
     std::vector<std::shared_ptr<NNGraph>> getGraphs() { return graphs_; }
 
-    void addTSSTensor(std::pair<uint32_t, std::shared_ptr<TSSTensor>> shape_tensor)
+    void addSTensor(std::pair<uint32_t, std::shared_ptr<STensor>> shape_tensor)
     {
         shape_tensors_.insert(shape_tensor);
     }
 
-    void deleteTSSTensor(uint32_t shape_tensor_id) { shape_tensors_.erase(shape_tensor_id); }
+    void deleteSTensor(uint32_t shape_tensor_id) { shape_tensors_.erase(shape_tensor_id); }
 
-    std::map<uint32_t, std::shared_ptr<TSSTensor>> getTSSTensors() { return shape_tensors_; }
+    std::map<uint32_t, std::shared_ptr<STensor>> getSTensors() { return shape_tensors_; }
 
     void addLayerRelationShips(uint32_t shape_tensor_id, std::shared_ptr<ir::NNLayer> layer)
     {
@@ -98,7 +97,7 @@ class NNModel
    private:
     std::vector<std::shared_ptr<NNGraph>> graphs_;
 
-    std::map<uint32_t, std::shared_ptr<TSSTensor>> shape_tensors_;
+    std::map<uint32_t, std::shared_ptr<STensor>> shape_tensors_;
 
     std::map<uint32_t, std::vector<std::shared_ptr<ir::NNLayer>>> layer_relations_map_;
 };

@@ -13,7 +13,6 @@
 #include <stdint.h>
 
 #include "ir/include/tensors/shape_tensor.h"
-#include "ir/include/types.h"
 
 namespace nn_compiler
 {

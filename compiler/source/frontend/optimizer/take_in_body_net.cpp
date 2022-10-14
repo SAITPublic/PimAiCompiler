@@ -155,7 +155,7 @@ void TakeInBodyNet::take_in_loop_body(std::unique_ptr<nn_compiler::ir::NNModel>&
         std::vector<uint32_t> new_loop_to_block_id;
         for (auto idx : loop_layer_out_tensor_ids) {
             auto id = getUniqueTensorId(model);
-            auto shape_tensors = model->getTSSTensors();
+            auto shape_tensors = model->getSTensors();
             auto data_type = shape_tensors[idx]->getFeaturemapType();
             auto index_to_block_id_shape_tensor = shape_tensors[id];
             index_to_block_id_shape_tensor->setFeaturemapType(data_type);
@@ -179,7 +179,7 @@ void TakeInBodyNet::take_in_loop_body(std::unique_ptr<nn_compiler::ir::NNModel>&
 
             if (i == 0) {
                 auto index_to_block_id = getUniqueTensorId(model);
-                auto index_to_block_id_shape_tensor = model->getTSSTensors()[index_to_block_id];
+                auto index_to_block_id_shape_tensor = model->getSTensors()[index_to_block_id];
                 index_to_block_id_shape_tensor->setFeaturemapType(nn_compiler::ir::DataType::UINT8);
                 auto loop_index_layer = std::make_shared<nn_compiler::ir::PrimLoopIndexLayer>(
                     "", nn_compiler::ir::LayerType::PRIMLOOPINDEX);
@@ -208,7 +208,7 @@ void TakeInBodyNet::take_in_loop_body(std::unique_ptr<nn_compiler::ir::NNModel>&
                 // if loop has no output, we need add edge to link block and loop layer
                 if (new_loop_to_block_id.size() == 0) {
                     auto loop_to_block_id = getUniqueTensorId(model);
-                    auto loop_to_block_id_shape_tensor = model->getTSSTensors()[loop_to_block_id];
+                    auto loop_to_block_id_shape_tensor = model->getSTensors()[loop_to_block_id];
                     loop_to_block_id_shape_tensor->setFeaturemapType(nn_compiler::ir::DataType::UINT8);
                     new_loop_to_block_id.push_back(loop_to_block_id);
                     block_layer->addInSTensorID(loop_to_block_id);
@@ -263,8 +263,8 @@ void TakeInBodyNet::run(std::unique_ptr<nn_compiler::ir::NNModel>& model)
 
 uint32_t TakeInBodyNet::getUniqueTensorId(std::unique_ptr<nn_compiler::ir::NNModel>& model)
 {
-    auto shape_tensor = std::make_shared<nn_compiler::ir::TSSTensor>();
-    model->addTSSTensor(std::make_pair(shape_tensor->getID(), shape_tensor));
+    auto shape_tensor = std::make_shared<nn_compiler::ir::STensor>();
+    model->addSTensor(std::make_pair(shape_tensor->getID(), shape_tensor));
     return shape_tensor->getID();
 }
 

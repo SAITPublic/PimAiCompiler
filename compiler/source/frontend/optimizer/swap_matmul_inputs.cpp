@@ -17,15 +17,7 @@ bool SwapMatmulInputs::fitCondition(std::unique_ptr<nn_compiler::ir::NNModel>& m
             if (predecessors.size() == 2 && predecessors[1]->getType() == nn_compiler::ir::LayerType::PRIMCONSTANT) {
                 auto constant_layer = std::dynamic_pointer_cast<nn_compiler::ir::PrimConstantLayer>(predecessors[1]);
                 auto dtensor = constant_layer->getAttr();
-                std::vector<int> shape;
-                auto b = dtensor->getTensorShape().getBatch();
-                auto c = dtensor->getTensorShape().getChannel();
-                auto h = dtensor->getTensorShape().getHeight();
-                auto w = dtensor->getTensorShape().getWidth();
-                if (b != 0) shape.push_back(b);
-                if (c != 0) shape.push_back(c);
-                if (h != 0) shape.push_back(h);
-                if (w != 0) shape.push_back(w);
+                auto shape = dtensor->getTensorShape().getDims();
 
                 if (shape.size() == 2) {
                     layers_.push_back(layer);
@@ -57,11 +49,11 @@ void SwapMatmulInputs::run(std::unique_ptr<nn_compiler::ir::NNModel>& model)
 
         model->updateLayerRelationShips(in_ids[0], layer, transpose_layer_for_input);
 
-        auto new_stensor1 = std::make_shared<nn_compiler::ir::TSSTensor>();
+        auto new_stensor1 = std::make_shared<nn_compiler::ir::STensor>();
         auto idx1 = new_stensor1->getID();
-        model->addTSSTensor(std::make_pair(idx1, new_stensor1));
-        new_stensor1->setFeaturemapType(model->getTSSTensors()[in_ids[0]]->getFeaturemapType());
-        new_stensor1->setReprType(model->getTSSTensors()[in_ids[0]]->getReprType());
+        model->addSTensor(std::make_pair(idx1, new_stensor1));
+        new_stensor1->setFeaturemapType(model->getSTensors()[in_ids[0]]->getFeaturemapType());
+        new_stensor1->setReprType(model->getSTensors()[in_ids[0]]->getReprType());
 
         transpose_layer_for_input->addOutSTensorID(idx1);
         model->addLayerRelationShips(idx1, transpose_layer_for_input);
@@ -87,12 +79,12 @@ void SwapMatmulInputs::run(std::unique_ptr<nn_compiler::ir::NNModel>& model)
 
         model->updateLayerRelationShips(out_ids[0], layer, transpose_layer_for_output);
 
-        auto new_stensor2 = std::make_shared<nn_compiler::ir::TSSTensor>();
+        auto new_stensor2 = std::make_shared<nn_compiler::ir::STensor>();
         auto idx2 = new_stensor2->getID();
-        new_stensor2->setFeaturemapType(model->getTSSTensors()[out_ids[0]]->getFeaturemapType());
-        new_stensor2->setReprType(model->getTSSTensors()[out_ids[0]]->getReprType());
+        new_stensor2->setFeaturemapType(model->getSTensors()[out_ids[0]]->getFeaturemapType());
+        new_stensor2->setReprType(model->getSTensors()[out_ids[0]]->getReprType());
 
-        model->addTSSTensor(std::make_pair(idx2, new_stensor2));
+        model->addSTensor(std::make_pair(idx2, new_stensor2));
         layer->setOutSTensorID({idx2});
         transpose_layer_for_output->addInSTensorID(idx2);
         model->addLayerRelationShips(idx2, transpose_layer_for_output);
