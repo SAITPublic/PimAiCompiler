@@ -23,6 +23,7 @@ bool CatLabeling::fitCondition(std::unique_ptr<nn_compiler::ir::NNModel>& model)
 
 void CatLabeling::run(std::unique_ptr<nn_compiler::ir::NNModel>& model)
 {
+    DLOG(INFO) << "CatLabeling::run is called.";
     auto graph = model->getGraphs()[0];
     std::vector<int64_t> target_cat_ids;
 

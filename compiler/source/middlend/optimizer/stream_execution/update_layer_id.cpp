@@ -11,7 +11,7 @@ bool UpdateLayerId::fitCondition(std::unique_ptr<nn_compiler::ir::NNModel>& mode
 
 void UpdateLayerId::run(std::unique_ptr<nn_compiler::ir::NNModel>& model)
 {
-    DLOG(INFO) << "Update layer id start.";
+    DLOG(INFO) << "UpdateLayerId::run is called.";
     uint32_t layer_id = 0;
     auto graph = model->getGraphs()[0];
 

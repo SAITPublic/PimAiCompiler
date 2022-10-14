@@ -14,7 +14,7 @@ PassManager::PassManager() {}
 
 void PassManager::runPasses(std::unique_ptr<nn_compiler::ir::NNModel>& model)
 {
-    DLOG(INFO) << "PassManager::runPasses is called.";
+    DLOG(INFO) << "middlend PassManager::runPasses is called.";
     auto base_pass = std::make_shared<Pass>();
 
     auto multi_stream_execution = std::make_shared<MultiStreamExecution>();

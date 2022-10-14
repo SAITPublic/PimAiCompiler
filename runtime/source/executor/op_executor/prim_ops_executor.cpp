@@ -40,9 +40,7 @@ void executePrimConstant(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, Strea
         // set bool as int64
         int64_t tmp = 0;
         tmp = *(int64_t*)ptr;
-        DLOG(INFO) << "Set Data: " << tmp;
         iv = scalarToIValue(tmp);
-        DLOG(INFO) << "IV: " << iv;
         dtype = DataType::INT64;
     } else if (ntype == "float") {
         // float64
@@ -285,8 +283,6 @@ void executePrimIf(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecu
     auto if_layer = std::static_pointer_cast<nn_compiler::ir::PrimIfLayer>(layer);
     auto in_stensor_ids = layer->getInSTensorID();
     assert(in_stensor_ids.size() == 1);
-
-    DLOG(INFO) << "PrimIfLayer.if" << layer->getID();
 
     // Find input edge, primIf only have one input
     // Find the input blob, named condition, it is a int64/bool value

@@ -24,7 +24,7 @@ PassManager::PassManager(const std::string& model_name) { model_name_ = model_na
 
 void PassManager::runPasses(std::unique_ptr<nn_compiler::ir::NNModel>& model)
 {
-    DLOG(INFO) << "PassManager::runPasses is called.";
+    DLOG(INFO) << "frontend PassManager::runPasses is called.";
     auto base_pass = std::make_shared<Pass>();
 
     auto take_in_body_net = std::make_shared<TakeInBodyNet>();

@@ -77,7 +77,7 @@ void primListUnpack(std::vector<torch::IValue>& stack, size_t num_outputs)
 void primRaiseException(std::string msg)
 {
     utils::NNRuntimeException exception(msg);
-    DLOG(INFO) << exception.what();
+    LOG(INFO) << exception.what();
     throw exception;
 }
 
