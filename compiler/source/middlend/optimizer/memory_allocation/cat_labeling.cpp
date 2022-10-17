@@ -39,7 +39,11 @@ void CatLabeling::run(std::unique_ptr<nn_compiler::ir::NNModel>& model)
             auto cat_layer = std::dynamic_pointer_cast<ir::AtenCatLayer>(graph->getLayerByID(cat_id));
             auto cat_in_layer_id = cat_layer->getInSTensorID()[0];
             for (auto cat_in_layer : graph->getLayers()) {
-                if (cat_in_layer->getID() == cat_in_layer_id) {
+                auto cur_out_stensor_ids = cat_in_layer->getOutSTensorID();
+                if (cur_out_stensor_ids.size() == 0) {
+                    continue;
+                }
+                if (cur_out_stensor_ids[0] == cat_in_layer_id) {
                     cat_layer->setMemLayerId(cat_in_layer->getID() * 10);
                     break;
                 }
