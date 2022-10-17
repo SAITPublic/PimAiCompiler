@@ -7,7 +7,25 @@ namespace nn_compiler
 namespace middlend
 {
 /** @Details:
- *
+ *  Automatically recognize parallelizable model structure, and apply multi-stream to acclerate execution time.
+ *  For Switch Transformer model, the following modle structure is recognized:
+ *                                aten::contiguous
+ *                      /          |           |            \
+ *               aten::slice  aten::slice  aten::slice  aten::slice
+ *                     |           |           |             |
+ *         aten::transpose aten::transpose aten::transpose aten::transpose
+ *                     |           |           |             |
+ *             aten::matmul  aten::matmul  aten::matmul   aten::matmul
+ *                     |           |           |             |
+ *               aten::add     aten::add    aten::add      aten::add
+ *                     |           |           |             |
+ *           prim::Variable prim::Variable prim::Variable prim::Variable
+ *                     |           |           |             |
+ *           aten::reshape  aten::reshape  aten::reshape   aten::reshape
+ *                     \           |           |             /
+ *                              prim::ListConstruct
+ *  And then get reorgnized by a new multi-stream Op, which will execute four aten::matmul Ops inside with multi-stream
+ *  in runtime.
  **/
 class MultiStreamExecution : public Pass
 {
