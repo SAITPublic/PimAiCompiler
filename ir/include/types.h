@@ -183,5 +183,9 @@ enum class LayerType {
 
 std::string convertLayerTypeToString(LayerType type);
 
+bool isControlOp(LayerType type);
+
+bool isMIOpenSupportOp(LayerType type);
+
 }  // namespace ir
 }  // namespace nn_compiler

@@ -156,5 +156,16 @@ std::string convertLayerTypeToString(LayerType type)
     }
 }
 
+bool isControlOp(LayerType type)
+{
+    return (type == ir::LayerType::PRIMIF || type == ir::LayerType::PRIMENDIF || type == ir::LayerType::PRIMLOOP ||
+            type == ir::LayerType::PRIMENDLOOP || type == ir::LayerType::PRIMBLOCK);
+}
+
+bool isMIOpenSupportOp(LayerType type)
+{
+    return (type == ir::LayerType::ATENLSTM1 || type == ir::LayerType::ATENLSTM2);
+}
+
 }  // namespace ir
 }  // namespace nn_compiler

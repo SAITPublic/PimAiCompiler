@@ -138,12 +138,6 @@ RetVal StreamExecutor::inferenceModel(const std::vector<torch::Tensor>& input_te
     int cursor_begin = input_tensors.size();
     int cursor_end = layers.size() - output_blob_ids_.size();
 
-    // control_op will move cursor by itself
-    auto is_control_op = [](ir::LayerType type) {
-        return (type == ir::LayerType::PRIMIF || type == ir::LayerType::PRIMENDIF || type == ir::LayerType::PRIMLOOP ||
-                type == ir::LayerType::PRIMENDLOOP || type == ir::LayerType::PRIMBLOCK);
-    };
-
     // Execute Graph
     for (cursor_ = cursor_begin; cursor_ < cursor_end;) {
         auto layer = layers[cursor_];
@@ -161,7 +155,8 @@ RetVal StreamExecutor::inferenceModel(const std::vector<torch::Tensor>& input_te
             op_executor(layer, *this);
         }
 
-        if (!is_control_op(layer_type)) {
+        // control_op will move cursor by itself
+        if (!ir::isControlOp(layer_type)) {
             cursor_++;
         }
     }
@@ -193,12 +188,6 @@ RetVal StreamExecutor::inferenceModelwithProfiling(const std::vector<torch::Tens
     int cursor_begin = input_tensors.size();
     int cursor_end = layers.size() - output_blob_ids_.size();
 
-    // control_op will move cursor by itself
-    auto is_control_op = [](ir::LayerType type) {
-        return (type == ir::LayerType::PRIMIF || type == ir::LayerType::PRIMENDIF || type == ir::LayerType::PRIMLOOP ||
-                type == ir::LayerType::PRIMENDLOOP || type == ir::LayerType::PRIMBLOCK);
-    };
-
     // Execute Graph
     for (cursor_ = cursor_begin; cursor_ < cursor_end;) {
         auto layer = layers[cursor_];
@@ -219,7 +208,8 @@ RetVal StreamExecutor::inferenceModelwithProfiling(const std::vector<torch::Tens
             at::hip::device_synchronize();
         }
 
-        if (!is_control_op(layer_type)) {
+        // control_op will move cursor by itself
+        if (!ir::isControlOp(layer_type)) {
             cursor_++;
         }
     }
