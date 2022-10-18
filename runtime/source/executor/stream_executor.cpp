@@ -3,6 +3,7 @@
 
 #include "c10/hip/HIPFunctions.h"
 #include "executor/op_executor/aten_ops_executor.h"
+#include "executor/op_executor/miopen_ops_executor.h"
 #include "executor/op_executor/prim_ops_executor.h"
 #include "executor/op_executor/stream_ops_executor.h"
 #include "executor/stream_executor.h"
