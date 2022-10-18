@@ -50,6 +50,16 @@ RetVal StreamExecutor::preProcess()
     input_blob_ids_.clear();
     output_blob_ids_.clear();
 
+    // 1. set executor for Ops
+    for (auto layer : graph_->getLayers()) {
+        auto type = layer->getType();
+        if (type == ir::LayerType::PRIMINPUT || type == ir::LayerType::PRIMOUTPUT) {
+            continue;
+        }
+        this->global_op_register_.insert({layer->getID(), findOpExecutorByType(type)});
+    }
+
+    // 2. pre-load constants
     int custom_cat_mem_id = 0;
     for (auto layer : graph_->getLayers()) {
         if (model_type_ == "GNMT" && layer->getType() == ir::LayerType::ATENLSTM1) {
@@ -90,6 +100,7 @@ RetVal StreamExecutor::preProcess()
         }
     }
 
+    // 3. set stream arguments
     int max_stream_num = 0;
     for (auto layer : graph_->getLayers()) {
         if (layer->getType() == ir::LayerType::MULTISTREAM) {
@@ -137,7 +148,8 @@ RetVal StreamExecutor::inferenceModel(const std::vector<torch::Tensor>& input_te
     for (cursor_ = cursor_begin; cursor_ < cursor_end;) {
         auto layer = layers[cursor_];
         auto layer_type = layer->getType();
-        DLOG(INFO) << "Layer id:" << layer->getID() << " name: " << layer->getName()
+        auto layer_id = layer->getID();
+        DLOG(INFO) << "Layer id:" << layer_id << " name: " << layer->getName()
                    << " type: " << convertLayerTypeToString(layer_type);
 
         if (layer_type == ir::LayerType::PRIMCONSTANT) {
@@ -145,7 +157,7 @@ RetVal StreamExecutor::inferenceModel(const std::vector<torch::Tensor>& input_te
             cursor_++;
             continue;
         } else {
-            auto op_executor = findOpExecutor(layer_type);
+            auto op_executor = getOpExecutor(layer_id);
             op_executor(layer, *this);
         }
 
@@ -192,7 +204,8 @@ RetVal StreamExecutor::inferenceModelwithProfiling(const std::vector<torch::Tens
         auto layer = layers[cursor_];
         auto layer_name = layer->getName();
         auto layer_type = layer->getType();
-        DLOG(INFO) << "Layer id:" << layer->getID() << " name: " << layer->getName()
+        auto layer_id = layer->getID();
+        DLOG(INFO) << "Layer id:" << layer_id << " name: " << layer_name
                    << " type: " << convertLayerTypeToString(layer_type);
 
         if (layer_type == ir::LayerType::PRIMCONSTANT) {
@@ -200,7 +213,7 @@ RetVal StreamExecutor::inferenceModelwithProfiling(const std::vector<torch::Tens
             cursor_++;
             continue;
         } else {
-            auto op_executor = findOpExecutor(layer_type);
+            auto op_executor = getOpExecutor(layer_id);
             PROFILE_SCOPE(layer_name);
             op_executor(layer, *this);
             at::hip::device_synchronize();
@@ -245,12 +258,21 @@ std::pair<DataType, torch::jit::IValue>& StreamExecutor::findBlob(int64_t blob_i
 
 bool StreamExecutor::checkValidBlobID(int64_t blob_id) { return (global_blobs_.find(blob_id) != global_blobs_.end()); }
 
-OpExecutorFn StreamExecutor::findOpExecutor(ir::LayerType& type)
+OpExecutorFn StreamExecutor::findOpExecutorByType(ir::LayerType& type)
 {
-    auto it = global_op_register_.find(type);
+    auto it = type_to_executor_map_.find(type);
+    if (it == type_to_executor_map_.end()) {
+        DLOG(FATAL) << "Unregistered Op found: " << convertLayerTypeToString(type);
+    }
+    assert(it != type_to_executor_map_.end());
+    return it->second;
+}
+
+OpExecutorFn StreamExecutor::getOpExecutor(uint32_t& id)
+{
+    auto it = global_op_register_.find(id);
     if (it == global_op_register_.end()) {
-        DLOG(FATAL) << "Runtime error, Unregistered Op found: " << convertLayerTypeToString(type);
-        ;
+        DLOG(FATAL) << "Runtime error, Id of Op out of size!";
     }
     assert(it != global_op_register_.end());
     return it->second;
@@ -350,144 +372,145 @@ const std::shared_ptr<ir::NNGraph> StreamExecutor::getGraph() { return this->gra
 
 void StreamExecutor::registerOp()
 {
-    this->global_op_register_.insert({ir::LayerType::ATENABS, op_executor::executeAtenAbs});
-    this->global_op_register_.insert({ir::LayerType::ATENADD, op_executor::executeAtenAdd});
-    this->global_op_register_.insert({ir::LayerType::ATENADDMM, op_executor::executeAtenAddmm});
-    this->global_op_register_.insert({ir::LayerType::ATENAND, op_executor::executeAtenAnd});
-    this->global_op_register_.insert({ir::LayerType::ATENANY, op_executor::executeAtenAny});
-    this->global_op_register_.insert({ir::LayerType::ATENAPPEND, op_executor::executeAtenAppend});
-    this->global_op_register_.insert({ir::LayerType::ATENARANGE1, op_executor::executeAtenArange1});
-    this->global_op_register_.insert({ir::LayerType::ATENARANGE2, op_executor::executeAtenArange2});
-    this->global_op_register_.insert({ir::LayerType::ATENARANGE3, op_executor::executeAtenArange3});
-    this->global_op_register_.insert({ir::LayerType::ATENARGMAX, op_executor::executeAtenArgmax});
-    this->global_op_register_.insert({ir::LayerType::ATENASTENSOR, op_executor::executeAtenAsTensor});
-    this->global_op_register_.insert({ir::LayerType::ATENBATCHNORM2D, op_executor::executeAtenBatchNorm2d});
-    this->global_op_register_.insert({ir::LayerType::ATENBITWISENOT, op_executor::executeAtenBitwiseNot});
-    this->global_op_register_.insert({ir::LayerType::ATENBMM, op_executor::executeAtenBmm});
-    this->global_op_register_.insert({ir::LayerType::ATENBOOL, op_executor::executeAtenBool});
-    this->global_op_register_.insert({ir::LayerType::ATENCAT, op_executor::executeAtenCat});
-    this->global_op_register_.insert({ir::LayerType::ATENCEIL, op_executor::executeAtenCeil});
-    this->global_op_register_.insert({ir::LayerType::ATENCHUNK, op_executor::executeAtenChunk});
-    this->global_op_register_.insert({ir::LayerType::ATENCLAMP, op_executor::executeAtenClamp});
-    this->global_op_register_.insert({ir::LayerType::ATENCLEAR, op_executor::executeAtenClear});
-    this->global_op_register_.insert({ir::LayerType::ATENCLONE, op_executor::executeAtenClone});
-    this->global_op_register_.insert({ir::LayerType::ATENCONTIGUOUS, op_executor::executeAtenContiguous});
-    this->global_op_register_.insert({ir::LayerType::ATENCONV2D, op_executor::executeAtenConv2d});
-    this->global_op_register_.insert({ir::LayerType::ATENCOPY, op_executor::executeAtenCopy});
-    this->global_op_register_.insert({ir::LayerType::ATENCPU, op_executor::executeAtenCpu});
-    this->global_op_register_.insert({ir::LayerType::ATENCUDA, op_executor::executeAtenCuda});
-    this->global_op_register_.insert({ir::LayerType::ATENCUMSUM, op_executor::executeAtenCumsum});
-    this->global_op_register_.insert({ir::LayerType::ATENDERIVEINDEX, op_executor::executeAtenDeriveIndex});
-    this->global_op_register_.insert({ir::LayerType::ATENDETACH, op_executor::executeAtenDetach});
-    this->global_op_register_.insert({ir::LayerType::ATENDIM, op_executor::executeAtenDim});
-    this->global_op_register_.insert({ir::LayerType::ATENDIV, op_executor::executeAtenDiv});
-    this->global_op_register_.insert({ir::LayerType::ATENDROPOUT, op_executor::executeAtenDropout});
-    this->global_op_register_.insert({ir::LayerType::ATENEINSUM, op_executor::executeAtenEinsum});
-    this->global_op_register_.insert({ir::LayerType::ATENEMBEDDING, op_executor::executeAtenEmbedding});
-    this->global_op_register_.insert({ir::LayerType::ATENEQ, op_executor::executeAtenEq});
-    this->global_op_register_.insert({ir::LayerType::ATENEQUAL, op_executor::executeAtenEqual});
-    this->global_op_register_.insert({ir::LayerType::ATENEXPAND, op_executor::executeAtenExpand});
-    this->global_op_register_.insert({ir::LayerType::ATENFILL, op_executor::executeAtenFill});
-    this->global_op_register_.insert({ir::LayerType::ATENFLOORDIVIDE, op_executor::executeAtenFloorDivide});
-    this->global_op_register_.insert({ir::LayerType::ATENFORMAT, op_executor::executeAtenFormat});
-    this->global_op_register_.insert({ir::LayerType::ATENFULLLIKE, op_executor::executeAtenFullLike});
-    this->global_op_register_.insert({ir::LayerType::ATENGETITEM, op_executor::executeAtenGetItem});
-    this->global_op_register_.insert({ir::LayerType::ATENGATHER, op_executor::executeAtenGather});
-    this->global_op_register_.insert({ir::LayerType::ATENGE, op_executor::executeAtenGe});
-    this->global_op_register_.insert({ir::LayerType::ATENGT, op_executor::executeAtenGt});
-    this->global_op_register_.insert({ir::LayerType::ATENINDEX, op_executor::executeAtenIndex});
-    this->global_op_register_.insert({ir::LayerType::ATENINDEXPUT, op_executor::executeAtenIndexPut});
-    this->global_op_register_.insert({ir::LayerType::ATENINDEXSELECT, op_executor::executeAtenIndexSelect});
-    this->global_op_register_.insert({ir::LayerType::ATENINT, op_executor::executeAtenInt});
-    this->global_op_register_.insert({ir::LayerType::ATENINTIMPLICIT, op_executor::executeAtenIntImplicit});
-    this->global_op_register_.insert({ir::LayerType::ATENITEM, op_executor::executeAtenItem});
-    this->global_op_register_.insert({ir::LayerType::ATENIS, op_executor::executeAtenIs});
-    this->global_op_register_.insert({ir::LayerType::ATENISINF, op_executor::executeAtenIsInf});
-    this->global_op_register_.insert({ir::LayerType::ATENISNOT, op_executor::executeAtenIsNot});
-    this->global_op_register_.insert({ir::LayerType::ATENLAYERNORM, op_executor::executeAtenLayerNorm});
-    this->global_op_register_.insert({ir::LayerType::ATENLEAKYRELU, op_executor::executeAtenLeakyRelu});
-    this->global_op_register_.insert({ir::LayerType::ATENLE, op_executor::executeAtenLe});
-    this->global_op_register_.insert({ir::LayerType::ATENLEN, op_executor::executeAtenLen});
-    this->global_op_register_.insert({ir::LayerType::ATENLINEAR, op_executor::executeAtenLinear});
-    this->global_op_register_.insert({ir::LayerType::ATENLIST, op_executor::executeAtenList});
-    this->global_op_register_.insert({ir::LayerType::ATENLOG, op_executor::executeAtenLog});
-    this->global_op_register_.insert({ir::LayerType::ATENLOGSOFTMAX, op_executor::executeAtenLogSoftmax});
-    this->global_op_register_.insert({ir::LayerType::ATENLSTM1, op_executor::executeAtenLSTM1});
-    this->global_op_register_.insert({ir::LayerType::ATENLSTM2, op_executor::executeAtenLSTM2});
-    this->global_op_register_.insert({ir::LayerType::ATENLT, op_executor::executeAtenLt});
-    this->global_op_register_.insert({ir::LayerType::ATENMASKEDFILL, op_executor::executeAtenMaskedFill});
-    this->global_op_register_.insert({ir::LayerType::ATENMASKEDSELECT, op_executor::executeAtenMaskedSelect});
-    this->global_op_register_.insert({ir::LayerType::ATENMATMUL, op_executor::executeAtenMatmul});
-    this->global_op_register_.insert({ir::LayerType::ATENMAX, op_executor::executeAtenMax});
-    this->global_op_register_.insert({ir::LayerType::ATENMAXPOOL2D, op_executor::executeAtenMaxPool2d});
-    this->global_op_register_.insert({ir::LayerType::ATENMEAN, op_executor::executeAtenMean});
-    this->global_op_register_.insert({ir::LayerType::ATENMIN, op_executor::executeAtenMin});
-    this->global_op_register_.insert({ir::LayerType::ATENMUL, op_executor::executeAtenMul});
-    this->global_op_register_.insert({ir::LayerType::ATENNE, op_executor::executeAtenNe});
-    this->global_op_register_.insert({ir::LayerType::ATENNEG, op_executor::executeAtenNeg});
-    this->global_op_register_.insert({ir::LayerType::ATENNORM, op_executor::executeAtenNorm});
-    this->global_op_register_.insert({ir::LayerType::ATENNOT, op_executor::executeAtenNot});
-    this->global_op_register_.insert({ir::LayerType::ATENONEHOT, op_executor::executeAtenOneHot});
-    this->global_op_register_.insert({ir::LayerType::ATENONES, op_executor::executeAtenOnes});
-    this->global_op_register_.insert(
+    this->type_to_executor_map_.insert({ir::LayerType::ATENABS, op_executor::executeAtenAbs});
+    this->type_to_executor_map_.insert({ir::LayerType::ATENADD, op_executor::executeAtenAdd});
+    this->type_to_executor_map_.insert({ir::LayerType::ATENADDMM, op_executor::executeAtenAddmm});
+    this->type_to_executor_map_.insert({ir::LayerType::ATENAND, op_executor::executeAtenAnd});
+    this->type_to_executor_map_.insert({ir::LayerType::ATENANY, op_executor::executeAtenAny});
+    this->type_to_executor_map_.insert({ir::LayerType::ATENAPPEND, op_executor::executeAtenAppend});
+    this->type_to_executor_map_.insert({ir::LayerType::ATENARANGE1, op_executor::executeAtenArange1});
+    this->type_to_executor_map_.insert({ir::LayerType::ATENARANGE2, op_executor::executeAtenArange2});
+    this->type_to_executor_map_.insert({ir::LayerType::ATENARANGE3, op_executor::executeAtenArange3});
+    this->type_to_executor_map_.insert({ir::LayerType::ATENARGMAX, op_executor::executeAtenArgmax});
+    this->type_to_executor_map_.insert({ir::LayerType::ATENASTENSOR, op_executor::executeAtenAsTensor});
+    this->type_to_executor_map_.insert({ir::LayerType::ATENBATCHNORM2D, op_executor::executeAtenBatchNorm2d});
+    this->type_to_executor_map_.insert({ir::LayerType::ATENBITWISENOT, op_executor::executeAtenBitwiseNot});
+    this->type_to_executor_map_.insert({ir::LayerType::ATENBMM, op_executor::executeAtenBmm});
+    this->type_to_executor_map_.insert({ir::LayerType::ATENBOOL, op_executor::executeAtenBool});
+    this->type_to_executor_map_.insert({ir::LayerType::ATENCAT, op_executor::executeAtenCat});
+    this->type_to_executor_map_.insert({ir::LayerType::ATENCEIL, op_executor::executeAtenCeil});
+    this->type_to_executor_map_.insert({ir::LayerType::ATENCHUNK, op_executor::executeAtenChunk});
+    this->type_to_executor_map_.insert({ir::LayerType::ATENCLAMP, op_executor::executeAtenClamp});
+    this->type_to_executor_map_.insert({ir::LayerType::ATENCLEAR, op_executor::executeAtenClear});
+    this->type_to_executor_map_.insert({ir::LayerType::ATENCLONE, op_executor::executeAtenClone});
+    this->type_to_executor_map_.insert({ir::LayerType::ATENCONTIGUOUS, op_executor::executeAtenContiguous});
+    this->type_to_executor_map_.insert({ir::LayerType::ATENCONV2D, op_executor::executeAtenConv2d});
+    this->type_to_executor_map_.insert({ir::LayerType::ATENCOPY, op_executor::executeAtenCopy});
+    this->type_to_executor_map_.insert({ir::LayerType::ATENCPU, op_executor::executeAtenCpu});
+    this->type_to_executor_map_.insert({ir::LayerType::ATENCUDA, op_executor::executeAtenCuda});
+    this->type_to_executor_map_.insert({ir::LayerType::ATENCUMSUM, op_executor::executeAtenCumsum});
+    this->type_to_executor_map_.insert({ir::LayerType::ATENDERIVEINDEX, op_executor::executeAtenDeriveIndex});
+    this->type_to_executor_map_.insert({ir::LayerType::ATENDETACH, op_executor::executeAtenDetach});
+    this->type_to_executor_map_.insert({ir::LayerType::ATENDIM, op_executor::executeAtenDim});
+    this->type_to_executor_map_.insert({ir::LayerType::ATENDIV, op_executor::executeAtenDiv});
+    this->type_to_executor_map_.insert({ir::LayerType::ATENDROPOUT, op_executor::executeAtenDropout});
+    this->type_to_executor_map_.insert({ir::LayerType::ATENEINSUM, op_executor::executeAtenEinsum});
+    this->type_to_executor_map_.insert({ir::LayerType::ATENEMBEDDING, op_executor::executeAtenEmbedding});
+    this->type_to_executor_map_.insert({ir::LayerType::ATENEQ, op_executor::executeAtenEq});
+    this->type_to_executor_map_.insert({ir::LayerType::ATENEQUAL, op_executor::executeAtenEqual});
+    this->type_to_executor_map_.insert({ir::LayerType::ATENEXPAND, op_executor::executeAtenExpand});
+    this->type_to_executor_map_.insert({ir::LayerType::ATENFILL, op_executor::executeAtenFill});
+    this->type_to_executor_map_.insert({ir::LayerType::ATENFLOORDIVIDE, op_executor::executeAtenFloorDivide});
+    this->type_to_executor_map_.insert({ir::LayerType::ATENFORMAT, op_executor::executeAtenFormat});
+    this->type_to_executor_map_.insert({ir::LayerType::ATENFULLLIKE, op_executor::executeAtenFullLike});
+    this->type_to_executor_map_.insert({ir::LayerType::ATENGETITEM, op_executor::executeAtenGetItem});
+    this->type_to_executor_map_.insert({ir::LayerType::ATENGATHER, op_executor::executeAtenGather});
+    this->type_to_executor_map_.insert({ir::LayerType::ATENGE, op_executor::executeAtenGe});
+    this->type_to_executor_map_.insert({ir::LayerType::ATENGT, op_executor::executeAtenGt});
+    this->type_to_executor_map_.insert({ir::LayerType::ATENINDEX, op_executor::executeAtenIndex});
+    this->type_to_executor_map_.insert({ir::LayerType::ATENINDEXPUT, op_executor::executeAtenIndexPut});
+    this->type_to_executor_map_.insert({ir::LayerType::ATENINDEXSELECT, op_executor::executeAtenIndexSelect});
+    this->type_to_executor_map_.insert({ir::LayerType::ATENINT, op_executor::executeAtenInt});
+    this->type_to_executor_map_.insert({ir::LayerType::ATENINTIMPLICIT, op_executor::executeAtenIntImplicit});
+    this->type_to_executor_map_.insert({ir::LayerType::ATENITEM, op_executor::executeAtenItem});
+    this->type_to_executor_map_.insert({ir::LayerType::ATENIS, op_executor::executeAtenIs});
+    this->type_to_executor_map_.insert({ir::LayerType::ATENISINF, op_executor::executeAtenIsInf});
+    this->type_to_executor_map_.insert({ir::LayerType::ATENISNOT, op_executor::executeAtenIsNot});
+    this->type_to_executor_map_.insert({ir::LayerType::ATENLAYERNORM, op_executor::executeAtenLayerNorm});
+    this->type_to_executor_map_.insert({ir::LayerType::ATENLEAKYRELU, op_executor::executeAtenLeakyRelu});
+    this->type_to_executor_map_.insert({ir::LayerType::ATENLE, op_executor::executeAtenLe});
+    this->type_to_executor_map_.insert({ir::LayerType::ATENLEN, op_executor::executeAtenLen});
+    this->type_to_executor_map_.insert({ir::LayerType::ATENLINEAR, op_executor::executeAtenLinear});
+    this->type_to_executor_map_.insert({ir::LayerType::ATENLIST, op_executor::executeAtenList});
+    this->type_to_executor_map_.insert({ir::LayerType::ATENLOG, op_executor::executeAtenLog});
+    this->type_to_executor_map_.insert({ir::LayerType::ATENLOGSOFTMAX, op_executor::executeAtenLogSoftmax});
+    this->type_to_executor_map_.insert({ir::LayerType::ATENLSTM1, op_executor::executeAtenLSTM1});
+    this->type_to_executor_map_.insert({ir::LayerType::ATENLSTM2, op_executor::executeAtenLSTM2});
+    this->type_to_executor_map_.insert({ir::LayerType::ATENLT, op_executor::executeAtenLt});
+    this->type_to_executor_map_.insert({ir::LayerType::ATENMASKEDFILL, op_executor::executeAtenMaskedFill});
+    this->type_to_executor_map_.insert({ir::LayerType::ATENMASKEDSELECT, op_executor::executeAtenMaskedSelect});
+    this->type_to_executor_map_.insert({ir::LayerType::ATENMATMUL, op_executor::executeAtenMatmul});
+    this->type_to_executor_map_.insert({ir::LayerType::ATENMAX, op_executor::executeAtenMax});
+    this->type_to_executor_map_.insert({ir::LayerType::ATENMAXPOOL2D, op_executor::executeAtenMaxPool2d});
+    this->type_to_executor_map_.insert({ir::LayerType::ATENMEAN, op_executor::executeAtenMean});
+    this->type_to_executor_map_.insert({ir::LayerType::ATENMIN, op_executor::executeAtenMin});
+    this->type_to_executor_map_.insert({ir::LayerType::ATENMUL, op_executor::executeAtenMul});
+    this->type_to_executor_map_.insert({ir::LayerType::ATENNE, op_executor::executeAtenNe});
+    this->type_to_executor_map_.insert({ir::LayerType::ATENNEG, op_executor::executeAtenNeg});
+    this->type_to_executor_map_.insert({ir::LayerType::ATENNORM, op_executor::executeAtenNorm});
+    this->type_to_executor_map_.insert({ir::LayerType::ATENNOT, op_executor::executeAtenNot});
+    this->type_to_executor_map_.insert({ir::LayerType::ATENONEHOT, op_executor::executeAtenOneHot});
+    this->type_to_executor_map_.insert({ir::LayerType::ATENONES, op_executor::executeAtenOnes});
+    this->type_to_executor_map_.insert(
         {ir::LayerType::ATENPACKPADDEDSEQUENCE, op_executor::executeAtenPackPaddedSequence});
-    this->global_op_register_.insert({ir::LayerType::ATENPADPACKEDSEQUENCE, op_executor::executeAtenPadPackedSequence});
-    this->global_op_register_.insert({ir::LayerType::ATENPERMUTE, op_executor::executeAtenPermute});
-    this->global_op_register_.insert({ir::LayerType::ATENPOW, op_executor::executeAtenPow});
-    this->global_op_register_.insert({ir::LayerType::ATENRELU, op_executor::executeAtenRelu});
-    this->global_op_register_.insert({ir::LayerType::ATENRESHAPE, op_executor::executeAtenReshape});
-    this->global_op_register_.insert({ir::LayerType::ATENREMAINDER, op_executor::executeAtenRemainder});
-    this->global_op_register_.insert({ir::LayerType::ATENREPEAT, op_executor::executeAtenRepeat});
-    this->global_op_register_.insert({ir::LayerType::ATENRSQRT, op_executor::executeAtenRsqrt});
-    this->global_op_register_.insert({ir::LayerType::ATENSELECT, op_executor::executeAtenSelect});
-    this->global_op_register_.insert({ir::LayerType::ATENSETITEM, op_executor::executeAtenSetItem});
-    this->global_op_register_.insert({ir::LayerType::ATENSIZE, op_executor::executeAtenSize});
-    this->global_op_register_.insert({ir::LayerType::ATENSLICE, op_executor::executeAtenSlice});
-    this->global_op_register_.insert({ir::LayerType::ATENSOFTMAX, op_executor::executeAtenSoftmax});
-    this->global_op_register_.insert({ir::LayerType::ATENSQUEEZE, op_executor::executeAtenSqueeze});
-    this->global_op_register_.insert({ir::LayerType::ATENSUB, op_executor::executeAtenSub});
-    this->global_op_register_.insert({ir::LayerType::ATENSUM, op_executor::executeAtenSum});
-    this->global_op_register_.insert({ir::LayerType::ATENTANH, op_executor::executeAtenTanh});
-    this->global_op_register_.insert({ir::LayerType::ATENTENSOR, op_executor::executeAtenTensor});
-    this->global_op_register_.insert({ir::LayerType::ATENTRANSPOSE, op_executor::executeAtenTranspose});
-    this->global_op_register_.insert({ir::LayerType::ATENTO1, op_executor::executeAtenTo1});
-    this->global_op_register_.insert({ir::LayerType::ATENTO2, op_executor::executeAtenTo2});
-    this->global_op_register_.insert({ir::LayerType::ATENTO3, op_executor::executeAtenTo3});
-    this->global_op_register_.insert({ir::LayerType::ATENTOPK, op_executor::executeAtenTopk});
-    this->global_op_register_.insert({ir::LayerType::ATENTRIU, op_executor::executeAtenTriu});
-    this->global_op_register_.insert({ir::LayerType::ATENTYPEAS, op_executor::executeAtenTypeAs});
-    this->global_op_register_.insert({ir::LayerType::ATENUNSQUEEZE, op_executor::executeAtenUnsqueeze});
-    this->global_op_register_.insert({ir::LayerType::ATENVIEW, op_executor::executeAtenView});
-    this->global_op_register_.insert({ir::LayerType::ATENWARN, op_executor::executeAtenWarn});
-    this->global_op_register_.insert({ir::LayerType::ATENWHERE, op_executor::executeAtenWhere});
-    this->global_op_register_.insert({ir::LayerType::ATENZEROS, op_executor::executeAtenZeros});
-    this->global_op_register_.insert({ir::LayerType::ATENZEROSLIKE, op_executor::executeAtenZerosLike});
+    this->type_to_executor_map_.insert(
+        {ir::LayerType::ATENPADPACKEDSEQUENCE, op_executor::executeAtenPadPackedSequence});
+    this->type_to_executor_map_.insert({ir::LayerType::ATENPERMUTE, op_executor::executeAtenPermute});
+    this->type_to_executor_map_.insert({ir::LayerType::ATENPOW, op_executor::executeAtenPow});
+    this->type_to_executor_map_.insert({ir::LayerType::ATENRELU, op_executor::executeAtenRelu});
+    this->type_to_executor_map_.insert({ir::LayerType::ATENRESHAPE, op_executor::executeAtenReshape});
+    this->type_to_executor_map_.insert({ir::LayerType::ATENREMAINDER, op_executor::executeAtenRemainder});
+    this->type_to_executor_map_.insert({ir::LayerType::ATENREPEAT, op_executor::executeAtenRepeat});
+    this->type_to_executor_map_.insert({ir::LayerType::ATENRSQRT, op_executor::executeAtenRsqrt});
+    this->type_to_executor_map_.insert({ir::LayerType::ATENSELECT, op_executor::executeAtenSelect});
+    this->type_to_executor_map_.insert({ir::LayerType::ATENSETITEM, op_executor::executeAtenSetItem});
+    this->type_to_executor_map_.insert({ir::LayerType::ATENSIZE, op_executor::executeAtenSize});
+    this->type_to_executor_map_.insert({ir::LayerType::ATENSLICE, op_executor::executeAtenSlice});
+    this->type_to_executor_map_.insert({ir::LayerType::ATENSOFTMAX, op_executor::executeAtenSoftmax});
+    this->type_to_executor_map_.insert({ir::LayerType::ATENSQUEEZE, op_executor::executeAtenSqueeze});
+    this->type_to_executor_map_.insert({ir::LayerType::ATENSUB, op_executor::executeAtenSub});
+    this->type_to_executor_map_.insert({ir::LayerType::ATENSUM, op_executor::executeAtenSum});
+    this->type_to_executor_map_.insert({ir::LayerType::ATENTANH, op_executor::executeAtenTanh});
+    this->type_to_executor_map_.insert({ir::LayerType::ATENTENSOR, op_executor::executeAtenTensor});
+    this->type_to_executor_map_.insert({ir::LayerType::ATENTRANSPOSE, op_executor::executeAtenTranspose});
+    this->type_to_executor_map_.insert({ir::LayerType::ATENTO1, op_executor::executeAtenTo1});
+    this->type_to_executor_map_.insert({ir::LayerType::ATENTO2, op_executor::executeAtenTo2});
+    this->type_to_executor_map_.insert({ir::LayerType::ATENTO3, op_executor::executeAtenTo3});
+    this->type_to_executor_map_.insert({ir::LayerType::ATENTOPK, op_executor::executeAtenTopk});
+    this->type_to_executor_map_.insert({ir::LayerType::ATENTRIU, op_executor::executeAtenTriu});
+    this->type_to_executor_map_.insert({ir::LayerType::ATENTYPEAS, op_executor::executeAtenTypeAs});
+    this->type_to_executor_map_.insert({ir::LayerType::ATENUNSQUEEZE, op_executor::executeAtenUnsqueeze});
+    this->type_to_executor_map_.insert({ir::LayerType::ATENVIEW, op_executor::executeAtenView});
+    this->type_to_executor_map_.insert({ir::LayerType::ATENWARN, op_executor::executeAtenWarn});
+    this->type_to_executor_map_.insert({ir::LayerType::ATENWHERE, op_executor::executeAtenWhere});
+    this->type_to_executor_map_.insert({ir::LayerType::ATENZEROS, op_executor::executeAtenZeros});
+    this->type_to_executor_map_.insert({ir::LayerType::ATENZEROSLIKE, op_executor::executeAtenZerosLike});
 
-    this->global_op_register_.insert({LayerType::PRIMBLOCK, op_executor::executePrimBlock});
-    this->global_op_register_.insert({LayerType::PRIMCONSTANT, op_executor::executePrimConstant});
-    this->global_op_register_.insert({LayerType::PRIMDATA, op_executor::executePrimData});
-    this->global_op_register_.insert({LayerType::PRIMDEVICE, op_executor::executePrimDevice});
-    this->global_op_register_.insert({LayerType::PRIMDTYPE, op_executor::executePrimDtype});
-    this->global_op_register_.insert({LayerType::PRIMENDLOOP, op_executor::executePrimEndLoop});
-    this->global_op_register_.insert({LayerType::PRIMIF, op_executor::executePrimIf});
-    this->global_op_register_.insert({LayerType::PRIMGETATTR, op_executor::executePrimGetAttr});
-    this->global_op_register_.insert({LayerType::PRIMENDIF, op_executor::executePrimEndIf});
-    this->global_op_register_.insert({LayerType::PRIMLOOP, op_executor::executePrimLoop});
-    this->global_op_register_.insert({LayerType::PRIMLOOPINDEX, op_executor::executePrimLoopIndex});
-    this->global_op_register_.insert({LayerType::PRIMLISTCONSTRUCT, op_executor::executePrimListConstruct});
-    this->global_op_register_.insert({LayerType::PRIMLISTUNPACK, op_executor::executePrimListUnpack});
-    this->global_op_register_.insert({LayerType::PRIMRAISEEXCEPTION, op_executor::executePrimRaiseException});
-    this->global_op_register_.insert({LayerType::PRIMSETATTR, op_executor::executePrimSetAttr});
-    this->global_op_register_.insert({LayerType::PRIMTOLIST, op_executor::executePrimToList});
-    this->global_op_register_.insert({LayerType::PRIMTUPLECONSTRUCT, op_executor::executePrimTupleConstruct});
-    this->global_op_register_.insert({LayerType::PRIMTUPLEINDEX, op_executor::executePrimTupleIndex});
-    this->global_op_register_.insert({LayerType::PRIMTUPLEUNPACK, op_executor::executePrimTupleUnpack});
-    this->global_op_register_.insert({LayerType::PRIMTYPE, op_executor::executePrimType});
-    this->global_op_register_.insert({LayerType::PRIMUNCHECKEDCAST, op_executor::executePrimUncheckedCast});
-    this->global_op_register_.insert({LayerType::PRIMUNINITIALIZED, op_executor::executePrimUninitialized});
-    this->global_op_register_.insert({LayerType::PRIMVARIABLE, op_executor::executePrimVariable});
+    this->type_to_executor_map_.insert({LayerType::PRIMBLOCK, op_executor::executePrimBlock});
+    this->type_to_executor_map_.insert({LayerType::PRIMCONSTANT, op_executor::executePrimConstant});
+    this->type_to_executor_map_.insert({LayerType::PRIMDATA, op_executor::executePrimData});
+    this->type_to_executor_map_.insert({LayerType::PRIMDEVICE, op_executor::executePrimDevice});
+    this->type_to_executor_map_.insert({LayerType::PRIMDTYPE, op_executor::executePrimDtype});
+    this->type_to_executor_map_.insert({LayerType::PRIMENDLOOP, op_executor::executePrimEndLoop});
+    this->type_to_executor_map_.insert({LayerType::PRIMIF, op_executor::executePrimIf});
+    this->type_to_executor_map_.insert({LayerType::PRIMGETATTR, op_executor::executePrimGetAttr});
+    this->type_to_executor_map_.insert({LayerType::PRIMENDIF, op_executor::executePrimEndIf});
+    this->type_to_executor_map_.insert({LayerType::PRIMLOOP, op_executor::executePrimLoop});
+    this->type_to_executor_map_.insert({LayerType::PRIMLOOPINDEX, op_executor::executePrimLoopIndex});
+    this->type_to_executor_map_.insert({LayerType::PRIMLISTCONSTRUCT, op_executor::executePrimListConstruct});
+    this->type_to_executor_map_.insert({LayerType::PRIMLISTUNPACK, op_executor::executePrimListUnpack});
+    this->type_to_executor_map_.insert({LayerType::PRIMRAISEEXCEPTION, op_executor::executePrimRaiseException});
+    this->type_to_executor_map_.insert({LayerType::PRIMSETATTR, op_executor::executePrimSetAttr});
+    this->type_to_executor_map_.insert({LayerType::PRIMTOLIST, op_executor::executePrimToList});
+    this->type_to_executor_map_.insert({LayerType::PRIMTUPLECONSTRUCT, op_executor::executePrimTupleConstruct});
+    this->type_to_executor_map_.insert({LayerType::PRIMTUPLEINDEX, op_executor::executePrimTupleIndex});
+    this->type_to_executor_map_.insert({LayerType::PRIMTUPLEUNPACK, op_executor::executePrimTupleUnpack});
+    this->type_to_executor_map_.insert({LayerType::PRIMTYPE, op_executor::executePrimType});
+    this->type_to_executor_map_.insert({LayerType::PRIMUNCHECKEDCAST, op_executor::executePrimUncheckedCast});
+    this->type_to_executor_map_.insert({LayerType::PRIMUNINITIALIZED, op_executor::executePrimUninitialized});
+    this->type_to_executor_map_.insert({LayerType::PRIMVARIABLE, op_executor::executePrimVariable});
 
-    this->global_op_register_.insert({LayerType::MULTISTREAM, op_executor::executeMultiStream});
+    this->type_to_executor_map_.insert({LayerType::MULTISTREAM, op_executor::executeMultiStream});
 }
 
 }  // namespace runtime

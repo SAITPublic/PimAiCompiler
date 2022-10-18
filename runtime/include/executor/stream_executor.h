@@ -43,7 +43,9 @@ class StreamExecutor
 
     bool checkValidBlobID(int64_t blob_id);
 
-    OpExecutorFn findOpExecutor(ir::LayerType& op_type);
+    OpExecutorFn findOpExecutorByType(ir::LayerType& op_type);
+
+    OpExecutorFn getOpExecutor(uint32_t& id);
 
     void registerOp();
 
@@ -131,7 +133,9 @@ class StreamExecutor
     blob_store_type global_blobs_;
 
     // Op Register
-    std::unordered_map<ir::LayerType, OpExecutorFn> global_op_register_;
+    std::unordered_map<uint32_t, OpExecutorFn> global_op_register_;
+
+    std::unordered_map<ir::LayerType, OpExecutorFn> type_to_executor_map_;
 
     std::pair<ir::DataType, torch::jit::IValue> undefined_data_;
 
