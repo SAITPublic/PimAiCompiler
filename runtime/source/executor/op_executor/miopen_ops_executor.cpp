@@ -410,7 +410,7 @@ void executeMIOpenLSTM1(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, Stream
 
 void executeMIOpenLSTM2(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExecutor& stream_executor)
 {
-    DLOG(INFO) << "execute Aten LSTM2 layer";
+    DLOG(INFO) << "execute MIOpen LSTM2 layer";
 
     auto lstm2_layer = std::static_pointer_cast<nn_compiler::ir::AtenLSTM2Layer>(layer);
 

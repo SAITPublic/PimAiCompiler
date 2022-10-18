@@ -677,7 +677,7 @@ void executeAtenBmm(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamExec
             stream_executor.getGraph()->getLayerByPosition((out2_out2_layer->getNextLayerIDs())[0]);
         auto out2_out3_out1_layer =
             stream_executor.getGraph()->getLayerByPosition((out2_out3_layer->getNextLayerIDs())[0]);
-        // auto end_if_node = op_node.getOutEdge(1).getOutNode();
+
         int64_t cat_mem_id =
             std::static_pointer_cast<nn_compiler::ir::AtenCatLayer>(out2_out1_out1_layer)->getMemLayerId();
         auto options = at::TensorOptions().dtype(at::kHalf).device(at::kCUDA);
@@ -2236,9 +2236,8 @@ void executeAtenLSTM1(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamEx
     std::vector<int> in_len({batch_size, input_size});
     std::vector<int> out_len({bidirectional_int * hidden_size});
 
-    auto output =
-        atenLstm1(input, hx, params, static_cast<bool>(has_biases), num_layers, dropout, static_cast<bool>(train),
-                  static_cast<bool>(bidirectional), static_cast<bool>(batch_first));
+    auto output = atenLstm1(input, hx, params, static_cast<bool>(has_biases), num_layers, dropout,
+                            static_cast<bool>(train), static_cast<bool>(bidirectional), static_cast<bool>(batch_first));
     auto lstm_output = std::get<0>(output);
     auto hidden_output = std::get<1>(output);
     auto cell_output = std::get<2>(output);

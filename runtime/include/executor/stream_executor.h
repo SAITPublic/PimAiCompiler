@@ -2,17 +2,12 @@
 
 #include <miopen/miopen.h>
 #include <torch/script.h>
-#include <functional>
-#include <stack>
-#include <string>
-#include <vector>
 
 #include "builder/model_builder.h"
 #include "c10/hip/HIPFunctions.h"
-#include "common/include/types.hpp"
 #include "executor/utils/utils.h"
-#include "ir/include/layers/all_layers.h"
-#include "ir/include/nn_model.h"
+
+#define SELECT_OPTIMAL_LIB
 
 namespace nn_compiler
 {
@@ -43,9 +38,13 @@ class StreamExecutor
 
     bool checkValidBlobID(int64_t blob_id);
 
-    OpExecutorFn findOpExecutorByType(ir::LayerType& op_type);
+    OpExecutorFn findAtenExecutorByType(ir::LayerType& op_type);
+
+    OpExecutorFn findMIOpenExecutorByType(ir::LayerType& op_type);
 
     OpExecutorFn getOpExecutor(uint32_t& id);
+
+    void setOptimalLibForOpExecution();
 
     void registerOp();
 
@@ -129,18 +128,16 @@ class StreamExecutor
    private:
     std::shared_ptr<ir::NNGraph> graph_;
 
-    // Global input & output vars
-    blob_store_type global_blobs_;
-
-    // Op Register
-    std::unordered_map<uint32_t, OpExecutorFn> global_op_register_;
-
-    std::unordered_map<ir::LayerType, OpExecutorFn> type_to_executor_map_;
+    // op executor map
+    std::unordered_map<uint32_t, OpExecutorFn> op_executor_;
+    std::unordered_map<ir::LayerType, OpExecutorFn> aten_executor_map_;
+    std::unordered_map<ir::LayerType, OpExecutorFn> miopen_executor_map_;
 
     std::pair<ir::DataType, torch::jit::IValue> undefined_data_;
 
     int64_t cursor_ = 0;  // the program counter
 
+    blob_store_type global_blobs_;
     std::vector<int64_t> input_blob_ids_;
     std::vector<int64_t> output_blob_ids_;
 
@@ -161,6 +158,9 @@ class StreamExecutor
     int stream_num_ = 0;
 
     static std::mutex stream_exec_mutex_;
+
+    bool has_set_optimal_lib_ = false;
+    std::set<uint32_t> layers_to_select_lib_;
 };
 
 }  // namespace runtime
