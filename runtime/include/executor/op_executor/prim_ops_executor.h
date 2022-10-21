@@ -6,7 +6,6 @@
 #include "executor/stream_executor.h"
 #include "executor/utils/utils.h"
 #include "ir/include/common/utils.hpp"
-#include "ir/include/layers/all_layers.h"
 #include "utils/utils.h"
 
 namespace nn_compiler

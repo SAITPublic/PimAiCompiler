@@ -23,7 +23,7 @@ class ConstantParser
         auto x_stride = stride[2], y_stride = stride[3];
         auto origin_data = dtensor->getData<T>();
         auto shape = dtensor->getTensorShape().getDims();
-        assert(shape.size() == 4); // n, c, h, w
+        assert(shape.size() == 4);  // n, c, h, w
 
         std::vector<std::vector<T>> matrix;
 

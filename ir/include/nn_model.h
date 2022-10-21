@@ -40,10 +40,7 @@ class NNModel
 
     std::vector<std::shared_ptr<NNGraph>> getGraphs() { return graphs_; }
 
-    void addSTensor(std::pair<uint32_t, std::shared_ptr<STensor>> shape_tensor)
-    {
-        shape_tensors_.insert(shape_tensor);
-    }
+    void addSTensor(std::pair<uint32_t, std::shared_ptr<STensor>> shape_tensor) { shape_tensors_.insert(shape_tensor); }
 
     void deleteSTensor(uint32_t shape_tensor_id) { shape_tensors_.erase(shape_tensor_id); }
 

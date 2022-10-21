@@ -1,4 +1,3 @@
-#include "ir/include/utils/graph_util.h"
 #include "middlend/optimizer/stream_execution/multi_stream_execution.h"
 
 namespace nn_compiler

@@ -39,7 +39,7 @@ void SetWeightsForEmbedding::run(std::unique_ptr<nn_compiler::ir::NNModel>& grap
             auto constant_layer = std::dynamic_pointer_cast<nn_compiler::ir::PrimConstantLayer>(constant_g_layer);
             auto d_tensor = constant_layer->getAttr();
             auto tensor_shape = d_tensor->getTensorShape().getDims();
-            assert(tensor_shape.size() == 4); // n, c, h, w
+            assert(tensor_shape.size() == 4);  // n, c, h, w
             auto height = tensor_shape[2], width = tensor_shape[3];
             std::vector<int> weights_shape = {(height, width)};
             cur_layer->setWeightsShape(weights_shape);

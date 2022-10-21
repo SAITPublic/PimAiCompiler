@@ -1,6 +1,7 @@
 #pragma once
 
 #include "common/pass.hpp"
+#include "ir/include/utils/graph_util.h"
 
 namespace nn_compiler
 {
