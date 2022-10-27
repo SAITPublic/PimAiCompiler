@@ -2455,8 +2455,7 @@ void executeAtenLSTM1(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamEx
                 cy_dev = cy.data_ptr();
 
                 if (stream_executor.getModelType() == "GNMT" && lstm1_layer->getMatchCustomOpt()) {
-                    int cat_f = 22222;
-                    auto cat_mem = stream_executor.findBlob(cat_f).second.toTensor();
+                    auto cat_mem = stream_executor.findBlob(lstm1_layer->getCustomCatMemId()).second.toTensor();
 
                     if (lstm1_layer->getCustomOptNumber() == 0) {
                         hy = torch::from_blob((_Float16*)(cat_mem.data_ptr()), {1, 1, 1024}, options);

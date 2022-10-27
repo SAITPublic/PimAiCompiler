@@ -9,11 +9,14 @@ CatLabeling::CatLabeling() {}
 bool CatLabeling::fitCondition(std::unique_ptr<nn_compiler::ir::NNModel>& model)
 {
     auto graph = model->getGraphs()[0];
-    for (auto layer : graph->getLayers()) {
+    auto layers = graph->getLayers();
+    for (auto layer : layers) {
         if (layer->getType() == ir::LayerType::ATENBMM) {
             getOffspring(target_cat_ids_bmm_, graph, layer, ir::LayerType::ATENCAT, 3);
         } else if (layer->getType() == ir::LayerType::ATENLSTM1 &&
                    std::dynamic_pointer_cast<ir::AtenLSTM1Layer>(layer)->getMatchCustomOpt()) {
+            auto lstm_layer = std::dynamic_pointer_cast<ir::AtenLSTM1Layer>(layer);
+            lstm_layer->setCustomCatMemId(layers.size() * 10);
             getOffspring(target_cat_ids_lstm_, graph, layer, ir::LayerType::ATENCAT, 3);
         }
     }

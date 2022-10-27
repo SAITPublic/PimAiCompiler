@@ -49,21 +49,23 @@ RetVal StreamExecutor::preProcess()
     input_blob_ids_.clear();
     output_blob_ids_.clear();
 
+    int custom_cat_mem_id = 0;
     for (auto layer : graph_->getLayers()) {
+        if (model_type_ == "GNMT" && layer->getType() == ir::LayerType::ATENLSTM1) {
+            auto lstm_layer = std::static_pointer_cast<ir::AtenLSTM1Layer>(layer);
+            custom_cat_mem_id = lstm_layer->getCustomCatMemId();
+        }
         if (model_type_ == "GNMT" && layer->getType() == ir::LayerType::ATENCAT) {
             auto cat_layer = std::static_pointer_cast<ir::AtenCatLayer>(layer);
             auto options = at::TensorOptions().dtype(at::kHalf).device(at::kCUDA);
             auto mem_blob_id = cat_layer->getMemLayerId();
             if (mem_blob_id != -1) {
-                // memory cat_s
-                auto cat_mem_s0 = at::zeros({1, 1, 2048}, options);
-                this->global_blobs_.insert({mem_blob_id, {ir::DataType::TENSOR, tensorToIValue(cat_mem_s0)}});
+                auto cat_mem = at::zeros({1, 1, 2048}, options);
+                this->global_blobs_.insert({mem_blob_id, {ir::DataType::TENSOR, tensorToIValue(cat_mem)}});
             } else {
-                // memory cat_f
-                int cat_f = 22222;
-                cat_layer->setMemLayerId(cat_f);
+                cat_layer->setMemLayerId(custom_cat_mem_id);
                 auto cat_mem = at::empty({8, 1, 1024}, options);
-                this->global_blobs_.insert({cat_f, {ir::DataType::TENSOR, tensorToIValue(cat_mem)}});
+                this->global_blobs_.insert({custom_cat_mem_id, {ir::DataType::TENSOR, tensorToIValue(cat_mem)}});
             }
         }
 

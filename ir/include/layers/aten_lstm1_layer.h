@@ -122,6 +122,10 @@ class AtenLSTM1Layer : public NNLayer
 
     int getCustomOptNumber() { return custom_opt_number_; }
 
+    void setCustomCatMemId(int custom_cat_mem_id) { custom_cat_mem_id_ = custom_cat_mem_id; }
+
+    int getCustomCatMemId() { return custom_cat_mem_id_; }
+
     struct AtenLSTM1LayerAttr {
         int has_biases;
         int64_t num_layers;
@@ -164,6 +168,7 @@ class AtenLSTM1Layer : public NNLayer
     int lstm_type_ = 0;
     bool match_custom_opt_ = false;
     int custom_opt_number_ = 0;
+    int custom_cat_mem_id_ = 0;
 };
 }  // namespace ir
 }  // namespace nn_compiler
