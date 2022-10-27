@@ -151,8 +151,6 @@ torch::jit::IValue convertVaraibleData2IValve(uint8_t* ptr, DataType d_type)
     return iv;
 }
 
-std::mutex AUTO_Mutex::mutex_;
-
 }  // namespace utils
 }  // namespace runtime
 }  // namespace nn_compiler

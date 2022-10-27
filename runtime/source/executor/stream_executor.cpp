@@ -14,6 +14,8 @@ namespace nn_compiler
 {
 namespace runtime
 {
+std::mutex StreamExecutor::stream_exec_mutex_;
+
 StreamExecutor::StreamExecutor(std::pair<std::shared_ptr<ir::NNGraph>, blob_store_type> model, std::string model_type)
 {
     this->graph_ = model.first;
@@ -332,9 +334,8 @@ void StreamExecutor::getOutputTensors(std::vector<torch::Tensor>& output_tensors
         auto iv = findBlob(id).second;
         auto temp_out = iValueParser(iv);
         for (auto out : temp_out) {
-            AUTO_Mutex::auto_lock();
+            std::lock_guard<std::mutex> lock(stream_exec_mutex_);
             output_tensors.push_back(out.to("cuda:0"));  // All output needs to be copied to cuda:0
-            AUTO_Mutex::auto_unlock();
         }
     }
     for (auto idx = 0; idx < output_tensors.size(); idx++) {

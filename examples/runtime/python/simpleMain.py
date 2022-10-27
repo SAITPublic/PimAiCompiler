@@ -144,7 +144,7 @@ def test_switch_transformer_inference(input_file : str, input_tensor_file : str,
     attention_mask = torch.load(attention_mask_file).cuda()
     # Init nncompiler
     nncompiler = NNCompiler.PipelineManager(input_file, model_type, gpu_num)
-    # warn-up
+    # warm-up
     _ = nncompiler.inferenceModel([input_tensor, attention_mask])
     # Run and test
     torch.cuda.synchronize()

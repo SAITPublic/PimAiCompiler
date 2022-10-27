@@ -7,7 +7,6 @@
 #include <string>
 #include <vector>
 
-#include "../utils/utils.h"
 #include "builder/model_builder.h"
 #include "c10/hip/HIPFunctions.h"
 #include "common/include/types.hpp"
@@ -156,6 +155,8 @@ class StreamExecutor
     // multi-stream
     std::vector<hipStream_t> streams_;
     int stream_num_ = 0;
+
+    static std::mutex stream_exec_mutex_;
 };
 
 }  // namespace runtime

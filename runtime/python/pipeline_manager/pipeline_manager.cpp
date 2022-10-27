@@ -1,7 +1,6 @@
 #include "compiler/include/nn_compiler.hpp"
 #include "runtime/include/nn_runtime.h"
 
-#include <thread>
 #include "pipeline_manager.h"
 
 using namespace nn_compiler::compiler;
@@ -11,6 +10,7 @@ namespace fs = std::experimental::filesystem;
 namespace NNRuntimeInterface
 {
 int PipelineManager::finally_nums = 0;
+std::mutex PipelineManager::pipelineManager_mutex_;
 std::vector<torch::Tensor> PipelineManager::output_tensors_;
 
 void PipelineManager::launchInference(std::shared_ptr<nn_compiler::ir::NNModel> model_,
@@ -35,6 +35,7 @@ void PipelineManager::launchInference(std::shared_ptr<nn_compiler::ir::NNModel> 
 
             runtime_->inferenceModel(input_tensors, output_tensors_, profiling);
             thread_param->is_enable = false;
+            std::lock_guard<std::mutex> lock(pipelineManager_mutex_);
             finally_nums++;
         }
     }
@@ -62,7 +63,7 @@ PipelineManager::PipelineManager(const std::string& input_file_path, std::string
             thread_pool_.emplace_back(std::make_pair(
                 std::thread(&launchInference, model_, thread_param, model_type_, is_profiling_, gpu_id), thread_param));
         }
-    }else{
+    } else {
         runtime = std::make_shared<NNRuntime>(model, model_type_);
     }
 }

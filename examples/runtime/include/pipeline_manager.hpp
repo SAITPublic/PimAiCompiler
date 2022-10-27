@@ -1,8 +1,5 @@
 #pragma once
 
-#include <thread>
-#include <vector>
-
 #include "common/include/types.hpp"
 
 namespace examples
