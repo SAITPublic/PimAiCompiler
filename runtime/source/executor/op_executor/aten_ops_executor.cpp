@@ -2248,62 +2248,58 @@ void executeAtenLSTM1(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamEx
         std::vector<at::Tensor> hidden_cell_out_vec = {hidden_output, cell_output};
         at::TensorList hidden_cell_out_list(hidden_cell_out_vec);
         auto hidden_cell_out_tensor = atenCat(hidden_cell_out_list, 0);
+        auto custom_opt_number = lstm1_layer->getCustomOptNumber();
 
-        if (lstm1_layer->getCustomOptNumber() == 0) {
+        if (custom_opt_number == 0) {
             auto cat_sliced_tensor = atenSlice(cat_tensor, 0, 2, 8);
             std::vector<at::Tensor> cat_out_vec = {hidden_cell_out_tensor, cat_sliced_tensor};
             at::TensorList cat_out_list(cat_out_vec);
             auto cat_out_tensor = atenCat(cat_out_list, 0);
             stream_executor.updateBlob(cat_forced_id, DataType::TENSOR, tensorToIValue(cat_out_tensor));
-        } else if (lstm1_layer->getCustomOptNumber() == 1) {
+        } else if (custom_opt_number == 1) {
             auto cat_sliced_tensor1 = atenSlice(cat_tensor, 0, 0, 2);
             auto cat_sliced_tensor2 = atenSlice(cat_tensor, 0, 4, 8);
             std::vector<at::Tensor> cat_out_vec = {cat_sliced_tensor1, hidden_cell_out_tensor, cat_sliced_tensor2};
             at::TensorList cat_out_list(cat_out_vec);
             auto cat_out_tensor = atenCat(cat_out_list, 0);
             stream_executor.updateBlob(cat_forced_id, DataType::TENSOR, tensorToIValue(cat_out_tensor));
-        } else if (lstm1_layer->getCustomOptNumber() == 2) {
+        } else if (custom_opt_number == 2) {
             auto cat_sliced_tensor1 = atenSlice(cat_tensor, 0, 0, 4);
             auto cat_sliced_tensor2 = atenSlice(cat_tensor, 0, 6, 8);
             std::vector<at::Tensor> cat_out_vec = {cat_sliced_tensor1, hidden_cell_out_tensor, cat_sliced_tensor2};
             at::TensorList cat_out_list(cat_out_vec);
             auto cat_out_tensor = atenCat(cat_out_list, 0);
             stream_executor.updateBlob(cat_forced_id, DataType::TENSOR, tensorToIValue(cat_out_tensor));
-        } else if (lstm1_layer->getCustomOptNumber() == 3) {
+        } else if (custom_opt_number == 3) {
             auto cat_sliced_tensor = atenSlice(cat_tensor, 0, 0, 6);
             std::vector<at::Tensor> cat_out_vec = {cat_sliced_tensor, hidden_cell_out_tensor};
             at::TensorList cat_out_list(cat_out_vec);
             auto cat_out_tensor = atenCat(cat_out_list, 0);
             stream_executor.updateBlob(cat_forced_id, DataType::TENSOR, tensorToIValue(cat_out_tensor));
         }
-        if (lstm1_layer->getCustomOptNumber() == 0) {
+
+        if (custom_opt_number == 0 || custom_opt_number == 1) {
             if (stream_executor.findBlob(out_stensor_id[0]).first == ir::DataType::UNDEFINED) {
                 lstm_output = at::zeros({in_len[0], seq_len, out_len[0]}, input.options());
             }
-            auto out4_layer = stream_executor.getGraph()->getLayerByPosition((layer->getNextLayerIDs())[3]);
-            auto out4_out1_layer = stream_executor.getGraph()->getLayerByPosition((out4_layer->getNextLayerIDs())[0]);
+            auto out_layer = stream_executor.getGraph()->getLayerByPosition(
+                (layer->getNextLayerIDs())[custom_opt_number == 0 ? 3 : 0]);
+            auto out_out_layer = stream_executor.getGraph()->getLayerByPosition((out_layer->getNextLayerIDs())[0]);
             int64_t cat_mem_id =
-                std::static_pointer_cast<nn_compiler::ir::AtenCatLayer>(out4_out1_layer)->getMemLayerId();
+                std::static_pointer_cast<nn_compiler::ir::AtenCatLayer>(out_out_layer)->getMemLayerId();
             cat_tensor = stream_executor.findBlob(cat_mem_id).second.toTensor();
             auto cat_sliced_tensor = atenSlice(cat_tensor, 2, 1024, 2048);
             std::vector<at::Tensor> cat_out_vec = {lstm_output, cat_sliced_tensor};
             at::TensorList cat_out_list(cat_out_vec);
             auto cat_out_tensor = atenCat(cat_out_list, 2);
-            stream_executor.updateBlob(cat_mem_id, DataType::TENSOR, tensorToIValue(cat_out_tensor));
-        } else if (lstm1_layer->getCustomOptNumber() == 1) {
-            if (stream_executor.findBlob(out_stensor_id[0]).first == ir::DataType::UNDEFINED) {
-                lstm_output = at::zeros({in_len[0], seq_len, out_len[0]}, input.options());
+            if (stream_executor.findBlob(out_stensor_id[0]).first == ir::DataType::UNDEFINED ||
+                stream_executor.hasSelectOptimalLib()) {
+                stream_executor.updateBlob(cat_mem_id, DataType::TENSOR, tensorToIValue(cat_out_tensor));
             }
-            auto out1_layer = stream_executor.getGraph()->getLayerByPosition((layer->getNextLayerIDs())[0]);
-            auto out1_out1_layer = stream_executor.getGraph()->getLayerByPosition((out1_layer->getNextLayerIDs())[0]);
-            int64_t cat_mem_id =
-                std::static_pointer_cast<nn_compiler::ir::AtenCatLayer>(out1_out1_layer)->getMemLayerId();
-            cat_tensor = stream_executor.findBlob(cat_mem_id).second.toTensor();
-            auto cat_sliced_tensor = atenSlice(cat_tensor, 2, 1024, 2048);
-            std::vector<at::Tensor> cat_out_vec = {lstm_output, cat_sliced_tensor};
-            at::TensorList cat_out_list(cat_out_vec);
-            auto cat_out_tensor = atenCat(cat_out_list, 2);
-            stream_executor.updateBlob(cat_mem_id, DataType::TENSOR, tensorToIValue(cat_out_tensor));
+        }
+        if (stream_executor.findBlob(out_stensor_id[0]).first != ir::DataType::UNDEFINED &&
+            !stream_executor.hasSelectOptimalLib()) {
+            return;
         }
     }
 

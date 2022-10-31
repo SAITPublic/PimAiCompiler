@@ -352,43 +352,35 @@ void executeMIOpenLSTM1(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, Stream
 
         if (stream_executor.getModelType() == "GNMT" && lstm1_layer->getMatchCustomOpt()) {
             auto cat_mem = stream_executor.findBlob(lstm1_layer->getCustomCatMemId()).second.toTensor();
+            auto custom_opt_number = lstm1_layer->getCustomOptNumber();
 
-            if (lstm1_layer->getCustomOptNumber() == 0) {
+            if (custom_opt_number == 0) {
                 hy = torch::from_blob((_Float16*)(cat_mem.data_ptr()), {1, 1, 1024}, options);
                 cy = torch::from_blob((_Float16*)(cat_mem.data_ptr()) + 1024, {1, 1, 1024}, options);
                 hy_dev = hy.data_ptr();
                 cy_dev = cy.data_ptr();
-            } else if (lstm1_layer->getCustomOptNumber() == 1) {
+            } else if (custom_opt_number == 1) {
                 hy = torch::from_blob((_Float16*)(cat_mem.data_ptr()) + 2048, {1, 1, 1024}, options);
                 cy = torch::from_blob((_Float16*)(cat_mem.data_ptr()) + 3072, {1, 1, 1024}, options);
                 hy_dev = hy.data_ptr();
                 cy_dev = cy.data_ptr();
-            } else if (lstm1_layer->getCustomOptNumber() == 2) {
+            } else if (custom_opt_number == 2) {
                 hy = torch::from_blob((_Float16*)(cat_mem.data_ptr()) + 4096, {1, 1, 1024}, options);
                 cy = torch::from_blob((_Float16*)(cat_mem.data_ptr()) + 5120, {1, 1, 1024}, options);
                 hy_dev = hy.data_ptr();
                 cy_dev = cy.data_ptr();
-            } else if (lstm1_layer->getCustomOptNumber() == 3) {
+            } else if (custom_opt_number == 3) {
                 hy = torch::from_blob((_Float16*)(cat_mem.data_ptr()) + 6144, {1, 1, 1024}, options);
                 cy = torch::from_blob((_Float16*)(cat_mem.data_ptr()) + 7168, {1, 1, 1024}, options);
                 hy_dev = hy.data_ptr();
                 cy_dev = cy.data_ptr();
             }
-            if (lstm1_layer->getCustomOptNumber() == 0) {
-                auto out4_layer = stream_executor.getGraph()->getLayerByPosition((layer->getNextLayerIDs())[3]);
-                auto out4_out1_layer =
-                    stream_executor.getGraph()->getLayerByPosition((out4_layer->getNextLayerIDs())[0]);
+            if (custom_opt_number == 0 || custom_opt_number == 1) {
+                auto out_layer = stream_executor.getGraph()->getLayerByPosition(
+                    (layer->getNextLayerIDs())[custom_opt_number == 0 ? 3 : 0]);
+                auto out_out_layer = stream_executor.getGraph()->getLayerByPosition((out_layer->getNextLayerIDs())[0]);
                 int64_t cat_mem_id =
-                    std::static_pointer_cast<nn_compiler::ir::AtenCatLayer>(out4_out1_layer)->getMemLayerId();
-                auto options = at::TensorOptions().dtype(at::kHalf).device(at::kCUDA);
-                auto cat_mem = stream_executor.findBlob(cat_mem_id).second.toTensor();
-                output = torch::from_blob((_Float16*)(cat_mem.data_ptr()), {1, 1, 1024}, options);
-            } else if (lstm1_layer->getCustomOptNumber() == 1) {
-                auto out1_layer = stream_executor.getGraph()->getLayerByPosition((layer->getNextLayerIDs())[0]);
-                auto out1_out1_layer =
-                    stream_executor.getGraph()->getLayerByPosition((out1_layer->getNextLayerIDs())[0]);
-                int64_t cat_mem_id =
-                    std::static_pointer_cast<nn_compiler::ir::AtenCatLayer>(out1_out1_layer)->getMemLayerId();
+                    std::static_pointer_cast<nn_compiler::ir::AtenCatLayer>(out_out_layer)->getMemLayerId();
                 auto options = at::TensorOptions().dtype(at::kHalf).device(at::kCUDA);
                 auto cat_mem = stream_executor.findBlob(cat_mem_id).second.toTensor();
                 output = torch::from_blob((_Float16*)(cat_mem.data_ptr()), {1, 1, 1024}, options);
