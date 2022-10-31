@@ -125,6 +125,8 @@ class StreamExecutor
 
     int getStreamNum() { return stream_num_; }
 
+    bool hasSelectOptimalLib() { return has_select_optimal_lib_; }
+
    private:
     std::shared_ptr<ir::NNGraph> graph_;
 
@@ -157,9 +159,11 @@ class StreamExecutor
     std::vector<hipStream_t> streams_;
     int stream_num_ = 0;
 
+    // multi-GPU
     static std::mutex stream_exec_mutex_;
 
-    bool has_set_optimal_lib_ = false;
+    // dynamic optimal lib selection
+    bool has_select_optimal_lib_ = false;
     std::set<uint32_t> layers_to_select_lib_;
 };
 

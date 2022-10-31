@@ -153,6 +153,13 @@ RetVal StreamExecutor::inferenceModel(const std::vector<torch::Tensor>& input_te
         }
 
         auto op_executor = getOpExecutor(layer_id);
+#ifdef SELECT_OPTIMAL_LIB
+        // Once MIOpen is needed, its LstmExecutor must run firstly because it should maintain the tensor relations(by
+        // pointer, which is not initialized in AtenExecutors) for the custom optimization for GNMT model.
+        if (!has_select_optimal_lib_ && ir::isMIOpenSupportOp(layer_type)) {
+            op_executor = findMIOpenExecutorByType(layer_type);
+        }
+#endif
         op_executor(layer, *this);
 
         // control_op will move cursor by itself
@@ -161,16 +168,16 @@ RetVal StreamExecutor::inferenceModel(const std::vector<torch::Tensor>& input_te
         }
 
 #ifdef SELECT_OPTIMAL_LIB
-        if (!has_set_optimal_lib_ && ir::isMIOpenSupportOp(layer_type)) {
+        if (!has_select_optimal_lib_ && ir::isMIOpenSupportOp(layer_type)) {
             layers_to_select_lib_.insert(layer_id);
         }
 #endif
     }
 
 #ifdef SELECT_OPTIMAL_LIB
-    if (!has_set_optimal_lib_) {
+    if (!has_select_optimal_lib_) {
         setOptimalLibForOpExecution();
-        has_set_optimal_lib_ = true;
+        has_select_optimal_lib_ = true;
     }
 #endif
 
@@ -300,21 +307,21 @@ void StreamExecutor::setOptimalLibForOpExecution()
         auto layer_type = layer->getType();
 
         // for Ops with MIOpen support, compare which lib can help them run faster
-        auto default_op_executor = op_executor_[layer_id];
+        auto aten_op_executor = findAtenExecutorByType(layer_type);
         auto miopen_op_executor = findMIOpenExecutorByType(layer_type);
 
-        miopen_op_executor(layer, *this);  // warm up for miopen executor, the default executor has been warmed up.
+        aten_op_executor(layer, *this);  // warm up for aten executor, while miopen executor has been warmed up.
 
         start_time = std::chrono::high_resolution_clock::now();
-        default_op_executor(layer, *this);
+        aten_op_executor(layer, *this);
         end_time = std::chrono::high_resolution_clock::now();
-        std::chrono::duration<double, std::micro> default_duration = end_time - start_time;  // us
+        std::chrono::duration<double, std::micro> aten_duration = end_time - start_time;  // us
         start_time = std::chrono::high_resolution_clock::now();
         miopen_op_executor(layer, *this);
         end_time = std::chrono::high_resolution_clock::now();
         std::chrono::duration<double, std::micro> miopen_duration = end_time - start_time;  // us
 
-        if (miopen_duration.count() < default_duration.count()) {
+        if (miopen_duration.count() < aten_duration.count()) {
             op_executor_[layer_id] = miopen_op_executor;  // the Op can run faster with MIOpen lib
         }
     }
