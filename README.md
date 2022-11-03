@@ -1,8 +1,8 @@
 # PIM AI Compiler
 
 This repository contains on-device neural network compiler, GPU+PIM runtime and python libs.
-1) Neural network compiler consists of IR generator, high/low level IR optimizer, PIM code generator.
-2) GPU+PIM Runtime provides resource manager(model, memory) and stream executor(miopen, pim, custom kernels).
+1) Neural network compiler consists of model importer, high/low level IR optimizer, PIM code generator.
+2) GPU+PIM Runtime mainly provides stream executor with MIOpen, PIM and custom GPU kernels.
 3) Python libs provide model compile and inference for both pytorch and tensorflow in runtime.
 
 
@@ -50,7 +50,7 @@ PIM AI Compiler provides simpleMain example program for users who want to valida
 
 General Options:
   -i, <input file>         Input file path
-  -m, <model type>         Model type. Possible values: RNNT/GNMT/HWR
+  -m, <model type>         Model type. Possible values: RNNT/GNMT/HWR/Transformer/SwitchTransformer
   -p, <profiling>          Run with profiling
   -?, <--help>             Help info
 ```
@@ -75,5 +75,5 @@ $ export LIBTORCH_DIR=/home/user/.local/lib/python3.6/site-packages/torch
 $ export LD_LIBRARY_PATH=$LIBTORCH_DIR/lib:$LD_LIBRARY_PATH
 $ export PYTHONPATH=$PYTHONPATH:/opt/rocm/lib/
 
-$ python3 ./examples/runtime/simpleMain.py
+$ python3 ./examples/runtime/python/simpleMain.py
 ```
