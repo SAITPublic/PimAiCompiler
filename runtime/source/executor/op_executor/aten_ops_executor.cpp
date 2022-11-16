@@ -2303,6 +2303,7 @@ void executeAtenLSTM1(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamEx
             std::vector<at::Tensor> cat_out_vec = {lstm_output, cat_sliced_tensor};
             at::TensorList cat_out_list(cat_out_vec);
             auto cat_out_tensor = atenCat(cat_out_list, 2);
+#ifdef SELECT_OPTIMAL_LIB
             if (stream_executor.findBlob(out_stensor_id[0]).first == ir::DataType::UNDEFINED ||
                 stream_executor.hasSelectOptimalLib()) {
                 stream_executor.updateBlob(cat_mem_id, DataType::TENSOR, tensorToIValue(cat_out_tensor));
@@ -2312,6 +2313,10 @@ void executeAtenLSTM1(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamEx
             !stream_executor.hasSelectOptimalLib()) {
             return;
         }
+#else
+            stream_executor.updateBlob(cat_mem_id, DataType::TENSOR, tensorToIValue(cat_out_tensor));
+        }
+#endif
     }
 
     stream_executor.updateBlob(out_stensor_id[0], DataType::TENSOR, tensorToIValue(lstm_output));
