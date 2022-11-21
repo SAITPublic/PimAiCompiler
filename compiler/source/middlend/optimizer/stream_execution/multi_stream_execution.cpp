@@ -254,7 +254,7 @@ void MultiStreamExecution::process(std::unique_ptr<nn_compiler::ir::NNModel>& mo
     }
 
     auto new_type = nn_compiler::ir::LayerType::MULTISTREAM;
-    auto new_name = "multi_stream_for_" + start_layer->getName();
+    auto new_name = "multi_stream_for_" + multi_stream_apply_layers[0]->getName();
     auto new_layer = std::make_shared<nn_compiler::ir::MultiStreamLayer>(new_name, new_type);
     new_layer->setLayers(multi_stream_apply_layers);
     new_layer->setLayerNum(multi_stream_apply_layers.size());
