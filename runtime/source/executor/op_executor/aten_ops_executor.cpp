@@ -1689,11 +1689,30 @@ void executeAtenIndex(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamEx
     assert(indices_iv.isTensorList());
     auto indices_list_ivalue = indices_iv.toList();
     c10::List<c10::optional<at::Tensor>> indices_optional_list;
+
+    at::Tensor output;
+    bool all_zero_indice = true;
+    for (torch::jit::IValue iv : indices_list_ivalue) {
+        auto indice = iv.toTensor();
+        if (!(indice.dim() == 1 && (indice.sizes())[0] == 1 && indice.item().toInt() == 0)) {
+            all_zero_indice = false;
+            break;
+        }
+    }
+    if (all_zero_indice) {
+        output = self_tensor;
+        for (int i = self_tensor.sizes().size(); i > 1; i--) {
+            output = atenSqueeze(output, -1);
+        }
+        stream_executor.updateBlob(out_stensor_id[0], DataType::TENSOR, tensorToIValue(output));
+        return;
+    }
+
     for (torch::jit::IValue iv : indices_list_ivalue) {
         indices_optional_list.push_back(iv.toOptional<at::Tensor>());
     }
 
-    auto output = atenIndex(self_tensor, indices_optional_list);
+    output = atenIndex(self_tensor, indices_optional_list);
     // update output
     stream_executor.updateBlob(out_stensor_id[0], DataType::TENSOR, tensorToIValue(output));
 }
