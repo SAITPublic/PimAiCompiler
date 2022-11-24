@@ -74,10 +74,10 @@ std::vector<std::shared_ptr<nn_compiler::ir::NNLayer>> RemoveCatForAddmm::create
 
     float16 origin_data[shape_of_matmul_weight_[0]][shape_of_matmul_weight_[1]];
     for (auto i = 0; i < shape_of_matmul_weight_[0]; i++) {
-        auto idx_in_vec = i + x_stride - 1;
+        auto idx_in_vec = i + y_stride - 1;
         for (auto j = 0; j < shape_of_matmul_weight_[1]; j++) {
             origin_data[i][j] = (*origin_data_vec)[idx_in_vec];
-            idx_in_vec += y_stride;
+            idx_in_vec += x_stride;
         }
     }
 
