@@ -12,7 +12,7 @@ function usage () {
         <command>               <argument>
 
         --input(-i)             input file name
-        --model_type(-m)        model type: RNNT/GNMT/HWR/Transformer"
+        --model_type(-m)        model type: RNNT/GNMT/HWR/Transformer/SwitchTransformer/PRMOE"
 }
 
 ARGS=""

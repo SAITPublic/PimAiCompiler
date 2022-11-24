@@ -18,7 +18,7 @@ namespace examples
 class PipelineManager
 {
    public:
-    enum class ModelType { NO_MODEL = 0, RNNT, GNMT, HWR, Transformer, SwitchTransformer };
+    enum class ModelType { NO_MODEL = 0, RNNT, GNMT, HWR, Transformer, SwitchTransformer, PRMOE };
 
     PipelineManager() = default;
 
@@ -56,6 +56,8 @@ class PipelineManager
     std::string input_file_path_ = "";
 
     ModelType model_type_ = ModelType::NO_MODEL;
+
+    std::string str_model_type_ = "";
 
     bool is_profiling_ = false;
 

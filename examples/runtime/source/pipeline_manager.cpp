@@ -37,9 +37,12 @@ RetVal PipelineManager::initialize(const std::string& input_file, const std::str
         model_type_ = ModelType::Transformer;
     } else if (model_type == "SwitchTransformer") {
         model_type_ = ModelType::SwitchTransformer;
+    } else if (model_type == "PRMOE") {
+        model_type_ = ModelType::PRMOE;
     } else {
         DLOG(FATAL) << "Unsupported model type.";
     }
+    str_model_type_ = model_type;
     input_file_path_ = input_file;
     is_profiling_ = profiling;
     gpu_num_ = gpu_num;
@@ -62,6 +65,7 @@ RetVal PipelineManager::run()
         case ModelType::Transformer:
             load_and_run_transformer();
             break;
+        case ModelType::PRMOE:
         case ModelType::SwitchTransformer:
             load_and_run_switchtransformer();
             break;
@@ -90,10 +94,10 @@ void PipelineManager::load_and_run_rnnt()
     std::unique_ptr<nn_compiler::ir::NNModel> model = std::make_unique<nn_compiler::ir::NNModel>();
 
     NNCompiler compiler;
-    compiler.initialize(input_file_path_, "RNNT");
+    compiler.initialize(input_file_path_, str_model_type_);
     compiler.compile(model);
 
-    NNRuntime runtime(model, "RNNT");
+    NNRuntime runtime(model, str_model_type_);
 
     std::vector<torch::Tensor> input_tensors;
     std::vector<torch::Tensor> output_tensors;
@@ -130,10 +134,10 @@ void PipelineManager::load_and_run_gnmt()
     std::unique_ptr<nn_compiler::ir::NNModel> model = std::make_unique<nn_compiler::ir::NNModel>();
 
     NNCompiler compiler;
-    compiler.initialize(input_file_path_, "GNMT");
+    compiler.initialize(input_file_path_, str_model_type_);
     compiler.compile(model);
 
-    NNRuntime runtime(model, "GNMT");
+    NNRuntime runtime(model, str_model_type_);
 
     std::vector<torch::Tensor> input_tensors;
     std::vector<torch::Tensor> output_tensors;
@@ -168,10 +172,10 @@ void PipelineManager::load_and_run_hwr()
     std::unique_ptr<nn_compiler::ir::NNModel> model = std::make_unique<nn_compiler::ir::NNModel>();
 
     NNCompiler compiler;
-    compiler.initialize(input_file_path_, "HWR");
+    compiler.initialize(input_file_path_, str_model_type_);
     compiler.compile(model);
 
-    NNRuntime runtime(model, "HWR");
+    NNRuntime runtime(model, str_model_type_);
 
     std::vector<torch::Tensor> input_tensors;
     std::vector<torch::Tensor> output_tensors;
@@ -201,10 +205,10 @@ void PipelineManager::load_and_run_transformer()
     std::unique_ptr<nn_compiler::ir::NNModel> model = std::make_unique<nn_compiler::ir::NNModel>();
 
     NNCompiler compiler;
-    compiler.initialize(input_file_path_, "Transformer");
+    compiler.initialize(input_file_path_, str_model_type_);
     compiler.compile(model);
 
-    NNRuntime runtime(model, "Transformer");
+    NNRuntime runtime(model, str_model_type_);
 
     std::vector<torch::Tensor> input_tensors;
     std::vector<torch::Tensor> output_tensors;
@@ -259,7 +263,7 @@ void PipelineManager::load_and_run_switchtransformer()
     std::unique_ptr<nn_compiler::ir::NNModel> model = std::make_unique<nn_compiler::ir::NNModel>();
 
     NNCompiler compiler;
-    compiler.initialize(input_file_path_, "SwitchTransformer");
+    compiler.initialize(input_file_path_, str_model_type_);
     compiler.compile(model);
     std::shared_ptr<nn_compiler::ir::NNModel> model_ = std::move(model);
 
@@ -280,7 +284,7 @@ void PipelineManager::load_and_run_switchtransformer()
         input_tensors.push_back(input);
         input_tensors.push_back(attention_mask);
         thread_pool_.emplace_back(
-            std::thread(&launchInference, model_, input_tensors, "SwitchTransformer", is_profiling_, idx));
+            std::thread(&launchInference, model_, input_tensors, str_model_type_, is_profiling_, idx));
     }
     for (auto& t : thread_pool_) {
         t.join();

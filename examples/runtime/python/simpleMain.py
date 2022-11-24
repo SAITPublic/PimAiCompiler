@@ -172,10 +172,10 @@ def test_switch_transformer_inference(input_file : str, input_tensor_file : str,
 
 if __name__ == '__main__':
     arg_parser = argparse.ArgumentParser()
-    arg_parser.add_argument("--model_kind", type=str, choices=['RNNT', 'HWR', 'GNMT', 'Transformer', 'SwitchTransformer'], 
+    arg_parser.add_argument("--model_kind", type=str, choices=['RNNT', 'HWR', 'GNMT', 'Transformer', 'SwitchTransformer','PRMOE'], 
                             help='choose model to inference', required=True)
     arg_parser.add_argument('--input_file', type=str, help='Input file', required=True)
-    arg_parser.add_argument('--gpu_num', type=int, help='gpu num for inferring model', required=False)
+    arg_parser.add_argument('--gpu_num', type=int, default=1, help='gpu num for inferring model', required=False)
     args = arg_parser.parse_args()
     
     assert os.path.exists(args.input_file)
@@ -201,7 +201,7 @@ if __name__ == '__main__':
         input_tensor_file = os.path.join(current_dir, '../resource/transformer/inputs/transformer.pt')
         assert os.path.exists(input_tensor_file)
         test_transformer_inference(args.input_file, input_tensor_file, args.model_kind)
-    elif args.model_kind == 'SwitchTransformer':
+    elif args.model_kind == 'SwitchTransformer' or args.model_kind == 'PRMOE':
         input_tensor_file = os.path.join(current_dir, '../resource/switch_transformer/inputs/input_ids_2_13.pt')
         attention_mask_file = os.path.join(current_dir, '../resource/switch_transformer/inputs/attention_mask_2_13.pt')
         assert os.path.exists(input_tensor_file) and os.path.exists(attention_mask_file)
