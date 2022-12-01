@@ -2213,44 +2213,7 @@ void executeAtenLSTM1(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamEx
         batch_first = batch_first_iv.toInt();
     }
 
-    // at::TensorList params
-    // param layerout                --> (fw_w_ih, fw_w_hh, fw_b_ih?, fw_b_hh?) * layers
-    // param layerout (bidirctional) --> (fw_w_ih, fw_w_hh, fw_b_ih?, fw_b_hh?, bw_w_ih, bw_w_hh, bw_b_ih?, bw_b_hh?) *
-    // layers
-
-    auto weight_ids = lstm1_layer->getWeightIds();
-    auto bias_ids = lstm1_layer->getBiasIds();
-    std::vector<at::Tensor> param_vector;
-    assert((bidirectional == 0 || bidirectional == 1));
-    int hash_id = 0;
-    for (int i = 0; i < num_layers * (bidirectional + 1); i++) {
-        // w_ih
-        auto w_ih_iv = stream_executor.findBlob(weight_ids[i * 2]).second;
-        hash_id += weight_ids[i * 2];
-        if (w_ih_iv.isTensor()) {
-            param_vector.push_back(w_ih_iv.toTensor());
-        }
-        // w_hh
-        auto w_hh_iv = stream_executor.findBlob(weight_ids[i * 2 + 1]).second;
-        hash_id += weight_ids[i * 2 + 1];
-        if (w_hh_iv.isTensor()) {
-            param_vector.push_back(w_hh_iv.toTensor());
-        }
-        if (has_biases) {
-            // b_ih? (optional)
-            auto b_ih_iv = stream_executor.findBlob(bias_ids[i * 2]).second;
-            hash_id += bias_ids[i * 2];
-            if (b_ih_iv.isTensor()) {
-                param_vector.push_back(b_ih_iv.toTensor());
-            }
-            // b_hh? (optional)
-            auto b_hh_iv = stream_executor.findBlob(bias_ids[i * 2 + 1]).second;
-            hash_id += bias_ids[i * 2 + 1];
-            if (b_hh_iv.isTensor()) {
-                param_vector.push_back(b_hh_iv.toTensor());
-            }
-        }
-    }
+    auto param_vector = lstm1_layer->getParamVector();
     at::TensorList params(param_vector);
     auto pos = std::unique(out_stensor_id.begin(), out_stensor_id.end());
     out_stensor_id.erase(pos, out_stensor_id.end());
@@ -2423,45 +2386,7 @@ void executeAtenLSTM2(std::shared_ptr<nn_compiler::ir::NNLayer>& layer, StreamEx
         bidirectional = bidirectional_iv.toInt();
     }
 
-    // at::TensorList params
-    // param layerout                --> (fw_w_ih, fw_w_hh, fw_b_ih?, fw_b_hh?) * layers
-    // param layerout (bidirctional) --> (fw_w_ih, fw_w_hh, fw_b_ih?, fw_b_hh?, bw_w_ih, bw_w_hh, bw_b_ih?, bw_b_hh?) *
-    // layers
-
-    auto weight_ids = lstm2_layer->getWeightIds();
-    auto bias_ids = lstm2_layer->getBiasIds();
-    std::vector<at::Tensor> param_vector;
-    assert((bidirectional == 0 || bidirectional == 1));
-
-    int hash_id = 0;
-    for (int i = 0; i < num_layers * (bidirectional + 1); i++) {
-        // w_ih
-        auto w_ih_iv = stream_executor.findBlob(weight_ids[i * 2]).second;
-        hash_id += weight_ids[i * 2];
-        if (w_ih_iv.isTensor()) {
-            param_vector.push_back(w_ih_iv.toTensor());
-        }
-        // w_hh
-        auto w_hh_iv = stream_executor.findBlob(weight_ids[i * 2 + 1]).second;
-        hash_id += weight_ids[i * 2 + 1];
-        if (w_hh_iv.isTensor()) {
-            param_vector.push_back(w_hh_iv.toTensor());
-        }
-        if (has_biases) {
-            // b_ih? (optional)
-            auto b_ih_iv = stream_executor.findBlob(bias_ids[i * 2]).second;
-            hash_id += bias_ids[i * 2];
-            if (b_ih_iv.isTensor()) {
-                param_vector.push_back(b_ih_iv.toTensor());
-            }
-            // b_hh? (optional)
-            auto b_hh_iv = stream_executor.findBlob(bias_ids[i * 2 + 1]).second;
-            hash_id += bias_ids[i * 2 + 1];
-            if (b_hh_iv.isTensor()) {
-                param_vector.push_back(b_hh_iv.toTensor());
-            }
-        }
-    }
+    auto param_vector = lstm2_layer->getParamVector();
     at::TensorList params(param_vector);
     auto output = atenLstm2(input, batch_sizes, hx, params, static_cast<bool>(has_biases), num_layers, dropout,
                             static_cast<bool>(train), static_cast<bool>(bidirectional));

@@ -258,7 +258,11 @@ RetVal ModelBuilder::reArangeLstmWeights(std::shared_ptr<nn_compiler::ir::NNLaye
         DLOG(FATAL) << "Cannot re-arange parameter vector for: " << ir::convertLayerTypeToString(layer_type);
     }
 
-    size_t weight_size = 0;
+    auto element_num = 0;
+    for (auto param_tensor : param_vector) {
+        element_num += param_tensor.numel();
+    }
+    size_t weight_size = element_num * 2;  // weights in FP16 half size
 
     size_t offset = 0;
     size_t param_size = 0;
