@@ -49,11 +49,21 @@ RetVal ModelBuilder::preloadModel(std::unique_ptr<nn_compiler::ir::NNModel>& mod
                 auto ids = this->loadWeightAndBias(lstm1_layer->getWeights(), lstm1_layer->getBiases());
                 lstm1_layer->setWeightIds(ids.first);
                 lstm1_layer->setBiasIds(ids.second);
+                if (feasibleForLstmWeightProcess(layer)) {
+                    buildLstmParameterVector(layer);
+                } else {
+                    DLOG(FATAL) << "Failed to pre-process weights for: " << layer->getName();
+                }
             } else if (type == nn_compiler::ir::LayerType::ATENLSTM2) {
                 auto lstm2_layer = std::dynamic_pointer_cast<ir::AtenLSTM2Layer>(layer);
                 auto ids = this->loadWeightAndBias(lstm2_layer->getWeights(), lstm2_layer->getBiases());
                 lstm2_layer->setWeightIds(ids.first);
                 lstm2_layer->setBiasIds(ids.second);
+                if (feasibleForLstmWeightProcess(layer)) {
+                    buildLstmParameterVector(layer);
+                } else {
+                    DLOG(FATAL) << "Failed to pre-process weights for: " << layer->getName();
+                }
             } else if (type == nn_compiler::ir::LayerType::ATENCONV2D) {
                 auto conv2d_layer = std::dynamic_pointer_cast<ir::AtenConv2dLayer>(layer);
                 auto ids = this->loadWeightAndBias(conv2d_layer->getWeights(), conv2d_layer->getBiases());
@@ -105,6 +115,110 @@ std::pair<std::vector<int64_t>, std::vector<int64_t> > ModelBuilder::loadWeightA
     }
 
     return std::make_pair(weight_ids, bias_ids);
+}
+
+bool ModelBuilder::feasibleForLstmWeightProcess(std::shared_ptr<nn_compiler::ir::NNLayer>& layer)
+{
+    if (layer->getType() == nn_compiler::ir::LayerType::ATENLSTM1) {
+        auto lstm1_layer = std::dynamic_pointer_cast<ir::AtenLSTM1Layer>(layer);
+        int has_biases = lstm1_layer->getHasBiases();
+        int64_t num_layers = lstm1_layer->getNumLayers();
+        double dropout = lstm1_layer->getDropout();
+        int train = lstm1_layer->getTrain();
+        int bidirectional = lstm1_layer->getBidirectional();
+        int batch_first = lstm1_layer->getBatchFirst();
+        if (nn_compiler::ir::isDefaultValue(has_biases) || nn_compiler::ir::isDefaultValue(num_layers) ||
+            nn_compiler::ir::isDefaultValue(dropout) || nn_compiler::ir::isDefaultValue(train) ||
+            nn_compiler::ir::isDefaultValue(bidirectional) || nn_compiler::ir::isDefaultValue(batch_first)) {
+            return false;
+        } else {
+            return true;
+        }
+    } else if (layer->getType() == nn_compiler::ir::LayerType::ATENLSTM2) {
+        auto lstm2_layer = std::dynamic_pointer_cast<ir::AtenLSTM2Layer>(layer);
+        int has_biases = lstm2_layer->getHasBiases();
+        int64_t num_layers = lstm2_layer->getNumLayers();
+        double dropout = lstm2_layer->getDropout();
+        int train = lstm2_layer->getTrain();
+        int bidirectional = lstm2_layer->getBidirectional();
+        if (nn_compiler::ir::isDefaultValue(has_biases) || nn_compiler::ir::isDefaultValue(num_layers) ||
+            nn_compiler::ir::isDefaultValue(dropout) || nn_compiler::ir::isDefaultValue(train) ||
+            nn_compiler::ir::isDefaultValue(bidirectional)) {
+            return false;
+        } else {
+            return true;
+        }
+    } else {
+        DLOG(FATAL) << "Cannot pre-process weight for: " << ir::convertLayerTypeToString(layer->getType());
+    }
+}
+
+RetVal ModelBuilder::buildLstmParameterVector(std::shared_ptr<nn_compiler::ir::NNLayer>& layer)
+{
+    int has_biases = 0;
+    int64_t num_layers = 0;
+    int bidirectional = 0;
+    std::vector<int64_t> weight_ids, bias_ids;
+    std::vector<at::Tensor> param_vector;
+    auto layer_type = layer->getType();
+
+    if (layer_type == nn_compiler::ir::LayerType::ATENLSTM1) {
+        auto lstm1_layer = std::dynamic_pointer_cast<ir::AtenLSTM1Layer>(layer);
+        has_biases = lstm1_layer->getHasBiases();
+        num_layers = lstm1_layer->getNumLayers();
+        bidirectional = lstm1_layer->getBidirectional();
+        weight_ids = lstm1_layer->getWeightIds();
+        bias_ids = lstm1_layer->getBiasIds();
+    } else if (layer_type == nn_compiler::ir::LayerType::ATENLSTM2) {
+        auto lstm2_layer = std::dynamic_pointer_cast<ir::AtenLSTM2Layer>(layer);
+        has_biases = lstm2_layer->getHasBiases();
+        num_layers = lstm2_layer->getNumLayers();
+        bidirectional = lstm2_layer->getBidirectional();
+        weight_ids = lstm2_layer->getWeightIds();
+        bias_ids = lstm2_layer->getBiasIds();
+    } else {
+        DLOG(FATAL) << "Cannot build parameter vector for: " << ir::convertLayerTypeToString(layer_type);
+    }
+
+    // at::TensorList params
+    // param layerout                --> (fw_w_ih, fw_w_hh, fw_b_ih?, fw_b_hh?) * layers
+    // param layerout (bidirctional) --> (fw_w_ih, fw_w_hh, fw_b_ih?, fw_b_hh?, bw_w_ih, bw_w_hh, bw_b_ih?, bw_b_hh?) *
+    // layers
+    assert((bidirectional == 0 || bidirectional == 1));
+    for (int i = 0; i < num_layers * (bidirectional + 1); i++) {
+        // w_ih
+        auto w_ih_iv = (preloaded_data_container_.find(weight_ids[i * 2])->second).second;
+        if (w_ih_iv.isTensor()) {
+            param_vector.push_back(w_ih_iv.toTensor().cuda());
+        }
+        // w_hh
+        auto w_hh_iv = (preloaded_data_container_.find(weight_ids[i * 2 + 1])->second).second;
+        if (w_hh_iv.isTensor()) {
+            param_vector.push_back(w_hh_iv.toTensor().cuda());
+        }
+        if (has_biases) {
+            // b_ih
+            auto b_ih_iv = (preloaded_data_container_.find(bias_ids[i * 2])->second).second;
+            if (b_ih_iv.isTensor()) {
+                param_vector.push_back(b_ih_iv.toTensor().cuda());
+            }
+            // b_hh
+            auto b_hh_iv = (preloaded_data_container_.find(bias_ids[i * 2 + 1])->second).second;
+            if (b_hh_iv.isTensor()) {
+                param_vector.push_back(b_hh_iv.toTensor().cuda());
+            }
+        }
+    }
+
+    if (layer_type == nn_compiler::ir::LayerType::ATENLSTM1) {
+        auto lstm1_layer = std::dynamic_pointer_cast<ir::AtenLSTM1Layer>(layer);
+        lstm1_layer->setParamVector(param_vector);
+    } else {
+        auto lstm2_layer = std::dynamic_pointer_cast<ir::AtenLSTM2Layer>(layer);
+        lstm2_layer->setParamVector(param_vector);
+    }
+
+    return RetVal::SUCCESS;
 }
 
 }  // namespace runtime

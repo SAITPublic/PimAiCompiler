@@ -15,6 +15,7 @@
 
 #include "common/include/types.hpp"
 #include "half.hpp"
+#include "ir/include/common/utils.hpp"
 #include "ir/include/layers/all_layers.h"
 #include "ir/include/nn_model.h"
 #include "ir/include/tensors/data_tensor.h"
@@ -40,6 +41,10 @@ class ModelBuilder
     data_store_type getPreLoadedData() { return preloaded_data_container_; }
 
    private:
+    bool feasibleForLstmWeightProcess(std::shared_ptr<nn_compiler::ir::NNLayer>& layer);
+
+    RetVal buildLstmParameterVector(std::shared_ptr<nn_compiler::ir::NNLayer>& layer);
+
     data_store_type preloaded_data_container_;
 
     int64_t preload_id_ = 0;

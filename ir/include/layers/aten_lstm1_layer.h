@@ -50,6 +50,7 @@ class AtenLSTM1Layer : public NNLayer
         this->biases_ = aten_lstm1_layer.biases_;
         this->weight_ids_ = aten_lstm1_layer.weight_ids_;
         this->bias_ids_ = aten_lstm1_layer.bias_ids_;
+        this->param_vector_ = aten_lstm1_layer.param_vector_;
         this->setAttr(aten_lstm1_layer.has_biases_, aten_lstm1_layer.num_layers_, aten_lstm1_layer.dropout_,
                       aten_lstm1_layer.train_, aten_lstm1_layer.bidirectional_, aten_lstm1_layer.batch_first_,
                       aten_lstm1_layer.match_custom_opt_, aten_lstm1_layer.custom_opt_number_);
@@ -100,6 +101,10 @@ class AtenLSTM1Layer : public NNLayer
     void setBiasIds(const std::vector<int64_t> &bias_ids) { bias_ids_ = bias_ids; }
 
     std::vector<int64_t> getBiasIds() { return bias_ids_; }
+
+    void setParamVector(const std::vector<at::Tensor> &param_vector) { this->param_vector_ = param_vector; }
+
+    std::vector<at::Tensor> getParamVector() { return this->param_vector_; }
 
     void setHasBiases(int has_biases) { this->has_biases_ = has_biases; }
 
@@ -175,6 +180,8 @@ class AtenLSTM1Layer : public NNLayer
     std::vector<at::Tensor> biases_;   // bias, dim == 1
     std::vector<int64_t> weight_ids_;
     std::vector<int64_t> bias_ids_;
+
+    std::vector<at::Tensor> param_vector_;  // weight and bias
 
     int lstm_type_ = 0;
     bool match_custom_opt_ = false;

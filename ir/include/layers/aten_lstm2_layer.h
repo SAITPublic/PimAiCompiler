@@ -50,6 +50,7 @@ class AtenLSTM2Layer : public NNLayer
         this->biases_ = aten_lstm2_layer.biases_;
         this->weight_ids_ = aten_lstm2_layer.weight_ids_;
         this->bias_ids_ = aten_lstm2_layer.bias_ids_;
+        this->param_vector_ = aten_lstm2_layer.param_vector_;
         this->setAttr(aten_lstm2_layer.has_biases_, aten_lstm2_layer.num_layers_, aten_lstm2_layer.dropout_,
                       aten_lstm2_layer.train_, aten_lstm2_layer.bidirectional_);
     }
@@ -92,6 +93,10 @@ class AtenLSTM2Layer : public NNLayer
     std::vector<int64_t> getBiasIds() { return bias_ids_; }
 
     void setBiasIds(const std::vector<int64_t> &bias_ids) { bias_ids_ = bias_ids; }
+
+    std::vector<at::Tensor> getParamVector() { return this->param_vector_; }
+
+    void setParamVector(const std::vector<at::Tensor> &param_vector) { this->param_vector_ = param_vector; }
 
     int getHasBiases() { return this->has_biases_; }
 
@@ -143,6 +148,8 @@ class AtenLSTM2Layer : public NNLayer
     std::vector<at::Tensor> biases_;   // bias, dim == 1
     std::vector<int64_t> weight_ids_;
     std::vector<int64_t> bias_ids_;
+
+    std::vector<at::Tensor> param_vector_;  // weight and bias
 };
 }  // namespace ir
 }  // namespace nn_compiler
