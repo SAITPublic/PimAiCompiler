@@ -45,6 +45,8 @@ class ModelBuilder
 
     RetVal buildLstmParameterVector(std::shared_ptr<nn_compiler::ir::NNLayer>& layer);
 
+    RetVal reArangeLstmWeights(std::shared_ptr<nn_compiler::ir::NNLayer>& layer);
+
     data_store_type preloaded_data_container_;
 
     int64_t preload_id_ = 0;
