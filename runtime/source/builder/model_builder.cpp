@@ -275,114 +275,36 @@ RetVal ModelBuilder::reArangeLstmWeights(std::shared_ptr<nn_compiler::ir::NNLaye
         static_cast<bool>(has_biases) ? 4 * num_layers * bidirectional_int : 2 * num_layers * bidirectional_int;
 
     int num_offset = static_cast<bool>(has_biases) ? 4 * bidirectional_int : 2 * bidirectional_int;
-    for (int num = 0; num < param_num; num += num_offset) {
+
+    auto reOrganizeWeightTensor = [&](int start_index, int index_offset, int bidirectional_offset) {
         param_size = 1;
-        auto in_wei_vec = param_vector[num].sizes().vec();
-        for (int i = 0; i < in_wei_vec.size(); ++i) {
-            param_size *= in_wei_vec[i];
+        auto weight_tensor = param_vector[start_index + index_offset + bidirectional_offset].sizes().vec();
+        for (int i = 0; i < weight_tensor.size(); ++i) {
+            param_size *= weight_tensor[i];
         }
 
         at::Tensor param = at::from_blob((_Float16*)(weight_buffer.data_ptr()) + offset,
                                          {static_cast<long>(param_size)}, weight_buffer.options());
-        auto sliced_tensor = param_vector[num].chunk(4, 0);
-        auto permuted_wei = at::cat({sliced_tensor[0], sliced_tensor[1], sliced_tensor[3], sliced_tensor[2]});
-        param.copy_(permuted_wei.view_as(param));
+        auto sliced_tensors = param_vector[start_index + index_offset + bidirectional_offset].chunk(4, 0);
+        auto new_weight = at::cat({sliced_tensors[0], sliced_tensors[1], sliced_tensors[3], sliced_tensors[2]});
+        param.copy_(new_weight.view_as(param));
         offset += param_size;
+    };
 
-        if (bidirectional_int == 2) {
-            param_size = 1;
-            in_wei_vec = param_vector[num + (num_offset / bidirectional_int)].sizes().vec();
-            for (int i = 0; i < in_wei_vec.size(); ++i) {
-                param_size *= in_wei_vec[i];
+    auto processWeights = [&](int start_idx) {
+        for (int num = start_idx; num < param_num; num += num_offset) {
+            for (int index_offset = 0; index_offset < 2; index_offset++) {
+                reOrganizeWeightTensor(num, index_offset, 0);
+                if (bidirectional_int == 2) {
+                    reOrganizeWeightTensor(num, index_offset, num_offset / bidirectional_int);
+                }
             }
-            param = at::from_blob((_Float16*)(weight_buffer.data_ptr()) + offset, {static_cast<long>(param_size)},
-                                  weight_buffer.options());
-            sliced_tensor = param_vector[num + (num_offset / bidirectional_int)].chunk(4, 0);
-            permuted_wei = at::cat({sliced_tensor[0], sliced_tensor[1], sliced_tensor[3], sliced_tensor[2]});
-            param.copy_(permuted_wei.view_as(param));
-            offset += param_size;
         }
+    };
 
-        param_size = 1;
-        in_wei_vec = param_vector[num + 1].sizes().vec();
-        for (int i = 0; i < in_wei_vec.size(); ++i) {
-            param_size *= in_wei_vec[i];
-        }
-        param = at::from_blob((_Float16*)(weight_buffer.data_ptr()) + offset, {static_cast<long>(param_size)},
-                              weight_buffer.options());
-        sliced_tensor = param_vector[num + 1].chunk(4, 0);
-        permuted_wei = at::cat({sliced_tensor[0], sliced_tensor[1], sliced_tensor[3], sliced_tensor[2]});
-        param.copy_(permuted_wei.view_as(param));
-        offset += param_size;
-
-        if (bidirectional_int == 2) {
-            param_size = 1;
-            in_wei_vec = param_vector[num + (num_offset / bidirectional_int) + 1].sizes().vec();
-            for (int i = 0; i < in_wei_vec.size(); ++i) {
-                param_size *= in_wei_vec[i];
-            }
-            param = at::from_blob((_Float16*)(weight_buffer.data_ptr()) + offset, {static_cast<long>(param_size)},
-                                  weight_buffer.options());
-            sliced_tensor = param_vector[num + (num_offset / bidirectional_int) + 1].chunk(4, 0);
-            permuted_wei = at::cat({sliced_tensor[0], sliced_tensor[1], sliced_tensor[3], sliced_tensor[2]});
-            param.copy_(permuted_wei.view_as(param));
-            offset += param_size;
-        }
-    }
+    processWeights(0);
     if (static_cast<bool>(has_biases)) {
-        for (int num = 2; num < param_num; num += num_offset) {
-            param_size = 1;
-            auto in_wei_vec = param_vector[num].sizes().vec();
-            for (int i = 0; i < in_wei_vec.size(); ++i) {
-                param_size *= in_wei_vec[i];
-            }
-            at::Tensor param = at::from_blob((_Float16*)(weight_buffer.data_ptr()) + offset,
-                                             {static_cast<long>(param_size)}, weight_buffer.options());
-            auto sliced_tensor = param_vector[num].chunk(4, 0);
-            auto permuted_wei = at::cat({sliced_tensor[0], sliced_tensor[1], sliced_tensor[3], sliced_tensor[2]});
-            param.copy_(permuted_wei.view_as(param));
-            offset += param_size;
-
-            if (bidirectional_int == 2) {
-                param_size = 1;
-                in_wei_vec = param_vector[num + (num_offset / bidirectional_int)].sizes().vec();
-                for (int i = 0; i < in_wei_vec.size(); ++i) {
-                    param_size *= in_wei_vec[i];
-                }
-                param = at::from_blob((_Float16*)(weight_buffer.data_ptr()) + offset, {static_cast<long>(param_size)},
-                                      weight_buffer.options());
-                sliced_tensor = param_vector[num + (num_offset / bidirectional_int)].chunk(4, 0);
-                permuted_wei = at::cat({sliced_tensor[0], sliced_tensor[1], sliced_tensor[3], sliced_tensor[2]});
-                param.copy_(permuted_wei.view_as(param));
-                offset += param_size;
-            }
-
-            param_size = 1;
-            in_wei_vec = param_vector[num + 1].sizes().vec();
-            for (int i = 0; i < in_wei_vec.size(); ++i) {
-                param_size *= in_wei_vec[i];
-            }
-            param = at::from_blob((_Float16*)(weight_buffer.data_ptr()) + offset, {static_cast<long>(param_size)},
-                                  weight_buffer.options());
-            sliced_tensor = param_vector[num + 1].chunk(4, 0);
-            permuted_wei = at::cat({sliced_tensor[0], sliced_tensor[1], sliced_tensor[3], sliced_tensor[2]});
-            param.copy_(permuted_wei.view_as(param));
-            offset += param_size;
-
-            if (bidirectional_int == 2) {
-                param_size = 1;
-                in_wei_vec = param_vector[num + (num_offset / bidirectional_int) + 1].sizes().vec();
-                for (int i = 0; i < in_wei_vec.size(); ++i) {
-                    param_size *= in_wei_vec[i];
-                }
-                param = at::from_blob((_Float16*)(weight_buffer.data_ptr()) + offset, {static_cast<long>(param_size)},
-                                      weight_buffer.options());
-                sliced_tensor = param_vector[num + (num_offset / bidirectional_int) + 1].chunk(4, 0);
-                permuted_wei = at::cat({sliced_tensor[0], sliced_tensor[1], sliced_tensor[3], sliced_tensor[2]});
-                param.copy_(permuted_wei.view_as(param));
-                offset += param_size;
-            }
-        }
+        processWeights(2);
     }
 
     if (layer_type == nn_compiler::ir::LayerType::ATENLSTM1) {
