@@ -713,7 +713,7 @@ void customAtenAddmm(std::string act_type, at::Tensor &self_tensor, at::Tensor &
         // the dims of mat1_shape and mat2_shape are 4
         int num = mat2_shape[0] * mat2_shape[1] * mat2_shape[3];
         const char *env_k = std::getenv("ENABLE_PIM");
-        if (num > DIM_OUT_PIM && env_k != nullptr && *env_k == 1) {
+        if (num > DIM_OUT_PIM && env_k != nullptr && *env_k == '1') {
             float alpha = 1.0f;
             float beta = 0.0f;
 
@@ -884,7 +884,7 @@ void customAtenMatmul(at::Tensor &self_tensor, at::Tensor &other_tensor, torch::
         // the dims of self_shape and other_shape are 4
         int num = other_shape[0] * other_shape[1] * other_shape[3];
         const char *env_k = std::getenv("ENABLE_PIM");
-        if (num > DIM_OUT_PIM && env_k != nullptr && *env_k == 1) {
+        if (num > DIM_OUT_PIM && env_k != nullptr && *env_k == '1') {
             if (!self_tensor.is_contiguous()) self_tensor = self_tensor.contiguous();
             if (!other_tensor.is_contiguous()) other_tensor = other_tensor.contiguous();
             int n = self_shape[0] > other_shape[0] ? self_shape[0] : other_shape[0];
