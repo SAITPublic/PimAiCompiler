@@ -12,6 +12,8 @@
 #include "frontend/optimizer/remove_cat_for_addmm.h"
 #include "ir/include/utils/graph_util.h"
 
+#include <iostream>
+
 namespace nn_compiler
 {
 namespace frontend
@@ -148,6 +150,11 @@ void RemoveCatForAddmm::reorganize_graph(std::unique_ptr<nn_compiler::ir::NNMode
         model->addSTensor(std::make_pair(constant_out_stensor1->getID(), constant_out_stensor1));
         addmm_layer->renewInSTensorID(2, constant_out_stensor1->getID());
 
+        model->updateLayerRelationShips(out_stensor1_id, list_construct_layer, addmm_layer);
+        auto constant_out_stensor1_id = constant_out_stensor1->getID();
+        model->addLayerRelationShips(constant_out_stensor1_id, new_constant_layer1);
+        model->addLayerRelationShips(constant_out_stensor1_id, addmm_layer);
+
         // create second addmm Op
         auto new_addmm_layer =
             std::make_shared<nn_compiler::ir::AtenAddmmLayer>("", nn_compiler::ir::LayerType::ATENADDMM);
@@ -156,6 +163,8 @@ void RemoveCatForAddmm::reorganize_graph(std::unique_ptr<nn_compiler::ir::NNMode
         auto new_addmm_out_stensor = std::make_shared<nn_compiler::ir::STensor>();
         new_addmm_layer->addOutSTensorID(new_addmm_out_stensor->getID());
         model->addSTensor(std::make_pair(new_addmm_out_stensor->getID(), new_addmm_out_stensor));
+
+        model->addLayerRelationShips(new_addmm_out_stensor->getID(), new_addmm_layer);
 
         // update second addmm Op
         new_addmm_layer->addInSTensorID(addmm_layer->getOutSTensorID()[0]);
@@ -169,10 +178,19 @@ void RemoveCatForAddmm::reorganize_graph(std::unique_ptr<nn_compiler::ir::NNMode
         new_constant_layer2->addOutSTensorID(constant_out_stensor2->getID());
         new_addmm_layer->addInSTensorID(constant_out_stensor2->getID());
 
+        model->updateLayerRelationShips(out_stensor2_id, list_construct_layer, new_addmm_layer);
+        auto constant_out_stensor2_id = constant_out_stensor2->getID();
+        model->addLayerRelationShips(constant_out_stensor2_id, new_constant_layer2);
+        model->addLayerRelationShips(constant_out_stensor2_id, new_addmm_layer);
+
         // update output of second addmm Op
         for (auto block_output : block_outputs) {
             for (auto idx : block_output.second) {
+                std::cout << block_output.first->getName() << ": " << idx << std::endl;
                 block_output.first->renewInSTensorID(idx, new_addmm_out_stensor->getID());
+
+                model->updateLayerRelationShips(addmm_layer->getOutSTensorID()[0], block_output.first, new_addmm_layer);
+                model->addLayerRelationShips(new_addmm_out_stensor->getID(), block_output.first);
             }
         }
     }
