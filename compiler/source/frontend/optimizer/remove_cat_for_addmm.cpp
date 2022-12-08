@@ -12,8 +12,6 @@
 #include "frontend/optimizer/remove_cat_for_addmm.h"
 #include "ir/include/utils/graph_util.h"
 
-#include <iostream>
-
 namespace nn_compiler
 {
 namespace frontend
@@ -76,32 +74,29 @@ std::vector<std::shared_ptr<nn_compiler::ir::NNLayer>> RemoveCatForAddmm::create
 
     float16 origin_data[shape_of_matmul_weight_[0]][shape_of_matmul_weight_[1]];
     for (auto i = 0; i < shape_of_matmul_weight_[0]; i++) {
-        auto idx_in_vec = i + y_stride - 1;
+        auto idx_in_vec = i * x_stride;
         for (auto j = 0; j < shape_of_matmul_weight_[1]; j++) {
             origin_data[i][j] = (*origin_data_vec)[idx_in_vec];
-            idx_in_vec += x_stride;
+            idx_in_vec += y_stride;
         }
     }
 
-    std::vector<float16> contiguous_data_vec;
+    std::vector<float16> new_data1;
+    std::vector<float16> new_data2;
+    std::vector<nn_compiler::ir::STensor> data_shapes;
+    data_shapes.push_back(nn_compiler::ir::STensor({0, 0, shape_of_matmul_weight_[0], shape_of_inputs_[0][1]}));
+    data_shapes.push_back(nn_compiler::ir::STensor({0, 0, shape_of_matmul_weight_[0], shape_of_inputs_[1][1]}));
+
     for (auto i = 0; i < shape_of_matmul_weight_[0]; i++) {
         for (auto j = 0; j < shape_of_matmul_weight_[1]; j++) {
-            contiguous_data_vec.push_back(origin_data[i][j]);
+            if (j < shape_of_inputs_[0][1]) {
+                new_data1.push_back(origin_data[i][j]);
+            } else {
+                new_data2.push_back(origin_data[i][j]);
+            }
         }
     }
-
-    std::vector<std::vector<float16>> new_data;
-    std::vector<nn_compiler::ir::STensor> data_shapes;
-    int data_start = 0, data_amount = 0;
-    for (auto shape_of_input : shape_of_inputs_) {
-        data_amount += shape_of_input[1] * shape_of_matmul_weight_[1];
-        std::vector<float16> new_vec{(contiguous_data_vec.begin() + data_start),
-                                     (contiguous_data_vec.begin() + data_amount)};
-        new_data.push_back(new_vec);
-        std::vector<int32_t> tensor_shape = {0, 0, shape_of_input[1], shape_of_matmul_weight_[1]};
-        data_shapes.push_back(nn_compiler::ir::STensor(tensor_shape));
-        data_start = data_amount;
-    }
+    std::vector<std::vector<float16>> new_data{new_data1, new_data2};
 
     for (auto idx = 0; idx < new_data.size(); idx++) {
         auto type = nn_compiler::ir::LayerType::PRIMCONSTANT;
@@ -186,7 +181,6 @@ void RemoveCatForAddmm::reorganize_graph(std::unique_ptr<nn_compiler::ir::NNMode
         // update output of second addmm Op
         for (auto block_output : block_outputs) {
             for (auto idx : block_output.second) {
-                std::cout << block_output.first->getName() << ": " << idx << std::endl;
                 block_output.first->renewInSTensorID(idx, new_addmm_out_stensor->getID());
 
                 model->updateLayerRelationShips(addmm_layer->getOutSTensorID()[0], block_output.first, new_addmm_layer);

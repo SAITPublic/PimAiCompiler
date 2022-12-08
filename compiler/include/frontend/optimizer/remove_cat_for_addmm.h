@@ -76,7 +76,7 @@ class RemoveCatForAddmm : public Pass
     // TODO: remove hard code of tensor shapes
     std::vector<std::vector<int>> shape_of_inputs_ = {{1, 1024}, {1, 320}};
 
-    std::vector<int> shape_of_matmul_weight_ = {1344, 512};
+    std::vector<int> shape_of_matmul_weight_ = {512, 1344};
 
     std::vector<std::shared_ptr<nn_compiler::ir::NNLayer>> create_new_constants(
         std::shared_ptr<nn_compiler::ir::PrimConstantLayer> old_constant_layer);
